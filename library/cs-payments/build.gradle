@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+version = "${project.ext.projectVersion}"
+status = 'integration'
+
+sourceCompatibility = 11
+
+dependencies {
+    api("com.cybersource:flex-server-sdk:${project.ext.cybersourceFlexServerVersion}")
+    api("com.cybersource:cybersource-sdk-java:${project.ext.cybersourceVersion}")
+    api("com.commercetools.sdk.jvm.core:commercetools-models:${project.ext.commerceToolsVersion}")
+    api("com.commercetools.sdk.jvm.core:commercetools-java-client:${project.ext.commerceToolsVersion}") {
+        exclude group: 'org.asynchttpclient', module: 'async-http-client'
+    }
+    implementation("org.asynchttpclient:async-http-client:${project.ext.asyncHttpClientVersion}")
+
+    implementation("commons-beanutils:commons-beanutils:${project.ext.beanUtilsVersion}")
+    implementation("org.slf4j:slf4j-api:${project.ext.slf4jVersion}")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+jar {
+    archivesBaseName = "cs-payments"
+}

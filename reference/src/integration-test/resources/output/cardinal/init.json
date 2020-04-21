@@ -1,0 +1,32 @@
+{
+  "BrowserPayload": {
+    "Order": {
+      "OrderDetails": {},
+      "Consumer": {
+        "BillingAddress": {},
+        "ShippingAddress": {},
+        "Account": {}
+      },
+      "Cart": [],
+      "Token": {},
+      "Authorization": {},
+      "Options": {},
+      "CCAExtension": {}
+    },
+    "SupportsAlternativePayments": {
+      "cca": true,
+      "hostedFields": false,
+      "applepay": false,
+      "discoverwallet": false,
+      "wallet": false,
+      "paypal": false,
+      "visacheckout": false
+    }
+  },
+  "Client": {
+    "Agent": "SongbirdJS",
+    "Version": "1.29.1"
+  },
+  "ConsumerSessionId": null,
+  "ServerJWT": "${requestJwt}"
+}

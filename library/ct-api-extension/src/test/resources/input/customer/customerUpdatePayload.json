@@ -1,0 +1,39 @@
+{
+  "action": "Update",
+  "resource": {
+    "typeId": "customer",
+    "id": "6d8d1db6-bade-464a-9bc8-c0e962699a5f",
+    "obj": {
+      "id": "6d8d1db6-bade-464a-9bc8-c0e962699a5f",
+      "version": 3,
+      "lastMessageSequenceNumber": 2,
+      "createdAt": "2019-09-03T01:43:27.577Z",
+      "lastModifiedAt": "2019-09-03T01:43:27.577Z",
+      "lastModifiedBy": {
+        "clientId": "YD0c7sgHzKzLbwgQl4AKLFvs",
+        "isPlatformClient": false
+      },
+      "createdBy": {
+        "clientId": "YD0c7sgHzKzLbwgQl4AKLFvs",
+        "isPlatformClient": false
+      },
+      "email": "cybersource-commercetools-extension@example.com",
+      "firstName": "other",
+      "lastName": "last",
+      "password": "Nb5xTL2RKcTg3013HHZfUa7vC4xxdYr1CxwKqNwKKOQ=$ed/Kd17yE9TukGfLSCB3jTg00YyjN7xZGaVOcooUc8A=",
+      "addresses": [
+        {
+          "id": "4Gb_czMs",
+          "streetName": "shipping street",
+          "streetNumber": "37",
+          "country": "GB",
+          "key": "address_key"
+        }
+      ],
+      "shippingAddressIds": [],
+      "billingAddressIds": [],
+      "isEmailVerified": false,
+      "stores": []
+    }
+  }
+}

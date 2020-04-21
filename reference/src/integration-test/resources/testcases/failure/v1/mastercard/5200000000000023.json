@@ -1,0 +1,18 @@
+{
+  "description": "V1 Mastercard: Unsuccessful Authentication",
+  "cardType": "Mastercard",
+  "cardNumber": "5200000000000023",
+  "fieldCount": 6,
+  "specificationVersion": "1.0.2",
+  "authenticationResult": "9",
+  "authenticationStatusMessage": "User failed authentication",
+  "paResStatus": "N",
+  "commerceIndicator": null,
+  "eciRaw": "00",
+  "eci": null,
+  "cavvAlgorithm": null,
+  "collectionIndicator": null,
+  "expectXid": true,
+  "expectCavv": false,
+  "expectAav": false
+}

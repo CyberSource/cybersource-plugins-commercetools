@@ -1,0 +1,64 @@
+{
+  "action": "Update",
+  "resource": {
+    "typeId": "payment",
+    "id": "911d0e6b-218a-4c3c-a542-d5c45db8a170",
+    "obj": {
+      "amountPlanned": {
+        "type": "centPrecision",
+        "centAmount": 549,
+        "currencyCode": "GBP"
+      },
+      "createdAt": "2019-10-10T08:28:24.379Z",
+      "custom": {
+        "type": {
+          "typeId": "type",
+          "id": "ab3cc368-7a40-43b8-a629-7baadc4671e2"
+        },
+        "fields": {
+          "cs_maskedPan": "something",
+          "cs_cardExpiryYear": "2022",
+          "cs_token": "something",
+          "cs_cardExpiryMonth": "01",
+          "cs_cardType": "Visa",
+          "cs_deviceFingerprintId": "fingerprint"
+        }
+      },
+      "customer": {
+        "typeId": "customer",
+        "id": "customer-with-accept-address"
+      },
+      "id": "911d0e6b-218a-4c3c-a542-d5c45db8a170",
+      "interfaceInteractions": [
+        {
+          "type": {
+            "typeId": "type",
+            "id": "${enrolmentCheckDataTypeId}"
+          },
+          "fields": {
+            "authenticationRequired": true
+      }
+      }
+      ],
+      "lastModifiedAt": "2019-10-10T08:28:32.994Z",
+      "paymentMethodInfo": {
+        "paymentInterface": "cybersource",
+        "method": "creditCard"
+      },
+      "paymentStatus": {},
+      "transactions": [
+        {
+          "amount": {
+            "type": "centPrecision",
+            "centAmount": 549,
+            "currencyCode": "GBP"
+          },
+          "id": "8788176c-e42f-4544-aeaf-a155e1232292",
+          "state": "Initial",
+          "type": "Authorization"
+        }
+      ],
+      "version": 8
+    }
+  }
+}

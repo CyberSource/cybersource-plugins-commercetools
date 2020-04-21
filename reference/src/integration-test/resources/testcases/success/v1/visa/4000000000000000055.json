@@ -1,0 +1,18 @@
+{
+  "description": "V1 Visa: Incomplete Authentication",
+  "cardType": "Visa",
+  "cardNumber": "4000000000000000055",
+  "fieldCount": 8,
+  "specificationVersion": "1.0.2",
+  "authenticationResult": "6",
+  "authenticationStatusMessage": "Issuer unable to perform authentication",
+  "paResStatus": "U",
+  "commerceIndicator": "vbv_failure",
+  "eciRaw": "07",
+  "eci": "07",
+  "cavvAlgorithm": null,
+  "collectionIndicator": null,
+  "expectXid": true,
+  "expectCavv": false,
+  "expectAav": false
+}

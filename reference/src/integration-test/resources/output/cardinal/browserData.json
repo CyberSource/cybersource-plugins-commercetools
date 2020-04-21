@@ -1,0 +1,60 @@
+{
+  "BinConfigIdentifiers": null,
+  "Cookies": {
+    "Legacy": false,
+    "LocalStorage": null,
+    "SessionStorage": true
+  },
+  "DeviceChannel": "Browser",
+  "Extended": {
+    "Browser": {
+      "Adblock": true,
+      "AvailableJsFonts": [],
+      "DoNotTrack": "unspecified",
+      "JavaEnabled": false
+    },
+    "Device": {
+      "ColorDepth": 24,
+      "Cpu": "unknown",
+      "Platform": "MacIntel",
+      "TouchSupport": {
+        "MaxTouchPoints": 0,
+        "OnTouchStartAvailable": false,
+        "TouchEventCreationSuccessful": false
+      }
+    }
+  },
+  "Fingerprint": "fec7728f8abd705c5fa59c9c2cf5fb74",
+  "FingerprintingTime": 74,
+  "FingerprintDetails": {
+    "Version": "1.5.1"
+  },
+  "Language": "en-GB",
+  "Latitude": null,
+  "Longitude": null,
+  "OrgUnitId": "${orgUnitId}",
+  "Origin": "Songbird",
+  "Plugins": [
+    "Shockwave Flash::Shockwave Flash 32.0 r0::application/x-shockwave-flash~swf,application/futuresplash~spl"
+  ],
+  "ReferenceId": "${cardinalReferenceId}",
+  "Referrer": "http://localhost:8181/authorise?enable3d=true",
+  "Screen": {
+    "FakedResolution": false,
+    "Ratio": 1.7777777777777777,
+    "Resolution": "2560x1440",
+    "UsableResolution": "2560x1348",
+    "CCAScreenSize": "03"
+  },
+  "ThreatMetrixEnabled": "false",
+  "ThreatMetrixEventType": "PAYMENT",
+  "ThreatMetrixAlias": "Default",
+  "ThreeDSServerTransId": null,
+  "TimeOffset": -600,
+  "UserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:69.0) Gecko/20100101 Firefox/69.0",
+  "UserAgentDetails": {
+    "FakedOS": false,
+    "FakedBrowser": false
+  },
+  "BinSessionId": null
+}

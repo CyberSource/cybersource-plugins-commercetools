@@ -1,0 +1,12 @@
+{
+  "priority": 2,
+  "name": "retrieveRejectAddressCart",
+  "request": {
+    "urlPattern": "/.*/carts\\?where=customerId%3D%22customer-with-reject-address.*",
+    "method": "GET"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "cartWithRejectAddress.json"
+  }
+}

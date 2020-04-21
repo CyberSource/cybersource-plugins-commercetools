@@ -1,0 +1,12 @@
+{
+  "priority": 2,
+  "name": "retrieveMissingBillingAddressCart",
+  "request": {
+    "urlPattern": "/.*/carts\\?where=customerId%3D%22customer-with-address-missing-billing-fields.*",
+    "method": "GET"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "cartWithMissingBillingFields.json"
+  }
+}

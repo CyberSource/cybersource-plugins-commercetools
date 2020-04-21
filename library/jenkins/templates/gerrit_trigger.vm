@@ -1,0 +1,103 @@
+<flow-definition plugin="workflow-job">
+    <actions>
+        <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition"/>
+        <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition">
+            <jobProperties/>
+            <triggers/>
+            <parameters/>
+        </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+    </actions>
+    <description>$description</description>
+    <keepDependencies>false</keepDependencies>
+    <properties>
+        <jenkins.model.BuildDiscarderProperty>
+            <strategy class="hudson.tasks.LogRotator">
+                <daysToKeep>$daysToKeep</daysToKeep>
+                <numToKeep>$numToKeep</numToKeep>
+                <artifactDaysToKeep>-1</artifactDaysToKeep>
+                <artifactNumToKeep>-1</artifactNumToKeep>
+            </strategy>
+        </jenkins.model.BuildDiscarderProperty>
+        <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+            <triggers>
+                <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger plugin="gerrit-trigger">
+                    <spec/>
+                    <gerritProjects>
+                        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+                            <compareType>$projectType</compareType>
+                            <pattern>$projectPattern</pattern>
+                            <branches>
+                                <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+                                    <compareType>$branchType</compareType>
+                                    <pattern>$branchPattern</pattern>
+                                </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+                            </branches>
+                            <disableStrictForbiddenFileVerification>false</disableStrictForbiddenFileVerification>
+                        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+                    </gerritProjects>
+                    <dynamicGerritProjects class="empty-list"/>
+                    <skipVote>
+                        <onSuccessful>false</onSuccessful>
+                        <onFailed>false</onFailed>
+                        <onUnstable>false</onUnstable>
+                        <onNotBuilt>false</onNotBuilt>
+                    </skipVote>
+                    <silentMode>false</silentMode>
+                    <notificationLevel/>
+                    <silentStartMode>false</silentStartMode>
+                    <escapeQuotes>true</escapeQuotes>
+                    <nameAndEmailParameterMode>PLAIN</nameAndEmailParameterMode>
+                    <dependencyJobsNames/>
+                    <commitMessageParameterMode>BASE64</commitMessageParameterMode>
+                    <changeSubjectParameterMode>PLAIN</changeSubjectParameterMode>
+                    <commentTextParameterMode>BASE64</commentTextParameterMode>
+                    <buildStartMessage/>
+                    <buildFailureMessage/>
+                    <buildSuccessfulMessage/>
+                    <buildUnstableMessage/>
+                    <buildNotBuiltMessage/>
+                    <buildUnsuccessfulFilepath/>
+                    <customUrl/>
+                    <serverName>$gerritServerName</serverName>
+                    <triggerOnEvents>
+                        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.events.PluginDraftPublishedEvent/>
+                        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.events.PluginPatchsetCreatedEvent>
+                            <excludeDrafts>true</excludeDrafts>
+                            <excludeTrivialRebase>true</excludeTrivialRebase>
+                            <excludeNoCodeChange>true</excludeNoCodeChange>
+                        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.events.PluginPatchsetCreatedEvent>
+                    </triggerOnEvents>
+                    <dynamicTriggerConfiguration>false</dynamicTriggerConfiguration>
+                    <triggerConfigURL/>
+                    <triggerInformationAction/>
+                </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+            </triggers>
+        </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+    </properties>
+    <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps">
+        <scm class="hudson.plugins.git.GitSCM" plugin="git">
+            <configVersion>2</configVersion>
+            <userRemoteConfigs>
+                <hudson.plugins.git.UserRemoteConfig>
+                    <refspec>$GERRIT_REFSPEC:$GERRIT_REFSPEC</refspec>
+                    <url>
+                        $gitRepoURL
+                    </url>
+                    <credentialsId>$gitRepoCredentials</credentialsId>
+                </hudson.plugins.git.UserRemoteConfig>
+            </userRemoteConfigs>
+            <branches>
+                <hudson.plugins.git.BranchSpec>
+                    <name>$GERRIT_REFSPEC</name>
+                </hudson.plugins.git.BranchSpec>
+            </branches>
+            <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+            <submoduleCfg class="list"/>
+            <extensions/>
+        </scm>
+        <scriptPath>$scriptPath</scriptPath>
+        <lightweight>false</lightweight>
+    </definition>
+    <triggers/>
+    <disabled>false</disabled>
+</flow-definition>

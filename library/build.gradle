@@ -1,0 +1,46 @@
+plugins {
+    id 'maven-publish'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'pmd'
+    apply plugin: 'codenarc'
+    apply plugin: 'maven-publish'
+
+    apply from: "${rootDir}/version-info.gradle"
+
+    project.group = 'com.cybersource'
+
+    idea {
+       module {
+          jdkName = '11'
+          sourceDirs += file('src/main/java')
+          resourceDirs += file('src/main/resources')
+       }
+    }
+
+    pmd {
+        ruleSets = []
+        ruleSetFiles = files("${rootDir}/analysis/pmd.xml")
+    }
+
+    codenarc {
+        configFile = project.file("${rootDir}/analysis/codenarc.xml")
+    }
+
+    dependencies {
+        testCompile("org.codehaus.groovy:groovy-all:${project.ext.groovyVersion}")
+        testCompile("org.spockframework:spock-core:${project.ext.spockVersion}") {
+            exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        }
+        testCompile("cglib:cglib-nodep:${project.ext.cglibVersion}")
+        testCompile("org.objenesis:objenesis:${project.ext.objenesisVersion}")
+    }
+
+}

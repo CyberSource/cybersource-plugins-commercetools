@@ -1,0 +1,37 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+version = "${project.ext.projectVersion}"
+status = 'integration'
+
+sourceCompatibility = 11
+
+dependencies {
+    api project(":cs-payments")
+
+    implementation("org.slf4j:slf4j-api:${project.ext.slf4jVersion}")
+
+    testImplementation("org.codehaus.groovy:groovy-all:${project.ext.groovyVersion}")
+    testImplementation("org.spockframework:spock-core:${project.ext.spockVersion}") {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+jar {
+    archivesBaseName = "cs-ct-mapping"
+}

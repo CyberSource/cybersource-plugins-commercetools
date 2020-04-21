@@ -1,0 +1,11 @@
+{
+  "priority": 2,
+  "name" : "proxy",
+  "request" : {
+    "url" : "/commerce/1.x/transactionProcessor",
+    "method" : "POST"
+  },
+  "response": {
+    "proxyBaseUrl" : "https://ics2wstest.ic3.com"
+  }
+}

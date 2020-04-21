@@ -1,0 +1,18 @@
+{
+  "description": "V2 Visa: Unsuccessful Step Up Authentication",
+  "cardType": "Visa",
+  "cardNumber": "4000000000001109",
+  "fieldCount": 6,
+  "specificationVersion": "2.",
+  "authenticationResult": "9",
+  "authenticationStatusMessage": "User failed authentication",
+  "paResStatus": "N",
+  "commerceIndicator": null,
+  "eciRaw": "07",
+  "eci": null,
+  "cavvAlgorithm": null,
+  "collectionIndicator": null,
+  "expectXid": false,
+  "expectCavv": false,
+  "expectAav": false
+}

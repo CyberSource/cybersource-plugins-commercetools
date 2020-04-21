@@ -1,0 +1,43 @@
+{
+  "action": "Create",
+  "resource": {
+    "typeId": "payment",
+    "id": "b3308ae7-b464-4b32-ad6e-aee03d359dfb",
+    "obj": {
+      "amountPlanned": {
+        "type": "centPrecision",
+        "centAmount": 549,
+        "currencyCode": "GBP"
+      },
+      "createdAt": "1970-01-01T00:00:00.000Z",
+      "custom": {
+        "type": {
+          "typeId": "type",
+          "id": "9acb3017-df1e-439e-bf10-450e04a86609"
+        },
+        "fields": {
+          "cs_cardExpiryMonth": "01",
+          "cs_cardExpiryYear": "2022",
+          "cs_cardType": "something",
+          "cs_requestJwt": "something",
+          "cs_maskedPan": "something",
+          "cs_token": "something"
+        }
+      },
+      "customer": {
+        "typeId": "customer",
+        "id": "customer-with-address-missing-auth-fields"
+      },
+      "id": "b3308ae7-b464-4b32-ad6e-aee03d359dfb",
+      "interfaceInteractions": [],
+      "lastModifiedAt": "1970-01-01T00:00:00.000Z",
+      "paymentMethodInfo": {
+        "paymentInterface": "cybersource",
+        "method": "creditCardWithPayerAuthentication"
+      },
+      "paymentStatus": {},
+      "transactions": [],
+      "version": 1
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "priority": 1,
+  "name": "retrieveErrorCart",
+  "request": {
+    "urlPattern": "/.*/carts\\?where=customerId.*",
+    "method": "GET"
+  },
+  "response": {
+    "status": 500
+  }
+}

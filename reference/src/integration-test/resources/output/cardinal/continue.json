@@ -1,0 +1,26 @@
+{
+  "BrowserPayload": {
+    "PaymentType": "CCA",
+    "Order": {
+      "OrderDetails": {
+        "TransactionId": "${authenticationTransactionId}"
+      },
+      "Consumer": {
+        "BillingAddress": {},
+        "ShippingAddress": {},
+        "Account": {}
+      },
+      "Cart": [],
+      "Token": {},
+      "Authorization": {},
+      "Options": {},
+      "CCAExtension": {}
+    }
+  },
+  "Client": {
+    "Agent": "SongbirdJS",
+    "Version": "1.29.1"
+  },
+  "ConsumerSessionId": "${consumerSessionId}",
+  "ServerJWT": "${requestJwt}"
+}
