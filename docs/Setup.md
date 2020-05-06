@@ -18,6 +18,10 @@ The following section contains steps to get started with an generic
 integration between commercetools and CyberSource using the provided
 Spring Boot reference implementation.
 
+## 0. Prerequisites
+
+  - An installation of a Java Development Kit (JDK) version 11 (currently tested against the Zulu Community builds of OpenJDK: https://www.azul.com/downloads/zulu-community)
+
 ## 1. Create Access Keys
 
 To allow access to both commercetools and CyberSource authorisation is

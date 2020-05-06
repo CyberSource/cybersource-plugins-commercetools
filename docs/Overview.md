@@ -34,6 +34,8 @@ with Cybersource to carry out various actions depending on the payment
 state, making further updates to the Commercetools payment as
 appropriate when Cybersource has processed the request.
 
+It is intended that when using the reference application the developer would consider how the application should be secured, ran and scaled before it is exposed to the outside world. The reference application provides a reference for functional integration only.
+
 # <a name="Modules"></a>Modules
 
 The project consists of the following modules:
@@ -59,12 +61,12 @@ Description
 <td style="text-align: left;">Various libraries for interacting with Commercetools and Cybersource</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">spring-boot-impl</td>
+<td style="text-align: left;">reference</td>
 <td style="text-align: left;">Spring Boot reference application that uses the libraries above to provide a functional commercetools API Extension.<br />
 Also provides service for creation of Cybersource one-time keys and JWT tokens for Cardinal, although this can be extracted to its own service if needed.</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">sync-impl</td>
+<td style="text-align: left;">sync</td>
 <td style="text-align: left;">Example application demoing synchronisation of payments between Commercetools and Cybersource</td>
 </tr>
 </tbody>
