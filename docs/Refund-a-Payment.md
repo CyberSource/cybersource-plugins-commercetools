@@ -1,16 +1,5 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Refund a Payment
 
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 ## Process
 
@@ -24,10 +13,3 @@ To reverse a payment:
 
 A successful refund will change the INITIAL REFUND to a SUCCESS REFUND transaction, adding the Credit Request ID onto the transaction as an `interactionId`
 
-</div>
-
-</div>
-
-</div>
-
-</div>

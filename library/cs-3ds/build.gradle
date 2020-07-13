@@ -17,8 +17,7 @@ dependencies {
     api project(":cs-payments")
     api project(":cs-ct-mapping")
 
-    api("io.jsonwebtoken:jjwt:${project.ext.jwtVersion}")
-
+    implementation("io.jsonwebtoken:jjwt:${project.ext.jwtVersion}")
     implementation("com.cybersource:cybersource-sdk-java:${project.ext.cybersourceVersion}")
     implementation("javax.xml.bind:jaxb-api:${project.ext.jaxbApiVersion}")
 }

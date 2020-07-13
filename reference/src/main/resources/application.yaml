@@ -33,6 +33,14 @@ cybersource:
     logDirectory: .
     logMaximumSize: 10
     certificateCacheEnabled: true
+    runEnvironment: CyberSource.Environment.SANDBOX
+    authenticationType: http_signature
+    merchantKeyId: ${env.cybersource.sharedSecret.id}
+    merchantsecretKey: ${secrets.cybersource.sharedSecret.value}
+  flex:
+    targetOrigins: ${env.cybersource.flex.targetOrigins}
+    verificationKey: ${env.cybersource.flex.verificationKey}
+    connectTimeout: 5000
 
 cardinal:
   apiKey: ${secrets.cardinal.apiKey}

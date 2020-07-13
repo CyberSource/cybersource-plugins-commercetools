@@ -1,16 +1,4 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Setup
-
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 # Getting Started With The Reference Application
 
@@ -75,11 +63,3 @@ implementations will be different.
   - For setting up the client-side application to work with Visa
     Checkout, use the following guide: [Visa Checkout
     Setup](Visa-Checkout-Setup.md)
-
-</div>
-
-</div>
-
-</div>
-
-</div>

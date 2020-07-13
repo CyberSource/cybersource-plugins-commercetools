@@ -1,16 +1,4 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Reverse a Payment
-
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 ## Process
 
@@ -23,11 +11,3 @@ To reverse a payment:
   - Update the payment, adding an INITIAL CANCEL\_AUTHORIZATION transaction onto the payment with an amount matching the amount of the authorization being reversed
 
 A successful reversal will change the INITIAL CANCEL\_AUTHORIZATION to a SUCCESS CANCEL\_AUTHORIZATION transaction, adding the Reversal Request ID onto the transaction as an `interactionId`
-
-</div>
-
-</div>
-
-</div>
-
-</div>

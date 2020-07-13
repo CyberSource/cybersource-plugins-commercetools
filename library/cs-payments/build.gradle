@@ -14,7 +14,7 @@ status = 'integration'
 sourceCompatibility = 11
 
 dependencies {
-    api("com.cybersource:flex-server-sdk:${project.ext.cybersourceFlexServerVersion}")
+    api("com.cybersource:cybersource-rest-client-java:${cybersourceRestClientVersion}")
     api("com.cybersource:cybersource-sdk-java:${project.ext.cybersourceVersion}")
     api("com.commercetools.sdk.jvm.core:commercetools-models:${project.ext.commerceToolsVersion}")
     api("com.commercetools.sdk.jvm.core:commercetools-java-client:${project.ext.commerceToolsVersion}") {

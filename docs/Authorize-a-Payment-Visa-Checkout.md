@@ -1,16 +1,4 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Authorize a Payment (Visa Checkout)
-
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 ## Visa Checkout Authorisation Sequence Diagram
 
@@ -23,143 +11,52 @@ Visa Checkout implementation does not currently support 3DS. See 'Using 3D Secur
 
 ⚠️ **Shipping Address
 The shipping address should be acquired from Visa Checkout. This can be set via the `init` javascript:**
-```javascript
-V.init({
-  apikey: "...",
-  paymentRequest: {
-    currencyCode: "GBP",
-    subtotal: "..."
-  },
-  settings: {
-    shipping: {
-      collectShipping: "true",
-      acceptedRegions: ["GB"]
-    }
-  }
-});
-```
+
+	V.init({
+	  apikey: "...",
+	  paymentRequest: {
+	    currencyCode: "GBP",
+	    subtotal: "..."
+	  },
+	  settings: {
+	    shipping: {
+	      collectShipping: "true",
+	      acceptedRegions: ["GB"]
+	    }
+	  }
+	});
+
 **If this method of collecting the shipping address is not used, a shipping address should be set on the cart before authorizing payment.**  
 
 1.  Create / prepare your cart
     
-    a.  Ensure your cart locale is set.
+	a.  Ensure your cart locale is set.
 
 2.  Create a commercetools payment
     (<https://docs.commercetools.com/http-api-projects-payments>) and
     populate the following
     
-    <div class="table-wrap">
-    
-    <div class="table-wrap">
-    
-    <table>
-    <thead>
-    <tr class="header">
-    <th style="text-align: left;"><div class="tablesorter-header-inner">
-    Property
-    </div></th>
-    <th style="text-align: left;"><div class="tablesorter-header-inner">
-    Value
-    </div></th>
-    <th style="text-align: left;"><div class="tablesorter-header-inner">
-    Required
-    </div></th>
-    <th style="text-align: left;"><div class="tablesorter-header-inner">
-    Notes
-    </div></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td style="text-align: left;">customer</td>
-    <td style="text-align: left;">Reference to commercetools customer</td>
-    <td style="text-align: left;">See notes</td>
-    <td style="text-align: left;">Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated</td>
-    </tr>
-    <tr class="even">
-    <td style="text-align: left;">anonymousId</td>
-    <td style="text-align: left;">Id for tracking guest checkout</td>
-    <td style="text-align: left;">See notes</td>
-    <td style="text-align: left;">Required for guest checkout. If using MyPayments API this will automatically be set. One of customer or anonymousId must be populated</td>
-    </tr>
-    <tr class="odd">
-    <td style="text-align: left;">paymentMethodInfo.paymentInterface</td>
-    <td style="text-align: left;">cybersource</td>
-    <td style="text-align: left;">Yes</td>
-    <td style="text-align: left;">Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated</td>
-    </tr>
-    <tr class="even">
-    <td style="text-align: left;">paymentMethodInfo.method</td>
-    <td style="text-align: left;">visaCheckout</td>
-    <td style="text-align: left;">Yes</td>
-    <td style="text-align: left;"><p>The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being used</p>
-    <p>Typically an implementation would choose one or the other and the method name may be different to this</p></td>
-    </tr>
-    <tr class="odd">
-    <td style="text-align: left;">amountPlanned</td>
-    <td style="text-align: left;">Amount to authorise</td>
-    <td style="text-align: left;">Yes</td>
-    <td style="text-align: left;">Should match cart gross total, unless split payments are being used</td>
-    </tr>
-    <tr class="even">
-    <td style="text-align: left;">custom.fields.cs_token</td>
-    <td style="text-align: left;">Visa Checkout callid</td>
-    <td style="text-align: left;">Yes</td>
-    <td style="text-align: left;">Obtain from the 'callid' field on a successful Visa Checkout response</td>
-    </tr>
-    </tbody>
-    </table>
-    
-    </div>
-    
-    </div>
+	|Property|Value|Required|Notes|
+	|--- |--- |--- |--- |
+	|customer|Reference to commercetools customer|See notes|Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated|
+	|anonymousId|Id for tracking guest checkout|See notes|Required for guest checkout. If using MyPayments API this will automatically be set. One of customer or anonymousId must be populated|
+	|paymentMethodInfo.paymentInterface|cybersource|Yes|Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated|
+	|paymentMethodInfo.method|visaCheckout|Yes|The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being used<br><br>Typically an implementation would choose one or the other and the method name may be different to this|
+	|amountPlanned|Amount to authorise|Yes|Should match cart gross total, unless split payments are being used|
+	|custom.fields.cs_token|Visa Checkout callid|Yes|Obtain from the 'callid' field on a successful Visa Checkout response|    
 
 3.  Add the payment to the cart
 
 4.  Add a transaction to the payment with the following values populated
     
-    <div class="table-wrap">
     
-    <div class="table-wrap">
+	| Property | Value               | Notes                                 |
+	| -------- | ------------------- | ------------------------------------- |
+	| type     | Authorization       |                                       |
+	| state    | Initial             |                                       |
+	| amount   | Amount to authorise | Should match amountPlanned on payment |
+
     
-    <table>
-    <thead>
-    <tr class="header">
-    <th style="text-align: left;"><div class="tablesorter-header-inner">
-    Property
-    </div></th>
-    <th style="text-align: left;"><div class="tablesorter-header-inner">
-    Value
-    </div></th>
-    <th style="text-align: left;"><div class="tablesorter-header-inner">
-    Notes
-    </div></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td style="text-align: left;">type</td>
-    <td style="text-align: left;">Authorization</td>
-    <td style="text-align: left;"><br />
-    </td>
-    </tr>
-    <tr class="even">
-    <td style="text-align: left;">state</td>
-    <td style="text-align: left;">Initial</td>
-    <td style="text-align: left;"><br />
-    </td>
-    </tr>
-    <tr class="odd">
-    <td style="text-align: left;">amount</td>
-    <td style="text-align: left;">Amount to authorise</td>
-    <td style="text-align: left;">Should match amountPlanned on payment</td>
-    </tr>
-    </tbody>
-    </table>
-    
-    </div>
-    
-    </div>
 
 5.  Verify the payment state
     
@@ -168,11 +65,3 @@ V.init({
     b.  See [Overview\#Errorhandling](Overview.md#Errorhandling) for handling errors or failures
 
 6.  Convey the payment result to the customer. If this is the only/final payment for this order you can transition your commercetools cart to an order at this point
-
-</div>
-
-</div>
-
-</div>
-
-</div>

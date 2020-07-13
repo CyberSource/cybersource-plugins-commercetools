@@ -1,16 +1,4 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Synchronising Payments
-
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 ## Overview
 
@@ -44,68 +32,56 @@ TODO
 #### Before and After Examples States
 
 ##### CT Payment
-```json
-{
-  "id": "123",
-  ...
-  "transactions": []
-}
-```
+	{
+	  "id": "123",
+	  ...
+	  "transactions": []
+	}
+
 ##### CS Transaction
-```json
-{
-  "searchId":"xyz",
-  "_embedded": {
-    "transactionSummaries":[
-      {
-        "id": "5707854284416758104010",
-        "applicationInformation": {
-          "applications": [
-            {
-              "name": "ics_auth",
-              "reasonCode": "100",
-              "rMessage": "Request was processed successfully.",
-            },
-            {
-              "name": "ics_bill",
-              "reasonCode": "100",
-              "rMessage": "Request was processed successfully.",
-            }
-          ]
-        },
-        "clientReferenceInformation": {
-          "code": "123",
-          "applicationName": "Simple Order API"
-        }
-      }
-    ]
-  }
-}
-```
+	{
+	  "searchId":"xyz",
+	  "_embedded": {
+	    "transactionSummaries":[
+	      {
+	        "id": "5707854284416758104010",
+	        "applicationInformation": {
+	          "applications": [
+	            {
+	              "name": "ics_auth",
+	              "reasonCode": "100",
+	              "rMessage": "Request was processed successfully.",
+	            },
+	            {
+	              "name": "ics_bill",
+	              "reasonCode": "100",
+	              "rMessage": "Request was processed successfully.",
+	            }
+	          ]
+	        },
+	        "clientReferenceInformation": {
+	          "code": "123",
+	          "applicationName": "Simple Order API"
+	        }
+	      }
+	    ]
+	  }
+	}
+
 ##### CT Payment After Synchronisation
-```json
-{
-  "id": "123",
-  ...
-  "transactions": [
-    {
-      "state": "Success",
-      "type": "Authorization",
-      "interactionId": "5707854284416758104010"
-    },
-    {
-      "state": "Success",
-      "type": "Capture",
-      "interactionId": "5707854284416758104010"
-    }
-  ]
-}
-```
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+	{
+	  "id": "123",
+	  ...
+	  "transactions": [
+	    {
+	      "state": "Success",
+	      "type": "Authorization",
+	      "interactionId": "5707854284416758104010"
+	    },
+	    {
+	      "state": "Success",
+	      "type": "Capture",
+	      "interactionId": "5707854284416758104010"
+	    }
+	  ]
+	}

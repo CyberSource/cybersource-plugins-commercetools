@@ -1,18 +1,4 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Overview
-
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
-
-<div class="toc-macro rbtoc1581891561172">
 
   - [Modules](#Modules)
   - [Architecture](#Architecture)
@@ -22,8 +8,6 @@
       - [Communications failure on Payment Create](#CommunicationsfailureonPaymentCreate)
       - [Cybersource request failures](#Cybersourcerequestfailures)
       - [API Extension errors](#APIExtensionerrors)
-
-</div>
 
 The Cybersource Commercetools integration is a set of libraries and a
 reference implementation that allows processing payments registered in
@@ -39,10 +23,6 @@ It is intended that when using the reference application the developer would con
 # <a name="Modules"></a>Modules
 
 The project consists of the following modules:
-
-<div class="table-wrap">
-
-<div class="table-wrap">
 
 <table>
 <thead>
@@ -72,10 +52,6 @@ Also provides service for creation of Cybersource one-time keys and JWT tokens f
 </tbody>
 </table>
 
-</div>
-
-</div>
-
 # <a name="Architecture"></a>Architecture
 
 The architecture of the implementation looks as follows - the dotted
@@ -86,10 +62,6 @@ lines show optional features of the implementation:
 # <a name="Endpoints"></a>Endpoints
 
 The reference application exposes the following endpoints
-
-<div class="table-wrap">
-
-<div class="table-wrap">
 
 <table>
 <thead>
@@ -145,11 +117,7 @@ This endpoint should be defined in Commercetools as the Payment Update API Exten
 </tbody>
 </table>
 
-</div>
-
 <span style="font-size: 1.714em;">Requirements and Design Decisions</span>
-
-</div>
 
 The Cybersource plugin assumes full control of the management of Payment
 resources. Due to this, there should be no manual modifications to
@@ -201,10 +169,3 @@ updated to contain a new interfaceInteraction of type
 'cybersource\_payment\_failure', containing a message from the exception
 that was thrown.
 
-</div>
-
-</div>
-
-</div>
-
-</div>

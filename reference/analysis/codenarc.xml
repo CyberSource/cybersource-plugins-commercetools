@@ -47,6 +47,9 @@
     </ruleset-ref>
     <ruleset-ref path='rulesets/serialization.xml' />
     <ruleset-ref path='rulesets/size.xml'>
+        <rule-config name='ParameterCount'>
+            <property name='maxParameters' value='6'/>
+        </rule-config>
         <exclude name='CrapMetric' />
         <exclude name='AbcMetric' />
     </ruleset-ref>

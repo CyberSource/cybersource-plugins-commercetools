@@ -19,6 +19,8 @@
           "cs_maskedPan": "${maskedPan}",
           "cs_cardExpiryYear": "2022",
           "cs_token": "${token}",
+          "cs_tokenVerificationContext": "${verificationContext}",
+          "cs_tokenAlias": "${tokenAlias}",
           "cs_cardExpiryMonth": "01",
           "cs_cardType": "${cardType}",
           "cs_customerIpAddress": "127.0.0.1"

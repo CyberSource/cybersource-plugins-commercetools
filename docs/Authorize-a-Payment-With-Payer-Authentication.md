@@ -1,16 +1,5 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Authorize a Payment (With Payer Authentication)
 
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 To authorize a payment with 3DS functionality, a payment should be created with the amount to authorise, a token representing the payment card and the billing address associated with the card.
 
@@ -31,77 +20,17 @@ After authentication is complete, authorisation of the payment can then be tri
         fields is as follows. If you require a different mapping this
         can be [customised](Customisation.md)
         
-        <div class="table-wrap">
-        
-        <table>
-        <thead>
-        <tr class="header">
-        <th>Commercetools address</th>
-        <th>Cybersource shipping fields</th>
-        <th>Cybersource billing fields</th>
-        <th>Notes</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr class="odd">
-        <td>firstName</td>
-        <td>shipTo_firstName</td>
-        <td>billTo_firstName</td>
-        <td><br />
-        </td>
-        </tr>
-        <tr class="even">
-        <td>lastName</td>
-        <td>shipTo_lastName</td>
-        <td>billTo_lastName</td>
-        <td><p><br />
-        </p></td>
-        </tr>
-        <tr class="odd">
-        <td>streetNumber and streetName</td>
-        <td>shipTo_street1</td>
-        <td>billTo_street1</td>
-        <td>If both values populated they are concatenated together with a space between. Otherwise streetName is used by itself</td>
-        </tr>
-        <tr class="even">
-        <td>city</td>
-        <td>shipTo_city</td>
-        <td>billTo_city</td>
-        <td><br />
-        </td>
-        </tr>
-        <tr class="odd">
-        <td>postalCode</td>
-        <td>shipTo_postalCode</td>
-        <td>billTo_postalCode</td>
-        <td><br />
-        </td>
-        </tr>
-        <tr class="even">
-        <td>region</td>
-        <td>shipTo_state</td>
-        <td>billTo_state</td>
-        <td><br />
-        </td>
-        </tr>
-        <tr class="odd">
-        <td>country</td>
-        <td>shipTo_country</td>
-        <td>billTo_country</td>
-        <td><br />
-        </td>
-        </tr>
-        <tr class="even">
-        <td>email</td>
-        <td>Not used</td>
-        <td>billTo_email</td>
-        <td><br />
-        </td>
-        </tr>
-        </tbody>
-        </table>
-        
-        </div>
+    | Commercetools address       | Cybersource shipping fields | Cybersource billing fields | Notes |
+    | --------------------------- | --------------------------- | -------------------------- | ----- |
+    | firstName                   | shipTo_firstName            | billTo_firstName           |       |
+    | lastName                    | shipTo_lastName             | billTo_lastName            |       |
+    | streetNumber and streetName | shipTo_street1              | billTo_street1             | If both values populated they are concatenated together with a space between. Otherwise streetName is used by itself |
+    | city                        | shipTo_city                 | billTo_city                |       |
+    | postalCode                  | shipTo_postalCode           | billTo_postalCode          |       |
+    | region                      | shipTo_state                | billTo_state               |       |
+    | country                     | shipTo_country              | billTo_country             |       |
+    | email                       | Not used                    | billTo_email               |       |
+
 
 2.  Retrieve a request JWT for Cardinal
     
@@ -110,12 +39,10 @@ After authentication is complete, authorisation of the payment can then be tri
 
 3.  Initialise Cardinal with the request JWT
     
-    ```javascript
-      Cardinal.setup("init", {
-        // cardinalRequestJwt is value retrieved in above step
-         jwt: cardinalRequestJwt
-      });
-    ```
+	      Cardinal.setup("init", {
+	        // cardinalRequestJwt is value retrieved in above step
+	         jwt: cardinalRequestJwt
+	      });
 
 4.  Wait for Cardinal payments.setupComplete complete event. See [3D
     Secure Setup](3D-Secure-Setup.md) for details of the
@@ -126,23 +53,17 @@ After authentication is complete, authorisation of the payment can then be tri
     
     1.  Retrieve one time key
         
-        Make a POST request to http://{host}:{port}/keys. The response
-        will be a JSON Web Token containing your one time key
+        Make a POST request to http://{host}:{port}/keys. The response will be JSON containing two properties - the captureContext and the verificationContext - both of which are JWTs
     
-    2.  Use Flex SDK to tokenise card details  
-        See <https://github.com/CyberSource/cybersource-flex-samples-java/blob/master/jsp-flexjs/src/main/webapp/index.jsp> for
-        an example of how to use the key obtained above and the Flex JS
-        SDK to tokenise a credit card. Note that the line beginning
-        with **`var jwk =`** needs to be replaced with code that will
-        populate the one time key
+    2.  Use the Flex Microform 0.11 to tokenise card details See <https://github.com/CyberSource/cybersource-flex-samples-java/tree/master/jsp-microform> for an example of how to use the captureContext obtained above and the Flex Microform JS to tokenise a credit card.
+
+    This step can be skipped when using a saved token
 
 6.  Call [Cardinal BIN detection](https://cardinaldocs.atlassian.net/wiki/spaces/CC/pages/311984510/BIN+Detection)
     
-    ```javascript
-      Cardinal.trigger("bin.process", cardNumber).then(function(results){
-        // create commerce tools payment as per next step
-      });
-    ```
+	      Cardinal.trigger("bin.process", cardNumber).then(function(results){
+	        // create commerce tools payment as per next step
+	      });
     
     ⚠️ **There are other ways to call BIN detection as documented at <https://cardinaldocs.atlassian.net/wiki/spaces/CC/pages/311984510/BIN+Detection>**
     
@@ -152,96 +73,23 @@ After authentication is complete, authorisation of the payment can then be tri
     (<https://docs.commercetools.com/http-api-projects-payments>) and
     populate the following
     
-    <div class="table-wrap">
-    
-    <table>
-    <thead>
-    <tr class="header">
-    <th>Property</th>
-    <th>Value</th>
-    <th>Required</th>
-    <th>Notes</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td>customer</td>
-    <td>Reference to commercetools customer</td>
-    <td>See notes</td>
-    <td>Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated</td>
-    </tr>
-    <tr class="even">
-    <td>anonymousId</td>
-    <td>Id for tracking guest checkout</td>
-    <td>See notes</td>
-    <td>Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated</td>
-    </tr>
-    <tr class="odd">
-    <td>paymentMethodInfo.paymentInterface</td>
-    <td>cybersource</td>
-    <td>Yes</td>
-    <td><br />
-    </td>
-    </tr>
-    <tr class="even">
-    <td>paymentMethodInfo.method</td>
-    <td>creditCardWithPayerAuthentication</td>
-    <td>Yes</td>
-    <td><p>The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being used</p>
-    <p>Typically an implementation would choose one or the other and the method name may be different to this</p></td>
-    </tr>
-    <tr class="odd">
-    <td>amountPlanned</td>
-    <td>Amount to authorise</td>
-    <td>Yes</td>
-    <td>Should match cart gross total, unless split payments are being used</td>
-    </tr>
-    <tr class="even">
-    <td>custom.fields.cs_token</td>
-    <td>Cybersource flex token</td>
-    <td>Yes</td>
-    <td>Obtain from the token field from the response to the FLEX.createToken call</td>
-    </tr>
-    <tr class="odd">
-    <td>custom.fields.cs_maskedPan</td>
-    <td>Masked credit card number</td>
-    <td>No</td>
-    <td>Obtain from the maskedPan field from the response to the FLEX.createToken call. Not required by extension but can be used for display</td>
-    </tr>
-    <tr class="even">
-    <td>custom.fields.cs_cardType</td>
-    <td>Credit card type</td>
-    <td>No</td>
-    <td>For display only</td>
-    </tr>
-    <tr class="odd">
-    <td>custom.fields.cs_cardExpiryMonth</td>
-    <td>Card expiry month</td>
-    <td>No</td>
-    <td>For display only</td>
-    </tr>
-    <tr class="even">
-    <td>custom.fields.cs_cardExpiryYear</td>
-    <td>Card expiry year</td>
-    <td>No</td>
-    <td>For display only</td>
-    </tr>
-    <tr class="odd">
-    <td><span class="inline-comment-marker" data-ref="5915c34c-0410-4fbe-a729-0d0ea407cb9d">custom.fields.cs_acceptHeader</span></td>
-    <td>Value of Accept header from user's browser</td>
-    <td>Yes</td>
-    <td>Used by 3DS process, populated from client-side libraries</td>
-    </tr>
-    <tr class="even">
-    <td>custom.fields.cs_userAgentHeader</td>
-    <td>Value of UserAgent header from user's browser</td>
-    <td>Yes</td>
-    <td>Used by 3DS process, populated from client-side libraries</td>
-    </tr>
-    </tbody>
-    </table>
-    
-    </div>
+    | Property                                  | Value                                      | Required  | Notes |
+    | ----------------------------------------- | ------------------------------------------ | --------- | ----- |
+    | customer                                  | Reference to commercetools customer        | See notes | Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated |
+    | anonymousId	                            | Id for tracking guest checkout             | See notes | Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated |
+    | paymentMethodInfo.paymentInterface        | cybersource                                | Yes       |  |
+    | paymentMethodInfo.method                  | creditCardWithPayerAuthentication          | Yes       | The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being used. <br><br> Typically an implementation would choose one or the other and the method name may be different to this |
+    | amountPlanned                             | Amount to authorise                        | Yes       | Should match cart gross total, unless split payments are being used |
+    | custom.fields.cs_token                    | Cybersource flex token                     | See notes | This is the token parameter passed into the callback for the microform.createToken call  <br><br> Required when not using a saved token |
+    | custom.fields.cs_tokenVerificationContext | Token verification context                 | See notes | This is the verificationContext property from the call to the /keys service <br><br> Required when cs_token is populated |
+    | custom.fields.cs_tokenAlias               | Alias for saved token                      | No        | When this is specified the token will be saved as a subscription for later use |
+    | custom.fields.cs_savedToken               | Saved token value                          | No        | Required when paying with a saved token |
+    | custom.fields.cs_maskedPan                | Masked credit card number                  | No        | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.number field containing the masked card number. <br><br> Not required by extension but can be used for display |
+    | custom.fields.cs_cardType                 | Credit card type                           | No        | For display only |
+    | custom.fields.cs_cardExpiryMonth          | Card expiry month                          | No        | For display only |
+    | custom.fields.cs_cardExpiryYear           | Card expiry year                           | No        | For display only |
+    | custom.fields.cs_acceptHeader             | Value of Accept header from user's browser | Yes       | Used by 3DS process, populated from client-side libraries |
+    | custom.fields.cs_userAgentHeader          | Value of Accept header from user's browser | Yes       | Used by 3DS process, populated from client-side libraries |
     
     a.  Also see [Decision Manager](Decision-Manager.md) for additional fields to populate if you are using Decision Manager
     
@@ -254,19 +102,17 @@ After authentication is complete, authorisation of the payment can then be tri
     
     a.  Call Cardinal.continue with
         
-    ```javascript
-      Cardinal.continue('cca',
-        {
-          "AcsUrl": <value of cs_payerAuthenticationAcsUrl from created payment>,
-          "Payload": <value of cs_payerAuthenticationPaReq from created payment>
-        },
-        {
-          "OrderDetails": {
-            "TransactionId": <value of cs_payerAuthenticationTransactionId from created payment>
-          }
-        }
-      );
-    ```
+	      Cardinal.continue('cca',
+	        {
+	          "AcsUrl": <value of cs_payerAuthenticationAcsUrl from created payment>,
+	          "Payload": <value of cs_payerAuthenticationPaReq from created payment>
+	        },
+	        {
+	          "OrderDetails": {
+	            "TransactionId": <value of cs_payerAuthenticationTransactionId from created payment>
+	          }
+	        }
+	      );
     
     b.  The payer authentication window will be displayed and when the user completes the process you will receive a payments.validated event. Inspect the response to determine if the validation was successful and extract the response JWT
     
@@ -274,38 +120,11 @@ After authentication is complete, authorisation of the payment can then be tri
 
 10. Add a transaction to the payment with the following values populated
     
-    <div class="table-wrap">
-    
-    <table>
-    <thead>
-    <tr class="header">
-    <th>Property</th>
-    <th>Value</th>
-    <th>Notes</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td>type</td>
-    <td>Authorization</td>
-    <td><br />
-    </td>
-    </tr>
-    <tr class="even">
-    <td>state</td>
-    <td>Initial</td>
-    <td><br />
-    </td>
-    </tr>
-    <tr class="odd">
-    <td>amount</td>
-    <td>Amount to authorise</td>
-    <td>Should match amountPlanned on payment</td>
-    </tr>
-    </tbody>
-    </table>
-    
-    </div>
+    | Property | Value               | Notes                                 |
+    | -------- | ------------------- | ------------------------------------- |
+    | type     | Authorization       |                                       |
+    | state    | Initial	         |                                       |
+    | amount   | Amount to authorise | Should match amountPlanned on payment |
 
 11. Verify the payment state
     
@@ -330,6 +149,8 @@ verification that the payer was authenticated correctly
     ⚠️ **V1 paReq values can be decoded by Base64 decoding the string and then inflating the resulting bytes**
     
     ⚠️ **V2 paReq values can be decoded by Base64 decoding the string**
+    
+When a token is saved as a subscription the saved token value will be returned as a custom property on the payment called cs_savedToken
 
 See [Commercetools Setup](Commercetools-Setup.md) for more details on the individual fields.
 
@@ -337,11 +158,3 @@ See [Commercetools Setup](Commercetools-Setup.md) for more details on the indiv
 
 * [Cybersource Payer Authentication documentation](http://apps.cybersource.com/library/documentation/dev_guides/Payer_Authentication_SO_API/Payer_Authentication_SO_API.pdf)
 * [Cardinal Cruise Hybrid Integration documentation](https://cardinaldocs.atlassian.net/wiki/spaces/CC/pages/360668/Cardinal+Cruise+Hybrid)
-
-</div>
-
-</div>
-
-</div>
-
-</div>

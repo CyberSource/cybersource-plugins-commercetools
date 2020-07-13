@@ -1,16 +1,5 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Usage
 
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 ## Payment Event Usage Guides
 
@@ -23,11 +12,3 @@
 - [Refund a Payment](Refund-a-Payment.md)
 - [Synchronising Payments](Synchronising-Payments.md)
 - [Decision Manager](Decision-Manager.md)
-
-</div>
-
-</div>
-
-</div>
-
-</div>

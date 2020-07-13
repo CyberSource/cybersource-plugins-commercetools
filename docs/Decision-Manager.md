@@ -1,22 +1,9 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Decision Manager
 
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 ## Field mapping
 
 Fields which are used by Decision Manager are mapped from commercetools fields as follows
-
-<div class="table-wrap">
 
 <table>
 <thead>
@@ -111,8 +98,6 @@ Fields which are used by Decision Manager are mapped from commercetools fields a
 </tbody>
 </table>
 
-</div>
-
 ### Customising shipping address mapping
 
 See [Customisation](Customisation.md)
@@ -130,8 +115,6 @@ The reference app uses a PaymentDetailsFactory to create PaymentDetails object
 ## Optional fields
 
 To pass additional data to Decision Manager it is possible to customise your commercetools resources to add extra fields. If these fields exist and there are values present for these then the extension will pass the values on to Cybersource in the appropriate request
-
-<div class="table-wrap">
 
 <table>
 <thead>
@@ -173,130 +156,124 @@ To pass additional data to Decision Manager it is possible to customise your com
 </tbody>
 </table>
 
-</div>
-
 ### Sample definitions
 
 #### Payment
 
 The following is an example of field definitions for the customer IP address and a single merchant defined field. They would need to be added to the base field definitions and any other payment customisations you may already have
 
-```json
-{
-  "fieldDefinitions": [
-    {
-      "type": {
-        "name": "String"
-      },
-      "name": "cs_customerIpAddress",
-      "label": {
-        "en": "Customer IP address"
-      },
-      "required": false
-    },
-    {
-      "type": {
-        "name": "String"
-      },
-      "name": "cs_merchantDefinedData_mddField_1",
-      "label": {
-        "en": "cs_merchantDefinedData_mddField_1"
-      },
-      "required": false
-    }
-  ],
-  "key": "cybersource_payment_data",
-  "name": {
-    "en": "Cybersource custom payment fields"
-  },
-  "resourceTypeIds": [
-    "payment"
-  ]
-}
-```
+	{
+	  "fieldDefinitions": [
+	    {
+	      "type": {
+	        "name": "String"
+	      },
+	      "name": "cs_customerIpAddress",
+	      "label": {
+	        "en": "Customer IP address"
+	      },
+	      "required": false
+	    },
+	    {
+	      "type": {
+	        "name": "String"
+	      },
+	      "name": "cs_merchantDefinedData_mddField_1",
+	      "label": {
+	        "en": "cs_merchantDefinedData_mddField_1"
+	      },
+	      "required": false
+	    }
+	  ],
+	  "key": "cybersource_payment_data",
+	  "name": {
+	    "en": "Cybersource custom payment fields"
+	  },
+	  "resourceTypeIds": [
+	    "payment"
+	  ]
+	}
 
 #### Line Item
 
 The following fields are defined as enums with all the values supported by Cybersource for the product code and risk. However you could use plain String fields instead. If you have already customised the line-item resource you should add the fields to that definition
 
-```json
-{
-  "fieldDefinitions": [
-    {
-      "type" : {
-        "name" : "Enum",
-        "values" : [ {
-          "key" : "adult_content",
-          "label" : "Adult content."
-        }, {
-          "key" : "coupon",
-          "label" : "Coupon applied to the entire order."
-        }, {
-          "key" : "default",
-          "label" : "Default value for the product code."
-        }, {
-          "key" : "electronic_good",
-          "label" : "Electronic product other than software."
-        }, {
-          "key" : "electronic_software",
-          "label" : "Software distributed electronically rather than on disks or other media."
-        }, {
-          "key" : "gift_certificate",
-          "label" : "Gift certificate."
-        }, {
-          "key" : "handling_only",
-          "label" : "Fee that you charge your customer to cover your administrative selling costs."
-        }, {
-          "key" : "service",
-          "label" : "Service that you perform for your customer."
-        }, {
-          "key" : "shipping_and_handling",
-          "label" : "The shipping portion is the charge for shipping the product to your customer."
-        }, {
-          "key" : "shipping_only",
-          "label" : "Charge for transporting tangible personal property from your location to your customer."
-        }, {
-          "key" : "subscription",
-          "label" : "Subscription to a web site or other content."
-        } ]
-      },
-      "name" : "cs_productCode",
-      "label" : {
-        "en" : "Cybersource product code"
-      },
-      "required" : false
-    },
-    {
-      "type" : {
-        "name" : "Enum",
-        "values" : [ {
-          "key" : "low",
-          "label" : "The product is associated with few chargebacks."
-        }, {
-          "key" : "normal",
-          "label" : "The product is associated with a normal number of chargebacks."
-        }, {
-          "key" : "high",
-          "label" : "The product is associated with many chargebacks."
-        } ]
-      },
-      "name" : "cs_productRisk",
-      "label" : {
-        "en" : "Cybersource product risk"
-      },
-      "required" : false
-    }
-
-  ],
-  "key": "cybersource_line_item_data",
-  "name": {
-    "en": "Cybersource custom line item fields"
-  },
-  "resourceTypeIds": [
-    "line-item"
-  ]
-}
-```
+	{
+	  "fieldDefinitions": [
+	    {
+	      "type" : {
+	        "name" : "Enum",
+	        "values" : [ {
+	          "key" : "adult_content",
+	          "label" : "Adult content."
+	        }, {
+	          "key" : "coupon",
+	          "label" : "Coupon applied to the entire order."
+	        }, {
+	          "key" : "default",
+	          "label" : "Default value for the product code."
+	        }, {
+	          "key" : "electronic_good",
+	          "label" : "Electronic product other than software."
+	        }, {
+	          "key" : "electronic_software",
+	          "label" : "Software distributed electronically rather than on disks or other media."
+	        }, {
+	          "key" : "gift_certificate",
+	          "label" : "Gift certificate."
+	        }, {
+	          "key" : "handling_only",
+	          "label" : "Fee that you charge your customer to cover your administrative selling costs."
+	        }, {
+	          "key" : "service",
+	          "label" : "Service that you perform for your customer."
+	        }, {
+	          "key" : "shipping_and_handling",
+	          "label" : "The shipping portion is the charge for shipping the product to your customer."
+	        }, {
+	          "key" : "shipping_only",
+	          "label" : "Charge for transporting tangible personal property from your location to your customer."
+	        }, {
+	          "key" : "subscription",
+	          "label" : "Subscription to a web site or other content."
+	        } ]
+	      },
+	      "name" : "cs_productCode",
+	      "label" : {
+	        "en" : "Cybersource product code"
+	      },
+	      "required" : false
+	    },
+	    {
+	      "type" : {
+	        "name" : "Enum",
+	        "values" : [ {
+	          "key" : "low",
+	          "label" : "The product is associated with few chargebacks."
+	        }, {
+	          "key" : "normal",
+	          "label" : "The product is associated with a normal number of chargebacks."
+	        }, {
+	          "key" : "high",
+	          "label" : "The product is associated with many chargebacks."
+	        } ]
+	      },
+	      "name" : "cs_productRisk",
+	      "label" : {
+	        "en" : "Cybersource product risk"
+	      },
+	      "required" : false
+	    }
+	
+	  ],
+	  "key": "cybersource_line_item_data",
+	  "name": {
+	    "en": "Cybersource custom line item fields"
+	  },
+	  "resourceTypeIds": [
+	    "line-item"
+	  ]
+	}
 
 ## Integration tests
 
@@ -333,11 +310,3 @@ screenshots
 ### Rule example
 
 ![](images/966819993.png)
-
-</div>
-
-</div>
-
-</div>
-
-</div>

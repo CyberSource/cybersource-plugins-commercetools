@@ -17,11 +17,13 @@ dependencies {
     api project(":cs-payments")
 
     implementation("org.slf4j:slf4j-api:${project.ext.slf4jVersion}")
+    implementation("io.jsonwebtoken:jjwt:${project.ext.jwtVersion}")
 
     testImplementation("org.codehaus.groovy:groovy-all:${project.ext.groovyVersion}")
     testImplementation("org.spockframework:spock-core:${project.ext.spockVersion}") {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
+    testImplementation("jakarta.xml.bind:jakarta.xml.bind-api:${project.ext.jakartaBindVersion}")
 }
 
 publishing {

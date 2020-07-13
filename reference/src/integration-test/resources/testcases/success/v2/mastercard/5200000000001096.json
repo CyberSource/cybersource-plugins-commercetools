@@ -2,7 +2,7 @@
   "description": "V2 Mastercard: Successful Step Up Authentication",
   "cardType": "Mastercard",
   "cardNumber": "5200000000001096",
-  "fieldCount": 10,
+  "fieldCount": 9,
   "specificationVersion": "2.",
   "authenticationResult": "0",
   "authenticationStatusMessage": "Success",
@@ -12,7 +12,7 @@
   "eci": null,
   "cavvAlgorithm": null,
   "collectionIndicator": 2,
-  "expectXid": true,
+  "expectXid": false,
   "expectCavv": false,
   "expectAav": true
 }

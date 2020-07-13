@@ -1,18 +1,5 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Key Creation
 
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
-
-<div class="toc-macro rbtoc1581891563817">
 
   - [Commercetools](#Commercetools)
       - [Backend/Extension API
@@ -23,8 +10,6 @@
       - [Shared Secret](#SharedSecret)
       - [Simple Order API keys](#SimpleOrderAPIkeys)
 
-</div>
-
 # <a name="Commercetools"></a>Commercetools
 
 ## <a name="Backend/ExtensionAPIKeys"></a>Backend/Extension API Keys
@@ -32,8 +17,6 @@
 The API Extension and the Synchronization Service require an API key
 which will be used throughout the payments process. The scopes required
 for this API key are:
-
-<div class="table-wrap">
 
 <table>
 <thead>
@@ -62,16 +45,12 @@ for this API key are:
 </tbody>
 </table>
 
-</div>
-
 ## <a name="Frontend/UIAPIKey"></a>Frontend/UI API Key
 
 To be used for frontend applications in order to create and manage
 payments and carts for customers. The scopes for the API key used here
 should be limited to the 'My' commercetools APIs to limit access a
 client-side application has to the data in commercetools.
-
-<div class="table-wrap">
 
 | Scope                     | Reason                                                                                         |
 | ------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -80,8 +59,6 @@ client-side application has to the data in commercetools.
 | manage\_my\_orders        | Adding Payments to an Order                                                                    |
 | manage\_my\_profile       | Access to the current customers profile so it can be associated with the Payment and Order     |
 | create\_anonymous\_token  | (optional) If you are using the key to control the customers session                           |
-
-</div>
 
 # <a name="Cybersource"></a>Cybersource
 
@@ -116,11 +93,3 @@ download it to a directory accessible from where you deploy the
 reference application. This file path should be provided in the API
 Extension's application.yaml as described in the [API Extension
 Setup](API-Extension-Setup.md) page.
-
-</div>
-
-</div>
-
-</div>
-
-</div>

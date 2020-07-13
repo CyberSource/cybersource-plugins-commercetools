@@ -14,6 +14,46 @@
       "type": {
         "name": "String"
       },
+      "name": "cs_tokenAlias",
+      "label": {
+        "en": "Save token with alias"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_savedToken",
+      "label": {
+        "en": "Saved token (subscription)"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_tokenVerificationContext",
+      "label": {
+        "en": "Token verification context"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_tokenCaptureContextSignature",
+      "label": {
+        "en": "Token capture context signature"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
       "name": "cs_cardType",
       "label": {
         "en": "Card type"

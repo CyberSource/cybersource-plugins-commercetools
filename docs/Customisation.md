@@ -1,22 +1,9 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Customisation
 
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 ## Customising payment processing
 
 The following table documents the name of the Service, Validation Rule and Request Transformer in the library code which can be used to customise the respective Payment Event for a given Payment Method.
-
-<div class="table-wrap">
 
 <table>
 <thead>
@@ -189,8 +176,6 @@ update</p>
 </tbody>
 </table>
 
-</div>
-
 ## Customising billing address mapping
 
 By default the reference app uses the AuthorizationRequestTransformer to handle field mapping from commercetools to Cybersource. It is configured with a BillToFieldGroupTransformer which maps the cart billing address to Cybersource fields. If you require different commercetools address fields to be mapped, or indeed if you store your address elsewhere
@@ -199,35 +184,28 @@ By default the reference app uses the AuthorizationRequestTransformer to handle 
     - In the configure method you have access to a PaymentDetails object which contains the commercetools payment and cart resources relating to the authorize request
     - The configure method returns a list of BillToFieldGroup. In this case you should return a list with a single element
   - Create a customised RequestTransformer to replace the AuthorizationRequestTransformer. e.g.
-```java
-public class CustomAuthorizationRequestTransformer extends RequestTransformer {
-  public AuthorizationRequestTransformer(String merchantId) {
-    super(Arrays.asList(
-        ...
-        new CustomBillToFieldGroupTransformer()
-    ));
-  }
-}
-```
-Remember to include the other default field group transformers in your class
-  - Reconfigure the reference app to use the customised transformer
-```java
-var authorizationRequestTransformer = new CustomAuthorizationRequestTransformer(merchantId(cybersourceProperties));
-var authorizationResponseTransformer = new ReasonCodeResponseTransformer();
 
-return new PaymentAuthorizationService(validator, authorizationRequestTransformer, authorizationResponseTransformer, cybersourceClient, cartRetriever);
-```
+		public class CustomAuthorizationRequestTransformer extends RequestTransformer {
+		  public AuthorizationRequestTransformer(String merchantId) {
+		    super(Arrays.asList(
+		        ...
+		        new CustomBillToFieldGroupTransformer()
+		    ));
+		  }
+		}
+
+	Remember to include the other default field group transformers in your class
+  - Reconfigure the reference app to use the customised transformer
+
+		var authorizationRequestTransformer = new CustomAuthorizationRequestTransformer(merchantId(cybersourceProperties));
+		var authorizationResponseTransformer = new ReasonCodeResponseTransformer();
+		
+		return new PaymentAuthorizationService(validator, authorizationRequestTransformer, authorizationResponseTransformer, cybersourceClient, cartRetriever);
+
 
 ## Customising shipping address mapping
 
 The process for customising the shipping address mapping is much the same as for billing addresses, with the following differences
-  - The classes involved are ShipToFieldGroupTransformer and ShipToFieldGroup
-  - It may be the case that not all payments have a shipping address. In this case you can return an empty list from your FieldGroupTransformer
 
-</div>
-
-</div>
-
-</div>
-
-</div>
+- The classes involved are ShipToFieldGroupTransformer and ShipToFieldGroup
+- It may be the case that not all payments have a shipping address. In this case you can return an empty list from your FieldGroupTransformer

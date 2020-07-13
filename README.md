@@ -1,16 +1,4 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Visa CyberSource commercetools extension
-
-</div>
-
-<div id="content"> 
-
-<div id="main-content" class="wiki-content group">
 
 Please see the following two sections for a high-level overview and Getting Started guide
 
@@ -22,11 +10,3 @@ The following two sections contain more detailed information for specific functi
 
 - [Usage](docs/Usage.md)
 - [Customisation](docs/Customisation.md)
-
-</div>
-
-</div>
-
-</div>
-
-</div>

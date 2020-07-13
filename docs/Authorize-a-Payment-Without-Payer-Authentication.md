@@ -1,16 +1,4 @@
-<div id="page">
-
-<div id="main" class="aui-page-panel">
-
-<div id="main-header">
-
 # Authorize a Payment (Without Payer Authentication)
-
-</div>
-
-<div id="content" class="view">
-
-<div id="main-content" class="wiki-content group">
 
 Authorisation of a payment is triggered by adding an initial transaction to a commercetools payment resource. Before this can be done the payment must be populated with the amount to authorise, a token representing the payment card and the billing address associated with the card.
 
@@ -20,9 +8,9 @@ Authorisation of a payment is triggered by adding an initial transaction to a co
 
 1.  Prepare your cart
     
-    a  Ensure your cart locale is set.
+    1.  Ensure your cart locale is set.
     
-    b.  Ensure the cart billing and shipping addresses are set. The default mapping of commercetools address fields to Cybersource fields is as follows. If you require a different mapping this can be [customised](Customisation.md)
+    2.  Ensure the cart billing and shipping addresses are set. The default mapping of commercetools address fields to Cybersource fields is as follows. If you require a different mapping this can be [customised](Customisation.md)
         
 | Commercetools address                    | Cybersource shipping fields      | Cybersource billing fields     | Notes                                                 |
 | ---------------------------------------- | -------------------------------- | ------------------------------ | ----------------------------------------------------- |
@@ -37,24 +25,29 @@ Authorisation of a payment is triggered by adding an initial transaction to a co
 
 2.  Tokenise credit card details using Cybersource Flex
     
-    a.  Retrieve one time key: Make a POST request to `http://{host}:{port}/keys`. The response will be a JSON Web Token containing your one time key
+    1.  Retrieve the Flex capture context: Make a POST request to `http://{host}:{port}/keys`. The response will be JSON containing two properties - the captureContext and the verificationContext - both of which are JWTs
     
-    b.  Use Flex SDK to tokenise card details See <https://github.com/CyberSource/cybersource-flex-samples-java/blob/master/jsp-flexjs/src/main/webapp/index.jsp> for an example of how to use the key obtained above and the Flex JS SDK to tokenise a credit card. Note that the line starting "var jwk = " needs to be replaced with code that will populate the one time key
+    2.  Use the Flex Microform 0.11 to tokenise card details See <https://github.com/CyberSource/cybersource-flex-samples-java/tree/master/jsp-microform> for an example of how to use the captureContext obtained above and the Flex Microform JS to tokenise a credit card.
+
+    This step can be skipped when using a saved token
 
 3.  Create a commercetools payment (<https://docs.commercetools.com/http-api-projects-payments>) and populate the following
     
-| Property                              | Value                                  | Required   | Notes                                                                         |
-| ------------------------------------- | -------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
-| customer                              | Reference to commercetools customer    | See notes  | Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated |
-| anonymousId                           | Id for tracking guest checkout         | See notes  | Required for guest checkout. If using MyPayments API this will automatically be set. One of customer or anonymousId must be populated |
-| paymentMethodInfo.paymentInterface    | cybersource                            | Yes        | Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated |
-| paymentMethodInfo.method              | creditCard                             | Yes        | The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being use    Typically an implementation would choose one or the other and the method name may be different to this                  |
-| amountPlanned                         | Amount to authorise                    | Yes        | Should match cart gross total, unless split payments are being used           |
-| custom.fields.cs_token                | Cybersource flex token                 | Yes        | Obtain from the token field from the response to the FLEX.createToken call    |
-| custom.fields.cs_maskedPan            | Masked credit card number              | No         | Obtain from the maskedPan field from the response to the FLEX.createToken call. Not required by extension but can be used for display |
-| custom.fields.cs_cardType             | Credit card type                       | No         | For display only                                                              |
-| custom.fields.cs_cardExpiryMonth      | Card expiry month                      | No         | For display only                                                              |
-| custom.fields.cs_cardExpiryYear       | Card expiry year                       | No         | For display only                                                              |
+| Property                                  | Value                                  | Required   | Notes                                                                         |
+| ----------------------------------------- | -------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
+| customer                                  | Reference to commercetools customer    | See notes  | Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated |
+| anonymousId                               | Id for tracking guest checkout         | See notes  | Required for guest checkout. If using MyPayments API this will automatically be set. One of customer or anonymousId must be populated |
+| paymentMethodInfo.paymentInterface        | cybersource                            | Yes        | Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated |
+| paymentMethodInfo.method                  | creditCard                             | Yes        | The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being use    Typically an implementation would choose one or the other and the method name may be different to this                  |
+| amountPlanned                             | Amount to authorise                    | Yes        | Should match cart gross total, unless split payments are being used           |
+| custom.fields.cs_token                    | Cybersource flex token                 | See notes  | This is the token parameter passed into the callback for the microform.createToken call <br><br> Required when not using a saved token |
+| custom.fields.cs_tokenVerificationContext | Token verification context             | See notes  | This is the verificationContext property from the call to the /keys service <br><br> Required when cs_token is populated |
+| custom.fields.cs_tokenAlias               | Alias for saved token                  | No         | When this is specified the token will be saved as a subscription for later use |
+| custom.fields.cs_savedToken               | Saved token value                      | No         | Required when paying with a saved token |
+| custom.fields.cs_maskedPan                | Masked credit card number              | No         | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.number field containing the masked card number. <br><br> Not required by extension but can be used for display |
+| custom.fields.cs_cardType                 | Credit card type                       | No         | For display only                                                              |
+| custom.fields.cs_cardExpiryMonth          | Card expiry month                      | No         | For display only                                                              |
+| custom.fields.cs_cardExpiryYear           | Card expiry year                       | No         | For display only                                                              |
 
 Also see [Decision Manager](Decision-Manager.md) for additional fields to be populated if you are using Decision Manager
 
@@ -75,10 +68,8 @@ Also see [Decision Manager](Decision-Manager.md) for additional fields to be po
 
 7.  Convey the payment result to the customer. If this is the only/final payment for this order you can transition your commercetools cart to an order at this point
 
-</div>
+## Stored values
+    
+When a token is saved as a subscription the saved token value will be returned as a custom property on the payment called cs_savedToken
 
-</div>
-
-</div>
-
-</div>
+See [Commercetools Setup](Commercetools-Setup.md) for more details on the individual fields.

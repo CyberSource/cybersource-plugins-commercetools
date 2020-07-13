@@ -45,6 +45,10 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-actuator")
 
+    compile("io.jsonwebtoken:jjwt-api:${project.ext.jjwtVersion}")
+    runtime("io.jsonwebtoken:jjwt-impl:${project.ext.jjwtVersion}")
+    runtime("io.jsonwebtoken:jjwt-jackson:${project.ext.jjwtVersion}")
+
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("org.codehaus.groovy:groovy-all:${project.ext.groovyVersion}")
     testCompile("org.spockframework:spock-core:${project.ext.spockVersion}") {
@@ -55,6 +59,8 @@ dependencies {
     testCompile("com.nimbusds:nimbus-jose-jwt:${project.ext.nimbusJwtVersion}")
     testCompile("org.codehaus.groovy.modules.http-builder:http-builder:${project.ext.groovyHttpBuilderVersion}")
     testCompile ("com.github.tomakehurst:wiremock-jre8:${project.ext.wiremockVersion}")
+
+    testCompile("org.seleniumhq.selenium:selenium-java:${project.ext.seleniumVersion}")
 }
 
 idea {
