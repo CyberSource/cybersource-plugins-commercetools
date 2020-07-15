@@ -68,3 +68,25 @@ running/deploying the reference application:
 The reference application is a Spring Boot application built using
 Gradle, and can be built and run the same manner as any Spring Boot
 application. See <https://spring.io/guides/gs/spring-boot/>
+
+## Example deployment steps
+The steps involved in deploying the reference app will depend on many factors including your choice of platform and method of handling environment/secret values, so it is impossible to give a definitive guide. However, for the simple case of running it locally in a development environment the following steps are one possibility
+
+- Make a copy of the environment/secrets yaml template. Here we use **sample** as the profile name but you may choose anything providing you use the same value when running the application
+
+		cd reference
+		cp src/main/resources/env-secrets-template.yaml src/main/resources/application-sample.yaml
+		
+- Edit application-sample.yaml and replace the placeholders with actual values as documented above
+- Build the library modules
+> **_NOTE:_**  this is not necessary if the modules are not already available in an accessible repository 
+
+		cd ../library
+		./gradlew publishToMavenLocal
+		
+- Run the application specifying the profile name
+
+		cd 	../reference
+		./gradlew bootRun -I init-maven-local.gradle -PspringProfile=sample
+	
+	> **_NOTE:_**  when the library modules are available in an accessible repository then `-I init-maven-local.gradle` can be omitted
