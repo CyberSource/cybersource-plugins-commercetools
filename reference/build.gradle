@@ -1,0 +1,105 @@
+buildscript {
+    apply from: "version-info.gradle"
+
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'org.unbroken-dome.test-sets' version '2.1.1'
+    id "io.freefair.lombok" version "4.0.1"
+    id 'org.springframework.boot' version '2.2.0.RELEASE'
+}
+
+repositories {
+    jcenter()
+}
+
+apply plugin: 'idea'
+apply plugin: 'pmd'
+apply plugin: 'codenarc'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.cybersource'
+version = "${appVersion}"
+status = 'integration'
+
+sourceCompatibility = 11
+
+dependencies {
+    compile("com.cybersource:ct-api-extension:${project.ext.cybersourceCommercetoolsLibraryVersion}")
+    compile("com.cybersource:cs-payments:${project.ext.cybersourceCommercetoolsLibraryVersion}")
+    compile("com.cybersource:cs-ct-mapping:${project.ext.cybersourceCommercetoolsLibraryVersion}")
+    compile("com.cybersource:cs-3ds:${project.ext.cybersourceCommercetoolsLibraryVersion}")
+
+    compile("org.springframework.boot:spring-boot-starter")
+    compile("org.springframework.boot:spring-boot-starter-web") {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    }
+    compile("org.springframework.boot:spring-boot-starter-undertow")
+    compile("org.springframework.boot:spring-boot-autoconfigure")
+    compile("org.springframework.boot:spring-boot-configuration-processor")
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+
+    compile("io.jsonwebtoken:jjwt-api:${project.ext.jjwtVersion}")
+    runtime("io.jsonwebtoken:jjwt-impl:${project.ext.jjwtVersion}")
+    runtime("io.jsonwebtoken:jjwt-jackson:${project.ext.jjwtVersion}")
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.codehaus.groovy:groovy-all:${project.ext.groovyVersion}")
+    testCompile("org.spockframework:spock-core:${project.ext.spockVersion}") {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+    testCompile("org.spockframework:spock-spring:${project.ext.spockVersion}")
+    testCompile("com.github.stefanbirkner:system-rules:${project.ext.systemRulesVersion}")
+    testCompile("com.nimbusds:nimbus-jose-jwt:${project.ext.nimbusJwtVersion}")
+    testCompile("org.codehaus.groovy.modules.http-builder:http-builder:${project.ext.groovyHttpBuilderVersion}")
+    testCompile ("com.github.tomakehurst:wiremock-jre8:${project.ext.wiremockVersion}")
+
+    testCompile("org.seleniumhq.selenium:selenium-java:${project.ext.seleniumVersion}")
+}
+
+idea {
+    module {
+        jdkName = '11'
+        sourceDirs += file('src/main/java')
+        resourceDirs += file('src/main/resources')
+    }
+}
+
+pmd {
+    ruleSets = []
+    ruleSetFiles = files("${rootDir}/analysis/pmd.xml")
+}
+
+codenarc {
+    configFile = project.file("${rootDir}/analysis/codenarc.xml")
+}
+
+jar {
+    archivesBaseName = "spring-boot-impl"
+}
+
+testSets {
+    integrationTest {
+        dirName = 'integration-test'
+    }
+}
+
+integrationTest() {
+    maxHeapSize = "256m"
+    doFirst {
+        systemProperty 'spring.profiles.active', springProfile
+    }
+}
+
+bootRun() {
+    if (project.hasProperty('debug')) {
+        jvmArgs "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006"
+    }
+    systemProperty 'spring.profiles.active', springProfile
+}

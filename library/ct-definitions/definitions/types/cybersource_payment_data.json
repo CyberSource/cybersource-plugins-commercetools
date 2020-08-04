@@ -1,0 +1,191 @@
+{
+  "fieldDefinitions": [
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_token",
+      "label": {
+        "en": "Token"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_tokenAlias",
+      "label": {
+        "en": "Save token with alias"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_savedToken",
+      "label": {
+        "en": "Saved token (subscription)"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_tokenVerificationContext",
+      "label": {
+        "en": "Token verification context"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_tokenCaptureContextSignature",
+      "label": {
+        "en": "Token capture context signature"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_cardType",
+      "label": {
+        "en": "Card type"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_maskedPan",
+      "label": {
+        "en": "Masked card number"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_cardExpiryMonth",
+      "label": {
+        "en": "Card expiry year"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_cardExpiryYear",
+      "label": {
+        "en": "Card expiry year"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_requestJwt",
+      "label": {
+        "en": "3DSecure JWT sent to Cardinal"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_responseJwt",
+      "label": {
+        "en": "3DSecure JWT received from Cardinal"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "Boolean"
+      },
+      "name": "cs_payerAuthenticationRequired",
+      "label": {
+        "en": "Flag indicating 3DSecure authentication is required"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_payerAuthenticationTransactionId",
+      "label": {
+        "en": "3DSecure transaction id"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_payerAuthenticationAcsUrl",
+      "label": {
+        "en": "3DSecure ACS URL"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_payerAuthenticationPaReq",
+      "label": {
+        "en": "3DSecure PAReq"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_acceptHeader",
+      "label": {
+        "en": "Value of accept header from browser"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_userAgentHeader",
+      "label": {
+        "en": "Value of user agent header from browser"
+      },
+      "required": false
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "cs_deviceFingerprintId",
+      "label": {
+        "en": "Session id used for device fingerprinting"
+      },
+      "required": false
+    }
+  ],
+  "key": "cybersource_payment_data",
+  "name": {
+    "en": "Cybersource custom payment fields"
+  },
+  "resourceTypeIds": [
+    "payment"
+  ]
+}

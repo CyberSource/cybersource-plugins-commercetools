@@ -1,0 +1,4 @@
+{
+  "bin": "${cardNumber}",
+  "orgUnitId": "${orgUnitId}"
+}

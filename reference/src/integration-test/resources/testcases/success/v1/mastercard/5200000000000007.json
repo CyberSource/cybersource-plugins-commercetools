@@ -1,0 +1,18 @@
+{
+  "description": "V1 Mastercard: Successful Authentication",
+  "cardType": "Mastercard",
+  "cardNumber": "5200000000000007",
+  "fieldCount": 10,
+  "specificationVersion": "1.0.2",
+  "authenticationResult": "0",
+  "authenticationStatusMessage": "Success",
+  "paResStatus": "Y",
+  "commerceIndicator": "spa",
+  "eciRaw": "02",
+  "eci": null,
+  "cavvAlgorithm": "3",
+  "collectionIndicator": "2",
+  "expectXid": true,
+  "expectCavv": false,
+  "expectAav": true
+}

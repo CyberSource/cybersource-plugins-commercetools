@@ -1,0 +1,31 @@
+{
+  "fieldDefinitions": [
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "reasonCode",
+      "label": {
+        "en": "Reason Code"
+      },
+      "required": true
+    },
+    {
+      "type": {
+        "name": "String"
+      },
+      "name": "transactionId",
+      "label": {
+        "en": "Transaction ID"
+      },
+      "required": true
+    }
+  ],
+  "key": "cybersource_payment_failure",
+  "name": {
+    "en": "Interaction for a payment that been rejected or has failed in Cybersource"
+  },
+  "resourceTypeIds": [
+    "payment-interface-interaction"
+  ]
+}

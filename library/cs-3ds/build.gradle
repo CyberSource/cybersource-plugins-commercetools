@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+version = "${project.ext.projectVersion}"
+status = 'integration'
+
+sourceCompatibility = 11
+
+dependencies {
+    api project(":cs-payments")
+    api project(":cs-ct-mapping")
+
+    implementation("io.jsonwebtoken:jjwt:${project.ext.jwtVersion}")
+    implementation("com.cybersource:cybersource-sdk-java:${project.ext.cybersourceVersion}")
+    implementation("javax.xml.bind:jaxb-api:${project.ext.jaxbApiVersion}")
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+jar {
+    archivesBaseName = "cs-3ds"
+}

@@ -1,0 +1,10 @@
+out/
+build/
+target/
+.gradle/
+.DS_Store
+*.iws
+*.ipr
+.idea/
+*.iml
+application-dev.yaml
