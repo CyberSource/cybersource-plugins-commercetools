@@ -1,0 +1,18 @@
+{
+  "description": "V1 Visa: Authentication Error",
+  "cardType": "Visa",
+  "cardNumber": "4000000000000093",
+  "fieldCount": 3,
+  "specificationVersion": "1.0.2",
+  "authenticationResult": null,
+  "authenticationStatusMessage": null,
+  "paResStatus": null,
+  "commerceIndicator": "internet",
+  "eciRaw": null,
+  "eci": "07",
+  "cavvAlgorithm": null,
+  "collectionIndicator": null,
+  "expectXid": false,
+  "expectCavv": false,
+  "expectAav": false
+}

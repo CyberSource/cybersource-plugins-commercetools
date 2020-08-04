@@ -1,0 +1,11 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://apitest.cybersource.com/reporting/v3/conversion-details?startTime=2019-11-28T00:00:00.0Z&endTime=2019-11-29T00:00:00.0Z"
+    }
+  },
+  "conversionDetails": [],
+  "endTime": "2019-11-29T00:00:00.000Z",
+  "organizationId": "e2x_ct_02",
+  "startTime": "2019-11-28T00:00:00.000Z"
+}

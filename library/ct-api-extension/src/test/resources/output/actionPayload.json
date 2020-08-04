@@ -1,0 +1,16 @@
+{
+  "actions" : [ {
+    "action" : "changeTransactionState",
+    "state" : "Success",
+    "transactionId" : "tx id"
+  }, {
+    "action" : "addInterfaceInteraction",
+    "type" : {
+      "id" : "interaction type id"
+    },
+    "fields" : {
+      "interaction key" : "interaction value"
+    }
+  } ],
+  "errors" : [ ]
+}

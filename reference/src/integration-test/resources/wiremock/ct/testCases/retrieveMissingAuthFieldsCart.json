@@ -1,0 +1,12 @@
+{
+  "priority": 2,
+  "name": "retrieveMissingAuthFieldsAddressCart",
+  "request": {
+    "urlPattern": "/.*/carts\\?where=customerId%3D%22customer-with-address-missing-auth-fields.*",
+    "method": "GET"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "cartWithMissingAuthFields.json"
+  }
+}

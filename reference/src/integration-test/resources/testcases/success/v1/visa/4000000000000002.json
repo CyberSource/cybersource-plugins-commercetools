@@ -1,0 +1,18 @@
+{
+  "description": "V1 Visa: Successful Authentication",
+  "cardType": "Visa",
+  "cardNumber": "4000000000000002",
+  "fieldCount": 10,
+  "specificationVersion": "1.0.2",
+  "authenticationResult": "0",
+  "authenticationStatusMessage": "Success",
+  "paResStatus": "Y",
+  "commerceIndicator": "vbv",
+  "eciRaw": "05",
+  "eci": "05",
+  "cavvAlgorithm": "2",
+  "collectionIndicator": null,
+  "expectXid": true,
+  "expectCavv": true,
+  "expectAav": false
+}

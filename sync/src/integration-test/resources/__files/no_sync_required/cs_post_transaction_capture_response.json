@@ -1,0 +1,99 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://apitest.cybersource.com/tss/v2/searches/d89ffe28-7e9f-4c24-8f8e-353ef3862c5c",
+      "method": "GET"
+    }
+  },
+  "searchId": "d89ffe28-7e9f-4c24-8f8e-353ef3862c5c",
+  "save": false,
+  "name": "MRN",
+  "query": "clientReferenceInformation.code:TC50171_3 AND submitTimeUtc:[NOW/DAY-7DAYS TO NOW/DAY+1DAY}",
+  "count": 1,
+  "totalCount": 1,
+  "limit": 100,
+  "offset": 0,
+  "sort": "id:asc,submitTimeUtc:asc",
+  "timezone": "America/Chicago",
+  "submitTimeUtc": "2019-10-10T12:41:07Z",
+  "_embedded": {
+    "transactionSummaries": [
+      {
+        "id": "5707853176936824904012",
+        "submitTimeUtc": "2019-10-11T09:15:17Z",
+        "merchantId": "merchant_id",
+        "applicationInformation": {
+          "applications": [
+            {
+              "name": "ics_bill",
+              "reasonCode": "100",
+              "rCode": "1",
+              "rFlag": "SOK",
+              "rMessage": "Request was processed successfully.",
+              "returnCode": "1010000",
+              "reconciliationId": "9113334959"
+            }
+          ]
+        },
+        "buyerInformation": {},
+        "clientReferenceInformation": {
+          "code": "0452380c-b51c-4e91-8bf2-41a97d9b05f3",
+          "applicationName": "Simple Order API"
+        },
+        "consumerAuthenticationInformation": {},
+        "deviceInformation": {},
+        "fraudMarkingInformation": {},
+        "merchantInformation": {},
+        "orderInformation": {
+          "billTo": {
+            "firstName": "TESTY",
+            "lastName": "MCTESTER",
+            "email": "cybersource-commercetools-extension@example.com",
+            "country": "GB"
+          },
+          "shipTo": {},
+          "amountDetails": {
+            "totalAmount": "5.49",
+            "currency": "GBP"
+          }
+        },
+        "paymentInformation": {
+          "paymentType": {
+            "type": "credit card",
+            "method": "VI"
+          },
+          "customer": {
+            "customerId": "949FC20593583490E05341588E0A25FE"
+          },
+          "card": {
+            "suffix": "1111",
+            "prefix": "411111",
+            "type": "001"
+          }
+        },
+        "processingInformation": {},
+        "processorInformation": {
+          "processor": {
+            "name": "streamline2"
+          },
+          "approvalCode": "5"
+        },
+        "pointOfSaleInformation": {
+          "terminalId": "11111111",
+          "partner": {}
+        },
+        "riskInformation": {
+          "providers": {
+            "fingerPrint": {}
+          }
+        },
+        "_links": {
+          "transactionDetail": {
+            "href": "https://apitest.cybersource.com/tss/v2/transactions/5707853176936824904012",
+            "method": "GET"
+          }
+        }
+      }
+    ]
+  }
+}
