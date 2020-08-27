@@ -1,0 +1,18 @@
+{
+  "actions" : [ ],
+  "errors" : [ {
+    "code" : "InvalidOperation",
+    "message" : "error message",
+    "localizedMessage" : {
+      "en" : "english",
+      "fr" : "francais"
+    },
+    "extensionExtraInfo" : {
+      "key1" : "value1",
+      "key2" : [ "value2", "value2" ]
+    }
+  }, {
+    "code" : "InvalidInput",
+    "message" : "another error message"
+  } ]
+}

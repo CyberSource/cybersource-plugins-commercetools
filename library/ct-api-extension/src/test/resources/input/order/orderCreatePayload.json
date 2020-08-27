@@ -1,0 +1,143 @@
+{
+  "action": "Create",
+  "resource": {
+    "typeId": "order",
+    "id": "a4f3bb38-ddd3-4edf-9ad3-11717d2c3ba0",
+    "obj": {
+      "type": "Order",
+      "id": "a4f3bb38-ddd3-4edf-9ad3-11717d2c3ba0",
+      "version": 1,
+      "lastMessageSequenceNumber": 1,
+      "createdAt": "2019-09-03T00:42:06.285Z",
+      "lastModifiedAt": "2019-09-03T00:42:06.285Z",
+      "lastModifiedBy": {
+        "clientId": "YD0c7sgHzKzLbwgQl4AKLFvs",
+        "isPlatformClient": false
+      },
+      "createdBy": {
+        "clientId": "YD0c7sgHzKzLbwgQl4AKLFvs",
+        "isPlatformClient": false
+      },
+      "customerId": "25b8c6ce-109c-4e84-b3b5-d2006b6171cb",
+      "totalPrice": {
+        "type": "centPrecision",
+        "currencyCode": "GBP",
+        "centAmount": 3702,
+        "fractionDigits": 2
+      },
+      "taxedPrice": {
+        "totalNet": {
+          "type": "centPrecision",
+          "currencyCode": "GBP",
+          "centAmount": 3085,
+          "fractionDigits": 2
+        },
+        "totalGross": {
+          "type": "centPrecision",
+          "currencyCode": "GBP",
+          "centAmount": 3702,
+          "fractionDigits": 2
+        },
+        "taxPortions": [
+          {
+            "rate": 0.2,
+            "amount": {
+              "type": "centPrecision",
+              "currencyCode": "GBP",
+              "centAmount": 617,
+              "fractionDigits": 2
+            },
+            "name": "20% incl."
+          }
+        ]
+      },
+      "orderState": "Open",
+      "syncInfo": [],
+      "returnInfo": [],
+      "taxMode": "Platform",
+      "inventoryMode": "None",
+      "taxRoundingMode": "HalfEven",
+      "taxCalculationMode": "LineItemLevel",
+      "origin": "Customer",
+      "lineItems": [],
+      "customLineItems": [
+        {
+          "totalPrice": {
+            "type": "centPrecision",
+            "currencyCode": "GBP",
+            "centAmount": 3702,
+            "fractionDigits": 2
+          },
+          "id": "23b594d3-ce78-474f-b2fd-20c7657ba6ba",
+          "name": {
+            "en": "line item"
+          },
+          "money": {
+            "type": "centPrecision",
+            "currencyCode": "GBP",
+            "centAmount": 1234,
+            "fractionDigits": 2
+          },
+          "slug": "slug",
+          "quantity": 3,
+          "discountedPricePerQuantity": [],
+          "taxCategory": {
+            "typeId": "tax-category",
+            "id": "701de047-0ca3-4b13-9d80-414aff5971c3"
+          },
+          "taxRate": {
+            "name": "20% incl.",
+            "amount": 0.2,
+            "includedInPrice": true,
+            "country": "GB",
+            "id": "fpiRnQbx",
+            "subRates": []
+          },
+          "state": [
+            {
+              "quantity": 3,
+              "state": {
+                "typeId": "state",
+                "id": "61fc2e0a-7b0a-4de2-b720-f581efa60e5e"
+              }
+            }
+          ],
+          "taxedPrice": {
+            "totalNet": {
+              "type": "centPrecision",
+              "currencyCode": "GBP",
+              "centAmount": 3085,
+              "fractionDigits": 2
+            },
+            "totalGross": {
+              "type": "centPrecision",
+              "currencyCode": "GBP",
+              "centAmount": 3702,
+              "fractionDigits": 2
+            }
+          }
+        }
+      ],
+      "transactionFee": true,
+      "discountCodes": [],
+      "cart": {
+        "typeId": "cart",
+        "id": "99ed110f-5a56-46dc-ae8d-2e412cd53f57"
+      },
+      "shippingAddress": {
+        "streetName": "shipping street",
+        "streetNumber": "37",
+        "country": "GB",
+        "key": "address_key"
+      },
+      "billingAddress": {
+        "streetName": "billing street",
+        "streetNumber": "37",
+        "country": "GB",
+        "key": "address_key"
+      },
+      "itemShippingAddresses": [],
+      "refusedGifts": []
+    }
+  }
+}

@@ -1,0 +1,20 @@
+version = "${project.ext.projectVersion}"
+
+task zipDefinitions(type: Zip) {
+    from 'definitions'
+    include '**/*.json'
+    archiveName 'definitions.zip'
+}
+
+def zipArtifact = artifacts.add('archives', file("${project.buildDir}/distributions/definitions.zip")) {
+    type 'zip'
+    builtBy 'zipDefinitions'
+}
+
+publishing {
+    publications {
+        mavenZip(MavenPublication) {
+            artifact zipArtifact
+        }
+    }
+}

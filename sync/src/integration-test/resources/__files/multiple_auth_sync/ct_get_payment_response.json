@@ -1,0 +1,73 @@
+{
+  "id": "0452380c-b51c-4e91-8bf2-41a97d9b05f3",
+  "version": 2,
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2019-10-10T10:31:00.979Z",
+  "lastModifiedAt": "2019-10-10T10:31:21.859Z",
+  "lastModifiedBy": {
+    "clientId": "TR1u2cVye8hQ1OCSeGaweB1q",
+    "isPlatformClient": false
+  },
+  "createdBy": {
+    "clientId": "TR1u2cVye8hQ1OCSeGaweB1q",
+    "isPlatformClient": false,
+    "customer": {
+      "typeId": "customer",
+      "id": "4dd07f2c-4a68-43e2-ba7b-582edd4b9512"
+    }
+  },
+  "customer": {
+    "typeId": "customer",
+    "id": "someCustomerId"
+  },
+  "amountPlanned": {
+    "type": "centPrecision",
+    "currencyCode": "GBP",
+    "centAmount": 5,
+    "fractionDigits": 49
+  },
+  "paymentMethodInfo": {
+    "paymentInterface": "cybersource",
+    "method": "creditCard"
+  },
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "id": "f26aa5f4-2493-46ed-8cd0-413d6ac30800"
+    },
+    "fields": {
+      "billingAddressLastName": "McTester",
+      "billingAddressEmail": "cybersource-commercetools-extension@example.com",
+      "billingAddressCity": "London",
+      "cs_acceptHeader": "accept header",
+      "cs_userAgentHeader": "user agent header",
+      "billingAddressLine1": "1 London Bridge",
+      "billingAddressFirstName": "Testy",
+      "billingAddressCountry": "United Kingdom",
+      "maskedPan": "someMaskedPan",
+      "cardExpiryYear": "2020",
+      "token": "1234",
+      "cardExpiryMonth": "12",
+      "cardType": "Visa",
+      "billingAddressPostalCode": "SE19BG",
+      "billingAddressState": "Greater London"
+    }
+  },
+  "paymentStatus": {},
+  "transactions": [
+    {
+      "id": "db022879-e770-4087-9ef3-c415240205bf",
+      "timestamp": "2019-10-11T09:15:17.000Z",
+      "type": "Authorization",
+      "amount": {
+        "type": "centPrecision",
+        "currencyCode": "GBP",
+        "centAmount": 549,
+        "fractionDigits": 2
+      },
+      "interactionId": "1",
+      "state": "Success"
+    }
+  ],
+  "interfaceInteractions": []
+}

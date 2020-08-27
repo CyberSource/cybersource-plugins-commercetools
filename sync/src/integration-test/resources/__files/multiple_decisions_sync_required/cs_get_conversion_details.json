@@ -1,0 +1,70 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://apitest.cybersource.com/reporting/v3/conversion-details?startTime=2019-11-28T00:00:00.0Z&endTime=2019-11-29T00:00:00.0Z"
+    }
+  },
+  "conversionDetails": [
+    {
+      "merchantReferenceNumber": "2fb99cc8-9645-4dd6-a12c-c7b3f33751b0",
+      "conversionTime": "2019-11-28T10:47:26.000Z",
+      "requestId": "5749372967476971804008",
+      "originalDecision": "REVIEW",
+      "newDecision": "ACCEPT",
+      "reviewer": "e2xbenharris",
+      "reviewerComments": "happy days",
+      "queue": "Example",
+      "profile": "BillingAddressBased",
+      "notes": [
+        {
+          "time": "2019-11-28T10:47:26.000Z",
+          "comments": "Took ownership.",
+          "requestId": "5749372967476971804008",
+          "addedBy": "e2xbenharris"
+        }
+      ]
+    },
+    {
+      "merchantReferenceNumber": "3fb99cc8-9645-4dd6-a12c-c7b3f33751b0",
+      "conversionTime": "2019-11-28T11:48:26.000Z",
+      "requestId": "5749372967476971804009",
+      "originalDecision": "REVIEW",
+      "newDecision": "ACCEPT",
+      "reviewer": "e2xbenharris",
+      "reviewerComments": "happy days",
+      "queue": "Example",
+      "profile": "BillingAddressBased",
+      "notes": [
+        {
+          "time": "2019-11-28T11:48:26.000Z",
+          "comments": "Took ownership.",
+          "requestId": "5749372967476971804009",
+          "addedBy": "e2xbenharris"
+        }
+      ]
+    }
+  ,
+    {
+      "merchantReferenceNumber": "4fb99cc8-9645-4dd6-a12c-c7b3f33751b0",
+      "conversionTime": "2019-11-28T11:48:26.000Z",
+      "requestId": "5749372967476971804009",
+      "originalDecision": "REVIEW",
+      "newDecision": "REJECT",
+      "reviewer": "e2xbenharris",
+      "reviewerComments": "happy days",
+      "queue": "Example",
+      "profile": "BillingAddressBased",
+      "notes": [
+        {
+          "time": "2019-11-28T11:48:26.000Z",
+          "comments": "Took ownership.",
+          "requestId": "5749372967476971804010",
+          "addedBy": "e2xbenharris"
+        }
+      ]
+    }
+  ],
+  "endTime": "2019-11-29T00:00:00.000Z",
+  "organizationId": "e2x_ct_02",
+  "startTime": "2019-11-28T00:00:00.000Z"
+}

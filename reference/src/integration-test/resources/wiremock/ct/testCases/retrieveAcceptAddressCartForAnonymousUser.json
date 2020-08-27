@@ -1,0 +1,12 @@
+{
+  "priority": 2,
+  "name": "retrieveAcceptAddressCart",
+  "request": {
+    "urlPattern": "/.*/carts\\?where=anonymousId%3D%22anonymous-user.*",
+    "method": "GET"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "cartWithAcceptAddress.json"
+  }
+}

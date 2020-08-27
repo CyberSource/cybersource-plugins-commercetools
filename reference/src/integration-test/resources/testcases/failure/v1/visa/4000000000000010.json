@@ -1,0 +1,18 @@
+{
+  "description": "V1 Visa: Successful Authentication but Invalid PARes",
+  "cardType": "Visa",
+  "cardNumber": "4000000000000010",
+  "fieldCount": 4,
+  "specificationVersion": "1.0.2",
+  "authenticationResult": "-1",
+  "authenticationStatusMessage": "PARes signature digest value mismatch. PARes message has been modified",
+  "paResStatus": null,
+  "commerceIndicator": null,
+  "eciRaw": null,
+  "eci": null,
+  "cavvAlgorithm": null,
+  "collectionIndicator": null,
+  "expectXid": true,
+  "expectCavv": false,
+  "expectAav": false
+}

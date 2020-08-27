@@ -1,0 +1,20 @@
+{
+  "destination": {
+    "type": "HTTP",
+    "url": "${apiEndpointBaseUrl}/api/extension/payment/create",
+    "authentication": {
+      "type": "AuthorizationHeader",
+      "headerValue": "Basic ${apiEndpointAuthorization}"
+    }
+  },
+  "key": "cybersource_payment_create_extension",
+  "timeoutInMs": 10000,
+  "triggers": [
+    {
+      "actions": [
+        "Create"
+      ],
+      "resourceTypeId": "payment"
+    }
+  ]
+}
