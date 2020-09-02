@@ -1,4 +1,4 @@
-# CyberSource Commercetools Extension
+# CyberSource commercetools Extension
 
 Please see the following two sections for a high-level overview and Getting Started guide
 
