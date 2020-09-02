@@ -1,4 +1,4 @@
-# Visa CyberSource commercetools extension
+# CyberSource Commercetools Extension
 
 Please see the following two sections for a high-level overview and Getting Started guide
 
