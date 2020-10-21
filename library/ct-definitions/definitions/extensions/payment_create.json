@@ -7,7 +7,7 @@
       "headerValue": "Basic ${apiEndpointAuthorization}"
     }
   },
-  "key": "cybersource_payment_create_extension",
+  "key": "isv_payment_create_extension",
   "timeoutInMs": 10000,
   "triggers": [
     {

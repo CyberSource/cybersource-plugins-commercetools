@@ -7,13 +7,13 @@ import spock.lang.Shared
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 
-@ActiveProfiles(['proxycs', 'proxyct'])
+@ActiveProfiles(['proxyps', 'proxyct'])
 class MockExternalServicesBaseSpecification extends BaseSpecification {
 
     @Shared
-    static WireMockServer csWireMockServer = new WireMockServer(wireMockConfig()
+    static WireMockServer paymentServiceWireMockServer = new WireMockServer(wireMockConfig()
             .port(8080)
-            .usingFilesUnderDirectory('src/integration-test/resources/wiremock/cs')
+            .usingFilesUnderDirectory('src/integration-test/resources/wiremock/ps')
     )
 
     @Shared
@@ -23,12 +23,12 @@ class MockExternalServicesBaseSpecification extends BaseSpecification {
     )
 
     def 'setupSpec'() {
-        csWireMockServer.start()
+        paymentServiceWireMockServer.start()
         ctWireMockServer.start()
     }
 
     def 'setup'() {
-        csWireMockServer.resetToDefaultMappings()
+        paymentServiceWireMockServer.resetToDefaultMappings()
         ctWireMockServer.resetToDefaultMappings()
 
         // load potential responses for cart lookup
@@ -41,13 +41,13 @@ class MockExternalServicesBaseSpecification extends BaseSpecification {
     }
 
     def 'cleanupSpec'() {
-        csWireMockServer.stop()
+        paymentServiceWireMockServer.stop()
         ctWireMockServer.stop()
     }
 
-    def loadCsMapping(String path) {
-        def jsonMapping = new File(getClass().getResource('/wiremock/cs/testCases/' + path).toURI()).text
-        csWireMockServer.addStubMapping(StubMapping.buildFrom(jsonMapping))
+    def loadPsMapping(String path) {
+        def jsonMapping = new File(getClass().getResource('/wiremock/ps/testCases/' + path).toURI()).text
+        paymentServiceWireMockServer.addStubMapping(StubMapping.buildFrom(jsonMapping))
     }
 
     def loadCtMapping(String path) {

@@ -9,11 +9,13 @@ import isv.commercetools.mapping.model.CustomPayment;
 import isv.commercetools.mapping.model.PaymentDetails;
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory;
 import isv.commercetools.reference.application.validation.ResourceValidator;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import isv.payments.exception.PaymentException;
-import isv.payments.model.CybersourceRequest;
+
 import java.util.List;
 import java.util.Map;
+
+import isv.payments.model.PaymentServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,7 @@ public class PayerAuthEnrolmentCheckService implements PaymentService {
     private final ResourceValidator<Cart> cartValidator;
     private final PayerAuthEnrolmentCheckRequestTransformer requestTransformer;
     private final PayerAuthEnrolmentCheckResponseTransformer responseTransformer;
-    private final CybersourceClient cybersourceClient;
+    private final PaymentServiceClient paymentServiceClient;
 
     public PayerAuthEnrolmentCheckService(
             PaymentDetailsFactory paymentDetailsFactory,
@@ -37,13 +39,13 @@ public class PayerAuthEnrolmentCheckService implements PaymentService {
             ResourceValidator<Cart> cartValidator,
             PayerAuthEnrolmentCheckRequestTransformer requestTransformer,
             PayerAuthEnrolmentCheckResponseTransformer responseTransformer,
-            CybersourceClient cybersourceClient) {
+            PaymentServiceClient paymentServiceClient) {
         this.paymentDetailsFactory = paymentDetailsFactory;
         this.paymentValidator = paymentValidator;
         this.cartValidator = cartValidator;
         this.requestTransformer = requestTransformer;
         this.responseTransformer = responseTransformer;
-        this.cybersourceClient = cybersourceClient;
+        this.paymentServiceClient = paymentServiceClient;
     }
 
     @Override
@@ -61,9 +63,9 @@ public class PayerAuthEnrolmentCheckService implements PaymentService {
     @Override
     public List<UpdateAction> process(PaymentDetails paymentDetails) {
         try {
-            CybersourceRequest request = requestTransformer.transform(paymentDetails);
-            Map<String, String> cybersourceResponse = cybersourceClient.makeRequest(request);
-            return responseTransformer.transform(cybersourceResponse, paymentDetails.getCustomPayment());
+            PaymentServiceRequest request = requestTransformer.transform(paymentDetails);
+            Map<String, String> paymentResponse = paymentServiceClient.makeRequest(request);
+            return responseTransformer.transform(paymentResponse, paymentDetails.getCustomPayment());
         } catch (PaymentException e) {
             LOGGER.error(String.format("Received PaymentException when trying to check enrolment for Payment with id %s", paymentDetails.getCustomPayment().getId()), e);
             throw new PayerAuthenticationException(e);

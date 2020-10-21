@@ -1,8 +1,8 @@
 package isv.commercetools.reference.application.controller
 
-import Invokers.ApiException
 import isv.commercetools.reference.application.validation.FlexTokenVerifier
 import isv.flex.service.KeyService
+import isv.payments.exception.PaymentException
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 
@@ -36,7 +36,7 @@ class KeyGenerationControllerSpecification extends Specification {
         def result = testObj.generateKey()
 
         then:
-        1 * keyServiceMock.generateKey() >> { throw new ApiException('test') }
+        1 * keyServiceMock.generateKey() >> { throw new PaymentException('test') }
         result.statusCode == HttpStatus.INTERNAL_SERVER_ERROR
     }
 

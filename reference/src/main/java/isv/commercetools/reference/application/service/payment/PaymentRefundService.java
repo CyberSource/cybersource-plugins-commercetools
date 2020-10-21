@@ -6,14 +6,14 @@ import isv.commercetools.mapping.transformer.RequestTransformer;
 import isv.commercetools.mapping.transformer.response.ResponseTransformer;
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory;
 import isv.commercetools.reference.application.validation.ResourceValidator;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Handles processing INITIAL REFUND transactions on payments. Processing a refund transaction requires a SUCCESS CHARGE
- * transaction that contains an interactionId relating to a Cybersource transaction to exist on the payment.
- * Any exceptions thrown while calling cybersource will fail the refund and add an interfaceInteraction onto the payment.
+ * transaction that contains an interactionId relating to a payment service transaction to exist on the payment.
+ * Any exceptions thrown while calling the payment service will fail the refund and add an interfaceInteraction onto the payment.
  */
 public class PaymentRefundService extends BasePaymentService {
 
@@ -22,9 +22,9 @@ public class PaymentRefundService extends BasePaymentService {
             ResourceValidator<CustomPayment> paymentValidator,
             RequestTransformer requestTransformer,
             ResponseTransformer responseTransformer,
-            CybersourceClient cybersourceClient
+            PaymentServiceClient paymentServiceClient
     ) {
-        this(paymentDetailsFactory, paymentValidator, requestTransformer, responseTransformer, cybersourceClient, LoggerFactory.getLogger(PaymentRefundService.class));
+        this(paymentDetailsFactory, paymentValidator, requestTransformer, responseTransformer, paymentServiceClient, LoggerFactory.getLogger(PaymentRefundService.class));
     }
 
     protected PaymentRefundService(
@@ -32,10 +32,10 @@ public class PaymentRefundService extends BasePaymentService {
             ResourceValidator<CustomPayment> paymentValidator,
             RequestTransformer requestTransformer,
             ResponseTransformer responseTransformer,
-            CybersourceClient cybersourceClient,
+            PaymentServiceClient paymentServiceClient,
             Logger logger
     ) {
-        super(paymentDetailsFactory, paymentValidator, requestTransformer, responseTransformer, cybersourceClient, logger);
+        super(paymentDetailsFactory, paymentValidator, requestTransformer, responseTransformer, paymentServiceClient, logger);
     }
 
     @Override

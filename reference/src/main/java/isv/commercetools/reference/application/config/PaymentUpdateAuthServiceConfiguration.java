@@ -11,7 +11,7 @@ import io.sphere.sdk.client.SphereClient;
 import io.sphere.sdk.payments.TransactionState;
 import io.sphere.sdk.payments.TransactionType;
 import isv.cardinal.service.CardinalService;
-import isv.commercetools.mapping.model.CybersourceIds;
+import isv.commercetools.mapping.model.PaymentServiceIds;
 import isv.commercetools.mapping.transformer.VisaCheckoutDataRequestTransformer;
 import isv.commercetools.mapping.transformer.auth.AuthorizationRequestTransformer;
 import isv.commercetools.mapping.transformer.auth.visacheckout.VisaCheckoutAuthorizationRequestTransformer;
@@ -19,8 +19,8 @@ import isv.commercetools.mapping.transformer.auth.visacheckout.VisaCheckoutUpdat
 import isv.commercetools.mapping.transformer.payerauth.AuthorizationWithPayerAuthRequestTransformer;
 import isv.commercetools.mapping.transformer.payerauth.PayerAuthValidateResponseTransformer;
 import isv.commercetools.mapping.transformer.response.CompositeResponseTransformer;
-import isv.commercetools.mapping.transformer.response.CybersourceResponseToFieldGroupTransformer;
-import isv.commercetools.mapping.transformer.response.DefaultCybersourceResponseAddressMapper;
+import isv.commercetools.mapping.transformer.response.PaymentServiceResponseToFieldGroupTransformer;
+import isv.commercetools.mapping.transformer.response.DefaultPaymentServiceResponseAddressMapper;
 import isv.commercetools.mapping.transformer.response.ReasonCodeResponseTransformer;
 import isv.commercetools.mapping.transformer.response.SubscriptionCreateResponseTransformer;
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory;
@@ -38,7 +38,7 @@ import isv.commercetools.reference.application.validation.rules.service.PayerAut
 import isv.commercetools.reference.application.validation.rules.service.PayerAuthEnrolmentResponseDataValidationRule;
 import isv.commercetools.reference.application.validation.rules.service.PaymentGreaterThanZeroValidationRule;
 import isv.commercetools.reference.application.validation.rules.service.TokenValidationRule;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -76,8 +76,8 @@ public class PaymentUpdateAuthServiceConfiguration {
     @Bean
     public PaymentService paymentWithoutPayerAuthAuthorizationService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory,
             FlexTokenVerifier flexTokenVerifier
     ) {
@@ -93,10 +93,10 @@ public class PaymentUpdateAuthServiceConfiguration {
                 new BillingAddressValidationRule(objectMapper)
         ));
 
-        var authorizationRequestTransformer = new AuthorizationRequestTransformer(cybersourceIds);
+        var authorizationRequestTransformer = new AuthorizationRequestTransformer(paymentServiceIds);
         var authorizationResponseTransformer = new CompositeResponseTransformer(new ReasonCodeResponseTransformer(), new SubscriptionCreateResponseTransformer());
 
-        return new PaymentAuthorizationService(paymentDetailsFactory, paymentValidator, cartValidator, authorizationRequestTransformer, authorizationResponseTransformer, cybersourceClient);
+        return new PaymentAuthorizationService(paymentDetailsFactory, paymentValidator, cartValidator, authorizationRequestTransformer, authorizationResponseTransformer, paymentServiceClient);
     }
 
     /**
@@ -105,8 +105,8 @@ public class PaymentUpdateAuthServiceConfiguration {
     @Bean
     public PaymentService visaCheckoutAuthorizationService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             SphereClient paymentSphereClient,
             PaymentDetailsFactory paymentDetailsFactory,
         FlexTokenVerifier flexTokenVerifier
@@ -120,14 +120,14 @@ public class PaymentUpdateAuthServiceConfiguration {
 
         var cartValidator = new ResourceValidator<Cart>(Collections.emptyList());
 
-        var authorizationRequestTransformer = new VisaCheckoutAuthorizationRequestTransformer(cybersourceIds);
-        var dataRequestTransformer = new VisaCheckoutDataRequestTransformer(cybersourceIds);
+        var authorizationRequestTransformer = new VisaCheckoutAuthorizationRequestTransformer(paymentServiceIds);
+        var dataRequestTransformer = new VisaCheckoutDataRequestTransformer(paymentServiceIds);
 
         var authorizationResponseTransformer = new ReasonCodeResponseTransformer();
-        var cybersourceResponseTransformer = new CybersourceResponseToFieldGroupTransformer(objectMapper);
+        var paymentServiceResponseTransformer = new PaymentServiceResponseToFieldGroupTransformer(objectMapper);
 
-        var visaCheckoutQueryService = new VisaCheckoutQueryService(dataRequestTransformer, cybersourceClient);
-        var updateActionCreator = new VisaCheckoutUpdateActionCreator(new DefaultCybersourceResponseAddressMapper());
+        var visaCheckoutQueryService = new VisaCheckoutQueryService(dataRequestTransformer, paymentServiceClient);
+        var updateActionCreator = new VisaCheckoutUpdateActionCreator(new DefaultPaymentServiceResponseAddressMapper());
 
         return new VisaCheckoutAuthorizationService(
                 paymentDetailsFactory,
@@ -135,11 +135,11 @@ public class PaymentUpdateAuthServiceConfiguration {
                 cartValidator,
                 authorizationRequestTransformer,
                 authorizationResponseTransformer,
-                cybersourceClient,
+                paymentServiceClient,
                 paymentSphereClient,
                 visaCheckoutQueryService,
                 updateActionCreator,
-                cybersourceResponseTransformer
+                paymentServiceResponseTransformer
         );
     }
 
@@ -150,8 +150,8 @@ public class PaymentUpdateAuthServiceConfiguration {
     public PaymentService paymentWithPayerAuthAuthorizationService(
             ObjectMapper objectMapper,
             CardinalService cardinalService,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory,
             FlexTokenVerifier flexTokenVerifier
     ) {
@@ -170,10 +170,10 @@ public class PaymentUpdateAuthServiceConfiguration {
                 new PayerAuthEnrolmentCustomerValidationRule(objectMapper)
         ));
 
-        var authorizationWithPayerAuthRequestTransformer = new AuthorizationWithPayerAuthRequestTransformer(cybersourceIds);
+        var authorizationWithPayerAuthRequestTransformer = new AuthorizationWithPayerAuthRequestTransformer(paymentServiceIds);
         var authorizationResponseTransformer = new CompositeResponseTransformer(new ReasonCodeResponseTransformer(), new PayerAuthValidateResponseTransformer("payerAuthValidateReply_", true), new SubscriptionCreateResponseTransformer());
 
-        return new PaymentAuthorizationService(paymentDetailsFactory, paymentValidator, cartValidator, authorizationWithPayerAuthRequestTransformer, authorizationResponseTransformer, cybersourceClient);
+        return new PaymentAuthorizationService(paymentDetailsFactory, paymentValidator, cartValidator, authorizationWithPayerAuthRequestTransformer, authorizationResponseTransformer, paymentServiceClient);
     }
 
 }

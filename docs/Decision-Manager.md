@@ -90,7 +90,7 @@ Fields which are used by Decision Manager are mapped from commercetools fields a
 </tr>
 <tr class="even">
 <td>payment</td>
-<td>cs_deviceFingerprintId</td>
+<td>isv_deviceFingerprintId</td>
 <td>deviceFingerprintID</td>
 <td><br />
 </td>
@@ -104,7 +104,7 @@ See [Customisation](Customisation.md)
 
 ### Device fingerprinting
 
-Follow the appropriate Cybersource guide for device fingerprinting and add the session id used for this to the commercetools payment as a custom field called cs\_deviceFingerprintId
+Follow the appropriate Cybersource guide for device fingerprinting and add the session id used for this to the commercetools payment as a custom field called isv\_deviceFingerprintId
 
 ### Enabling/disabling decision manager for specific payments
 
@@ -128,14 +128,14 @@ To pass additional data to Decision Manager it is possible to customise your com
 <tbody>
 <tr class="odd">
 <td>payment</td>
-<td>cs_customerIpAddress</td>
+<td>isv_customerIpAddress</td>
 <td>billTo_ipAddress</td>
 <td><br />
 </td>
 </tr>
 <tr class="even">
 <td>payment</td>
-<td>cs_merchantDefinedData_*</td>
+<td>isv_merchantDefinedData_*</td>
 <td>merchantDefinedData_*</td>
 <td><p>Any field matching the commercetools prefix will be passed to Cybersource using the Cybersource prefix</p>
 <p>Cybersource recognises merchantDefinedData_ mddField_1 to merchantDefinedData_ mddField_100</p>
@@ -143,13 +143,13 @@ To pass additional data to Decision Manager it is possible to customise your com
 </tr>
 <tr class="odd">
 <td>line-item</td>
-<td>cs_productCode</td>
+<td>isv_productCode</td>
 <td>item_#_productCode</td>
 <td><p>Needs to be populated on the cart line items as the extension has no access to the product</p></td>
 </tr>
 <tr class="even">
 <td>line-item</td>
-<td>cs_productRisk</td>
+<td>isv_productRisk</td>
 <td>item_#_productRisk</td>
 <td><p>Needs to be populated on the cart line items as the extension has no access to the product</p></td>
 </tr>
@@ -168,7 +168,7 @@ The following is an example of field definitions for the customer IP address and
 	      "type": {
 	        "name": "String"
 	      },
-	      "name": "cs_customerIpAddress",
+	      "name": "isv_customerIpAddress",
 	      "label": {
 	        "en": "Customer IP address"
 	      },
@@ -178,16 +178,16 @@ The following is an example of field definitions for the customer IP address and
 	      "type": {
 	        "name": "String"
 	      },
-	      "name": "cs_merchantDefinedData_mddField_1",
+	      "name": "isv_merchantDefinedData_mddField_1",
 	      "label": {
-	        "en": "cs_merchantDefinedData_mddField_1"
+	        "en": "isv_merchantDefinedData_mddField_1"
 	      },
 	      "required": false
 	    }
 	  ],
-	  "key": "cybersource_payment_data",
+	  "key": "isv_payment_data",
 	  "name": {
-	    "en": "Cybersource custom payment fields"
+	    "en": "ISV payment service custom payment fields"
 	  },
 	  "resourceTypeIds": [
 	    "payment"
@@ -238,9 +238,9 @@ The following fields are defined as enums with all the values supported by Cyber
 	          "label" : "Subscription to a web site or other content."
 	        } ]
 	      },
-	      "name" : "cs_productCode",
+	      "name" : "isv_productCode",
 	      "label" : {
-	        "en" : "Cybersource product code"
+	        "en" : "Payment service product code"
 	      },
 	      "required" : false
 	    },
@@ -258,26 +258,26 @@ The following fields are defined as enums with all the values supported by Cyber
 	          "label" : "The product is associated with many chargebacks."
 	        } ]
 	      },
-	      "name" : "cs_productRisk",
+	      "name" : "isv_productRisk",
 	      "label" : {
-	        "en" : "Cybersource product risk"
+	        "en" : "Payment service product risk"
 	      },
 	      "required" : false
 	    }
 	
 	  ],
-	  "key": "cybersource_line_item_data",
+	  "key": "isv_payments_line_item_data",
 	  "name": {
-	    "en": "Cybersource custom line item fields"
+	    "en": "Payment service custom line item fields"
 	  },
 	  "resourceTypeIds": [
 	    "line-item"
 	  ]
 	}
 
-## Integration tests
+## Test settings
 
-To run the integration tests successfully it is necessary to configure Decision Manager in EBC
+To support testing Decision Manager responses it is necessary to configure Decision Manager in EBC. This allows triggering of particular responses by matching line 1 of the billing address
 
   - In Decision Manager → Configuration → Extended Settings enable
     Decision Manager for Authorization

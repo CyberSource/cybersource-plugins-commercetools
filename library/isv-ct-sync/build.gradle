@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+version = "${project.ext.projectVersion}"
+status = 'integration'
+
+sourceCompatibility = 11
+
+jar {
+    archivesBaseName = "isv-ct-sync"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+dependencies {
+    api project(":isv-ct-mapping")
+
+    api("com.commercetools.sdk.jvm.core:commercetools-models:${project.ext.commerceToolsVersion}")
+    api("com.cybersource:cybersource-rest-client-java:${project.ext.cybersourceRestClientVersion}")
+    api("com.commercetools.sdk.jvm.core:commercetools-java-client:${project.ext.commerceToolsVersion}") {
+        exclude group: 'org.asynchttpclient', module: 'async-http-client'
+    }
+    implementation("org.asynchttpclient:async-http-client:${project.ext.asyncHttpClientVersion}")
+
+    testImplementation("org.objenesis:objenesis:${project.ext.objenesisVersion}")
+
+}

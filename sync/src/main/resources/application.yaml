@@ -11,21 +11,22 @@ commercetools:
       clientId: ${env.commercetools.clientConfig.payment.clientId}
       secret: ${secrets.commercetools.clientConfig.payment.secret}
 
-cybersource:
-  client:
-    merchantID: ${env.cybersource.merchantID}
-    keysDirectory: ${env.cybersource.keysDirectory}
-    keyPassword: ${secrets.cybersource.keyPassword}
-    sharedSecret:
-      id: ${env.cybersource.sharedSecret.id}
-      value: ${secrets.cybersource.sharedSecret.value}
-    targetAPIVersion: 1.159
-    timeout: 5000
-    enableLog: false
-    logDirectory: .
-    logMaximumSize: 10
-    certificateCacheEnabled: true
-    runEnvironment: ${env.cybersource.runEnvironment}
-    authenticationType: http_signature
-    merchantKeyId: ${env.cybersource.sharedSecret.id}
-    merchantsecretKey: ${cybersource.client.sharedSecret.value}
+isv:
+  payments:
+    client:
+      merchantID: ${env.isv.payments.merchantID}
+      keysDirectory: ${env.isv.payments.keysDirectory}
+      keyPassword: ${secrets.isv.payments.keyPassword}
+      sharedSecret:
+        id: ${env.isv.payments.sharedSecret.id}
+        value: ${secrets.isv.payments.sharedSecret.value}
+      targetAPIVersion: 1.159
+      timeout: 5000
+      enableLog: false
+      logDirectory: .
+      logMaximumSize: 10
+      certificateCacheEnabled: true
+      runEnvironment: ${env.isv.payments.runEnvironment}
+      authenticationType: http_signature
+      merchantKeyId: ${env.isv.payments.sharedSecret.id}
+      merchantsecretKey: ${isv.payments.client.sharedSecret.value}

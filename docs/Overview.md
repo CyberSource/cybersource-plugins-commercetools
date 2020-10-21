@@ -6,10 +6,10 @@
   - [Validation](#Validation)
   - [Error handling](#Errorhandling)
       - [Communications failure on Payment Create](#CommunicationsfailureonPaymentCreate)
-      - [Cybersource request failures](#Cybersourcerequestfailures)
+      - [Payment service request failures](#requestfailures)
       - [API Extension errors](#APIExtensionerrors)
 
-The Cybersource Commercetools integration is a set of libraries and a
+The ISV Commercetools integration is a set of libraries and a
 reference implementation that allows processing payments registered in
 Commercetools through the Cybersource payment gateway. It is realised by
 the usage of a Spring Boot app configured as a Payment Create and
@@ -119,7 +119,7 @@ This endpoint should be defined in Commercetools as the Payment Update API Exten
 
 <span style="font-size: 1.714em;">Requirements and Design Decisions</span>
 
-The Cybersource plugin assumes full control of the management of Payment
+The ISV plugin assumes full control of the management of Payment
 resources. Due to this, there should be no manual modifications to
 payments, and also no other payments API Extensions that affect payments
 should be running in parallel.
@@ -154,7 +154,7 @@ If on a payment create the API extension cannot communicate with
 Cybersource, the API Extension will return
 an `InvalidOperation` error.
 
-## <a name="Cybersourcerequestfailures"></a>Cybersource request failures
+## <a name="requestfailures"></a>Payment service request failures
 
 When Cybersource returns an unsuccessful response code, the relevant
 transaction's state will be updated to **Failure**, and the transaction
@@ -166,6 +166,6 @@ in Cybersource Merchant Center to diagnose the issue.
 
 When there is an error in the API Extension itself, the payment will be
 updated to contain a new interfaceInteraction of type
-'cybersource\_payment\_failure', containing a message from the exception
+'isv\_payment\_failure', containing a message from the exception
 that was thrown.
 

@@ -1,9 +1,9 @@
 package isv.commercetools.reference.application.controller;
 
-import Invokers.ApiException;
 import isv.commercetools.reference.application.model.FlexKeys;
 import isv.commercetools.reference.application.validation.FlexTokenVerifier;
 import isv.flex.service.KeyService;
+import isv.payments.exception.PaymentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ public class KeyGenerationController {
             var captureContext = keyService.generateKey();
             var verificationContext = tokenVerifier.createVerificationContext(captureContext);
             return new ResponseEntity<>(new FlexKeys(captureContext, verificationContext), HttpStatus.OK);
-        } catch (ApiException e) {
+        } catch (PaymentException e) {
             log.error("Failed to generate one time key for Flex token", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

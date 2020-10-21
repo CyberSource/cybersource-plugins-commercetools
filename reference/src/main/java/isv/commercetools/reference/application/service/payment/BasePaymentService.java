@@ -18,7 +18,7 @@ import isv.commercetools.mapping.transformer.RequestTransformer;
 import isv.commercetools.mapping.transformer.response.ResponseTransformer;
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory;
 import isv.commercetools.reference.application.validation.ResourceValidator;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import isv.payments.exception.PaymentException;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 public abstract class BasePaymentService implements PaymentService {
 
     private final RequestTransformer requestTransformer;
-    private final CybersourceClient cybersourceClient;
+    private final PaymentServiceClient paymentServiceClient;
     private final Logger logger;
     private final ResponseTransformer responseTransformer;
     protected final PaymentDetailsFactory paymentDetailsFactory;
@@ -42,13 +42,13 @@ public abstract class BasePaymentService implements PaymentService {
             ResourceValidator<CustomPayment> paymentValidator,
             RequestTransformer requestTransformer,
             ResponseTransformer responseTransformer,
-            CybersourceClient cybersourceClient,
+            PaymentServiceClient paymentServiceClient,
             Logger logger) {
         this.paymentDetailsFactory = paymentDetailsFactory;
         this.paymentValidator = paymentValidator;
         this.requestTransformer = requestTransformer;
         this.responseTransformer = responseTransformer;
-        this.cybersourceClient = cybersourceClient;
+        this.paymentServiceClient = paymentServiceClient;
         this.logger = logger;
     }
 
@@ -71,9 +71,9 @@ public abstract class BasePaymentService implements PaymentService {
             var transactionToProcess = optionalTransaction.get();
             var request = requestTransformer.transform(paymentDetails);
             try {
-                Map cybersourceResponse = cybersourceClient.makeRequest(request);
-                logger.info("Response received: {}", cybersourceResponse.toString());
-                response = responseTransformer.transform(cybersourceResponse, transactionToProcess);
+                Map paymentResponse = paymentServiceClient.makeRequest(request);
+                logger.info("Response received: {}", paymentResponse.toString());
+                response = responseTransformer.transform(paymentResponse, transactionToProcess);
             } catch (PaymentException exception) {
                 logger.error(String.format("Received PaymentException when trying to process transaction %s on payment %s", transactionToProcess.getId(), payment.getId()), exception);
                 response = handlePaymentException(exception, transactionToProcess);

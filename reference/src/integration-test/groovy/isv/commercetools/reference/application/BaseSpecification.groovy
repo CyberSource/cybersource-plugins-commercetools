@@ -25,7 +25,7 @@ class BaseSpecification extends Specification {
     RequestBuilder requestBuilder
 
     @Autowired
-    CybersourceHelper cybersourceHelper
+    PaymentServiceHelper paymentServiceHelper
 
     String paymentCreateUrl = '/api/extension/payment/create'
     String paymentUpdateUrl = '/api/extension/payment/update'

@@ -24,7 +24,7 @@
         "fractionDigits": 2
       },
       "paymentMethodInfo": {
-        "paymentInterface": "cybersource",
+        "paymentInterface": "isv_payments",
         "method": "creditCard"
       },
       "paymentStatus": {},

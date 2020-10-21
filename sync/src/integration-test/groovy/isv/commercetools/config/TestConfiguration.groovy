@@ -5,7 +5,7 @@ import Invokers.Pair
 import com.cybersource.authsdk.core.ConfigException
 import com.cybersource.authsdk.core.MerchantConfig
 import isv.commercetools.sync.RequestStubBuilder
-import isv.commercetools.sync.payment.config.CsClientConfigurationProperties
+import isv.commercetools.sync.payment.config.PaymentServiceClientConfigurationProperties
 import org.springframework.beans.BeanInstantiationException
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -23,13 +23,13 @@ class TestConfiguration {
 
     @Bean
     @Primary
-    ApiClient testCybersourceClient(CsClientConfigurationProperties appConfig) throws ConfigException {
-        Map csConfig = appConfig.client
-        if (csConfig.isEmpty()) {
-            throw new BeanInstantiationException(Properties, 'No Cybersource client configuration provided')
+    ApiClient testPaymentServiceClient(PaymentServiceClientConfigurationProperties appConfig) throws ConfigException {
+        Map paymentServiceClientConfig = appConfig.client
+        if (paymentServiceClientConfig.isEmpty()) {
+            throw new BeanInstantiationException(Properties, 'No payment service client configuration provided')
         }
         Properties properties = new Properties()
-        properties.putAll(csConfig)
+        properties.putAll(paymentServiceClientConfig)
 
         new ApiClient(new MerchantConfig(properties)) {
             @Override

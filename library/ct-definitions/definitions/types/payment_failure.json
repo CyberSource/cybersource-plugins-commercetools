@@ -21,9 +21,9 @@
       "required": true
     }
   ],
-  "key": "cybersource_payment_failure",
+  "key": "isv_payment_failure",
   "name": {
-    "en": "Interaction for a payment that been rejected or has failed in Cybersource"
+    "en": "Interaction for a payment that been rejected or has failed in payment service"
   },
   "resourceTypeIds": [
     "payment-interface-interaction"

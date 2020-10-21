@@ -16,9 +16,9 @@
           "id": "9acb3017-df1e-439e-bf10-450e04a86609"
         },
         "fields": {
-          "cs_acceptHeader": "*/*",
-          "cs_userAgentHeader": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:69.0) Gecko/20100101 Firefox/69.0",
-          "cs_token": "someToken"
+          "isv_acceptHeader": "*/*",
+          "isv_userAgentHeader": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:69.0) Gecko/20100101 Firefox/69.0",
+          "isv_token": "someToken"
         }
       },
       "customer": {
@@ -29,7 +29,7 @@
       "interfaceInteractions": [],
       "lastModifiedAt": "1970-01-01T00:00:00.000Z",
       "paymentMethodInfo": {
-        "paymentInterface": "cybersource",
+        "paymentInterface": "isv_payments",
         "method": "visaCheckout"
       },
       "paymentStatus": {},

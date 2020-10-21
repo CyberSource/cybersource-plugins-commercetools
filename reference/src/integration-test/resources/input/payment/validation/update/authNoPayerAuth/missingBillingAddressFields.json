@@ -16,11 +16,11 @@
           "id": "ab3cc368-7a40-43b8-a629-7baadc4671e2"
         },
         "fields": {
-          "cs_maskedPan": "something",
-          "cs_cardExpiryYear": "2022",
-          "cs_cardExpiryMonth": "01",
-          "cs_cardType": "Visa",
-          "cs_deviceFingerprintId": "fingerprint"
+          "isv_maskedPan": "something",
+          "isv_cardExpiryYear": "2022",
+          "isv_cardExpiryMonth": "01",
+          "isv_cardType": "Visa",
+          "isv_deviceFingerprintId": "fingerprint"
         }
       },
       "customer": {
@@ -31,7 +31,7 @@
       "interfaceInteractions": [],
       "lastModifiedAt": "2019-10-10T08:28:32.994Z",
       "paymentMethodInfo": {
-        "paymentInterface": "cybersource",
+        "paymentInterface": "isv_payments",
         "method": "creditCard"
       },
       "paymentStatus": {},

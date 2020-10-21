@@ -1,4 +1,4 @@
-# CyberSource commercetools Extension
+# ISV commercetools extension
 
 Please see the following two sections for a high-level overview and Getting Started guide
 

@@ -16,7 +16,7 @@ repositories {
     jcenter()
 }
 
-group = 'com.cybersource'
+group = 'com.isv'
 version = "${appVersion}"
 status = 'integration'
 
@@ -24,7 +24,7 @@ sourceCompatibility = 11
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter")
-    compile("com.cybersource:cs-ct-sync:${project.ext.cybersourceCommercetoolsLibraryVersion}")
+    compile("com.isv:isv-ct-sync:${project.ext.isvCommercetoolsLibraryVersion}")
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("org.codehaus.groovy:groovy-all:${project.ext.groovyVersion}")

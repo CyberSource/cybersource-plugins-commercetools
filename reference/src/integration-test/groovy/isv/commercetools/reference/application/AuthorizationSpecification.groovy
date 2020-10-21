@@ -47,19 +47,19 @@ class AuthorizationSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionState.state == 'Success'
         changeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validateShippingFields(csRequest)
-            validateLineItemFields(csRequest, 0)
-            validateLineItemFields(csRequest, 1)
-            validatePurchaseTotalFields(csRequest, new BigDecimal(amount).movePointLeft(2).toString())
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validateDeviceFingerprint(csRequest)
-            validateMerchantDefinedFields(csRequest)
-            validateAuthServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validateShippingFields(psRequest)
+            validateLineItemFields(psRequest, 0)
+            validateLineItemFields(psRequest, 1)
+            validatePurchaseTotalFields(psRequest, new BigDecimal(amount).movePointLeft(2).toString())
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validateDeviceFingerprint(psRequest)
+            validateMerchantDefinedFields(psRequest)
+            validateAuthServiceRun(psRequest)
         }
 
         where:
@@ -107,19 +107,19 @@ class AuthorizationSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionState.state == 'Success'
         changeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validateShippingFields(csRequest)
-            validateLineItemFields(csRequest, 0)
-            validateLineItemFields(csRequest, 1)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validateDeviceFingerprint(csRequest)
-            validateMerchantDefinedFields(csRequest)
-            validateAuthServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validateShippingFields(psRequest)
+            validateLineItemFields(psRequest, 0)
+            validateLineItemFields(psRequest, 1)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validateDeviceFingerprint(psRequest)
+            validateMerchantDefinedFields(psRequest)
+            validateAuthServiceRun(psRequest)
         }
     }
 
@@ -161,20 +161,20 @@ class AuthorizationSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionState.state == 'Success'
         changeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validateShippingFields(csRequest)
-            validateLineItemFields(csRequest, 0)
-            validateLineItemFields(csRequest, 1)
-            validatePurchaseTotalFields(csRequest, '1.23')
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validateDeviceFingerprint(csRequest)
-            validateMerchantDefinedFields(csRequest)
-            validateAuthServiceRun(csRequest)
-            validateSubscriptionCreateServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validateShippingFields(psRequest)
+            validateLineItemFields(psRequest, 0)
+            validateLineItemFields(psRequest, 1)
+            validatePurchaseTotalFields(psRequest, '1.23')
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validateDeviceFingerprint(psRequest)
+            validateMerchantDefinedFields(psRequest)
+            validateAuthServiceRun(psRequest)
+            validateSubscriptionCreateServiceRun(psRequest)
         }
 
         and: 'a persistent token is returned'
@@ -215,20 +215,20 @@ class AuthorizationSpecification extends MockExternalServicesBaseSpecification {
         savedTokenChangeTransactionState.state == 'Success'
         savedTokenChangeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
-        and: 'expected fields were sent to cybersource'
-        def csSavedTokenRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csSavedTokenRequest)
-            validateShippingFields(csSavedTokenRequest)
-            validateLineItemFields(csSavedTokenRequest, 0)
-            validateLineItemFields(csSavedTokenRequest, 1)
-            validatePurchaseTotalFields(csSavedTokenRequest, '1.23')
-            validateMerchantFields(csSavedTokenRequest)
-            validateSavedToken(csSavedTokenRequest)
-            validateDeviceFingerprint(csSavedTokenRequest)
-            validateMerchantDefinedFields(csSavedTokenRequest)
-            validateAuthServiceRun(csSavedTokenRequest)
-            validateSubscriptionUpdateServiceRun(csSavedTokenRequest)
+        and: 'expected fields were sent to payment service'
+        def psSavedTokenRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psSavedTokenRequest)
+            validateShippingFields(psSavedTokenRequest)
+            validateLineItemFields(psSavedTokenRequest, 0)
+            validateLineItemFields(psSavedTokenRequest, 1)
+            validatePurchaseTotalFields(psSavedTokenRequest, '1.23')
+            validateMerchantFields(psSavedTokenRequest)
+            validateSavedToken(psSavedTokenRequest)
+            validateDeviceFingerprint(psSavedTokenRequest)
+            validateMerchantDefinedFields(psSavedTokenRequest)
+            validateAuthServiceRun(psSavedTokenRequest)
+            validateSubscriptionUpdateServiceRun(psSavedTokenRequest)
         }
     }
 
@@ -260,23 +260,23 @@ class AuthorizationSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
         def addInterfaceInteraction = responseBody.actions.find { it.action == 'addInterfaceInteraction' }
-        addInterfaceInteraction.type.key == 'cybersource_payment_failure'
+        addInterfaceInteraction.type.key == 'isv_payment_failure'
         addInterfaceInteraction.fields.get('transactionId') == '8788176c-e42f-4544-aeaf-a155e1232292'
         addInterfaceInteraction.fields.get('reasonCode') == expectedReasonCode
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validateShippingFields(csRequest)
-            validateLineItemFields(csRequest, 0)
-            validateLineItemFields(csRequest, 1)
-            validatePurchaseTotalFields(csRequest, new BigDecimal(amount).movePointLeft(2).setScale(0).toString())
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validateDeviceFingerprint(csRequest)
-            validateMerchantDefinedFields(csRequest)
-            validateAuthServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validateShippingFields(psRequest)
+            validateLineItemFields(psRequest, 0)
+            validateLineItemFields(psRequest, 1)
+            validatePurchaseTotalFields(psRequest, new BigDecimal(amount).movePointLeft(2).setScale(0).toString())
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validateDeviceFingerprint(psRequest)
+            validateMerchantDefinedFields(psRequest)
+            validateAuthServiceRun(psRequest)
         }
 
         where:
@@ -325,25 +325,25 @@ class AuthorizationSpecification extends MockExternalServicesBaseSpecification {
 
         if (failureExpected) {
             def addInterfaceInteraction = updateResponseBody.actions.find { it.action == 'addInterfaceInteraction' }
-            addInterfaceInteraction.type.key == 'cybersource_payment_failure'
+            addInterfaceInteraction.type.key == 'isv_payment_failure'
             addInterfaceInteraction.fields.get('transactionId') == '8788176c-e42f-4544-aeaf-a155e1232292'
             addInterfaceInteraction.fields.get('reasonCode') == '102'
         }
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validateShippingFields(csRequest)
-            validateLineItemFields(csRequest, 0)
-            validateLineItemFields(csRequest, 1)
-            validatePurchaseTotalFields(csRequest, '1.23')
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validateDeviceFingerprint(csRequest)
-            validateMerchantDefinedFields(csRequest)
-            validateAuthServiceRun(csRequest)
-            validateDecisionManagerFlag(csRequest, featureFlagValue)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validateShippingFields(psRequest)
+            validateLineItemFields(psRequest, 0)
+            validateLineItemFields(psRequest, 1)
+            validatePurchaseTotalFields(psRequest, '1.23')
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validateDeviceFingerprint(psRequest)
+            validateMerchantDefinedFields(psRequest)
+            validateAuthServiceRun(psRequest)
+            validateDecisionManagerFlag(psRequest, featureFlagValue)
         }
 
         cleanup:

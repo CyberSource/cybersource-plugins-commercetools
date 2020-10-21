@@ -77,19 +77,19 @@ After authentication is complete, authorisation of the payment can then be tri
     | ----------------------------------------- | ------------------------------------------ | --------- | ----- |
     | customer                                  | Reference to commercetools customer        | See notes | Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated |
     | anonymousId	                            | Id for tracking guest checkout             | See notes | Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated |
-    | paymentMethodInfo.paymentInterface        | cybersource                                | Yes       |  |
+    | paymentMethodInfo.paymentInterface        | isv_payments                               | Yes       |  |
     | paymentMethodInfo.method                  | creditCardWithPayerAuthentication          | Yes       | The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being used. <br><br> Typically an implementation would choose one or the other and the method name may be different to this |
     | amountPlanned                             | Amount to authorise                        | Yes       | Should match cart gross total, unless split payments are being used |
-    | custom.fields.cs_token                    | Cybersource flex token                     | See notes | This is the token parameter passed into the callback for the microform.createToken call  <br><br> Required when not using a saved token |
-    | custom.fields.cs_tokenVerificationContext | Token verification context                 | See notes | This is the verificationContext property from the call to the /keys service <br><br> Required when cs_token is populated |
-    | custom.fields.cs_tokenAlias               | Alias for saved token                      | No        | When this is specified the token will be saved as a subscription for later use |
-    | custom.fields.cs_savedToken               | Saved token value                          | No        | Required when paying with a saved token |
-    | custom.fields.cs_maskedPan                | Masked credit card number                  | No        | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.number field containing the masked card number. <br><br> Not required by extension but can be used for display |
-    | custom.fields.cs_cardType                 | Credit card type                           | No        | For display only |
-    | custom.fields.cs_cardExpiryMonth          | Card expiry month                          | No        | For display only |
-    | custom.fields.cs_cardExpiryYear           | Card expiry year                           | No        | For display only |
-    | custom.fields.cs_acceptHeader             | Value of Accept header from user's browser | Yes       | Used by 3DS process, populated from client-side libraries |
-    | custom.fields.cs_userAgentHeader          | Value of Accept header from user's browser | Yes       | Used by 3DS process, populated from client-side libraries |
+    | custom.fields.isv_token                    | Cybersource flex token                     | See notes | This is the token parameter passed into the callback for the microform.createToken call  <br><br> Required when not using a saved token |
+    | custom.fields.isv_tokenVerificationContext | Token verification context                 | See notes | This is the verificationContext property from the call to the /keys service <br><br> Required when isv_token is populated |
+    | custom.fields.isv_tokenAlias               | Alias for saved token                      | No        | When this is specified the token will be saved as a subscription for later use |
+    | custom.fields.isv_savedToken               | Saved token value                          | No        | Required when paying with a saved token |
+    | custom.fields.isv_maskedPan                | Masked credit card number                  | No        | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.number field containing the masked card number. <br><br> Not required by extension but can be used for display |
+    | custom.fields.isv_cardType                 | Credit card type                           | No        | For display only |
+    | custom.fields.isv_cardExpiryMonth          | Card expiry month                          | No        | For display only |
+    | custom.fields.isv_cardExpiryYear           | Card expiry year                           | No        | For display only |
+    | custom.fields.isv_acceptHeader             | Value of Accept header from user's browser | Yes       | Used by 3DS process, populated from client-side libraries |
+    | custom.fields.isv_userAgentHeader          | Value of Accept header from user's browser | Yes       | Used by 3DS process, populated from client-side libraries |
     
     a.  Also see [Decision Manager](Decision-Manager.md) for additional fields to populate if you are using Decision Manager
     
@@ -104,12 +104,12 @@ After authentication is complete, authorisation of the payment can then be tri
         
 	      Cardinal.continue('cca',
 	        {
-	          "AcsUrl": <value of cs_payerAuthenticationAcsUrl from created payment>,
-	          "Payload": <value of cs_payerAuthenticationPaReq from created payment>
+	          "AcsUrl": <value of isv_payerAuthenticationAcsUrl from created payment>,
+	          "Payload": <value of isv_payerAuthenticationPaReq from created payment>
 	        },
 	        {
 	          "OrderDetails": {
-	            "TransactionId": <value of cs_payerAuthenticationTransactionId from created payment>
+	            "TransactionId": <value of isv_payerAuthenticationTransactionId from created payment>
 	          }
 	        }
 	      );
@@ -138,9 +138,9 @@ After authentication is complete, authorisation of the payment can then be tri
 The following values are stored within commerce tools to allow later
 verification that the payer was authenticated correctly
 
-  - Responses to the enrolment check are stored on a payment interface interaction with a type key of `cybersource_payer_authentication_enrolment_check`
+  - Responses to the enrolment check are stored on a payment interface interaction with a type key of `isv_payments_payer_authentication_enrolment_check`
 
-  - Responses to the authentication validation are stored on a payment interface interaction with a type key of `cybersource_payer_authentication_validate_result`
+  - Responses to the authentication validation are stored on a payment interface interaction with a type key of `isv_payments_payer_authentication_validate_result`
 
   - The request and response Cardinal JWTs are stored a custom properties on the payment
 
@@ -150,7 +150,7 @@ verification that the payer was authenticated correctly
     
     ⚠️ **V2 paReq values can be decoded by Base64 decoding the string**
     
-When a token is saved as a subscription the saved token value will be returned as a custom property on the payment called cs_savedToken
+When a token is saved as a subscription the saved token value will be returned as a custom property on the payment called isv_savedToken
 
 See [Commercetools Setup](Commercetools-Setup.md) for more details on the individual fields.
 

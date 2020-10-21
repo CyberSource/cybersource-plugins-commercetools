@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sphere.sdk.payments.TransactionState;
 import io.sphere.sdk.payments.TransactionType;
 import isv.commercetools.mapping.model.CustomPayment;
-import isv.commercetools.mapping.model.CybersourceIds;
+import isv.commercetools.mapping.model.PaymentServiceIds;
 import isv.commercetools.mapping.transformer.response.ReasonCodeResponseTransformer;
 import isv.commercetools.mapping.transformer.reversal.AuthReversalRequestTransformer;
 import isv.commercetools.mapping.transformer.reversal.VisaCheckoutAuthReversalRequestTransformer;
@@ -17,7 +17,7 @@ import isv.commercetools.reference.application.service.payment.PaymentCancelAuth
 import isv.commercetools.reference.application.service.payment.PaymentService;
 import isv.commercetools.reference.application.validation.ResourceValidator;
 import isv.commercetools.reference.application.validation.rules.service.CancelAuthAmountEqualsAuthAmountValidationRule;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,14 +48,14 @@ public class PaymentUpdateCancelAuthServiceConfiguration {
     @Bean
     public PaymentService paymentCancelAuthService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory
     ) {
-        var requestTransformer = new AuthReversalRequestTransformer(cybersourceIds);
+        var requestTransformer = new AuthReversalRequestTransformer(paymentServiceIds);
         var reasonCodeResponseTransformer = new ReasonCodeResponseTransformer();
 
-        return new PaymentCancelAuthorizationService(paymentDetailsFactory, validator(objectMapper), requestTransformer, reasonCodeResponseTransformer, cybersourceClient);
+        return new PaymentCancelAuthorizationService(paymentDetailsFactory, validator(objectMapper), requestTransformer, reasonCodeResponseTransformer, paymentServiceClient);
     }
 
     /**
@@ -64,14 +64,14 @@ public class PaymentUpdateCancelAuthServiceConfiguration {
     @Bean
     public PaymentService visaCheckoutPaymentCancelAuthService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory
     ) {
-        var requestTransformer = new VisaCheckoutAuthReversalRequestTransformer(cybersourceIds);
+        var requestTransformer = new VisaCheckoutAuthReversalRequestTransformer(paymentServiceIds);
         var reasonCodeResponseTransformer = new ReasonCodeResponseTransformer();
 
-        return new PaymentCancelAuthorizationService(paymentDetailsFactory, validator(objectMapper), requestTransformer, reasonCodeResponseTransformer, cybersourceClient);
+        return new PaymentCancelAuthorizationService(paymentDetailsFactory, validator(objectMapper), requestTransformer, reasonCodeResponseTransformer, paymentServiceClient);
     }
 
     private ResourceValidator<CustomPayment> validator(ObjectMapper objectMapper) {

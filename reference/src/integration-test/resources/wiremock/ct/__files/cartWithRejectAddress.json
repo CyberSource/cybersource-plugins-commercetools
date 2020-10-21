@@ -15,7 +15,7 @@
         "postalCode": "SE19BG",
         "city": "London",
         "region": "",
-        "email": "cybersource-commercetools-extension@example.com",
+        "email": "isv-commercetools-extension@example.com",
         "additionalAddressInfo": "Decision Manager: Reject"
       },
       "cartState": "Active",
@@ -35,8 +35,8 @@
               "id": "ab3cc368-7a40-43b8-a629-7baadc4671a4"
             },
             "fields": {
-              "cs_productCode": "electronic_good",
-              "cs_productRisk": "low"
+              "isv_productCode": "electronic_good",
+              "isv_productRisk": "low"
             }
           },
           "discountedPricePerQuantity": [],
@@ -157,8 +157,8 @@
               "id": "ab3cc368-7a40-43b8-a629-7baadc4671a4"
             },
             "fields": {
-              "cs_productCode": "coupon",
-              "cs_productRisk": "high"
+              "isv_productCode": "coupon",
+              "isv_productRisk": "high"
             }
           },
           "discountedPricePerQuantity": [],

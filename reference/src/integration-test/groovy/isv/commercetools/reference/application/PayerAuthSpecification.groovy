@@ -30,7 +30,7 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         responseBody.actions.size == 3
 
         def enrolmentCheckInteraction = responseBody.actions.find { it.action == 'addInterfaceInteraction' }
-        enrolmentCheckInteraction.type.key == 'cybersource_payer_authentication_enrolment_check'
+        enrolmentCheckInteraction.type.key == 'isv_payments_payer_authentication_enrolment_check'
         enrolmentCheckInteraction.fields.commerceIndicator == ci
         expectTransactionId == (enrolmentCheckInteraction.fields.authenticationTransactionId != null)
         enrolmentCheckInteraction.fields.veresEnrolled == veres
@@ -45,17 +45,17 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         enrolmentCheckInteraction.fields.authorizationAllowed == true
         enrolmentCheckInteraction.fields.eci == eci
 
-        commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationRequired') == false
-        expectTransactionId == (commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationTransactionId') != null)
+        commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationRequired') == false
+        expectTransactionId == (commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationTransactionId') != null)
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequest)
         }
 
         when: 'payment is updated with transaction'
@@ -78,19 +78,19 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionState.state == 'Success'
         changeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csAuthRequest)
-            validateShippingFields(csAuthRequest)
-            validateLineItemFields(csAuthRequest, 0)
-            validateLineItemFields(csAuthRequest, 1)
-            validatePurchaseTotalFields(csAuthRequest)
-            validateMerchantFields(csAuthRequest)
-            validateToken(csAuthRequest)
-            validateDeviceFingerprint(csAuthRequest)
-            validateMerchantDefinedFields(csAuthRequest)
-            validateAuthServiceRun(csAuthRequest)
+        and: 'expected fields were sent to payment service'
+        def psAuthRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psAuthRequest)
+            validateShippingFields(psAuthRequest)
+            validateLineItemFields(psAuthRequest, 0)
+            validateLineItemFields(psAuthRequest, 1)
+            validatePurchaseTotalFields(psAuthRequest)
+            validateMerchantFields(psAuthRequest)
+            validateToken(psAuthRequest)
+            validateDeviceFingerprint(psAuthRequest)
+            validateMerchantDefinedFields(psAuthRequest)
+            validateAuthServiceRun(psAuthRequest)
         }
 
         where:
@@ -126,7 +126,7 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         responseBody.actions.size == 4
 
         def enrolmentCheckInteraction = responseBody.actions.find {
-            it.action == 'addInterfaceInteraction' && it.type.key == 'cybersource_payer_authentication_enrolment_check'
+            it.action == 'addInterfaceInteraction' && it.type.key == 'isv_payments_payer_authentication_enrolment_check'
         }
         enrolmentCheckInteraction.fields.commerceIndicator == null
         enrolmentCheckInteraction.fields.authenticationTransactionId != null
@@ -139,7 +139,7 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         enrolmentCheckInteraction.fields.eci == null
 
         def validateResultInteraction = responseBody.actions.find {
-            it.action == 'addInterfaceInteraction' && it.type.key == 'cybersource_payer_authentication_validate_result'
+            it.action == 'addInterfaceInteraction' && it.type.key == 'isv_payments_payer_authentication_validate_result'
         }
         validateResultInteraction.fields.paresStatus == paresStatus
         validateResultInteraction.fields.eciRaw == '07'
@@ -148,8 +148,8 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         validateResultInteraction.fields.directoryServerTransactionId != null
         validateResultInteraction.fields.specificationVersion.startsWith('2.')
 
-        commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationRequired') == false
-        commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationTransactionId') != null
+        commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationRequired') == false
+        commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationTransactionId') != null
 
         when: 'payment is updated with transaction'
         def paymentUpdateRequest = requestBuilder.paymentUpdateWithoutAuthenticationRequest(requestJwt, createTokenResponse, enrolmentCheckInteraction.fields)
@@ -162,14 +162,14 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         updateResponseBody.errors[0].code == 'InvalidOperation'
         updateResponseBody.errors[0].message == 'Payment cannot be authorized due to previous failure.'
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequest)
         }
 
         where:
@@ -198,7 +198,7 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         responseBody.actions.size == 4
 
         def enrolmentCheckInteraction = responseBody.actions.find {
-            it.action == 'addInterfaceInteraction' && it.type.key == 'cybersource_payer_authentication_enrolment_check'
+            it.action == 'addInterfaceInteraction' && it.type.key == 'isv_payments_payer_authentication_enrolment_check'
         }
         testCase.expectXid == (enrolmentCheckInteraction.fields.xid != null)
         enrolmentCheckInteraction.fields.authenticationTransactionId != null
@@ -210,20 +210,20 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         enrolmentCheckInteraction.fields.authorizationAllowed == true
         enrolmentCheckInteraction.fields.eci == testCase.eci
 
-        commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationRequired') == false
-        commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationTransactionId') != null
+        commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationRequired') == false
+        commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationTransactionId') != null
 
         and: 'auth validate data in response'
         validateResultInteraction(responseBody, testCase)
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequest)
         }
 
         when: 'payment is updated with transaction'
@@ -246,19 +246,19 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionState.state == 'Success'
         changeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csAuthRequest)
-            validateShippingFields(csAuthRequest)
-            validateLineItemFields(csAuthRequest, 0)
-            validateLineItemFields(csAuthRequest, 1)
-            validatePurchaseTotalFields(csAuthRequest)
-            validateMerchantFields(csAuthRequest)
-            validateToken(csAuthRequest)
-            validateDeviceFingerprint(csAuthRequest)
-            validateMerchantDefinedFields(csAuthRequest)
-            validateAuthServiceRun(csAuthRequest)
+        and: 'expected fields were sent to payment service'
+        def psAuthRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psAuthRequest)
+            validateShippingFields(psAuthRequest)
+            validateLineItemFields(psAuthRequest, 0)
+            validateLineItemFields(psAuthRequest, 1)
+            validatePurchaseTotalFields(psAuthRequest)
+            validateMerchantFields(psAuthRequest)
+            validateToken(psAuthRequest)
+            validateDeviceFingerprint(psAuthRequest)
+            validateMerchantDefinedFields(psAuthRequest)
+            validateAuthServiceRun(psAuthRequest)
         }
 
         where:
@@ -282,19 +282,19 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def responseBody = new JsonSlurper().parseText(response.body)
         validateCreateResponseForCardRequiringAuthentication(responseBody, testCase.specificationVersion)
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequest)
         }
 
         when: 'authentication continued'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFields = responseBody.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionId = enrolmentCheckFields.authenticationTransactionId
 
@@ -321,20 +321,20 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def updateResponseBody = new JsonSlurper().parseText(paymentUpdateResponse.body)
         validateSuccessfulUpdateResponseForCardRequiringAuthentication(updateResponseBody, testCase)
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csAuthRequest)
-            validateShippingFields(csAuthRequest)
-            validateLineItemFields(csAuthRequest, 0)
-            validateLineItemFields(csAuthRequest, 1)
-            validatePurchaseTotalFields(csAuthRequest)
-            validateMerchantFields(csAuthRequest)
-            validateToken(csAuthRequest)
-            validateDeviceFingerprint(csAuthRequest)
-            validateMerchantDefinedFields(csAuthRequest)
-            validateAuthServiceRun(csAuthRequest)
-            validatePayerAuthValidateServiceRun(csAuthRequest)
+        and: 'expected fields were sent to payment service'
+        def psAuthRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psAuthRequest)
+            validateShippingFields(psAuthRequest)
+            validateLineItemFields(psAuthRequest, 0)
+            validateLineItemFields(psAuthRequest, 1)
+            validatePurchaseTotalFields(psAuthRequest)
+            validateMerchantFields(psAuthRequest)
+            validateToken(psAuthRequest)
+            validateDeviceFingerprint(psAuthRequest)
+            validateMerchantDefinedFields(psAuthRequest)
+            validateAuthServiceRun(psAuthRequest)
+            validatePayerAuthValidateServiceRun(psAuthRequest)
         }
 
         where:
@@ -358,19 +358,19 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def responseBody = new JsonSlurper().parseText(response.body)
         validateCreateResponseForCardRequiringAuthentication(responseBody, testCase.specificationVersion)
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequest)
         }
 
         when: 'authentication continued'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFields = responseBody.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionId = enrolmentCheckFields.authenticationTransactionId
 
@@ -397,20 +397,20 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def updateResponseBody = new JsonSlurper().parseText(paymentUpdateResponse.body)
         validateFailureUpdateResponseForCardRequiringAuthentication(updateResponseBody, testCase)
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csAuthRequest)
-            validateShippingFields(csAuthRequest)
-            validateLineItemFields(csAuthRequest, 0)
-            validateLineItemFields(csAuthRequest, 1)
-            validatePurchaseTotalFields(csAuthRequest)
-            validateMerchantFields(csAuthRequest)
-            validateToken(csAuthRequest)
-            validateDeviceFingerprint(csAuthRequest)
-            validateMerchantDefinedFields(csAuthRequest)
-            validateAuthServiceRun(csAuthRequest)
-            validatePayerAuthValidateServiceRun(csAuthRequest)
+        and: 'expected fields were sent to payment service'
+        def psAuthRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psAuthRequest)
+            validateShippingFields(psAuthRequest)
+            validateLineItemFields(psAuthRequest, 0)
+            validateLineItemFields(psAuthRequest, 1)
+            validatePurchaseTotalFields(psAuthRequest)
+            validateMerchantFields(psAuthRequest)
+            validateToken(psAuthRequest)
+            validateDeviceFingerprint(psAuthRequest)
+            validateMerchantDefinedFields(psAuthRequest)
+            validateAuthServiceRun(psAuthRequest)
+            validatePayerAuthValidateServiceRun(psAuthRequest)
         }
 
         where:
@@ -434,19 +434,19 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def responseBody = new JsonSlurper().parseText(response.body)
         validateCreateResponseForCardRequiringAuthentication(responseBody, testCase.specificationVersion)
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequest)
         }
 
         when: 'authentication continued'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFields = responseBody.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionId = enrolmentCheckFields.authenticationTransactionId
 
@@ -473,20 +473,20 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def updateResponseBody = new JsonSlurper().parseText(paymentUpdateResponse.body)
         validateSuccessfulUpdateResponseForCardRequiringAuthentication(updateResponseBody, testCase)
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csAuthRequest)
-            validateShippingFields(csAuthRequest)
-            validateLineItemFields(csAuthRequest, 0)
-            validateLineItemFields(csAuthRequest, 1)
-            validatePurchaseTotalFields(csAuthRequest)
-            validateMerchantFields(csAuthRequest)
-            validateToken(csAuthRequest)
-            validateDeviceFingerprint(csAuthRequest)
-            validateMerchantDefinedFields(csAuthRequest)
-            validateAuthServiceRun(csAuthRequest)
-            validatePayerAuthValidateServiceRun(csAuthRequest)
+        and: 'expected fields were sent to payment service'
+        def psAuthRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psAuthRequest)
+            validateShippingFields(psAuthRequest)
+            validateLineItemFields(psAuthRequest, 0)
+            validateLineItemFields(psAuthRequest, 1)
+            validatePurchaseTotalFields(psAuthRequest)
+            validateMerchantFields(psAuthRequest)
+            validateToken(psAuthRequest)
+            validateDeviceFingerprint(psAuthRequest)
+            validateMerchantDefinedFields(psAuthRequest)
+            validateAuthServiceRun(psAuthRequest)
+            validatePayerAuthValidateServiceRun(psAuthRequest)
         }
 
         where:
@@ -511,19 +511,19 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def responseBody = new JsonSlurper().parseText(response.body)
         validateCreateResponseForCardRequiringAuthentication(responseBody, testCase.specificationVersion)
 
-        and: 'expected fields were sent to cybersource'
-        def csRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequest)
-            validatePurchaseTotalFields(csRequest)
-            validateMerchantFields(csRequest)
-            validateToken(csRequest)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequest)
+        and: 'expected fields were sent to payment service'
+        def psRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequest)
+            validatePurchaseTotalFields(psRequest)
+            validateMerchantFields(psRequest)
+            validateToken(psRequest)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequest)
         }
 
         when: 'authentication continued'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFields = responseBody.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionId = enrolmentCheckFields.authenticationTransactionId
 
@@ -549,21 +549,21 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         paymentUpdateResponse.statusCode == HttpStatus.OK
         def updateResponseBody = new JsonSlurper().parseText(paymentUpdateResponse.body)
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csAuthRequest)
-            validateShippingFields(csAuthRequest)
-            validateLineItemFields(csAuthRequest, 0)
-            validateLineItemFields(csAuthRequest, 1)
-            validatePurchaseTotalFields(csAuthRequest)
-            validateMerchantFields(csAuthRequest)
-            validateToken(csAuthRequest)
-            validateDeviceFingerprint(csAuthRequest)
-            validateMerchantDefinedFields(csAuthRequest)
-            validateAuthServiceRun(csAuthRequest)
-            validatePayerAuthValidateServiceRun(csAuthRequest)
-            validateSubscriptionCreateServiceRun(csAuthRequest)
+        and: 'expected fields were sent to payment service'
+        def psAuthRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psAuthRequest)
+            validateShippingFields(psAuthRequest)
+            validateLineItemFields(psAuthRequest, 0)
+            validateLineItemFields(psAuthRequest, 1)
+            validatePurchaseTotalFields(psAuthRequest)
+            validateMerchantFields(psAuthRequest)
+            validateToken(psAuthRequest)
+            validateDeviceFingerprint(psAuthRequest)
+            validateMerchantDefinedFields(psAuthRequest)
+            validateAuthServiceRun(psAuthRequest)
+            validatePayerAuthValidateServiceRun(psAuthRequest)
+            validateSubscriptionCreateServiceRun(psAuthRequest)
         }
 
         and: 'a persistent token is returned'
@@ -585,19 +585,19 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def responseBodyForSavedToken = new JsonSlurper().parseText(responseForSavedToken.body)
         validateCreateResponseForCardRequiringAuthentication(responseBody, testCase.specificationVersion)
 
-        and: 'expected fields were sent to cybersource'
-        def csRequestForSavedToken = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csRequestForSavedToken)
-            validatePurchaseTotalFields(csRequestForSavedToken)
-            validateMerchantFields(csRequestForSavedToken)
-            validateSavedToken(csRequestForSavedToken)
-            validatePayerAuthEnrolmentCheckServiceRun(csRequestForSavedToken)
+        and: 'expected fields were sent to payment service'
+        def psRequestForSavedToken = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psRequestForSavedToken)
+            validatePurchaseTotalFields(psRequestForSavedToken)
+            validateMerchantFields(psRequestForSavedToken)
+            validateSavedToken(psRequestForSavedToken)
+            validatePayerAuthEnrolmentCheckServiceRun(psRequestForSavedToken)
         }
 
         when: 'authentication continued'
-        def acsUrlForSavedToken = commerceToolsHelper.getCustomFieldValue(responseBodyForSavedToken, 'cs_payerAuthenticationAcsUrl')
-        def paReqForSavedToken = commerceToolsHelper.getCustomFieldValue(responseBodyForSavedToken, 'cs_payerAuthenticationPaReq')
+        def acsUrlForSavedToken = commerceToolsHelper.getCustomFieldValue(responseBodyForSavedToken, 'isv_payerAuthenticationAcsUrl')
+        def paReqForSavedToken = commerceToolsHelper.getCustomFieldValue(responseBodyForSavedToken, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFieldsForSavedToken = responseBodyForSavedToken.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionIdForSavedToken = enrolmentCheckFields.authenticationTransactionId
 
@@ -625,21 +625,21 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         def updateResponseBodyForSavedToken = new JsonSlurper().parseText(paymentUpdateResponseForSavedToken.body)
         validateSuccessfulUpdateResponseForCardRequiringAuthentication(updateResponseBodyForSavedToken, testCase)
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthRequestForSavedToken = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validateBillingFields(csAuthRequestForSavedToken)
-            validateShippingFields(csAuthRequestForSavedToken)
-            validateLineItemFields(csAuthRequestForSavedToken, 0)
-            validateLineItemFields(csAuthRequestForSavedToken, 1)
-            validatePurchaseTotalFields(csAuthRequestForSavedToken)
-            validateMerchantFields(csAuthRequestForSavedToken)
-            validateSavedToken(csAuthRequestForSavedToken)
-            validateDeviceFingerprint(csAuthRequestForSavedToken)
-            validateMerchantDefinedFields(csAuthRequestForSavedToken)
-            validateAuthServiceRun(csAuthRequestForSavedToken)
-            validatePayerAuthValidateServiceRun(csAuthRequestForSavedToken)
-            validateSubscriptionUpdateServiceRun(csAuthRequestForSavedToken)
+        and: 'expected fields were sent to payment service'
+        def psAuthRequestForSavedToken = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validateBillingFields(psAuthRequestForSavedToken)
+            validateShippingFields(psAuthRequestForSavedToken)
+            validateLineItemFields(psAuthRequestForSavedToken, 0)
+            validateLineItemFields(psAuthRequestForSavedToken, 1)
+            validatePurchaseTotalFields(psAuthRequestForSavedToken)
+            validateMerchantFields(psAuthRequestForSavedToken)
+            validateSavedToken(psAuthRequestForSavedToken)
+            validateDeviceFingerprint(psAuthRequestForSavedToken)
+            validateMerchantDefinedFields(psAuthRequestForSavedToken)
+            validateAuthServiceRun(psAuthRequestForSavedToken)
+            validatePayerAuthValidateServiceRun(psAuthRequestForSavedToken)
+            validateSubscriptionUpdateServiceRun(psAuthRequestForSavedToken)
         }
 
         where:
@@ -651,7 +651,7 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         assert responseBody.actions.size == 5
 
         def addInterfaceInteraction = responseBody.actions.find { it.action == 'addInterfaceInteraction' }
-        assert addInterfaceInteraction.type.key == 'cybersource_payer_authentication_enrolment_check'
+        assert addInterfaceInteraction.type.key == 'isv_payments_payer_authentication_enrolment_check'
         assert addInterfaceInteraction.fields.size() == (version == '1.0.2' ? 8 : 6)
         assert addInterfaceInteraction.fields.authenticationTransactionId != null
         assert addInterfaceInteraction.fields.veresEnrolled == 'Y'
@@ -660,22 +660,22 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         assert addInterfaceInteraction.fields.authenticationRequired == true
         assert addInterfaceInteraction.fields.authorizationAllowed == true
 
-        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationRequired') == true
-        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationTransactionId') != null
-        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl') != null
-        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq') != null
+        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationRequired') == true
+        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationTransactionId') != null
+        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl') != null
+        assert commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq') != null
 
         if (version == '1.0.2') {
             assert addInterfaceInteraction.fields.xid != null
             assert addInterfaceInteraction.fields.proofXml != null
             assert commerceToolsHelper
-                    .getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
+                    .getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
                     .startsWith('https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp')
         } else {
             assert addInterfaceInteraction.fields.xid == null
             assert addInterfaceInteraction.fields.proofXml == null
             assert commerceToolsHelper
-                    .getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
+                    .getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
                     .startsWith('https://0merchantacsstag.cardinalcommerce.com/MerchantACSWeb/creq.jsp')
         }
         true
@@ -711,7 +711,7 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
         assert changeTransactionState.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
         def addInterfaceInteraction = responseBody.actions.find { it.action == 'addInterfaceInteraction' }
-        addInterfaceInteraction.type.key == 'cybersource_payment_failure'
+        addInterfaceInteraction.type.key == 'isv_payment_failure'
         addInterfaceInteraction.fields.get('transactionId') == '8788176c-e42f-4544-aeaf-a155e1232292'
         addInterfaceInteraction.fields.get('reasonCode') == '476'
 
@@ -722,7 +722,7 @@ class PayerAuthSpecification extends MockExternalServicesBaseSpecification {
 
     def validateResultInteraction(Map responseBody, TestCase testCase) {
         def addInterfaceInteraction = responseBody.actions.find {
-            it.action == 'addInterfaceInteraction' && it.type.key == 'cybersource_payer_authentication_validate_result'
+            it.action == 'addInterfaceInteraction' && it.type.key == 'isv_payments_payer_authentication_validate_result'
         }
         assert addInterfaceInteraction.fields.size() == testCase.fieldCount
         assert addInterfaceInteraction.fields.authenticationStatusMessage == testCase.authenticationStatusMessage

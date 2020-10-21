@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sphere.sdk.payments.TransactionState;
 import io.sphere.sdk.payments.TransactionType;
 import isv.commercetools.mapping.model.CustomPayment;
-import isv.commercetools.mapping.model.CybersourceIds;
+import isv.commercetools.mapping.model.PaymentServiceIds;
 import isv.commercetools.mapping.transformer.credit.CreditRequestTransformer;
 import isv.commercetools.mapping.transformer.credit.VisaCheckoutCreditRequestTransformer;
 import isv.commercetools.mapping.transformer.response.ReasonCodeResponseTransformer;
@@ -18,7 +18,7 @@ import isv.commercetools.reference.application.service.payment.PaymentRefundServ
 import isv.commercetools.reference.application.service.payment.PaymentService;
 import isv.commercetools.reference.application.validation.ResourceValidator;
 import isv.commercetools.reference.application.validation.rules.service.RefundTotalNoMoreThanChargeAmountValidationRule;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,14 +49,14 @@ public class PaymentUpdateRefundServiceConfiguration {
     @Bean
     public PaymentService paymentRefundService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory
     ) {
-        var requestTransformer = new CreditRequestTransformer(cybersourceIds);
+        var requestTransformer = new CreditRequestTransformer(paymentServiceIds);
         var reasonCodeResponseTransformer = new ReasonCodeResponseTransformer();
 
-        return new PaymentRefundService(paymentDetailsFactory, validators(objectMapper), requestTransformer, reasonCodeResponseTransformer, cybersourceClient);
+        return new PaymentRefundService(paymentDetailsFactory, validators(objectMapper), requestTransformer, reasonCodeResponseTransformer, paymentServiceClient);
     }
 
     /**
@@ -65,13 +65,13 @@ public class PaymentUpdateRefundServiceConfiguration {
     @Bean
     public PaymentService visaCheckoutPaymentRefundService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory) {
-        var requestTransformer = new VisaCheckoutCreditRequestTransformer(cybersourceIds);
+        var requestTransformer = new VisaCheckoutCreditRequestTransformer(paymentServiceIds);
         var reasonCodeResponseTransformer = new ReasonCodeResponseTransformer();
 
-        return new PaymentRefundService(paymentDetailsFactory, validators(objectMapper), requestTransformer, reasonCodeResponseTransformer, cybersourceClient);
+        return new PaymentRefundService(paymentDetailsFactory, validators(objectMapper), requestTransformer, reasonCodeResponseTransformer, paymentServiceClient);
     }
 
     private ResourceValidator<CustomPayment> validators(ObjectMapper objectMapper) {

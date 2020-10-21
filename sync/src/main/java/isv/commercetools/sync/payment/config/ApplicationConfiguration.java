@@ -13,7 +13,7 @@ import isv.commercetools.sync.commercetools.AddTransactionMapper;
 import isv.commercetools.sync.commercetools.CtPaymentSearchService;
 import isv.commercetools.sync.commercetools.CtTransactionService;
 import isv.commercetools.sync.commercetools.TransactionTypeMapper;
-import isv.commercetools.sync.cybersource.CsTransactionSearchService;
+import isv.commercetools.sync.isv.IsvTransactionSearchService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +26,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationConfiguration {
 
-  @Value("${cybersource.client.merchantID}")
+  @Value("${isv.payments.client.merchantID}")
   private String merchantId;
 
   @Bean
   public SynchronizationRunner syncRunner(
-      SphereClient sphereClient, ApiClient cybersourceTransactionClient,
-      ApiClient cybersourceConversionClient) throws ConfigException {
+      SphereClient sphereClient, ApiClient transactionSearchApiClient,
+      ApiClient conversionSearchApiClient) {
     var addTransactionMapper = new AddTransactionMapper();
     var transactionTypeMapper = new TransactionTypeMapper();
     var synchronizableApplications = Arrays
@@ -40,21 +40,21 @@ public class ApplicationConfiguration {
     var ctAddTransactionService = new CtTransactionService(addTransactionMapper, sphereClient,
         transactionTypeMapper, synchronizableApplications);
     var ctPaymentSearchService = new CtPaymentSearchService(sphereClient);
-    var csTransactionSearchService = new CsTransactionSearchService(cybersourceTransactionClient,
-        cybersourceConversionClient);
+    var isvTransactionSearchService = new IsvTransactionSearchService(transactionSearchApiClient,
+            conversionSearchApiClient);
     var transactionSynchronizer = new TransactionSynchronizer(ctPaymentSearchService,
         ctAddTransactionService);
-    return new SynchronizationRunner(csTransactionSearchService, transactionSynchronizer);
+    return new SynchronizationRunner(isvTransactionSearchService, transactionSynchronizer);
   }
 
   @Bean
   public DecisionManagerDecisionSynchronizer decisionManagerDecisionSynchronizer(
-      SphereClient sphereClient, ApiClient cybersourceTransactionClient,
-      ApiClient cybersourceConversionClient) throws ConfigException {
+      SphereClient sphereClient, ApiClient transactionSearchApiClient,
+      ApiClient conversionSearchApiClient) {
     var ctPaymentSearchService = new CtPaymentSearchService(sphereClient);
-    var csTransactionSearchService = new CsTransactionSearchService(cybersourceTransactionClient,
-        cybersourceConversionClient);
-    return new DecisionManagerDecisionSynchronizer(csTransactionSearchService, sphereClient,
+    var isvTransactionSearchService = new IsvTransactionSearchService(transactionSearchApiClient,
+            conversionSearchApiClient);
+    return new DecisionManagerDecisionSynchronizer(isvTransactionSearchService, sphereClient,
         ctPaymentSearchService, merchantId);
   }
 
@@ -67,15 +67,15 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public ApiClient cybersourceClient(CsClientConfigurationProperties appConfig)
+  public ApiClient paymentServiceClient(PaymentServiceClientConfigurationProperties appConfig)
       throws ConfigException {
-    Map csConfig = appConfig.getClient();
-    if (csConfig.isEmpty()) {
+    Map paymentServiceConfig = appConfig.getClient();
+    if (paymentServiceConfig.isEmpty()) {
       throw new BeanInstantiationException(Properties.class,
-          "No Cybersource client configuration provided");
+          "No payment service client configuration provided");
     }
     Properties properties = new Properties();
-    properties.putAll(csConfig);
+    properties.putAll(paymentServiceConfig);
 
     return new ApiClient(new MerchantConfig(properties));
   }

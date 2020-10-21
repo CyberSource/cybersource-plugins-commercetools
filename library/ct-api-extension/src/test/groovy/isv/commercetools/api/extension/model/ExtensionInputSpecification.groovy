@@ -41,7 +41,7 @@ class ExtensionInputSpecification extends Specification {
         input.resource.obj instanceof Customer
         input.resource.obj.firstName == 'first'
         input.resource.obj.lastName == 'last'
-        input.resource.obj.email == 'cybersource-commercetools-extension@example.com'
+        input.resource.obj.email == 'isv-commercetools-extension@example.com'
         input.resource.obj.addresses.size() == 0
     }
 
@@ -79,7 +79,7 @@ class ExtensionInputSpecification extends Specification {
         input.action == Action.CREATE
         input.resource.obj instanceof Payment
         input.resource.obj.amountPlanned.number == 12.34
-        input.resource.obj.paymentMethodInfo.paymentInterface == 'cybersource'
+        input.resource.obj.paymentMethodInfo.paymentInterface == 'isv_payments'
         input.resource.obj.paymentMethodInfo.method == 'creditCard'
         input.resource.obj.transactions.size() == 0
     }
@@ -118,7 +118,7 @@ class ExtensionInputSpecification extends Specification {
         input.resource.obj instanceof Customer
         input.resource.obj.firstName == 'other'
         input.resource.obj.lastName == 'last'
-        input.resource.obj.email == 'cybersource-commercetools-extension@example.com'
+        input.resource.obj.email == 'isv-commercetools-extension@example.com'
         input.resource.obj.addresses[0].streetName
     }
 
@@ -159,7 +159,7 @@ class ExtensionInputSpecification extends Specification {
         input.resource.obj.transactions[0].amount.number == 12.34
         input.resource.obj.transactions[0].type == TransactionType.AUTHORIZATION
         input.resource.obj.transactions[0].state == TransactionState.SUCCESS
-        input.resource.obj.paymentMethodInfo.paymentInterface == 'cybersource'
+        input.resource.obj.paymentMethodInfo.paymentInterface == 'isv_payments'
         input.resource.obj.paymentMethodInfo.method == 'creditCard'
     }
 

@@ -29,8 +29,8 @@ class ReversalSpecification extends MockExternalServicesBaseSpecification {
         def responseBody = new JsonSlurper().parseText(response.body)
 
         when: 'authentication continued'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFields = responseBody.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionId = enrolmentCheckFields.authenticationTransactionId
 
@@ -61,8 +61,8 @@ class ReversalSpecification extends MockExternalServicesBaseSpecification {
         def authInteractionId = authInteractionIdAction.interactionId
         authInteractionId != null
 
-        and: 'we ignore previous requests to cybersource'
-        csWireMockServer.resetRequests()
+        and: 'we ignore previous requests to payment service'
+        paymentServiceWireMockServer.resetRequests()
 
         when: 'we create an INITIAL CANCEL_AUTHORIZATION transaction'
         def paymentReversalRequest = requestBuilder.paymentReversalRequest(authInteractionId)
@@ -81,19 +81,19 @@ class ReversalSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionStateAction.state == 'Success'
         changeTransactionStateAction.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthReversalRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validatePurchaseTotalFields(csAuthReversalRequest)
-            validateMerchantFields(csAuthReversalRequest)
-            validateAuthReversalServiceRun(csAuthReversalRequest, authInteractionId)
+        and: 'expected fields were sent to payment service'
+        def psAuthReversalRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validatePurchaseTotalFields(psAuthReversalRequest)
+            validateMerchantFields(psAuthReversalRequest)
+            validateAuthReversalServiceRun(psAuthReversalRequest, authInteractionId)
         }
 
         where:
         testCase << new TestCaseDataProvider('/testcases/success')
     }
 
-    def 'Should set the reversal to failed if the reversal is rejected from Cybersource'() {
+    def 'Should set the reversal to failed if the reversal is rejected from payment service'() {
         given: 'We create an INITIAL CANCEL_AUTHORIZATION on the payment'
         def paymentReversalRequest = requestBuilder.paymentReversalRequest()
 
@@ -114,16 +114,16 @@ class ReversalSpecification extends MockExternalServicesBaseSpecification {
         changeTransactionStateAction.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
         def addInterfaceInteraction = paymentReversalResponseMap.actions.find { it.action == 'addInterfaceInteraction' }
-        addInterfaceInteraction.type.key == 'cybersource_payment_failure'
+        addInterfaceInteraction.type.key == 'isv_payment_failure'
         addInterfaceInteraction.fields.get('transactionId') == '8788176c-e42f-4544-aeaf-a155e1232292'
         addInterfaceInteraction.fields.get('reasonCode') == '102'
 
-        and: 'expected fields were sent to cybersource'
-        def csAuthReversalRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validatePurchaseTotalFields(csAuthReversalRequest)
-            validateMerchantFields(csAuthReversalRequest)
-            validateAuthReversalServiceRun(csAuthReversalRequest, 'null')
+        and: 'expected fields were sent to payment service'
+        def psAuthReversalRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validatePurchaseTotalFields(psAuthReversalRequest)
+            validateMerchantFields(psAuthReversalRequest)
+            validateAuthReversalServiceRun(psAuthReversalRequest, 'null')
         }
     }
 
