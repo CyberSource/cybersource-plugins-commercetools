@@ -197,10 +197,10 @@ By default the reference app uses the AuthorizationRequestTransformer to handle 
 	Remember to include the other default field group transformers in your class
   - Reconfigure the reference app to use the customised transformer
 
-		var authorizationRequestTransformer = new CustomAuthorizationRequestTransformer(merchantId(cybersourceProperties));
+		var authorizationRequestTransformer = new CustomAuthorizationRequestTransformer(merchantId(paymentServiceProperties));
 		var authorizationResponseTransformer = new ReasonCodeResponseTransformer();
 		
-		return new PaymentAuthorizationService(validator, authorizationRequestTransformer, authorizationResponseTransformer, cybersourceClient, cartRetriever);
+		return new PaymentAuthorizationService(validator, authorizationRequestTransformer, authorizationResponseTransformer, paymentServiceClient, cartRetriever);
 
 
 ## Customising shipping address mapping

@@ -14,9 +14,9 @@ import isv.commercetools.mapping.transformer.response.ResponseTransformer
 import isv.commercetools.mapping.transformer.reversal.AuthReversalRequestTransformer
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory
 import isv.commercetools.reference.application.validation.ResourceValidator
-import isv.payments.CybersourceClient
+import isv.payments.PaymentServiceClient
 import isv.payments.exception.PaymentException
-import isv.payments.model.CybersourceRequest
+import isv.payments.model.PaymentServiceRequest
 import org.slf4j.Logger
 import spock.lang.Specification
 
@@ -28,7 +28,7 @@ class PaymentCancelAuthorizationServiceSpecification extends Specification {
     PaymentDetails paymentDetailsMock
 
     AuthReversalRequestTransformer requestTransformerMock = Mock()
-    CybersourceClient cybersourceClientMock = Mock()
+    PaymentServiceClient paymentServiceClientMock = Mock()
     ResponseTransformer responseTransformerMock = Mock()
     ResourceValidator<CustomPayment> validatorMock = Mock()
     Logger loggerMock = Mock()
@@ -36,7 +36,7 @@ class PaymentCancelAuthorizationServiceSpecification extends Specification {
 
     def testObj = new PaymentCancelAuthorizationService(
             paymentDetailsFactoryMock, validatorMock, requestTransformerMock,
-            responseTransformerMock, cybersourceClientMock, loggerMock
+            responseTransformerMock, paymentServiceClientMock, loggerMock
     )
 
     def 'setup'() {
@@ -55,7 +55,7 @@ class PaymentCancelAuthorizationServiceSpecification extends Specification {
         transactionMock.type >> TransactionType.CANCEL_AUTHORIZATION
         transactionMock.state >> TransactionState.INITIAL
 
-        def cybersourceRequestMock = Mock(CybersourceRequest)
+        def paymentServiceRequestMock = Mock(PaymentServiceRequest)
         def responseMock = ['some':'response']
         def updateActionMock = Mock(UpdateAction)
         def responseUpdateActions = [updateActionMock]
@@ -64,8 +64,8 @@ class PaymentCancelAuthorizationServiceSpecification extends Specification {
         def result = testObj.process(new PaymentDetails(customPaymentMock))
 
         then:
-        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(cybersourceRequestMock) >> responseMock
+        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(paymentServiceRequestMock) >> responseMock
         1 * responseTransformerMock.transform(responseMock, transactionMock) >> responseUpdateActions
 
         and:
@@ -79,14 +79,14 @@ class PaymentCancelAuthorizationServiceSpecification extends Specification {
         transactionMock.state >> TransactionState.INITIAL
         transactionMock.id >> 'transaction_id'
 
-        def cybersourceRequestMock = Mock(CybersourceRequest)
+        def paymentServiceRequestMock = Mock(PaymentServiceRequest)
 
         when:
         def result = testObj.process(new PaymentDetails(customPaymentMock))
 
         then:
-        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(cybersourceRequestMock) >> {
+        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(paymentServiceRequestMock) >> {
             throw new PaymentException('some exception')
         }
 
@@ -130,7 +130,7 @@ class PaymentCancelAuthorizationServiceSpecification extends Specification {
 
         then:
         0 * requestTransformerMock.transform(_)
-        0 * cybersourceClientMock.makeRequest(_)
+        0 * paymentServiceClientMock.makeRequest(_)
 
         and:
         result.isEmpty()

@@ -18,7 +18,7 @@
       "interfaceInteractions": [],
       "lastModifiedAt": "1970-01-01T00:00:00.000Z",
       "paymentMethodInfo": {
-        "paymentInterface": "cybersource",
+        "paymentInterface": "isv_payments",
         "method": "creditCardWithPayerAuthentication"
       },
       "paymentStatus": {},

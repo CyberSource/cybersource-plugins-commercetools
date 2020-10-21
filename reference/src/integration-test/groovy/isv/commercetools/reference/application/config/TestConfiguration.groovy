@@ -11,12 +11,12 @@ class TestConfiguration {
 
     @Bean
     TestRestTemplate testRestTemplate(Environment environment) {
-        configureTestRestTemplate(environment).withBasicAuth('cs-ct-extension', 'Passw0rd')
+        configureTestRestTemplate(environment).withBasicAuth('isv-ct-extension', 'Passw0rd')
     }
 
     @Bean
     TestRestTemplate badAuthTestRestTemplate(Environment environment) {
-        configureTestRestTemplate(environment).withBasicAuth('cs-ct-extension', 'wrong')
+        configureTestRestTemplate(environment).withBasicAuth('isv-ct-extension', 'wrong')
     }
 
     @Bean

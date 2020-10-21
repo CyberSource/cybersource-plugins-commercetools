@@ -15,7 +15,7 @@ allprojects {
 
     apply from: "${rootDir}/version-info.gradle"
 
-    project.group = 'com.cybersource'
+    project.group = 'com.isv'
 
     idea {
        module {

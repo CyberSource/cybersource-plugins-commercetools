@@ -9,7 +9,7 @@ import isv.commercetools.mapping.transformer.RequestTransformer;
 import isv.commercetools.mapping.transformer.response.ResponseTransformer;
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory;
 import isv.commercetools.reference.application.validation.ResourceValidator;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import isv.payments.exception.PaymentException;
 import java.util.List;
 import org.slf4j.Logger;
@@ -32,9 +32,9 @@ public class PaymentAuthorizationService extends BasePaymentService {
             ResourceValidator<Cart> cartValidator,
             RequestTransformer authorizationRequestTransformer,
             ResponseTransformer responseTransformer,
-            CybersourceClient cybersourceClient
+            PaymentServiceClient paymentServiceClient
     ) {
-        this(paymentDetailsFactory, paymentValidator, cartValidator, authorizationRequestTransformer, responseTransformer, cybersourceClient, LoggerFactory.getLogger(PaymentAuthorizationService.class));
+        this(paymentDetailsFactory, paymentValidator, cartValidator, authorizationRequestTransformer, responseTransformer, paymentServiceClient, LoggerFactory.getLogger(PaymentAuthorizationService.class));
     }
 
     protected PaymentAuthorizationService(
@@ -43,10 +43,10 @@ public class PaymentAuthorizationService extends BasePaymentService {
             ResourceValidator<Cart> cartValidator,
             RequestTransformer authorizationRequestTransformer,
             ResponseTransformer responseTransformer,
-            CybersourceClient cybersourceClient,
+            PaymentServiceClient paymentServiceClient,
             Logger logger
     ) {
-        super(paymentDetailsFactory, paymentValidator, authorizationRequestTransformer, responseTransformer, cybersourceClient, logger);
+        super(paymentDetailsFactory, paymentValidator, authorizationRequestTransformer, responseTransformer, paymentServiceClient, logger);
         this.cartValidator = cartValidator;
     }
 

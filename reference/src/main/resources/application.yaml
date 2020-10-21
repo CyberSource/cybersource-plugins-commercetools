@@ -3,44 +3,45 @@ server:
 
 commercetools:
   projectKey: ${env.commercetools.projectKey}
-  authUrl: https://auth.sphere.io
-  apiUrl: https://api.sphere.io
+  authUrl: https://auth.europe-west1.gcp.commercetools.com
+  apiUrl: https://api.europe-west1.gcp.commercetools.com
   clientConfig:
     payment:
       clientId: ${env.commercetools.clientConfig.payment.clientId}
       secret: ${secrets.commercetools.clientConfig.payment.secret}
   extension:
     security:
-      user: cs-ct-extension
+      user: isv-ct-extension
       password: Passw0rd
     features:
       DECISION_MANAGER:
         enabled: true
 
-cybersource:
-  client:
-    merchantID: ${env.cybersource.merchantID}
-    developerID: ${env.cybersource.developerID}
-    environment: TEST
-    keysDirectory: ${env.cybersource.keysDirectory}
-    keyPassword: ${secrets.cybersource.keyPassword}
-    sharedSecret:
-      id: ${env.cybersource.sharedSecret.id}
-      value: ${secrets.cybersource.sharedSecret.value}
-    targetAPIVersion: 1.159
-    timeout: 5000
-    enableLog: false
-    logDirectory: .
-    logMaximumSize: 10
-    certificateCacheEnabled: true
-    runEnvironment: CyberSource.Environment.SANDBOX
-    authenticationType: http_signature
-    merchantKeyId: ${env.cybersource.sharedSecret.id}
-    merchantsecretKey: ${secrets.cybersource.sharedSecret.value}
-  flex:
-    targetOrigins: ${env.cybersource.flex.targetOrigins}
-    verificationKey: ${env.cybersource.flex.verificationKey}
-    connectTimeout: 5000
+isv:
+  payments:
+    client:
+      merchantID: ${env.isv.payments.merchantID}
+      developerID: ${env.isv.payments.developerID}
+      environment: TEST
+      keysDirectory: ${env.isv.payments.keysDirectory}
+      keyPassword: ${secrets.isv.payments.keyPassword}
+      sharedSecret:
+        id: ${env.isv.payments.sharedSecret.id}
+        value: ${secrets.isv.payments.sharedSecret.value}
+      targetAPIVersion: 1.159
+      timeout: 5000
+      enableLog: false
+      logDirectory: .
+      logMaximumSize: 10
+      certificateCacheEnabled: true
+      runEnvironment: CyberSource.Environment.SANDBOX
+      authenticationType: http_signature
+      merchantKeyId: ${env.isv.payments.sharedSecret.id}
+      merchantsecretKey: ${secrets.isv.payments.sharedSecret.value}
+    flex:
+      targetOrigins: ${env.isv.payments.flex.targetOrigins}
+      verificationKey: ${env.isv.payments.flex.verificationKey}
+      connectTimeout: 5000
 
 cardinal:
   apiKey: ${secrets.cardinal.apiKey}
@@ -54,7 +55,7 @@ spring:
 
 logging:
   level:
-    com.visa.commercetools.reference.application.controller: DEBUG
+    isv.commercetools.reference.application.controller: DEBUG
 
 management:
   endpoints:
@@ -64,11 +65,12 @@ management:
 
 ---
 spring:
-  profiles: proxycs
+  profiles: proxyps
 
-cybersource:
-  client:
-    serverURL: http://localhost:8080/commerce/1.x/transactionProcessor
+isv:
+  payments:
+    client:
+      serverURL: http://localhost:8080/commerce/1.x/transactionProcessor
 
 ---
 spring:

@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import groovy.text.SimpleTemplateEngine
 import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.NodeChild
+import groovy.xml.XmlUtil
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import io.jsonwebtoken.Jwts
@@ -198,9 +199,14 @@ class CardinalHelper {
 
         def response = postFormData(formData, action)
         assert response.status == 200
-        def responseJwt = response.body.toString().replaceAll('(?s).*parent\\.postMessage\\("', '').replaceAll('(?s)".*', '')
 
-        log.info 'Response JWT:\n' + decodeJwt(responseJwt)
+        log.info 'JWT response body was::\n' + XmlUtil.serialize(response.body)
+
+        def responseJwtAttribueValue = response.body.'**'.find { it.@id == 'responseJwt' }.attributes().value
+        def responseJwt = new JsonSlurper().parseText(responseJwtAttribueValue).CardinalJWT
+
+        log.info 'Extracted raw response JWT:\n' + responseJwt
+        log.info 'Decoded response JWT:\n' + decodeJwt(responseJwt)
 
         responseJwt
     }
@@ -236,8 +242,8 @@ class CardinalHelper {
     def postFormData(Map formData, String url) {
         // use HttpBuilder rather than RestTemplate as RestTemplate returns empty bodies for V2 forms for some reason
         def http = new HTTPBuilder(url)
-        http.post([body:formData, requestContentType:ContentType.URLENC]) { resp, other ->
-            [status:resp.status, body:other]
+        http.post([body:formData, requestContentType:ContentType.URLENC]) { resp, parsed ->
+            [status:resp.status, body:parsed]
         }
     }
 

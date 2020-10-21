@@ -27,7 +27,7 @@
     "fractionDigits": 49
   },
   "paymentMethodInfo": {
-    "paymentInterface": "cybersource",
+    "paymentInterface": "isv_payments",
     "method": "creditCard"
   },
   "custom": {
@@ -37,10 +37,10 @@
     },
     "fields": {
       "billingAddressLastName": "McTester",
-      "billingAddressEmail": "cybersource-commercetools-extension@example.com",
+      "billingAddressEmail": "isv-commercetools-extension@example.com",
       "billingAddressCity": "London",
-      "cs_acceptHeader": "accept header",
-      "cs_userAgentHeader": "user agent header",
+      "isv_acceptHeader": "accept header",
+      "isv_userAgentHeader": "user agent header",
       "billingAddressLine1": "1 London Bridge",
       "billingAddressFirstName": "Testy",
       "billingAddressCountry": "United Kingdom",

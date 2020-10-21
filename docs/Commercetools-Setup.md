@@ -29,7 +29,7 @@ actions on a payment.
 
 | Property                   | Value                                  | Note |
 | -------------------------- | -------------------------------------- | ---- |
-| key                        | cybersource_payment_create_extension   | |
+| key                        | isv\_payment\_create\_extension           | |
 | type                       | HTTP                                   | The reference application only supports HTTP Destinations |
 | url                        | {baseUrl}/api/extension/payment/create | The baseUrl will be defined by where you deploy the reference application. HTTPS should be used for production |
 | authentication.type        | AuthorizationHeader                    | |
@@ -47,7 +47,7 @@ authorisations
 
 | Property                   | Value                                  | Note |
 | -------------------------- | -------------------------------------- | ---- |
-| key                        | cybersource_payment_update_extension   |      |
+| key                        | isv\_payment\_update\_extension   |      |
 | type                       | HTTP                                   | The reference application only supports HTTP Destinations |
 | url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the reference application. HTTPS should be used for production |
 | authentication.type        | AuthorizationHeader                    |      |
@@ -66,7 +66,7 @@ authorisations
 
 | Type                          | Key                         | Purpose |
 | ----------------------------- | --------------------------- | ------- |
-| payment-interface-interaction | cybersource_payment_failure | Used to save exception messages when there is a failure during payment |
+| payment-interface-interaction | isv\_payment\_failure | Used to save exception messages when there is a failure during payment |
 
 
 
@@ -83,7 +83,7 @@ Fields
 
 | Type                          | Key                                              | Purpose |
 | ----------------------------- | ------------------------------------------------ | ------- |
-| payment-interface-interaction | cybersource_payer_authentication_enrolment_check | Stores values from request and response of payer authentication enrolment check. This is used in further Authorization calls. |
+| payment-interface-interaction | isv\_payments\_payer\_authentication\_enrolment\_check | Stores values from request and response of payer authentication enrolment check. This is used in further Authorization calls. |
 
 
 Fields
@@ -110,7 +110,7 @@ Fields
 
 | Type                          | Key                                              | Purpose |
 | ----------------------------- | ------------------------------------------------ | ------- |
-| payment-interface-interaction | cybersource_payer_authentication_validate_result | Stores values from response of payer authentication validation. These values can also be returned from the enrolment check for 3D Secure 2.x frictionless payments. These values are saved for recordkeeping purposes only. |
+| payment-interface-interaction | isv\_payments\_payer\_authentication\_validate\_result | Stores values from response of payer authentication validation. These values can also be returned from the enrolment check for 3D Secure 2.x frictionless payments. These values are saved for recordkeeping purposes only. |
 
 Fields
 
@@ -137,28 +137,28 @@ All fields are optional within commerce tools, but some fields are
 contextually required - depending on the actions taken, the API
 extension may reject a payment due to missing required fields.
 
-| Type    | Key                      | Purpose                           |
-| ------- | ------------------------ | --------------------------------- |
-| payment | cybersource_payment_data | Cybersource custom payment fields |
+| Type    | Key                      | Purpose                   |
+| ------- | ------------------------ | ------------------------- |
+| payment | isv\_payment\_data         | ISV custom payment fields |
 
 Fields
 
 | Field                               | Type    | Required/Optional/Not allowed (At Auth)                    | Source               | Notes |
 | ----------------------------------- | ------- | ---------------------------------------------------------- | -------------------- | ----- |
-| cs_token                            | String  | Paying with new token (R) <br> Paying with saved token (N) | Payment creation     | Tokenized card details |
-| cs_tokenVerificationContext         | String  | Paying with new token (R) <br> Paying with saved token (N) | Payment creation     | Tokenized card details |
-| cs_tokenAlias                       | String  | Paying with new token (O) <br> Paying with saved token (N) | Payment creation     | Tokenized card details |
-| cs_savedToken                       | String  | Paying with new token (N) <br> Paying with saved token (R) | Payment creation     | Tokenized card details |
-| cs_cardType                         | String  | R                                                          | Payment creation     | Visa, Mastercard, etc. |
-| cs_maskedPan                        | String  | O                                                          | Payment creation     | Recommended to be set for display purposes |
-| cs_cardExpiryMonth                  | String  | O                                                          | Payment creation     | Recommended to be set for display purposes |
-| cs_cardExpiryYear                   | String  | O                                                          | Payment creation     | Recommended to be set for display purposes |
-| cs_requestJwt                       | String  | Without payer auth (O) <br> With payer auth (R)            | Payment creation     | Retrieved from /jwt service. The same value is sent to Cardinal |
-| cs_responseJwt                      | String  | Without payer auth (O) <br> With payer auth (see notes)    | Transaction addition | When authentication is required the value returned from Cardinal must be added to the payment |
-| cs_payerAuthenticationRequired      | Boolean | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. If true Cardinal.continue must be called to authenticate payer |
-| cs_payerAuthenticationTransactionId | String  | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. To be passed in Cardinal.continue call when required |
-| cs_payerAuthenticationAcsUrl        | String  | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. To be passed in Cardinal.continue call when required |
-| cs_payerAuthenticationPaReq         | String  | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. To be passed in Cardinal.continue call when required |
-| cs_acceptHeader                     | String  | Without payer auth (O) <br> With payer auth (R)            | Payment creation     | Value of the Accept header from the user's browser |
-| cs_userAgentHeader                  | String  | Without payer auth (O) <br> With payer auth (R)            | Payment creation     | Value of the UserAgent header from the user's browser |
-| cs_deviceFingerprintId              | String  | O                                                          | Payment creation     | Value of session id used for device fingerprinting |
+| isv_token                            | String  | Paying with new token (R) <br> Paying with saved token (N) | Payment creation     | Tokenized card details |
+| isv_tokenVerificationContext         | String  | Paying with new token (R) <br> Paying with saved token (N) | Payment creation     | Tokenized card details |
+| isv_tokenAlias                       | String  | Paying with new token (O) <br> Paying with saved token (N) | Payment creation     | Tokenized card details |
+| isv_savedToken                       | String  | Paying with new token (N) <br> Paying with saved token (R) | Payment creation     | Tokenized card details |
+| isv_cardType                         | String  | R                                                          | Payment creation     | Visa, Mastercard, etc. |
+| isv_maskedPan                        | String  | O                                                          | Payment creation     | Recommended to be set for display purposes |
+| isv_cardExpiryMonth                  | String  | O                                                          | Payment creation     | Recommended to be set for display purposes |
+| isv_cardExpiryYear                   | String  | O                                                          | Payment creation     | Recommended to be set for display purposes |
+| isv_requestJwt                       | String  | Without payer auth (O) <br> With payer auth (R)            | Payment creation     | Retrieved from /jwt service. The same value is sent to Cardinal |
+| isv_responseJwt                      | String  | Without payer auth (O) <br> With payer auth (see notes)    | Transaction addition | When authentication is required the value returned from Cardinal must be added to the payment |
+| isv_payerAuthenticationRequired      | Boolean | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. If true Cardinal.continue must be called to authenticate payer |
+| isv_payerAuthenticationTransactionId | String  | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. To be passed in Cardinal.continue call when required |
+| isv_payerAuthenticationAcsUrl        | String  | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. To be passed in Cardinal.continue call when required |
+| isv_payerAuthenticationPaReq         | String  | Without payer auth (O) <br> With payer auth (see notes)    | Extension            | Populated when processing payment creation. To be passed in Cardinal.continue call when required |
+| isv_acceptHeader                     | String  | Without payer auth (O) <br> With payer auth (R)            | Payment creation     | Value of the Accept header from the user's browser |
+| isv_userAgentHeader                  | String  | Without payer auth (O) <br> With payer auth (R)            | Payment creation     | Value of the UserAgent header from the user's browser |
+| isv_deviceFingerprintId              | String  | O                                                          | Payment creation     | Value of session id used for device fingerprinting |

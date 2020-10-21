@@ -14,7 +14,7 @@
       "postalCode" : "SE19BG",
       "city" : "London",
       "region" : "",
-      "email" : "cybersource-commercetools-extension@example.com",
+      "email" : "isv-commercetools-extension@example.com",
       "additionalAddressInfo" : "Decision Manager: Accept"
     },
     "cartState" : "Active",
@@ -289,7 +289,7 @@
         "postalCode" : "SE19BG",
         "city" : "London",
         "region" : "",
-        "email" : "cybersource-commercetools-extension@example.com",
+        "email" : "isv-commercetools-extension@example.com",
         "additionalAddressInfo" : "Decision Manager: Accept"
       },
       "cartState" : "Active",

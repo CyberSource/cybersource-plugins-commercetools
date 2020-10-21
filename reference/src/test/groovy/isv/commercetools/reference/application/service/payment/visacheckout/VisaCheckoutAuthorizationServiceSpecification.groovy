@@ -14,12 +14,12 @@ import isv.commercetools.mapping.model.CustomPayment
 import isv.commercetools.mapping.model.PaymentDetails
 import isv.commercetools.mapping.transformer.RequestTransformer
 import isv.commercetools.mapping.transformer.auth.visacheckout.VisaCheckoutUpdateActionCreator
-import isv.commercetools.mapping.transformer.response.CybersourceResponseToFieldGroupTransformer
+import isv.commercetools.mapping.transformer.response.PaymentServiceResponseToFieldGroupTransformer
 import isv.commercetools.mapping.transformer.response.ResponseTransformer
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory
 import isv.commercetools.reference.application.validation.ResourceValidator
-import isv.payments.CybersourceClient
-import isv.payments.model.CybersourceRequest
+import isv.payments.PaymentServiceClient
+import isv.payments.model.PaymentServiceRequest
 import isv.payments.model.fields.BillToFieldGroup
 import isv.payments.model.fields.CardFieldGroup
 import isv.payments.model.fields.ShipToFieldGroup
@@ -36,12 +36,12 @@ class VisaCheckoutAuthorizationServiceSpecification extends Specification {
     ResourceValidator<CustomPayment> paymentValidatorMock
     ResourceValidator<Cart> cartValidatorMock
     RequestTransformer authorizationRequestTransformerMock
-    CybersourceRequest visaCheckoutRequestMock
+    PaymentServiceRequest visaCheckoutRequestMock
     ResponseTransformer responseTransformerMock
-    CybersourceResponseToFieldGroupTransformer cybersourceResponseTransformerMock
+    PaymentServiceResponseToFieldGroupTransformer paymentServiceResponseTransformerMock
 
     SphereClient paymentSphereClientMock
-    CybersourceClient cybersourceClientMock
+    PaymentServiceClient paymentServiceClientMock
     VisaCheckoutQueryService queryServiceMock
     VisaCheckoutUpdateActionCreator actionCreatorMock
 
@@ -60,8 +60,8 @@ class VisaCheckoutAuthorizationServiceSpecification extends Specification {
         cartValidatorMock = Mock()
         authorizationRequestTransformerMock = Mock()
         responseTransformerMock = Mock()
-        cybersourceResponseTransformerMock = Mock()
-        cybersourceClientMock = Mock()
+        paymentServiceResponseTransformerMock = Mock()
+        paymentServiceClientMock = Mock()
         paymentSphereClientMock = Mock()
         paymentDetailsMock = Mock()
         queryServiceMock = Mock()
@@ -83,11 +83,11 @@ class VisaCheckoutAuthorizationServiceSpecification extends Specification {
                 cartValidatorMock,
                 authorizationRequestTransformerMock,
                 responseTransformerMock,
-                cybersourceClientMock,
+                paymentServiceClientMock,
                 paymentSphereClientMock,
                 queryServiceMock,
                 actionCreatorMock,
-                cybersourceResponseTransformerMock
+                paymentServiceResponseTransformerMock
         ])
     }
 
@@ -100,16 +100,16 @@ class VisaCheckoutAuthorizationServiceSpecification extends Specification {
         shippingGroup.country = 'GB'
         def visaResponseFieldGroup = new VisaCheckoutResponseFieldGroup()
         visaResponseFieldGroup.cardType = 'VISA'
-        cybersourceResponseTransformerMock.transform(_, 'billTo_', BillToFieldGroup) >> billingGroup
-        cybersourceResponseTransformerMock.transform(_, 'shipTo_', ShipToFieldGroup) >> shippingGroup
+        paymentServiceResponseTransformerMock.transform(_, 'billTo_', BillToFieldGroup) >> billingGroup
+        paymentServiceResponseTransformerMock.transform(_, 'shipTo_', ShipToFieldGroup) >> shippingGroup
         def cardFieldGroupMock = Mock(CardFieldGroup)
-        cybersourceResponseTransformerMock.transform(_, 'card_', CardFieldGroup) >> cardFieldGroupMock
-        cybersourceResponseTransformerMock.transform(_, 'vcReply_', VisaCheckoutResponseFieldGroup) >> visaResponseFieldGroup
+        paymentServiceResponseTransformerMock.transform(_, 'card_', CardFieldGroup) >> cardFieldGroupMock
+        paymentServiceResponseTransformerMock.transform(_, 'vcReply_', VisaCheckoutResponseFieldGroup) >> visaResponseFieldGroup
 
         when:
         def result = testObj.process(paymentDetailsMock)
 
-        then: 'cybersource is queried, returning a shipping address, billing address, and card information'
+        then: 'payment service is queried, returning a shipping address, billing address, and card information'
         1 * queryServiceMock.getVisaCheckoutData(paymentDetailsMock) >> [
                 'shipTo_country':'GB',
                 'billTo_country':'GB',
@@ -154,16 +154,16 @@ class VisaCheckoutAuthorizationServiceSpecification extends Specification {
         def shippingGroup = new ShipToFieldGroup()
         shippingGroup.country = 'GB'
 
-        cybersourceResponseTransformerMock.transform(_, 'shipTo_', ShipToFieldGroup) >> shippingGroup
+        paymentServiceResponseTransformerMock.transform(_, 'shipTo_', ShipToFieldGroup) >> shippingGroup
         def cardFieldGroupMock = Mock(CardFieldGroup)
         def visaResponseFieldGroupMock = Mock(VisaCheckoutResponseFieldGroup)
-        cybersourceResponseTransformerMock.transform(_, 'card_', CardFieldGroup) >> cardFieldGroupMock
-        cybersourceResponseTransformerMock.transform(_, 'vcReply_', VisaCheckoutResponseFieldGroup) >> visaResponseFieldGroupMock
+        paymentServiceResponseTransformerMock.transform(_, 'card_', CardFieldGroup) >> cardFieldGroupMock
+        paymentServiceResponseTransformerMock.transform(_, 'vcReply_', VisaCheckoutResponseFieldGroup) >> visaResponseFieldGroupMock
 
         when:
         def result = testObj.process(paymentDetailsMock)
 
-        then: 'cybersource is queried, returning a shipping address and card information'
+        then: 'payment service is queried, returning a shipping address and card information'
         1 * queryServiceMock.getVisaCheckoutData(paymentDetailsMock) >> [
                 'shipTo_country':'GB',
         ]
@@ -200,16 +200,16 @@ class VisaCheckoutAuthorizationServiceSpecification extends Specification {
 
         def billingGroup = new BillToFieldGroup()
         billingGroup.country = 'GB'
-        cybersourceResponseTransformerMock.transform(_, 'billTo_', BillToFieldGroup) >> billingGroup
+        paymentServiceResponseTransformerMock.transform(_, 'billTo_', BillToFieldGroup) >> billingGroup
         def cardFieldGroupMock = Mock(CardFieldGroup)
-        cybersourceResponseTransformerMock.transform(_, 'card_', CardFieldGroup) >> cardFieldGroupMock
+        paymentServiceResponseTransformerMock.transform(_, 'card_', CardFieldGroup) >> cardFieldGroupMock
         def visaResponseFieldGroup = Mock(VisaCheckoutResponseFieldGroup)
-        cybersourceResponseTransformerMock.transform(_, 'vcReply_', VisaCheckoutResponseFieldGroup) >> visaResponseFieldGroup
+        paymentServiceResponseTransformerMock.transform(_, 'vcReply_', VisaCheckoutResponseFieldGroup) >> visaResponseFieldGroup
 
         when:
         def result = testObj.process(paymentDetailsMock)
 
-        then: 'cybersource is queried, returning a shipping address, billing address, and card information'
+        then: 'payment service is queried, returning a shipping address, billing address, and card information'
         1 * queryServiceMock.getVisaCheckoutData(paymentDetailsMock) >> [
                 'billTo_country':'GB',
         ]

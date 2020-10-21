@@ -16,9 +16,9 @@ import isv.commercetools.mapping.transformer.auth.AuthorizationRequestTransforme
 import isv.commercetools.mapping.transformer.response.ResponseTransformer
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory
 import isv.commercetools.reference.application.validation.ResourceValidator
-import isv.payments.CybersourceClient
+import isv.payments.PaymentServiceClient
 import isv.payments.exception.PaymentException
-import isv.payments.model.CybersourceRequest
+import isv.payments.model.PaymentServiceRequest
 import org.slf4j.Logger
 import spock.lang.Specification
 
@@ -28,7 +28,7 @@ class PaymentAuthorizationServiceSpecification extends Specification {
 
     AuthorizationRequestTransformer requestTransformerMock = Mock()
     ResponseTransformer responseTransformerMock = Mock()
-    CybersourceClient cybersourceClientMock = Mock()
+    PaymentServiceClient paymentServiceClientMock = Mock()
     ResourceValidator<CustomPayment> paymentValidatorMock = Mock()
     ResourceValidator<Cart> cartValidatorMock = Mock()
     EnrolmentData enrolmentDataMock = Mock()
@@ -45,7 +45,7 @@ class PaymentAuthorizationServiceSpecification extends Specification {
             cartValidatorMock,
             requestTransformerMock,
             responseTransformerMock,
-            cybersourceClientMock,
+            paymentServiceClientMock,
             loggerMock
     )
 
@@ -71,7 +71,7 @@ class PaymentAuthorizationServiceSpecification extends Specification {
 
         then:
         0 * requestTransformerMock.transform(_)
-        0 * cybersourceClientMock.makeRequest(_)
+        0 * paymentServiceClientMock.makeRequest(_)
 
         and:
         result.isEmpty()
@@ -97,14 +97,14 @@ class PaymentAuthorizationServiceSpecification extends Specification {
 
     def 'Should return a list of actions on a successful authorization when #description'() {
         given:
-        def requestMock = Mock(CybersourceRequest)
+        def requestMock = Mock(PaymentServiceRequest)
         def firstTransaction = mockTransaction(1)
         def secondTransaction = mockTransaction(2)
         basePaymentMock.transactions >> [firstTransaction, secondTransaction]
 
         and:
         requestTransformerMock.transform { it.customPayment == paymentMock && it.cart == cartMock } >> requestMock
-        cybersourceClientMock.makeRequest(requestMock) >> [:]
+        paymentServiceClientMock.makeRequest(requestMock) >> [:]
 
         and:
         def transaction1Response = Mock(UpdateAction)
@@ -128,7 +128,7 @@ class PaymentAuthorizationServiceSpecification extends Specification {
 
         then:
         0 * requestTransformerMock.transform(_)
-        0 * cybersourceClientMock.makeRequest(_)
+        0 * paymentServiceClientMock.makeRequest(_)
 
         and:
         result.isEmpty()
@@ -136,7 +136,7 @@ class PaymentAuthorizationServiceSpecification extends Specification {
 
     def 'Should return a failed transaction state action and an interface interaction action if there is an exception'() {
         given:
-        def cybersourceRequestMock = Mock(CybersourceRequest)
+        def paymentServiceRequestMock = Mock(PaymentServiceRequest)
         basePaymentMock.transactions >> [mockTransaction()]
         enrolmentDataMock.authorizationAllowed >> Optional.ofNullable(null)
 
@@ -144,8 +144,8 @@ class PaymentAuthorizationServiceSpecification extends Specification {
         def result = testObj.process(new PaymentDetails(paymentMock))
 
         then:
-        1 * requestTransformerMock.transform(_) >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(_) >> {
+        1 * requestTransformerMock.transform(_) >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(_) >> {
             throw new PaymentException(new Exception('someExceptionMessage'))
         }
 
@@ -158,7 +158,7 @@ class PaymentAuthorizationServiceSpecification extends Specification {
 
         def addInterfaceInteraction = result.find { it instanceof AddInterfaceInteraction } as AddInterfaceInteraction
         addInterfaceInteraction != null
-        addInterfaceInteraction.type.key == 'cybersource_payment_failure'
+        addInterfaceInteraction.type.key == 'isv_payment_failure'
         addInterfaceInteraction.fields.get('reason').asText() == 'java.lang.Exception: someExceptionMessage'
 
         and: 'message is logged'
@@ -167,7 +167,7 @@ class PaymentAuthorizationServiceSpecification extends Specification {
 
     def 'Should only process one transaction'() {
         given:
-        def cybersourceRequestMock = Mock(CybersourceRequest)
+        def paymentServiceRequestMock = Mock(PaymentServiceRequest)
         def firstTransaction = mockTransaction(1)
         def secondTransaction = mockTransaction(2)
         basePaymentMock.transactions >> [firstTransaction, secondTransaction]
@@ -179,8 +179,8 @@ class PaymentAuthorizationServiceSpecification extends Specification {
         def result = testObj.process(new PaymentDetails(paymentMock))
 
         then:
-        1 * requestTransformerMock.transform(_) >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(_) >> successfulResponse
+        1 * requestTransformerMock.transform(_) >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(_) >> successfulResponse
         1 * responseTransformerMock.transform(successfulResponse, firstTransaction) >> [successfulAction]
 
         and:

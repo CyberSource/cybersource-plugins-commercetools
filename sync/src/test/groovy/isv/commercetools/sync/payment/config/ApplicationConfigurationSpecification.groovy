@@ -27,11 +27,11 @@ class ApplicationConfigurationSpecification extends Specification {
     def 'should build a sync runner'() {
         given:
         def sphereClientMock = Mock(SphereClient)
-        def csTransactionSearchClientMock = Mock(ApiClient)
-        def csDecisionSearchClientMock = Mock(ApiClient)
+        def paymentServiceTransactionSearchClientMock = Mock(ApiClient)
+        def paymentServiceDecisionSearchClientMock = Mock(ApiClient)
 
         when:
-        def result = testObj.syncRunner(sphereClientMock, csTransactionSearchClientMock, csDecisionSearchClientMock)
+        def result = testObj.syncRunner(sphereClientMock, paymentServiceTransactionSearchClientMock, paymentServiceDecisionSearchClientMock)
 
         then:
         result instanceof SynchronizationRunner
@@ -50,24 +50,24 @@ class ApplicationConfigurationSpecification extends Specification {
 
     def 'should throw a BeanInstantiationException for empty properties'() {
         given:
-        CsClientConfigurationProperties cybersourceConfigurationProperties = Mock(CsClientConfigurationProperties)
-        cybersourceConfigurationProperties.client >> emptyMap()
+        PaymentServiceClientConfigurationProperties paymentServiceClientConfigurationProperties = Mock(PaymentServiceClientConfigurationProperties)
+        paymentServiceClientConfigurationProperties.client >> emptyMap()
 
         when:
-        testObj.cybersourceClient(cybersourceConfigurationProperties)
+        testObj.paymentServiceClient(paymentServiceClientConfigurationProperties)
 
         then:
         def exception = thrown(BeanInstantiationException)
-        exception.message == 'Failed to instantiate [java.util.Properties]: No Cybersource client configuration provided'
+        exception.message == 'Failed to instantiate [java.util.Properties]: No payment service client configuration provided'
     }
 
-    def 'should create a cybersource client'() {
+    def 'should create a payment service client'() {
         given:
-        CsClientConfigurationProperties cybersourceConfigurationPropertiesMock = Mock(CsClientConfigurationProperties)
-        cybersourceConfigurationPropertiesMock.client >> ['runEnvironment':'SANDBOX']
+        PaymentServiceClientConfigurationProperties paymentServiceClientConfigurationProperties = Mock(PaymentServiceClientConfigurationProperties)
+        paymentServiceClientConfigurationProperties.client >> ['runEnvironment':'SANDBOX']
 
         when:
-        def result = testObj.cybersourceClient(cybersourceConfigurationPropertiesMock)
+        def result = testObj.paymentServiceClient(paymentServiceClientConfigurationProperties)
 
         then:
         result != null

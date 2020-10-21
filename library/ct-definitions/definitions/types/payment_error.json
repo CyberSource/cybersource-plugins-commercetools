@@ -21,7 +21,7 @@
       "required": false
     }
   ],
-  "key": "cybersource_payment_error",
+  "key": "isv_payment_error",
   "name": {
     "en": "Created when the payment service throws an unhandled exception"
   },

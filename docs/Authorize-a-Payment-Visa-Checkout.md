@@ -40,10 +40,10 @@ The shipping address should be acquired from Visa Checkout. This can be set via 
 	|--- |--- |--- |--- |
 	|customer|Reference to commercetools customer|See notes|Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated|
 	|anonymousId|Id for tracking guest checkout|See notes|Required for guest checkout. If using MyPayments API this will automatically be set. One of customer or anonymousId must be populated|
-	|paymentMethodInfo.paymentInterface|cybersource|Yes|Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated|
+	|paymentMethodInfo.paymentInterface|isv_payments|Yes|Required for guest checkout. If using MyPayments API this will automatically be set to the session id of the anonymous oauth token. One of customer or anonymousId must be populated|
 	|paymentMethodInfo.method|visaCheckout|Yes|The reference application is set up to support payments with and without payer authentication and the method is used to determine which is being used<br><br>Typically an implementation would choose one or the other and the method name may be different to this|
 	|amountPlanned|Amount to authorise|Yes|Should match cart gross total, unless split payments are being used|
-	|custom.fields.cs_token|Visa Checkout callid|Yes|Obtain from the 'callid' field on a successful Visa Checkout response|    
+	|custom.fields.isv_token|Visa Checkout callid|Yes|Obtain from the 'callid' field on a successful Visa Checkout response|    
 
 3.  Add the payment to the cart
 

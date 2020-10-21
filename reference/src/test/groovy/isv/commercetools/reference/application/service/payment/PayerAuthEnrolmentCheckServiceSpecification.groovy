@@ -9,16 +9,16 @@ import isv.commercetools.mapping.model.CustomPayment
 import isv.commercetools.mapping.model.PaymentDetails
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory
 import isv.commercetools.reference.application.validation.ResourceValidator
-import isv.payments.CybersourceClient
+import isv.payments.PaymentServiceClient
 import isv.payments.exception.PaymentException
-import isv.payments.model.CybersourceRequest
+import isv.payments.model.PaymentServiceRequest
 import spock.lang.Specification
 
 class PayerAuthEnrolmentCheckServiceSpecification extends Specification {
 
     PayerAuthEnrolmentCheckRequestTransformer requestTransformerMock = Mock()
     PayerAuthEnrolmentCheckResponseTransformer responseTransformerMock = Mock()
-    CybersourceClient cybersourceClientMock = Mock()
+    PaymentServiceClient paymentServiceClientMock = Mock()
     ResourceValidator<CustomPayment> paymentValidatorMock = Mock()
     ResourceValidator<Cart> cartValidatorMock = Mock()
     PaymentDetailsFactory paymentDetailsFactoryMock = Mock()
@@ -26,7 +26,7 @@ class PayerAuthEnrolmentCheckServiceSpecification extends Specification {
     CustomPayment paymentMock = Mock()
     Cart cartMock = Mock()
     PaymentDetails paymentDetailsMock = Mock()
-    CybersourceRequest cybersourceRequestMock = Mock()
+    PaymentServiceRequest paymentServiceRequestMock = Mock()
     UpdateAction actionMock = Mock()
     ExtensionError errorMock1 = Mock()
     ExtensionError errorMock2 = Mock()
@@ -37,7 +37,7 @@ class PayerAuthEnrolmentCheckServiceSpecification extends Specification {
             cartValidatorMock,
             requestTransformerMock,
             responseTransformerMock,
-            cybersourceClientMock
+            paymentServiceClientMock
     )
 
     def 'should call service with mapped request and return response'() {
@@ -45,9 +45,9 @@ class PayerAuthEnrolmentCheckServiceSpecification extends Specification {
         def result = testObj.process(new PaymentDetails(paymentMock))
 
         then:
-        1 * requestTransformerMock.transform { it.customPayment == paymentMock } >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(cybersourceRequestMock) >> ['cybersource':'response']
-        1 * responseTransformerMock.transform(['cybersource':'response'], paymentMock) >> [actionMock]
+        1 * requestTransformerMock.transform { it.customPayment == paymentMock } >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(paymentServiceRequestMock) >> ['payment-service':'response']
+        1 * responseTransformerMock.transform(['payment-service':'response'], paymentMock) >> [actionMock]
 
         and:
         result == [actionMock]
@@ -58,8 +58,8 @@ class PayerAuthEnrolmentCheckServiceSpecification extends Specification {
         testObj.process(new PaymentDetails(paymentMock))
 
         then:
-        1 * requestTransformerMock.transform { it.customPayment == paymentMock } >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(cybersourceRequestMock) >> { throw new PaymentException('message') }
+        1 * requestTransformerMock.transform { it.customPayment == paymentMock } >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(paymentServiceRequestMock) >> { throw new PaymentException('message') }
 
         and:
         thrown(PayerAuthenticationException)
@@ -70,9 +70,9 @@ class PayerAuthEnrolmentCheckServiceSpecification extends Specification {
         testObj.process(new PaymentDetails(paymentMock))
 
         then:
-        1 * requestTransformerMock.transform { it.customPayment == paymentMock } >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(cybersourceRequestMock) >> ['cybersource':'response']
-        1 * responseTransformerMock.transform(['cybersource':'response'], paymentMock) >> {
+        1 * requestTransformerMock.transform { it.customPayment == paymentMock } >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(paymentServiceRequestMock) >> ['payment-service':'response']
+        1 * responseTransformerMock.transform(['payment-service':'response'], paymentMock) >> {
             throw new PaymentException('message')
         }
 

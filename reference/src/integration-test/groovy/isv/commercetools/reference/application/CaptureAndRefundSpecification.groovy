@@ -30,8 +30,8 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         def responseBody = new JsonSlurper().parseText(response.body)
 
         when: 'authentication continued'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFields = responseBody.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionId = enrolmentCheckFields.authenticationTransactionId
 
@@ -62,8 +62,8 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         def authInteractionId = authInteractionIdAction.interactionId
         authInteractionId != null
 
-        and: 'we ignore previous requests to cybersource'
-        csWireMockServer.resetRequests()
+        and: 'we ignore previous requests to payment service'
+        paymentServiceWireMockServer.resetRequests()
 
         when: 'we create an INITIAL CHARGE transaction'
         def paymentCaptureRequest = requestBuilder.paymentCaptureRequest(authInteractionId)
@@ -74,12 +74,12 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         validateActions(paymentCaptureResponseMap)
         def captureInteractionId = paymentCaptureResponseMap.actions.find { it.action == 'changeTransactionInteractionId' }.interactionId
 
-        and: 'expected fields were sent to cybersource'
-        def csCaptureRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validatePurchaseTotalFields(csCaptureRequest)
-            validateMerchantFields(csCaptureRequest)
-            validateCaptureServiceRun(csCaptureRequest, authInteractionId)
+        and: 'expected fields were sent to payment service'
+        def psCaptureRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validatePurchaseTotalFields(psCaptureRequest)
+            validateMerchantFields(psCaptureRequest)
+            validateCaptureServiceRun(psCaptureRequest, authInteractionId)
         }
 
         when: 'we create an INITIAL REFUND transaction for a partial refund'
@@ -89,12 +89,12 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         then: 'we should get back the correct actions'
         validateActions(new JsonSlurper().parseText(paymentRefundResponse.body))
 
-        and: 'expected fields were sent to cybersource'
-        def csPartialRefundRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validatePurchaseTotalFields(csPartialRefundRequest, '1')
-            validateMerchantFields(csPartialRefundRequest)
-            validateCreditServiceRun(csPartialRefundRequest, captureInteractionId)
+        and: 'expected fields were sent to payment service'
+        def psPartialRefundRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validatePurchaseTotalFields(psPartialRefundRequest, '1')
+            validateMerchantFields(psPartialRefundRequest)
+            validateCreditServiceRun(psPartialRefundRequest, captureInteractionId)
         }
 
         when: 'we create an INITIAL REFUND transaction to complete refund'
@@ -104,12 +104,12 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         then: 'we should get back the correct actions'
         validateActions(new JsonSlurper().parseText(paymentRefundResponse2.body))
 
-        and: 'expected fields were sent to cybersource'
-        def csRemainingRefundRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validatePurchaseTotalFields(csRemainingRefundRequest, '4.49')
-            validateMerchantFields(csRemainingRefundRequest)
-            validateCreditServiceRun(csRemainingRefundRequest, captureInteractionId)
+        and: 'expected fields were sent to payment service'
+        def psRemainingRefundRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validatePurchaseTotalFields(psRemainingRefundRequest, '4.49')
+            validateMerchantFields(psRemainingRefundRequest)
+            validateCreditServiceRun(psRemainingRefundRequest, captureInteractionId)
         }
 
         where:
@@ -131,7 +131,7 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         true
     }
 
-    def 'Should set the capture to failed if the capture is rejected from Cybersource'() {
+    def 'Should set the capture to failed if the capture is rejected from payment service'() {
         given: 'We create an INITIAL CHARGE on the payment'
         def paymentCaptureRequest = requestBuilder.paymentCaptureRequest()
 
@@ -152,20 +152,20 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         changeTransactionStateAction.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
         def addInterfaceInteraction = paymentCaptureResponseMap.actions.find { it.action == 'addInterfaceInteraction' }
-        addInterfaceInteraction.type.key == 'cybersource_payment_failure'
+        addInterfaceInteraction.type.key == 'isv_payment_failure'
         addInterfaceInteraction.fields.get('transactionId') == '8788176c-e42f-4544-aeaf-a155e1232292'
         addInterfaceInteraction.fields.get('reasonCode') == '102'
 
-        and: 'expected fields were sent to cybersource'
-        def csRefundRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validatePurchaseTotalFields(csRefundRequest)
-            validateMerchantFields(csRefundRequest)
-            validateCaptureServiceRun(csRefundRequest, 'null')
+        and: 'expected fields were sent to payment service'
+        def psRefundRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validatePurchaseTotalFields(psRefundRequest)
+            validateMerchantFields(psRefundRequest)
+            validateCaptureServiceRun(psRefundRequest, 'null')
         }
     }
 
-    def 'Should set the refund to failed if the refund is rejected from Cybersource'() {
+    def 'Should set the refund to failed if the refund is rejected from payment service'() {
         given: 'We create an INITIAL REFUND on the payment'
         def paymentRefundRequest = requestBuilder.paymentPartialRefundRequest()
 
@@ -186,16 +186,16 @@ class CaptureAndRefundSpecification extends MockExternalServicesBaseSpecificatio
         changeTransactionStateAction.transactionId == '8788176c-e42f-4544-aeaf-a155e1232292'
 
         def addInterfaceInteraction = paymentRefundResponseMap.actions.find { it.action == 'addInterfaceInteraction' }
-        addInterfaceInteraction.type.key == 'cybersource_payment_failure'
+        addInterfaceInteraction.type.key == 'isv_payment_failure'
         addInterfaceInteraction.fields.get('transactionId') == '8788176c-e42f-4544-aeaf-a155e1232292'
         addInterfaceInteraction.fields.get('reasonCode') == '102'
 
-        and: 'expected fields were sent to cybersource'
-        def csRefundRequest = cybersourceHelper.extractRequestFields(csWireMockServer)
-        cybersourceHelper.with {
-            validatePurchaseTotalFields(csRefundRequest, '1')
-            validateMerchantFields(csRefundRequest)
-            validateCreditServiceRun(csRefundRequest, 'null')
+        and: 'expected fields were sent to payment service'
+        def psRefundRequest = paymentServiceHelper.extractRequestFields(paymentServiceWireMockServer)
+        paymentServiceHelper.with {
+            validatePurchaseTotalFields(psRefundRequest, '1')
+            validateMerchantFields(psRefundRequest)
+            validateCreditServiceRun(psRefundRequest, 'null')
         }
     }
 

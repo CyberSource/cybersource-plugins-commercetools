@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import isv.cardinal.service.CardinalService;
 import isv.commercetools.mapping.PayerAuthEnrolmentCheckRequestTransformer;
 import isv.commercetools.mapping.PayerAuthEnrolmentCheckResponseTransformer;
-import isv.commercetools.mapping.model.CybersourceIds;
+import isv.commercetools.mapping.model.PaymentServiceIds;
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory;
 import isv.commercetools.reference.application.service.payment.NoOpPaymentService;
 import isv.commercetools.reference.application.service.payment.PayerAuthEnrolmentCheckService;
@@ -20,7 +20,7 @@ import isv.commercetools.reference.application.validation.rules.service.PayerAut
 import isv.commercetools.reference.application.validation.rules.service.PayerAuthEnrolmentHeadersValidationRule;
 import isv.commercetools.reference.application.validation.rules.service.PaymentGreaterThanZeroValidationRule;
 import isv.commercetools.reference.application.validation.rules.service.TokenValidationRule;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +51,8 @@ public class PaymentCreateServiceConfiguration {
      */
     @Bean
     public PaymentService payerAuthEnrolmentCheckService(
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             CardinalService cardinalService,
             ObjectMapper objectMapper,
             PaymentDetailsFactory paymentDetailsFactory,
@@ -70,9 +70,9 @@ public class PaymentCreateServiceConfiguration {
                 new PayerAuthEnrolmentCustomerValidationRule(objectMapper)
         ));
 
-        var requestTransformer = new PayerAuthEnrolmentCheckRequestTransformer(cybersourceIds, cardinalService);
+        var requestTransformer = new PayerAuthEnrolmentCheckRequestTransformer(paymentServiceIds, cardinalService);
         var responseTransformer = new PayerAuthEnrolmentCheckResponseTransformer(cardinalService);
-        return new PayerAuthEnrolmentCheckService(paymentDetailsFactory, paymentValidator, cartValidator, requestTransformer, responseTransformer, cybersourceClient);
+        return new PayerAuthEnrolmentCheckService(paymentDetailsFactory, paymentValidator, cartValidator, requestTransformer, responseTransformer, paymentServiceClient);
     }
 
 }

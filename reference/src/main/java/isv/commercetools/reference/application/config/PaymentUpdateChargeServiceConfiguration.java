@@ -7,7 +7,7 @@ import static isv.commercetools.reference.application.validation.rules.service.T
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sphere.sdk.payments.TransactionState;
 import io.sphere.sdk.payments.TransactionType;
-import isv.commercetools.mapping.model.CybersourceIds;
+import isv.commercetools.mapping.model.PaymentServiceIds;
 import isv.commercetools.mapping.transformer.capture.CaptureRequestTransformer;
 import isv.commercetools.mapping.transformer.capture.VisaCheckoutCaptureRequestTransformer;
 import isv.commercetools.mapping.transformer.response.ReasonCodeResponseTransformer;
@@ -15,7 +15,7 @@ import isv.commercetools.reference.application.factory.payment.PaymentDetailsFac
 import isv.commercetools.reference.application.service.payment.PaymentChargeService;
 import isv.commercetools.reference.application.service.payment.PaymentService;
 import isv.commercetools.reference.application.validation.ResourceValidator;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +46,11 @@ public class PaymentUpdateChargeServiceConfiguration {
     @Bean
     public PaymentService paymentChargeService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory
     ) {
-        var requestTransformer = new CaptureRequestTransformer(cybersourceIds);
+        var requestTransformer = new CaptureRequestTransformer(paymentServiceIds);
         var reasonCodeResponseTransformer = new ReasonCodeResponseTransformer();
 
         var validator = new ResourceValidator<>(List.of(
@@ -58,7 +58,7 @@ public class PaymentUpdateChargeServiceConfiguration {
                 expectTransactionValidationRule(objectMapper, TransactionState.SUCCESS, TransactionType.AUTHORIZATION),
                 doNotExpectTransactionValidationRule(objectMapper, TransactionState.SUCCESS, TransactionType.CHARGE)
         ));
-        return new PaymentChargeService(paymentDetailsFactory, validator, requestTransformer, reasonCodeResponseTransformer, cybersourceClient);
+        return new PaymentChargeService(paymentDetailsFactory, validator, requestTransformer, reasonCodeResponseTransformer, paymentServiceClient);
     }
 
     /**
@@ -67,11 +67,11 @@ public class PaymentUpdateChargeServiceConfiguration {
     @Bean
     public PaymentService visaCheckoutPaymentChargeService(
             ObjectMapper objectMapper,
-            CybersourceIds cybersourceIds,
-            CybersourceClient cybersourceClient,
+            PaymentServiceIds paymentServiceIds,
+            PaymentServiceClient paymentServiceClient,
             PaymentDetailsFactory paymentDetailsFactory
     ) {
-        var requestTransformer = new VisaCheckoutCaptureRequestTransformer(cybersourceIds);
+        var requestTransformer = new VisaCheckoutCaptureRequestTransformer(paymentServiceIds);
         var reasonCodeResponseTransformer = new ReasonCodeResponseTransformer();
 
         var validator = new ResourceValidator<>(List.of(
@@ -79,7 +79,7 @@ public class PaymentUpdateChargeServiceConfiguration {
                 expectTransactionValidationRule(objectMapper, TransactionState.SUCCESS, TransactionType.AUTHORIZATION),
                 doNotExpectTransactionValidationRule(objectMapper, TransactionState.SUCCESS, TransactionType.CHARGE)
         ));
-        return new PaymentChargeService(paymentDetailsFactory, validator, requestTransformer, reasonCodeResponseTransformer, cybersourceClient);
+        return new PaymentChargeService(paymentDetailsFactory, validator, requestTransformer, reasonCodeResponseTransformer, paymentServiceClient);
     }
 
 }

@@ -23,15 +23,15 @@ non-secret properties.
 
 | Property                                        | Environment variable                                | Value | Notes |
 | ----------------------------------------------- |---------------------------------------------------- | ----- | ----- |
-| env.cybersource.merchantID                      | env\_cybersource\_merchantID                        | Your Cybersource merchant id | Provided by Cybersource |
-| env.cybersource.sharedSecret.id                 | env\_cybersource\_sharedSecret\_id                  | Id of a Cybersource shared secret key to be used for Flex token generation | Created in <a href="Key-Creation.md">Key Creation</a> |
-| env.cybersource.keysDirectory                   | env\_cybersource\_keysDirectory|Directory where .p12 API key resides | Created in <a href="Key-Creation.md">Key Creation</a> |
+| env.isv.payments.merchantID                      | env\_isv\_payments\_merchantID                        | Your Cybersource merchant id | Provided by Cybersource |
+| env.isv.payments.sharedSecret.id                 | env\_isv\_payments\_sharedSecret\_id                  | Id of a Cybersource shared secret key to be used for Flex token generation | Created in <a href="Key-Creation.md">Key Creation</a> |
+| env.isv.payments.keysDirectory                   | env\_isv\_payments\_keysDirectory|Directory where .p12 API key resides | Created in <a href="Key-Creation.md">Key Creation</a> |
 | env.commercetools.projectKey                    | env\_commercetools\_projectKey                      | Project key for your Commercetools project | |
 | env.commercetools.clientConfig.payment.clientId | env\_commercetools\_clientConfig\_payment\_clientId | Client ID of your Commercetools Payment API key | Created in <a href="Key-Creation.md">Key Creation</a> |
-| env.cybersource.service.keyGenerationUrl        | env\_cybersource\_service\_keygenerationurl         | Base URL of your Key Generation service (e.g. http://example.com) | See the 'Endpoints' section in <a href="Overview.md">Overview</a> |
-| env.cybersource.service.jwtCreationUrl          | env\_cybersource\_service\_jwtcreationurl           | Base URL of your JWT Creation service (e.g. http://example.com) | See the 'Endpoints' section in <a href="Overview.md">Overview</a> |
-| env.cybersource.flex.targetOrigins              | env\_cybersource\_flex\_targetOrigins               | Base URL where your frontend will be accessible | Multiple values can be seprated by spaces |
-| env.cybersource.flex.verificationKey            | env\_cybersource\_flex\_verificationKey             | Used to check Flex tokens for tampering | Generate with `openssl rand -base64 32` |
+| env.isv.payments.service.keyGenerationUrl        | env\_isv\_payments\_service\_keygenerationurl         | Base URL of your Key Generation service (e.g. http://example.com) | See the 'Endpoints' section in <a href="Overview.md">Overview</a> |
+| env.isv.payments.service.jwtCreationUrl          | env\_isv\_payments\_service\_jwtcreationurl           | Base URL of your JWT Creation service (e.g. http://example.com) | See the 'Endpoints' section in <a href="Overview.md">Overview</a> |
+| env.isv.payments.flex.targetOrigins              | env\_isv\_payments\_flex\_targetOrigins               | Base URL where your frontend will be accessible | Multiple values can be seprated by spaces |
+| env.isv.payments.flex.verificationKey            | env\_isv\_payments\_flex\_verificationKey             | Used to check Flex tokens for tampering | Generate with `openssl rand -base64 32` |
 
 ## <a name="SecretProperties"></a>Secret Properties
 
@@ -42,9 +42,9 @@ variables.
 
 | Property                                          | Environment variable                    | Value | Notes |
 | ------------------------------------------------- | --------------------------------------- | ----- | ----- |
-| secrets.cybersource.sharedSecret.value            | secrets\_cybersource\_sharedSecret\_value  | Value of a Cybersource shared secret key to be used for Flex token generation | Created in <a href="Key-Creation.md">Key Creation</a> |
-| secrets.cybersource.keyPassword                   | secrets\_cybersource\_keyPassword         | Password for the .p12 key (Your Cybersource merchant ID) | Created in <a href="Key-Creation.md">Key Creation</a> |
-| secrets.cybersource.visaCheckout.apiKey           | secrets\_cybersource\_visaCheckout\_apiKey | API key used for Visa Checkout | Created in <a href="Key-Creation.md">Key Creation</a> |
+| secrets.isv.payments.sharedSecret.value            | secrets\_isv\_payments\_sharedSecret\_value  | Value of a Cybersource shared secret key to be used for Flex token generation | Created in <a href="Key-Creation.md">Key Creation</a> |
+| secrets.isv.payments.keyPassword                   | secrets\_isv\_payments\_keyPassword         | Password for the .p12 key (Your Cybersource merchant ID) | Created in <a href="Key-Creation.md">Key Creation</a> |
+| secrets.isv.payments.visaCheckout.apiKey           | secrets\_isv\_payments\_visaCheckout\_apiKey | API key used for Visa Checkout | Created in <a href="Key-Creation.md">Key Creation</a> |
 | secrets.commercetools.clientConfig.payment.secret | secrets\_commercetools\_clientConfig\_payment\_secret | Client secret of your Commercetools Payment API key | Created in <a href="Key-Creation.md">Key Creation</a> |
 | secrets.cardinal.apiKey                           | secrets\_cardinal\_apiKey                 | Cardinal API key available from Cybersource|Created in <a href="Key-Creation.md">Key Creation</a> |
 | secrets.cardinal.apiIdentifier                    | secrets\_cardinal\_apiIdentifier          | Cardinal API identifier available from Cybersource | Created in <a href="Key-Creation.md">Key Creation</a> |

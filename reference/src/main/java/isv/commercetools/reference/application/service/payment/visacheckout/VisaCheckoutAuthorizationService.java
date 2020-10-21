@@ -8,12 +8,12 @@ import isv.commercetools.mapping.model.CustomPayment;
 import isv.commercetools.mapping.model.PaymentDetails;
 import isv.commercetools.mapping.transformer.RequestTransformer;
 import isv.commercetools.mapping.transformer.auth.visacheckout.VisaCheckoutUpdateActionCreator;
-import isv.commercetools.mapping.transformer.response.CybersourceResponseToFieldGroupTransformer;
+import isv.commercetools.mapping.transformer.response.PaymentServiceResponseToFieldGroupTransformer;
 import isv.commercetools.mapping.transformer.response.ResponseTransformer;
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory;
 import isv.commercetools.reference.application.service.payment.PaymentAuthorizationService;
 import isv.commercetools.reference.application.validation.ResourceValidator;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import isv.payments.exception.PaymentException;
 import isv.payments.model.fields.BillToFieldGroup;
 import isv.payments.model.fields.CardFieldGroup;
@@ -34,7 +34,7 @@ public class VisaCheckoutAuthorizationService extends PaymentAuthorizationServic
     private final SphereClient paymentSphereClient;
     private final VisaCheckoutQueryService visaCheckoutQueryService;
     private final VisaCheckoutUpdateActionCreator updateActionCreator;
-    private final CybersourceResponseToFieldGroupTransformer responseFieldGroupTransformer;
+    private final PaymentServiceResponseToFieldGroupTransformer responseFieldGroupTransformer;
 
     public VisaCheckoutAuthorizationService(
             PaymentDetailsFactory paymentDetailsFactory,
@@ -42,13 +42,13 @@ public class VisaCheckoutAuthorizationService extends PaymentAuthorizationServic
             ResourceValidator<Cart> cartValidator,
             RequestTransformer authorizationRequestTransformer,
             ResponseTransformer responseTransformer,
-            CybersourceClient cybersourceClient,
+            PaymentServiceClient paymentServiceClient,
             SphereClient paymentSphereClient,
             VisaCheckoutQueryService visaCheckoutQueryService,
             VisaCheckoutUpdateActionCreator updateActionCreator,
-            CybersourceResponseToFieldGroupTransformer responseFieldGroupTransformer
+            PaymentServiceResponseToFieldGroupTransformer responseFieldGroupTransformer
     ) {
-        super(paymentDetailsFactory, paymentValidator, cartValidator, authorizationRequestTransformer, responseTransformer, cybersourceClient);
+        super(paymentDetailsFactory, paymentValidator, cartValidator, authorizationRequestTransformer, responseTransformer, paymentServiceClient);
         this.paymentSphereClient = paymentSphereClient;
         this.visaCheckoutQueryService = visaCheckoutQueryService;
         this.updateActionCreator = updateActionCreator;

@@ -2,29 +2,29 @@ package isv.commercetools.reference.application.service.payment.visacheckout;
 
 import isv.commercetools.mapping.model.PaymentDetails;
 import isv.commercetools.mapping.transformer.RequestTransformer;
-import isv.payments.CybersourceClient;
+import isv.payments.PaymentServiceClient;
 import isv.payments.exception.PaymentException;
 import java.util.Map;
 
 public class VisaCheckoutQueryService {
 
     private final RequestTransformer visaCheckoutDataRequestTransformer;
-    private final CybersourceClient cybersourceClient;
+    private final PaymentServiceClient paymentServiceClient;
 
     public VisaCheckoutQueryService(
             RequestTransformer visaCheckoutDataRequestTransformer,
-            CybersourceClient cybersourceClient
+            PaymentServiceClient paymentServiceClient
     ) {
         this.visaCheckoutDataRequestTransformer = visaCheckoutDataRequestTransformer;
-        this.cybersourceClient = cybersourceClient;
+        this.paymentServiceClient = paymentServiceClient;
     }
 
     /**
-     * Queries Cybersource for the Visa Checkout payment data for the token on the provided PaymentDetails payment object
+     * Queries Payment service for the Visa Checkout payment data for the token on the provided PaymentDetails payment object
      */
     public Map<String, Object> getVisaCheckoutData(PaymentDetails paymentDetails) throws PaymentException {
-        var cybersourceRequest = visaCheckoutDataRequestTransformer.transform(paymentDetails);
-        return cybersourceClient.makeRequest(cybersourceRequest);
+        var paymentRequest = visaCheckoutDataRequestTransformer.transform(paymentDetails);
+        return paymentServiceClient.makeRequest(paymentRequest);
     }
 
 }

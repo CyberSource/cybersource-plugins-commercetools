@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import isv.commercetools.config.TestConfiguration
 import isv.commercetools.sync.payment.config.ApplicationConfiguration
-import isv.commercetools.sync.payment.config.CsClientConfigurationProperties
+import isv.commercetools.sync.payment.config.PaymentServiceClientConfigurationProperties
 import isv.commercetools.sync.payment.config.CtClientConfigurationProperties
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Value
@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(classes = [ApplicationConfiguration])
-@EnableConfigurationProperties([CtClientConfigurationProperties, CsClientConfigurationProperties, TestConfiguration])
+@EnableConfigurationProperties([CtClientConfigurationProperties, PaymentServiceClientConfigurationProperties, TestConfiguration])
 @ActiveProfiles(['dev', 'integration-test'])
 class DecisionManagerSyncSpecification extends BaseSpecification {
 
@@ -23,24 +23,24 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     String ctProjectKey
 
     def setupSpec() {
-        csWireMockServer.start()
+        paymentServiceWireMockServer.start()
         ctWireMockServer.start()
     }
 
     def cleanupSpec() {
-        csWireMockServer.stop()
+        paymentServiceWireMockServer.stop()
         ctWireMockServer.stop()
     }
 
     def cleanup() {
-        csWireMockServer.resetAll()
+        paymentServiceWireMockServer.resetAll()
         ctWireMockServer.resetAll()
     }
 
     def 'Successful synchronisation has been done for multiple conversions with auth as Pending in commerce tools'() {
-        given:'A cybersource conversion detail transaction search api returns a decisions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearch(
-                'multiple_decisions_sync_required/cs_get_conversion_details.json', 200))
+        given:'A payment service conversion detail transaction search api returns a decisions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearch(
+                'multiple_decisions_sync_required/ps_get_conversion_details.json', 200))
 
         and:'Commerce tools returns a payment with Pending auth on it'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForCTGetPayment(
@@ -57,7 +57,7 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
         decisionManagerDecisionSynchronizer.synchronizeTransactions(new DateTime('2019-11-28T00:00:00.0Z'), new DateTime('2019-11-29T00:00:00.000Z'))
 
         then:'The conversions will be retrieved'
-        def getConversions = csWireMockServer.findRequestsMatching(new RequestPatternBuilder(
+        def getConversions = paymentServiceWireMockServer.findRequestsMatching(new RequestPatternBuilder(
                 RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')).build())
                 .requests
         getConversions.size() == 1
@@ -83,16 +83,16 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'Synchronization is not performed for the empty conversion details'() {
-        given:'A cybersource conversion detail transaction search api returns an empty response'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearch(
-                'cs_empty_conversions_get_response.json', 200))
+        given:'A payment service conversion detail transaction search api returns an empty response'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearch(
+                'ps_empty_conversions_get_response.json', 200))
 
         when:'Synchronization call happens'
         decisionManagerDecisionSynchronizer.synchronizeTransactions(
                 new DateTime('2019-11-29T00:00:00.0Z'), new DateTime('2019-11-30T00:00:00.0Z'))
 
         then:'The conversions will be retrieved'
-        def getConversions = csWireMockServer.findRequestsMatching(
+        def getConversions = paymentServiceWireMockServer.findRequestsMatching(
                 new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')).build()).requests
         getConversions.size() == 1
 
@@ -111,9 +111,9 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'No synchronisation has been performed for the transaction with auth as successful in commerce tools'() {
-        given:'A cybersource conversion detail transaction search api returns a decisions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearch(
-                'decision_sync_not_required_successful_auth/cs_get_conversion_details.json', 200))
+        given:'A payment service conversion detail transaction search api returns a decisions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearch(
+                'decision_sync_not_required_successful_auth/ps_get_conversion_details.json', 200))
 
         and:'Commerce tools returns a payment with success auth on it'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
@@ -124,7 +124,7 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
                 new DateTime('2019-11-28T00:00:00.0Z'), new DateTime('2019-11-29T00:00:00.0Z'))
 
         then:'The conversions will be retrieved'
-        def getConversions = csWireMockServer.findRequestsMatching(
+        def getConversions = paymentServiceWireMockServer.findRequestsMatching(
                 new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')).build()).requests
         getConversions.size() == 1
 
@@ -144,15 +144,15 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'Synchronization is not performed if the reporting api returns 404-NOT FOUND'() {
-        given:'A cybersource conversion detail transaction search api returns a response with 404 error code'
-        csWireMockServer.addStubMapping(
-                requestStubBuilder.buildStubForCsDecisionSearchFor_400_404_Response(404, $/application/json/$))
+        given:'A payment service conversion detail transaction search api returns a response with 404 error code'
+        paymentServiceWireMockServer.addStubMapping(
+                requestStubBuilder.buildStubForPaymentServiceDecisionSearchFor_400_404_Response(404, $/application/json/$))
 
         when:'Synchronization call happens'
         decisionManagerDecisionSynchronizer.synchronizeTransactions(new DateTime('2019-12-11T10:22:37.783Z'), new DateTime('2019-12-11T10:22:37.814Z'))
 
         then:'The conversions will not be retrieved but a call to retrieve conversions will still be made'
-        csWireMockServer.verify(new RequestPatternBuilder(
+        paymentServiceWireMockServer.verify(new RequestPatternBuilder(
                 RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')))
 
         and:'No GET request will be made to get a payment on CT'
@@ -170,9 +170,9 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'No synchronisation has been performed for the transaction with auth as failure in commerce tools'() {
-        given:'A cybersource conversion detail transaction search api returns decisions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearch(
-                'decision_sync_not_required_auth_failure/cs_get_conversion_details.json', 200))
+        given:'A payment service conversion detail transaction search api returns decisions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearch(
+                'decision_sync_not_required_auth_failure/ps_get_conversion_details.json', 200))
 
         and:'Commerce tools returns a payment with Failure auth on it'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
@@ -183,7 +183,7 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
                 new DateTime('2019-11-28T00:00:00.0Z'), new DateTime('2019-11-29T00:00:00.0Z'))
 
         then:'The conversions will be retrieved'
-        def getConversions = csWireMockServer.findRequestsMatching(
+        def getConversions = paymentServiceWireMockServer.findRequestsMatching(
                 new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')).build()).requests
         getConversions.size() == 1
 
@@ -203,9 +203,9 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'No synchronisation has been performed if the payment not found in commerce tools'() {
-        given:'A cybersource conversion detail transaction search api returns decisions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearch(
-                'decision_sync_not_required_ct_payment_not_found/cs_get_conversion_details.json', 200))
+        given:'A payment service conversion detail transaction search api returns decisions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearch(
+                'decision_sync_not_required_ct_payment_not_found/ps_get_conversion_details.json', 200))
 
         and:'Commerce tools 404-Not found for the merchant reference'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubFor404CtRequest(ctProjectKey))
@@ -215,7 +215,7 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
                 new DateTime('2019-11-28T00:00:00.0Z'), new DateTime('2019-11-29T00:00:00.0Z'))
 
         then:'The conversions will be retrieved'
-        def getConversions = csWireMockServer.findRequestsMatching(
+        def getConversions = paymentServiceWireMockServer.findRequestsMatching(
                 new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')).build()).requests
         getConversions.size() == 1
 
@@ -235,14 +235,14 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'Synchronization is not performed if the reporting api returns 400-BAD REQUEST'() {
-        given:'A cybersource conversion detail transaction search api returns a response wih 400 error code'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearchFor_400_404_Response(400, $/application/json/$))
+        given:'A payment service conversion detail transaction search api returns a response wih 400 error code'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearchFor_400_404_Response(400, $/application/json/$))
 
         when:'Synchronization call happens'
         decisionManagerDecisionSynchronizer.synchronizeTransactions(new DateTime('2019-12-11T10:22:37.783Z'), new DateTime('2019-12-11T10:22:37.814Z'))
 
         then:'The conversions will not be retrieved but a call to retrieve conversions will still be made'
-        csWireMockServer.verify(new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')))
+        paymentServiceWireMockServer.verify(new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')))
 
         and:'CT payment will not be searched'
         def getRequests = ctWireMockServer.findRequestsMatching(
@@ -262,9 +262,9 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'A successful synchronization is performed if reporting api returns conversions in PENDING state and ACCEPT decision'() {
-        given:'A cybersource conversion detail transaction search api returns empty conversions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearch(
-                'decision_sync_required_single_decision/cs_get_conversion_details.json', 200))
+        given:'A payment service conversion detail transaction search api returns empty conversions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearch(
+                'decision_sync_required_single_decision/ps_get_conversion_details.json', 200))
 
         and:'A commerece tools payment is searched'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
@@ -274,7 +274,7 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
         decisionManagerDecisionSynchronizer.synchronizeTransactions(new DateTime('2019-11-28T00:00:00.0Z'), new DateTime('2019-11-29T00:00:00.0Z'))
 
         then:'The conversions will be retrieved'
-        def getConversions = csWireMockServer.findRequestsMatching(
+        def getConversions = paymentServiceWireMockServer.findRequestsMatching(
                 new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')).build()).requests
         getConversions.size() == 1
 
@@ -293,9 +293,9 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
     }
 
     def 'A successful synchronization is performed if reporting api returns conversions in PENDING state and REJECT decision'() {
-        given:'A cybersource conversion detail transaction search api returns empty conversions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsDecisionSearch(
-                'decision_sync_required_auth_failure/cs_get_conversion_details.json', 200))
+        given:'A payment service conversion detail transaction search api returns empty conversions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceDecisionSearch(
+                'decision_sync_required_auth_failure/ps_get_conversion_details.json', 200))
 
         and:'A commerece tools payment is searched'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
@@ -305,7 +305,7 @@ class DecisionManagerSyncSpecification extends BaseSpecification {
         decisionManagerDecisionSynchronizer.synchronizeTransactions(new DateTime('2019-11-28T00:00:00.0Z'), new DateTime('2019-11-29T00:00:00.0Z'))
 
         then:'The conversions will be retrieved'
-        def getConversions = csWireMockServer.findRequestsMatching(
+        def getConversions = paymentServiceWireMockServer.findRequestsMatching(
                 new RequestPatternBuilder(RequestMethod.GET, WireMock.urlPathMatching('.*reporting/v3/conversion-details.*')).build()).requests
         getConversions.size() == 1
 

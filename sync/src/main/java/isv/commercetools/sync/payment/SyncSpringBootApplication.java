@@ -2,8 +2,8 @@ package isv.commercetools.sync.payment;
 
 import isv.commercetools.sync.DecisionManagerDecisionSynchronizer;
 import isv.commercetools.sync.SynchronizationRunner;
-import isv.commercetools.sync.cybersource.request.CsTransactionSearch;
-import isv.commercetools.sync.cybersource.request.CsTransactionSearchImpl;
+import isv.commercetools.sync.isv.request.IsvTransactionSearch;
+import isv.commercetools.sync.isv.request.IsvTransactionSearchImpl;
 import org.joda.time.DateTime;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -37,7 +37,7 @@ public class SyncSpringBootApplication implements CommandLineRunner {
   }
 
   private void synchronizeTransactions() {
-    CsTransactionSearch transactionSearch = new CsTransactionSearchImpl("submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}", "submitTimeUtc:desc", 50);
+    IsvTransactionSearch transactionSearch = new IsvTransactionSearchImpl("submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}", "submitTimeUtc:desc", 50);
     runner.synchronize(transactionSearch);
   }
 }

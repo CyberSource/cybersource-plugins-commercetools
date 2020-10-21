@@ -23,17 +23,17 @@ apply plugin: 'pmd'
 apply plugin: 'codenarc'
 apply plugin: 'io.spring.dependency-management'
 
-group = 'com.cybersource'
+group = 'com.isv'
 version = "${appVersion}"
 status = 'integration'
 
 sourceCompatibility = 11
 
 dependencies {
-    compile("com.cybersource:ct-api-extension:${project.ext.cybersourceCommercetoolsLibraryVersion}")
-    compile("com.cybersource:cs-payments:${project.ext.cybersourceCommercetoolsLibraryVersion}")
-    compile("com.cybersource:cs-ct-mapping:${project.ext.cybersourceCommercetoolsLibraryVersion}")
-    compile("com.cybersource:cs-3ds:${project.ext.cybersourceCommercetoolsLibraryVersion}")
+    compile("com.isv:ct-api-extension:${project.ext.isvCommercetoolsLibraryVersion}")
+    compile("com.isv:isv-payments:${project.ext.isvCommercetoolsLibraryVersion}")
+    compile("com.isv:isv-ct-mapping:${project.ext.isvCommercetoolsLibraryVersion}")
+    compile("com.isv:isv-3ds:${project.ext.isvCommercetoolsLibraryVersion}")
 
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework.boot:spring-boot-starter-web") {

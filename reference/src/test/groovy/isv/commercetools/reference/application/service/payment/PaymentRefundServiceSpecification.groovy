@@ -14,9 +14,9 @@ import isv.commercetools.mapping.transformer.credit.CreditRequestTransformer
 import isv.commercetools.mapping.transformer.response.ResponseTransformer
 import isv.commercetools.reference.application.factory.payment.PaymentDetailsFactory
 import isv.commercetools.reference.application.validation.ResourceValidator
-import isv.payments.CybersourceClient
+import isv.payments.PaymentServiceClient
 import isv.payments.exception.PaymentException
-import isv.payments.model.CybersourceRequest
+import isv.payments.model.PaymentServiceRequest
 import org.slf4j.Logger
 import spock.lang.Specification
 
@@ -29,7 +29,7 @@ class PaymentRefundServiceSpecification extends Specification {
     PaymentDetails paymentDetailsMock
 
     CreditRequestTransformer requestTransformerMock = Mock()
-    CybersourceClient cybersourceClientMock = Mock()
+    PaymentServiceClient paymentServiceClientMock = Mock()
     ResponseTransformer responseTransformerMock = Mock()
     ResourceValidator<CustomPayment> validatorMock = Mock()
     PaymentDetailsFactory paymentDetailsFactoryMock = Mock()
@@ -43,7 +43,7 @@ class PaymentRefundServiceSpecification extends Specification {
         loggerMock = Mock()
         paymentDetailsMock = Mock()
 
-        testObj = new PaymentRefundService(paymentDetailsFactoryMock, validatorMock, requestTransformerMock, responseTransformerMock, cybersourceClientMock, loggerMock)
+        testObj = new PaymentRefundService(paymentDetailsFactoryMock, validatorMock, requestTransformerMock, responseTransformerMock, paymentServiceClientMock, loggerMock)
 
         customPaymentMock.id >> 'payment_id'
         customPaymentMock.basePayment >> paymentMock
@@ -55,7 +55,7 @@ class PaymentRefundServiceSpecification extends Specification {
         transactionMock.type >> TransactionType.REFUND
         transactionMock.state >> TransactionState.INITIAL
 
-        def cybersourceRequestMock = Mock(CybersourceRequest)
+        def paymentServiceRequestMock = Mock(PaymentServiceRequest)
         def responseMock = ['some':'response']
         def updateActionMock = Mock(UpdateAction)
         def responseUpdateActions = [updateActionMock]
@@ -64,8 +64,8 @@ class PaymentRefundServiceSpecification extends Specification {
         def result = testObj.process(new PaymentDetails(customPaymentMock))
 
         then:
-        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(cybersourceRequestMock) >> responseMock
+        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(paymentServiceRequestMock) >> responseMock
         1 * responseTransformerMock.transform(responseMock, transactionMock) >> responseUpdateActions
 
         and:
@@ -79,14 +79,14 @@ class PaymentRefundServiceSpecification extends Specification {
         transactionMock.state >> TransactionState.INITIAL
         transactionMock.id >> 'transaction_id'
 
-        def cybersourceRequestMock = Mock(CybersourceRequest)
+        def paymentServiceRequestMock = Mock(PaymentServiceRequest)
 
         when:
         def result = testObj.process(new PaymentDetails(customPaymentMock))
 
         then:
-        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> cybersourceRequestMock
-        1 * cybersourceClientMock.makeRequest(cybersourceRequestMock) >> {
+        1 * requestTransformerMock.transform { it.customPayment == customPaymentMock } >> paymentServiceRequestMock
+        1 * paymentServiceClientMock.makeRequest(paymentServiceRequestMock) >> {
             throw new PaymentException('some exception')
         }
 
@@ -130,7 +130,7 @@ class PaymentRefundServiceSpecification extends Specification {
 
         then:
         0 * requestTransformerMock.transform(_)
-        0 * cybersourceClientMock.makeRequest(_)
+        0 * paymentServiceClientMock.makeRequest(_)
 
         and:
         result.isEmpty()

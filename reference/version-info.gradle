@@ -1,6 +1,6 @@
 project.ext.spockVersion = '1.3-groovy-2.5'
 project.ext.groovyVersion = '2.5.4'
-project.ext.cybersourceCommercetoolsLibraryVersion = '1.4.0'
+project.ext.isvCommercetoolsLibraryVersion = '1.5.1'
 project.ext.systemRulesVersion = '1.19.0'
 project.ext.nimbusJwtVersion = '7.3'
 project.ext.groovyHttpBuilderVersion = '0.7.1'

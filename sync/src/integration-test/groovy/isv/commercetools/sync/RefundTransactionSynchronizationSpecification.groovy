@@ -3,10 +3,10 @@ package isv.commercetools.sync
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import isv.commercetools.config.TestConfiguration
-import isv.commercetools.sync.cybersource.request.CsTransactionSearch
-import isv.commercetools.sync.cybersource.request.CsTransactionSearchImpl
+import isv.commercetools.sync.isv.request.IsvTransactionSearch
+import isv.commercetools.sync.isv.request.IsvTransactionSearchImpl
 import isv.commercetools.sync.payment.config.ApplicationConfiguration
-import isv.commercetools.sync.payment.config.CsClientConfigurationProperties
+import isv.commercetools.sync.payment.config.PaymentServiceClientConfigurationProperties
 import isv.commercetools.sync.payment.config.CtClientConfigurationProperties
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl
 
 @SpringBootTest(classes = [ApplicationConfiguration])
-@EnableConfigurationProperties([CtClientConfigurationProperties, CsClientConfigurationProperties, TestConfiguration])
+@EnableConfigurationProperties([CtClientConfigurationProperties, PaymentServiceClientConfigurationProperties, TestConfiguration])
 @ActiveProfiles(['dev', 'integration-test'])
 class RefundTransactionSynchronizationSpecification extends BaseSpecification {
 
@@ -24,25 +24,25 @@ class RefundTransactionSynchronizationSpecification extends BaseSpecification {
     String ctProjectKey
 
     def setupSpec() {
-        csWireMockServer.start()
+        paymentServiceWireMockServer.start()
         ctWireMockServer.start()
     }
 
     def cleanupSpec() {
-        csWireMockServer.stop()
+        paymentServiceWireMockServer.stop()
         ctWireMockServer.stop()
     }
 
     def cleanup() {
-        csWireMockServer.resetAll()
+        paymentServiceWireMockServer.resetAll()
         ctWireMockServer.resetAll()
     }
 
     def 'Successful synchronisation has been done for the missing credit transaction as Success in commerce tools'() {
-        given: 'A cybersource search mock returns a list of transactions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch(
-                'Started', 'sync_required_successful_credit/cs_post_transaction_response.json', 'search1'))
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch('search1', 'cs_empty_transactions_post_response.json'))
+        given: 'A payment service search mock returns a list of transactions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch(
+                'Started', 'sync_required_successful_credit/ps_post_transaction_response.json', 'search1'))
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch('search1', 'ps_empty_transactions_post_response.json'))
 
         and: 'Commerce tools returns payment with no transaction on it'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
@@ -53,7 +53,7 @@ class RefundTransactionSynchronizationSpecification extends BaseSpecification {
                 'POST', 'sync_required_successful_credit/ct_post_response.json', ctProjectKey))
 
         when: 'Synchronization call happens'
-        CsTransactionSearch transactionSearch = new CsTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
+        IsvTransactionSearch transactionSearch = new IsvTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
         runner.synchronize(transactionSearch)
 
         then: 'The payment will be searched for'
@@ -71,17 +71,17 @@ class RefundTransactionSynchronizationSpecification extends BaseSpecification {
     }
 
     def 'No synchronization is required for a credit transaction on a payment'() {
-        given: 'A cybersource search mock returns a list of transactions'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch(
-                'Started', 'no_sync_required/cs_post_transaction_credit_response.json', 'search1'))
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch('search1', 'cs_empty_transactions_post_response.json'))
+        given: 'A payment service search mock returns a list of transactions'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch(
+                'Started', 'no_sync_required/ps_post_transaction_credit_response.json', 'search1'))
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch('search1', 'ps_empty_transactions_post_response.json'))
 
         and: 'Commerce tools returns payment with a successful auth transaction'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
                 'GET', 'no_sync_required/ct_get_payment_success_refund.json', ctProjectKey))
 
         when: 'Synchronization call happens'
-        CsTransactionSearch transactionSearch = new CsTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
+        IsvTransactionSearch transactionSearch = new IsvTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
         runner.synchronize(transactionSearch)
 
         then: 'Nothing to update in commerce tools'
@@ -94,9 +94,9 @@ class RefundTransactionSynchronizationSpecification extends BaseSpecification {
 
     def 'Successful synchronisation has been done for the missing transaction with credit as Failure in commerce tools'() {
         given: 'Commerce tools returns payment with no transaction on it'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch(
-                'Started', 'sync_required_failure_credit/cs_transaction_search_post_response.json', 'search1'))
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch('search1', 'cs_empty_transactions_post_response.json'))
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch(
+                'Started', 'sync_required_failure_credit/ps_transaction_search_post_response.json', 'search1'))
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch('search1', 'ps_empty_transactions_post_response.json'))
 
         and: 'Commerce tools returns payment with no transaction on it'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
@@ -107,7 +107,7 @@ class RefundTransactionSynchronizationSpecification extends BaseSpecification {
                 'POST', 'sync_required_failure_credit/ct_post_response.json', ctProjectKey))
 
         when: 'Synchronization call happens'
-        CsTransactionSearch transactionSearch = new CsTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
+        IsvTransactionSearch transactionSearch = new IsvTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
         runner.synchronize(transactionSearch)
 
         then: 'The payment will be searched for'
@@ -128,10 +128,10 @@ class RefundTransactionSynchronizationSpecification extends BaseSpecification {
     }
 
     def 'Should add transaction if successful and failure credit exists but has a different interaction ID'() {
-        given: 'CS returns a successful auth transaction'
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch(
-                'Started', 'multiple_credit_sync/cs_post_transaction_response.json', 'search1'))
-        csWireMockServer.addStubMapping(requestStubBuilder.buildStubForCsSearch('search1', 'cs_empty_transactions_post_response.json'))
+        given: 'payment service returns a successful auth transaction'
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch(
+                'Started', 'multiple_credit_sync/ps_post_transaction_response.json', 'search1'))
+        paymentServiceWireMockServer.addStubMapping(requestStubBuilder.buildStubForPaymentServiceSearch('search1', 'ps_empty_transactions_post_response.json'))
 
         and: 'The transaction references a payment in CT that contains a successful credit with a different interaction ID'
         ctWireMockServer.addStubMapping(requestStubBuilder.buildStubForSuccessfulCtRequest(
@@ -142,7 +142,7 @@ class RefundTransactionSynchronizationSpecification extends BaseSpecification {
                 'POST', 'multiple_credit_sync/ct_post_response.json', ctProjectKey))
 
         when: 'We try to synchronize'
-        CsTransactionSearch transactionSearch = new CsTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
+        IsvTransactionSearch transactionSearch = new IsvTransactionSearchImpl('submitTimeUtc:[NOW/DAY TO NOW/DAY+1DAY}', 'submitTimeUtc:desc', 50)
         runner.synchronize(transactionSearch)
 
         then: 'The process will search for CT payments'

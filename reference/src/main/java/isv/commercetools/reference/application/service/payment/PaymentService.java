@@ -8,7 +8,7 @@ import isv.payments.exception.PaymentException;
 import java.util.List;
 
 /**
- * Should be implemented by any service which will call Cybersource.
+ * Should be implemented by any service which will call the payment service.
  */
 public interface PaymentService {
 

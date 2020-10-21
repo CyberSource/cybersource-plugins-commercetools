@@ -10,13 +10,13 @@ import spock.lang.Unroll
 import static java.util.Collections.emptyList
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(['proxycs'])
+@ActiveProfiles(['proxyps'])
 class ExceptionHandlingSpecification extends MockExternalServicesBaseSpecification {
 
     @Unroll
     def 'Should handle an exception on payment create with payer auth (enrollment check fails)'() {
-        given: 'cybersource will fail with a 500 error when the enrollment request is sent'
-        loadCsMapping('csServerError_enrollCheck.json')
+        given: 'payment service will fail with a 500 error when the enrollment request is sent'
+        loadPsMapping('psServerError_enrollCheck.json')
 
         and: 'card is tokenised'
         def createTokenResponse = tokenHelper.tokeniseCard(testCase.cardNumber, testCase.cardType)
@@ -43,8 +43,8 @@ class ExceptionHandlingSpecification extends MockExternalServicesBaseSpecificati
 
     @Unroll
     def 'should handle exception on auth request'() {
-        given: 'cybersource will fail on an auth request'
-        loadCsMapping('csServerError_auth.json')
+        given: 'payment service will fail on an auth request'
+        loadPsMapping('psServerError_auth.json')
 
         and: 'card is tokenised'
         def createTokenResponse = tokenHelper.tokeniseCard(testCase.cardNumber, testCase.cardType)
@@ -66,8 +66,8 @@ class ExceptionHandlingSpecification extends MockExternalServicesBaseSpecificati
         cardinalHelper.continueAuthentication(requestJwt, enrolmentCheckFields.authenticationTransactionId, consumerSessionId)
 
         then: 'process ACS form and submit the PA Res'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         def acsResponse = cardinalHelper.processAcsForm(acsUrl, paReq, consumerSessionId)
         def responseJwt = cardinalHelper.submitPaRes(acsResponse.body)
 
@@ -85,7 +85,7 @@ class ExceptionHandlingSpecification extends MockExternalServicesBaseSpecificati
 
         and: 'one action should be an AddInterfaceInteraction'
         def interactionAction = paymentCaptureResponseMap.actions.find { it.action == 'addInterfaceInteraction' }
-        interactionAction.type.key == 'cybersource_payment_failure'
+        interactionAction.type.key == 'isv_payment_failure'
         interactionAction.fields.get('reason') == 'com.cybersource.ws.client.FaultException: Fault: \nXML parse error.\n'
 
         and: 'one action should be an changeTransactionState interaction'
@@ -101,8 +101,8 @@ class ExceptionHandlingSpecification extends MockExternalServicesBaseSpecificati
 
     @Unroll
     def 'should handle an exception on a capture'() {
-        given: 'cybersource will fail on a capture request'
-        loadCsMapping('csServerError_capture.json')
+        given: 'payment service will fail on a capture request'
+        loadPsMapping('psServerError_capture.json')
 
         and: 'card is tokenised'
         def createTokenResponse = tokenHelper.tokeniseCard(testCase.cardNumber, testCase.cardType)
@@ -120,8 +120,8 @@ class ExceptionHandlingSpecification extends MockExternalServicesBaseSpecificati
         def responseBody = new JsonSlurper().parseText(response.body)
 
         when: 'authentication continued'
-        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationAcsUrl')
-        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'cs_payerAuthenticationPaReq')
+        def acsUrl = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationAcsUrl')
+        def paReq = commerceToolsHelper.getCustomFieldValue(responseBody, 'isv_payerAuthenticationPaReq')
         Map enrolmentCheckFields = responseBody.actions.find { it.action == 'addInterfaceInteraction' }.fields
         def authenticationTransactionId = enrolmentCheckFields.authenticationTransactionId
 
@@ -166,7 +166,7 @@ class ExceptionHandlingSpecification extends MockExternalServicesBaseSpecificati
 
         and: 'one action should be an addInterfaceInteraction of type payment_failure'
         def interactionAction = paymentCaptureResponseMap.actions.find { it.action == 'addInterfaceInteraction' }
-        interactionAction.type.key == 'cybersource_payment_failure'
+        interactionAction.type.key == 'isv_payment_failure'
         interactionAction.fields.get('reason') == 'com.cybersource.ws.client.FaultException: Fault: \nXML parse error.\n'
 
         and: 'one action should be an changeTransactionState interaction setting transaction to failure'

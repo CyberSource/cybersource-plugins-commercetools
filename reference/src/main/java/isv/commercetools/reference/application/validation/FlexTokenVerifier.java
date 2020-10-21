@@ -21,7 +21,7 @@ public class FlexTokenVerifier {
 
     private final Key verificationKey;
 
-    public FlexTokenVerifier(@Value("${cybersource.flex.verificationKey}") byte[] verificationKey) {
+    public FlexTokenVerifier(@Value("${isv.payments.flex.verificationKey}") byte[] verificationKey) {
         this.verificationKey = Keys.hmacShaKeyFor(verificationKey);
     }
 

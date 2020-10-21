@@ -20,7 +20,7 @@ class BaseSpecification extends Specification {
     protected RequestStubBuilder requestStubBuilder
 
     @Shared
-    WireMockServer csWireMockServer = new WireMockServer(wireMockConfig()
+    WireMockServer paymentServiceWireMockServer = new WireMockServer(wireMockConfig()
             .port(8080)
             .usingFilesUnderDirectory('src/integration-test/resources')
     )
@@ -33,7 +33,7 @@ class BaseSpecification extends Specification {
 
     protected verifyNoUnmatchedRequests() {
         ctWireMockServer.findAllUnmatchedRequests().size() == 0 &&
-                csWireMockServer.findAllUnmatchedRequests().size() == 0
+                paymentServiceWireMockServer.findAllUnmatchedRequests().size() == 0
     }
 
     protected validateActions(String requestBody, String interactionId, String type, String state) {

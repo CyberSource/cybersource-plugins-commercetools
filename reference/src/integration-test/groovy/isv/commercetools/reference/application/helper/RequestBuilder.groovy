@@ -156,7 +156,7 @@ class RequestBuilder {
                 'maskedPan':createTokenResponse.maskedPan,
                 'cardType':tokenHelper.cardName(createTokenResponse.cardType),
                 'enrolmentCheckData':enrolmentCheckData,
-                'enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('cybersource_payer_authentication_enrolment_check'),
+                'enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('isv_payments_payer_authentication_enrolment_check'),
         ]
     }
 

@@ -118,7 +118,7 @@ class ValidationSpecification extends MockExternalServicesBaseSpecification {
         def response = testRestTemplate.postForEntity(
                 paymentUpdateUrl,
                 requestBuilder.withFileAndTemplateValues("/input/payment/validation/update/authNoPayerAuth/${testCase.file}",
-                        ['enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('cybersource_payer_authentication_enrolment_check')]),
+                        ['enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('isv_payments_payer_authentication_enrolment_check')]),
                 Map
         )
 
@@ -165,7 +165,7 @@ class ValidationSpecification extends MockExternalServicesBaseSpecification {
         def response = testRestTemplate.postForEntity(
                 paymentUpdateUrl,
                 requestBuilder.withFileAndTemplateValues("/input/payment/validation/update/visaCheckout/${testCase.file}",
-                        ['enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('cybersource_payer_authentication_enrolment_check')]),
+                        ['enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('isv_payments_payer_authentication_enrolment_check')]),
                 Map
         )
 
@@ -282,7 +282,7 @@ class ValidationSpecification extends MockExternalServicesBaseSpecification {
                         'token':'something',
                         'maskedPan':'something',
                         'cardType':'VISA',
-                        'enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('cybersource_payer_authentication_enrolment_check'),
+                        'enrolmentCheckDataTypeId':commerceToolsHelper.typeIdForKey('isv_payments_payer_authentication_enrolment_check'),
                 ]),
                 Map
         )

@@ -18,7 +18,7 @@ enabled via access keys supplied by the associative provider.
   - Commercetools API Keys can be created from within the commercetools
     Merchant Center. See [Key Creation](Key-Creation.md) for
     more details.
-  - The CyberSource integration contains 3 touchpoints to support 3D
+  - The ISV payments integration contains 3 touchpoints to support 3D
     Secure, Card Tokenisation and Payment processing. For more detail
     about how to setup these see [Key
     Creation](Key-Creation.md) for more details.
@@ -52,7 +52,7 @@ Setup](API-Extension-Setup.md) for more details.
 
 ## 4\. Front-end Setup
 
-The bulk of the integration work when using the CyberSource
+The bulk of the integration work when using the ISV payments
 commercetools extension is within the user-interface. This is because
 commercetools does not come with a user-interface and therefore all
 implementations will be different.
