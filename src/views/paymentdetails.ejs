@@ -1,0 +1,288 @@
+<html>
+<head>
+    <title>ISV Commercetools Plugin</title>
+    
+    <style>
+        h3 {
+            text-align: center;
+            font-size: 1.7rem;
+            margin-bottom: .5rem;
+            font-weight: 500;
+            line-height: 1.2;
+            margin-top: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            padding: .75rem;
+            table-layout: fixed;
+        }
+        td {
+            border-top:  1px solid #dee2e6;
+            text-align: left;
+            padding: .75rem;
+        }
+        th {
+            width: 230px;
+            text-align: left;
+            padding: .75rem;
+            font-size: 1.7rem;
+            margin-bottom: .5rem;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(0,0,0,.05);
+        }
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"
+        }
+        .abutton {
+            display: inline-block;
+            font-weight: 400;
+            border: 1px solid transparent;
+            padding: .375rem .75rem;
+            border-radius: .25rem;
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+        button, input {
+            font-family: inherit;
+            font-size: inherit;
+            line-height: 1.5;
+        }
+        form {
+            display: inline;
+        } 
+        .alert {
+            position: relative;
+            padding: .75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: .25rem
+        }
+
+        .alert-dismissible {
+            padding-right: 4rem;
+        }
+
+        .alert-error {
+            border-top-color: #f1b0b7;
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+
+        }
+
+        .alert-success {
+
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            border-top-color: #b1dfbb
+        }
+        .mark {
+            position: relative;
+            display: inline-block;
+            vertical-align: top;
+            width: 21px;
+            height: 21px;
+            border: 2px solid #c4cbd2;
+            border-radius: 100px;
+
+        }
+
+        .mark:before,
+        .mark:after {
+            content: '';
+            display: block;
+            position: absolute;
+        }
+        .check:before {
+            top: 11px;
+            left: 10px;
+            margin: -5px 0 0 -6px;
+            height: 3px;
+            width: 10px;
+            border: solid #39ca74;
+            border-width: 0 0 3px 3px;
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+        .error:before {
+            top: 8%;
+            left: 30%;
+            height: 30%;
+            width: 25%;
+            border: solid #c0392b;
+            border-width: 0 0 3px 3px;
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+        .error:after {
+            top: 48%;
+            left: 30%;
+            height: 30%;
+            width: 25%;
+            border: solid #c0392b;
+            border-width: 0 0 3px 3px;
+            -webkit-transform: rotate(135deg);
+            -moz-transform: rotate(135deg);
+            -ms-transform: rotate(135deg);
+            -o-transform: rotate(135deg);
+            transform: rotate(135deg);
+        }
+        #loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9;
+        }
+        span {
+            color: whitesmoke;
+            font-weight: 800;
+            font-weight: bold;
+            vertical-align: middle;
+            line-height: normal;
+            background: rgba(0, 0, 0, 0.5);
+            width: 35%;
+            height: 35%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <script>
+        function showDiv() {
+   document.getElementById('loading').style.display = "flex";
+}
+    </script>
+</head>
+
+<body>
+    <% if(error){%>
+    <div class="alert alert-error alert-dismissible"><em class="mark error"></em>
+        <%=error%>
+    </div>
+    <%} %>
+    <% if(message){%>
+        <div class="alert alert-success alert-dismissible"><em class="mark check"></em>
+            <%=message%>
+        </div>
+    <%} %>
+    <table>
+        <% var latestTransaction=payments.transactions[payments.transactions.length-1]%>
+        <th>Payment details</th>
+        <tr>
+            <td>Payment Id:</td>
+            <td><%= payments.id%></td>
+        </tr>
+        <tr>
+            <td>Amount:</th>
+            <td><%=payments.amountPlanned.currencyCode%> <%=amountConversion(payments.amountPlanned.centAmount)%>
+            </td>
+        </tr>
+        <tr>
+            <td>Payment Interface:</td>
+            <td><%= payments.paymentMethodInfo.paymentInterface%></td>
+        </tr>
+        <tr>
+            <td>Payment Method:</td>
+            <td><%= payments.paymentMethodInfo.method%></td>
+        </tr>
+        <% if(payments.custom.fields.isv_token!="" ) {%>
+            <tr>
+                <td>Token:</td>
+                <td>
+                    <%=payments.custom.fields.isv_token%>
+                </td>
+            </tr>
+        <% } %>
+            <tr>
+                <td>Credit Card Number:</td>
+                <td>
+                    <%= payments.custom.fields.isv_maskedPan %>
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Type:</td>
+                <td>
+                    <%= payments.custom.fields.isv_cardType %>
+                </td>
+            </tr>
+            <tr>
+                <td>Credit Card Expiry:</td>
+                <td>
+                    <%=payments.custom.fields.isv_cardExpiryMonth%>/<%=payments.custom.fields.isv_cardExpiryYear %>
+                </td>
+            </tr>
+        <% if(latestTransaction){ %>
+            <tr>
+                <td>Latest Transaction Id:</td>
+                <td><%=latestTransaction.id%></td>
+            </tr>
+            <tr>
+                <td>Latest Transaction Interaction Id:</td>
+                <td><%=latestTransaction.interactionId%></td>
+            </tr>
+            <tr>
+                <td>Latest Transaction Amount:</td>
+                <td><%=latestTransaction.amount.currencyCode%> <%=amountConversion(latestTransaction.amount.centAmount)%>
+                </td>
+            </tr>
+            <tr>
+                <td>Latest Transaction Type:</td>
+                <td><%=latestTransaction.type%></td>
+            </tr>
+            <tr>
+                <td>Latest Transaction State:</td>
+                <td><%=latestTransaction.state %></td>
+            </tr>
+        <% } %>
+    </table>
+    <br>
+    <% if((captureAmount) && (!(latestTransaction.type=="Charge" && latestTransaction.state=="Initial"
+    ))) { %>
+        You can refund amount  <%= captureAmount%>
+    <% } %>
+    <br>
+    <a class="abutton" href="/orders" role="button">Back</a>
+    <% if(latestTransaction) { %>
+        <% if((latestTransaction.type=='Authorization' && latestTransaction.state=='Success'
+        ) || (latestTransaction.type=='Charge' && latestTransaction.state=='Initial' )
+        || (latestTransaction.type=='CancelAuthorization' &&
+        latestTransaction.state=='Initial' )) { %>
+            <a class="abutton" href="/capture?id=<%=id%>" role="button" onclick="showDiv()">Capture</a>
+            <a class="abutton" href="/authreversal?id=<%=id%>" role="button" onclick="showDiv()">Reverse</a>
+        <% } %>
+        <% if(("Charge"==latestTransaction.type
+        && "Success"==latestTransaction.state) || ((captureAmount
+        && "Refund"==latestTransaction.type) &&
+        (("Success"==latestTransaction.state) ||
+        ("Failure"==latestTransaction.state) ||
+        ("Initial"==latestTransaction.state)))) {%>
+            <form action="/refund">
+                <input type="hidden" name="refundId" id="refundId" value="<%=id%>"/>
+                Refund amount: <input type="text" name="refundAmount" id="refundAmount" size="6" value="" required pattern="^[+]?([1-9][0-9]*(?:[\.][0-9]*)?|0*\.0*[1-9][0-9]*)(?:[eE][+-][0-9]+)?$" title="Refund amount should be greater than zero" /> 
+                <button type="submit" class="abutton" onclick="showDiv()">Refund</button>
+            </form>
+        <% } %>
+    <% } %>
+    <div id="loading"><span> Loading... </span></div>
+</body>
+</html>
