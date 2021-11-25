@@ -1,0 +1,82 @@
+<html>
+  <head>
+    <title>ISV Commercetools Plugin</title>
+    <style>
+      h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        line-height: 1.2;
+        margin-top: 0;
+      }
+      h3 {
+        font-size: 1.7rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        padding: 0.75rem;
+      }
+      td,
+      th {
+        border-top: 1px solid #dee2e6;
+        text-align: left;
+        padding: 0.75rem;
+        vertical-align: top;
+      }
+      tr:nth-child(even) {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+          'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>ISV Commercetools Plugin</h1>
+    <table>
+      <h3>Payments</h3>
+      Most recent <%=count%> of <%=total%>
+      <tr>
+        <th>Payment Id</th>
+        <th>Payment Date</th>
+        <th>Payment Method</th>
+        <th>Amount</th>
+        <th>Token</th>
+      </tr>
+      <% if (JSON.stringify(count)==(JSON.stringify(0)) ) { %>
+      <h2>No orders count = <%= count %></h2>
+      <% } else{ %> <% orderlist.forEach(function(list){ %>
+      <tr>
+        <td>
+          <a href="/paymentdetails?id= <%=list.id %>"><%=list.id %></a>
+        </td>
+        <td>
+          <%= moment(list.lastModifiedAt).format( 'DD/MM/YYYY HH:mm:ss' ) %>
+        </td>
+        <% if (list.paymentMethodInfo.name) { %>
+        <td><%=list.paymentMethodInfo.name.en%></td>
+        <% } else { %>
+        <td></td>
+        <% } %>
+        <td>
+          <%= list.amountPlanned.currencyCode%> <%=
+          amountConversion(list.amountPlanned.centAmount) %>
+        </td>
+        <td><%=list.custom.fields.isv_token%></td>
+      </tr>
+      <% }) %> <% } %>
+    </table>
+  </body>
+</html>
