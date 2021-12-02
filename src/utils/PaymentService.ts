@@ -1,257 +1,357 @@
 import { Constants } from '../constants';
 
-const transactionDetails = (trasanctionData) => {
-  return {
-    amount: trasanctionData.amount.centAmount,
-    id: trasanctionData.id,
-    state: trasanctionData.state,
-    type: trasanctionData.type,
+/* const transactionDetails = (trasanctionData) => {
+  let transactiondetails = {
+    amount: null,
+    id: null,
+    state: null,
+    type: null,
   };
-};
+  try {
+    if (null != trasanctionData) {
+      transactiondetails.amount = trasanctionData.amount.centAmount;
+      transactiondetails.id = trasanctionData.id;
+      transactiondetails.state = trasanctionData.state;
+      transactiondetails.type = trasanctionData.type;
+    } else {
+      console.log(Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    }
+  } catch (e) {
+    console.log(Constants.STRING_ERROR, e);
+  }
+  return transactiondetails;
+}; */
 
 const fieldMapper = (fields) => {
   let actions = [] as any;
-  const keys = Object.keys(fields);
-  keys.forEach((key, index) => {
-    actions.push({
-      action: Constants.SET_CUSTOM_FIELD,
-      name: key,
-      value: fields[key],
-    });
-  });
+  let keys: any;
+  try {
+    keys = Object.keys(fields);
+    if (null != keys) {
+      keys.forEach((key, index) => {
+        actions.push({
+          action: Constants.SET_CUSTOM_FIELD,
+          name: key,
+          value: fields[key],
+        });
+      });
+    } else {
+      console.log(Constants.ERROR_MSG_EMPTY_CUSTOM_FIELDS);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
+  }
   return actions;
 };
 
 function setTransactionId(paymentResponse, transactionDetail) {
-  return {
+  let transactionIdData = {
     action: Constants.CHANGE_TRANSACTION_INTERACTION_ID,
-    interactionId: paymentResponse.transactionId,
-    transactionId: transactionDetail.id,
+    interactionId: null,
+    transactionId: null,
   };
+  try {
+    if (null != paymentResponse && null != transactionDetail) {
+      transactionIdData.interactionId = paymentResponse.transactionId;
+      transactionIdData.transactionId = transactionDetail.id;
+    } else {
+      console.log(Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
+  }
+  return transactionIdData;
 }
 
 function changeState(transactionDetail, state) {
-  return {
+  let changeStateData = {
     action: Constants.CHANGE_TRANSACTION_STATE,
-    state: state,
-    transactionId: transactionDetail.id,
+    state: null,
+    transactionId: null,
   };
+  try {
+    if (null != transactionDetail && null != state) {
+      changeStateData.state = state;
+      changeStateData.transactionId = transactionDetail.id;
+    } else {
+      console.log(Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
+  }
+  return changeStateData;
 }
 
 const failureResponse = (paymentResponse, transactionDetail) => {
-  return {
+  let failureResponseData = {
     action: Constants.ADD_INTERFACE_INTERACTION,
     type: {
       key: Constants.ISV_PAYMENT_FAILURE,
     },
     fields: {
-      reasonCode: `${paymentResponse.httpCode}`,
-      transactionId: transactionDetail.id,
+      reasonCode: Constants.STRING_EMPTY,
+      transactionId: null,
     },
   };
+  try {
+    if (null != paymentResponse && null != transactionDetail) {
+      failureResponseData.fields.reasonCode = `${paymentResponse.httpCode}`;
+      failureResponseData.fields.transactionId = transactionDetail.id;
+    } else {
+      console.log(Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
+  }
+  return failureResponseData;
 };
 
 const visaCardDetailsAction = (visaCheckoutData) => {
-  var cardPrefix = visaCheckoutData.cardFieldGroup.prefix;
-  var cardSuffix = visaCheckoutData.cardFieldGroup.suffix;
-  var maskedPan = cardPrefix.concat('...', cardSuffix);
-  const actions = [
-    {
-      action: Constants.SET_CUSTOM_FIELD,
-      name: Constants.ISV_MASKED_PAN,
-      value: maskedPan,
-    },
-    {
-      action: Constants.SET_CUSTOM_FIELD,
-      name: Constants.ISV_CARD_EXPIRY_MONTH,
-      value: visaCheckoutData.cardFieldGroup.expirationMonth,
-    },
-    {
-      action: Constants.SET_CUSTOM_FIELD,
-      name: Constants.ISV_CARD_EXPIRY_YEAR,
-      value: visaCheckoutData.cardFieldGroup.expirationYear,
-    },
-    {
-      action: Constants.SET_CUSTOM_FIELD,
-      name: Constants.ISV_CARD_TYPE,
-      value: visaCheckoutData.cardFieldGroup.type,
-    },
-  ];
+  let actions: any;
+  let cardPrefix: any;
+  let cardSuffix: any;
+  let maskedPan: any;
+  try {
+    if (null != visaCheckoutData) {
+      cardPrefix = visaCheckoutData.cardFieldGroup.prefix;
+      cardSuffix = visaCheckoutData.cardFieldGroup.suffix;
+      maskedPan = cardPrefix.concat(
+        Constants.CLICK_TO_PAY_CARD_MASK,
+        cardSuffix
+      );
+      actions = [
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_MASKED_PAN,
+          value: maskedPan,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_CARD_EXPIRY_MONTH,
+          value: visaCheckoutData.cardFieldGroup.expirationMonth,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_CARD_EXPIRY_YEAR,
+          value: visaCheckoutData.cardFieldGroup.expirationYear,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_CARD_TYPE,
+          value: visaCheckoutData.cardFieldGroup.type,
+        },
+      ];
+    } else {
+      console.log(Constants.ERROR_MSG_CLICK_TO_PAY_DATA);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
+  }
   return actions;
 };
 
 const payerauthactions = (response) => {
-  return {
-    actions: [
-      {
-        action: Constants.ADD_INTERFACE_INTERACTION,
-        type: { key: Constants.ISV_ENROLLMENT_CHECK },
-        fields: {
-          authorizationAllowed: true,
-          authenticationRequired: true,
-          xid: response.xid,
-          authenticationTransactionId:
-            response.isv_payerAuthenticationTransactionId,
-          veresEnrolled: response.veresEnrolled,
-          cardinalReferenceId: response.cardinalId,
-          proofXml: response.proofXml,
-          specificationVersion: response.specificationVersion,
+  let action: any;
+  try {
+    if (null != response) {
+      action = [
+        {
+          action: Constants.ADD_INTERFACE_INTERACTION,
+          type: { key: Constants.ISV_ENROLLMENT_CHECK },
+          fields: {
+            authorizationAllowed: true,
+            authenticationRequired: true,
+            xid: response.xid,
+            authenticationTransactionId:
+              response.isv_payerAuthenticationTransactionId,
+            veresEnrolled: response.veresEnrolled,
+            cardinalReferenceId: response.cardinalId,
+            proofXml: response.proofXml,
+            specificationVersion: response.specificationVersion,
+          },
         },
-      },
-      {
-        action: Constants.SET_CUSTOM_FIELD,
-        name: Constants.ISV_PAYER_AUTHENTICATION_REQUIRED,
-        value: response.isv_payerAuthenticationRequired,
-      },
-      {
-        action: Constants.SET_CUSTOM_FIELD,
-        name: Constants.ISV_PAYER_AUTHETICATION_TRANSACTION_ID,
-        value: response.isv_payerAuthenticationTransactionId,
-      },
-      {
-        action: Constants.SET_CUSTOM_FIELD,
-        name: Constants.ISV_ACS_URL,
-        value: response.acsurl,
-      },
-      {
-        action: Constants.SET_CUSTOM_FIELD,
-        name: Constants.ISV_PAREQ,
-        value: response.isv_payerAuthenticationPaReq,
-      },
-      {
-        action: Constants.SET_CUSTOM_FIELD,
-        name: Constants.ISV_MDD_3,
-        value: response.stepUpUrl,
-      },
-      {
-        action: Constants.SET_CUSTOM_FIELD,
-        name: Constants.ISV_RESPONSE_JWT,
-        value: response.isv_responseJwt,
-      },
-    ],
-    errors: [],
-  };
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_PAYER_AUTHENTICATION_REQUIRED,
+          value: response.isv_payerAuthenticationRequired,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_PAYER_AUTHETICATION_TRANSACTION_ID,
+          value: response.isv_payerAuthenticationTransactionId,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_ACS_URL,
+          value: response.acsurl,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_PAREQ,
+          value: response.isv_payerAuthenticationPaReq,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_MDD_3,
+          value: response.stepUpUrl,
+        },
+        {
+          action: Constants.SET_CUSTOM_FIELD,
+          name: Constants.ISV_RESPONSE_JWT,
+          value: response.isv_responseJwt,
+        },
+      ];
+    } else {
+      console.log(Constants.ERROR_MSG_INVALID_INPUT);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
+  }
+  return action;
 };
 
 const getAuthResponse = (paymentResponse, transactionDetail) => {
-  let response = {};
-  let isv_payerAuthenticationTransactionId = Constants.EMPTY_STRING;
+  let response: any;
+  let actions: any;
+  let setTransaction: any;
+  let setCustomField: any;
+  let paymentFailure: any;
+  let payerAuthenticationData: any;
+  let isv_payerAuthenticationTransactionId = Constants.STRING_EMPTY;
   let isv_payerAuthenticationRequired = false;
-  let isv_requestJwt = Constants.EMPTY_STRING;
-  let isv_merchantDefinedData_mddField_1 = Constants.EMPTY_STRING;
-  let isv_merchantDefinedData_mddField_2 = Constants.EMPTY_STRING;
-  if (Constants.API_STATUS_AUTHORIZED == paymentResponse.status) {
-    const setTransaction = setTransactionId(paymentResponse, transactionDetail);
-    const setCustomField = changeState(transactionDetail, Constants.SUCCESS);
-    response = createResponse(
-      setTransaction,
-      setCustomField,
-      paymentResponse.data,
-      null
-    );
-  } else if (Constants.API_STATUS_PENDING_REVIEW == paymentResponse.status) {
-    const setTransaction = setTransactionId(paymentResponse, transactionDetail);
-    const setCustomField = changeState(transactionDetail, Constants.PENDING);
-    response = createResponse(
-      setTransaction,
-      setCustomField,
-      paymentResponse.data,
-      null
-    );
-  } else if (Constants.API_STATUS_COMPLETED == paymentResponse.status) {
-    isv_requestJwt = paymentResponse.accessToken;
-    isv_merchantDefinedData_mddField_1 = paymentResponse.referenceId;
-    isv_merchantDefinedData_mddField_2 =
-      paymentResponse.deviceDataCollectionUrl;
-    let actions = fieldMapper({
-      isv_requestJwt,
-      isv_merchantDefinedData_mddField_1,
-      isv_merchantDefinedData_mddField_2,
-    });
-    response = {
-      actions: actions,
-      errors: [],
-    };
-  } else if (
-    Constants.API_STATUS_PENDING_AUTHENTICATION == paymentResponse.status
-  ) {
-    const data = {
-      isv_payerAuthenticationPaReq:
-        paymentResponse.data.consumerAuthenticationInformation.pareq,
-      isv_payerAuthenticationTransactionId:
-        paymentResponse.data.consumerAuthenticationInformation
-          .authenticationTransactionId,
-      stepUpUrl:
-        paymentResponse.data.consumerAuthenticationInformation.stepUpUrl,
-      isv_responseJwt:
-        paymentResponse.data.consumerAuthenticationInformation.accessToken,
-      isv_payerAuthenticationRequired: true,
-      xid: paymentResponse.data.consumerAuthenticationInformation.xid,
-      pareq: paymentResponse.data.consumerAuthenticationInformation.pareq,
-      cardinalId: paymentResponse.cardinalReferenceId,
-      proofXml: paymentResponse.data.consumerAuthenticationInformation.proofXml,
-      veresEnrolled:
-        paymentResponse.data.consumerAuthenticationInformation.veresEnrolled,
-      specificationVersion:
-        paymentResponse.data.consumerAuthenticationInformation
-          .specificationVersion,
-      acsurl: paymentResponse.data.consumerAuthenticationInformation.acsUrl,
-      authenticationTransactionId:
-        paymentResponse.data.consumerAuthenticationInformation
-          .authenticationTransactionId,
-    };
-    response = payerauthactions(data);
-  } else if (
-    Constants.API_STATUS_AUTHENTICATION_SUCCESSFUL == paymentResponse.status
-  ) {
-    isv_payerAuthenticationTransactionId =
-      paymentResponse.data.consumerAuthenticationInformation
-        .authenticationTransactionId;
-    let actions = fieldMapper({
-      isv_payerAuthenticationTransactionId,
-      isv_payerAuthenticationRequired,
-    });
-    response = {
-      actions: actions,
-      errors: [],
-    };
-  } else {
-    if (null == transactionDetail) {
-      transactionDetail = null;
-      response = getEmptyResponse();
+  let isv_requestJwt = Constants.STRING_EMPTY;
+  let isv_merchantDefinedData_mddField_1 = Constants.STRING_EMPTY;
+  let isv_merchantDefinedData_mddField_2 = Constants.STRING_EMPTY;
+  try {
+    if (null != paymentResponse) {
+      if (
+        Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+        Constants.API_STATUS_AUTHORIZED == paymentResponse.status
+      ) {
+        setTransaction = setTransactionId(paymentResponse, transactionDetail);
+        setCustomField = changeState(
+          transactionDetail,
+          Constants.CT_TRANSACTION_STATE_SUCCESS
+        );
+        response = createResponse(setTransaction, setCustomField, null);
+      } else if (
+        (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+          Constants.API_STATUS_PENDING_REVIEW == paymentResponse.status) ||
+        Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status
+      ) {
+        setTransaction = setTransactionId(paymentResponse, transactionDetail);
+        setCustomField = changeState(
+          transactionDetail,
+          Constants.CT_TRANSACTION_STATE_PENDING
+        );
+        response = createResponse(setTransaction, setCustomField, null);
+      } else if (
+        Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+        Constants.API_STATUS_COMPLETED == paymentResponse.status
+      ) {
+        isv_requestJwt = paymentResponse.accessToken;
+        isv_merchantDefinedData_mddField_1 = paymentResponse.referenceId;
+        isv_merchantDefinedData_mddField_2 =
+          paymentResponse.deviceDataCollectionUrl;
+        actions = fieldMapper({
+          isv_requestJwt,
+          isv_merchantDefinedData_mddField_1,
+          isv_merchantDefinedData_mddField_2,
+        });
+        response = {
+          actions: actions,
+          errors: [],
+        };
+      } else if (
+        Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+        Constants.API_STATUS_PENDING_AUTHENTICATION == paymentResponse.status
+      ) {
+        payerAuthenticationData = {
+          isv_payerAuthenticationPaReq:
+            paymentResponse.data.consumerAuthenticationInformation.pareq,
+          isv_payerAuthenticationTransactionId:
+            paymentResponse.data.consumerAuthenticationInformation
+              .authenticationTransactionId,
+          stepUpUrl:
+            paymentResponse.data.consumerAuthenticationInformation.stepUpUrl,
+          isv_responseJwt:
+            paymentResponse.data.consumerAuthenticationInformation.accessToken,
+          isv_payerAuthenticationRequired: true,
+          xid: paymentResponse.data.consumerAuthenticationInformation.xid,
+          pareq: paymentResponse.data.consumerAuthenticationInformation.pareq,
+          cardinalId: paymentResponse.cardinalReferenceId,
+          proofXml:
+            paymentResponse.data.consumerAuthenticationInformation.proofXml,
+          veresEnrolled:
+            paymentResponse.data.consumerAuthenticationInformation
+              .veresEnrolled,
+          specificationVersion:
+            paymentResponse.data.consumerAuthenticationInformation
+              .specificationVersion,
+          acsurl: paymentResponse.data.consumerAuthenticationInformation.acsUrl,
+          authenticationTransactionId:
+            paymentResponse.data.consumerAuthenticationInformation
+              .authenticationTransactionId,
+        };
+        actions = payerauthactions(payerAuthenticationData);
+        response = {
+          actions: actions,
+          errors: [],
+        };
+      } else if (
+        Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+        Constants.API_STATUS_AUTHENTICATION_SUCCESSFUL == paymentResponse.status
+      ) {
+        isv_payerAuthenticationTransactionId =
+          paymentResponse.data.consumerAuthenticationInformation
+            .authenticationTransactionId;
+        actions = fieldMapper({
+          isv_payerAuthenticationTransactionId,
+          isv_payerAuthenticationRequired,
+        });
+        response = {
+          actions: actions,
+          errors: [],
+        };
+      } else {
+        if (null == transactionDetail) {
+          response = getEmptyResponse();
+        } else {
+          setTransaction = setTransactionId(paymentResponse, transactionDetail);
+          setCustomField = changeState(
+            transactionDetail,
+            Constants.CT_TRANSACTION_STATE_FAILURE
+          );
+          paymentFailure = failureResponse(paymentResponse, transactionDetail);
+          response = createResponse(
+            setTransaction,
+            setCustomField,
+            paymentFailure
+          );
+        }
+      }
     } else {
-      const setTransaction = setTransactionId(
-        paymentResponse,
-        transactionDetail
-      );
-      const setCustomField = changeState(transactionDetail, Constants.FAILURE);
-      const paymentFailure = failureResponse(
-        paymentResponse,
-        transactionDetail
-      );
-      response = createResponse(
-        setTransaction,
-        setCustomField,
-        paymentResponse.data,
-        paymentFailure
-      );
+      console.log(Constants.ERROR_MSG_INVALID_INPUT);
     }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
   }
   return response;
 };
 
-function createResponse(
-  setTransaction,
-  setCustomField,
-  paymentResponse,
-  paymentFailure
-) {
+function createResponse(setTransaction, setCustomField, paymentFailure) {
   let actions = [] as any;
   let returnResponse = {};
-  actions.push(setTransaction);
-  actions.push(setCustomField);
-  if (paymentFailure) {
-    actions.push(paymentFailure);
+  try {
+    if (null != setTransaction && null != setCustomField) {
+      actions.push(setTransaction);
+      actions.push(setCustomField);
+    }
+    if (null != paymentFailure) {
+      actions.push(paymentFailure);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
   }
   returnResponse = {
     actions: actions,
@@ -262,69 +362,97 @@ function createResponse(
 
 const getServiceResponse = (paymentResponse, transactionDetail) => {
   let response = {};
-  if (
-    Constants.API_STATUS_PENDING == paymentResponse.status ||
-    Constants.API_STATUS_REVERSED == paymentResponse.status
-  ) {
-    const setTransaction = setTransactionId(paymentResponse, transactionDetail);
-    const setCustomField = changeState(transactionDetail, Constants.SUCCESS);
-    response = createResponse(
-      setTransaction,
-      setCustomField,
-      paymentResponse.data,
-      null
-    );
-  } else {
-    const setTransaction = setTransactionId(paymentResponse, transactionDetail);
-    const setCustomField = changeState(transactionDetail, Constants.FAILURE);
-    const paymentFailure = failureResponse(paymentResponse, transactionDetail);
-    response = createResponse(
-      setTransaction,
-      setCustomField,
-      paymentResponse.data,
-      paymentFailure
-    );
+  let setTransaction: any;
+  let setCustomField: any;
+  let paymentFailure: any;
+  try {
+    if (null != paymentResponse && null != transactionDetail) {
+      if (
+        Constants.API_STATUS_PENDING == paymentResponse.status ||
+        Constants.API_STATUS_REVERSED == paymentResponse.status
+      ) {
+        setCustomField = changeState(
+          transactionDetail,
+          Constants.CT_TRANSACTION_STATE_SUCCESS
+        );
+        paymentFailure = null;
+      } else {
+        setCustomField = changeState(
+          transactionDetail,
+          Constants.CT_TRANSACTION_STATE_FAILURE
+        );
+        paymentFailure = failureResponse(paymentResponse, transactionDetail);
+      }
+      setTransaction = setTransactionId(paymentResponse, transactionDetail);
+      response = createResponse(setTransaction, setCustomField, paymentFailure);
+    } else {
+      console.log(Constants.ERROR_MSG_INVALID_OPERATION);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
   }
   return response;
 };
 
 const convertCentToAmount = (num) => {
-  return (
-    Number((num / Constants.VAL_HUNDRED).toFixed(Constants.VAL_TWO)) *
-    Constants.VAL_ONE
-  );
+  let amount = Constants.VAL_ZERO;
+  if (null != num) {
+    amount =
+      Number((num / Constants.VAL_HUNDRED).toFixed(Constants.VAL_TWO)) *
+      Constants.VAL_ONE;
+  }
+  return amount;
 };
 
 const convertAmountToCent = (amount) => {
-  return Number(
-    (amount.toFixed(Constants.VAL_TWO) * Constants.VAL_HUNDRED).toFixed(
-      Constants.VAL_TWO
-    )
-  );
+  let cent = Constants.VAL_ZERO;
+  if (null != amount) {
+    cent = Number(
+      (amount.toFixed(Constants.VAL_TWO) * Constants.VAL_HUNDRED).toFixed(
+        Constants.VAL_TWO
+      )
+    );
+  }
+  return cent;
 };
 
 const getCapturedAmount = (refundPaymentObj) => {
+  let refundTransaction: any;
+  let indexValue: any;
+  let capturedAmount = Constants.VAL_FLOAT_ZERO;
+  let refundedAmount = Constants.VAL_ZERO;
   let pendingCaptureAmount = Constants.VAL_ZERO;
-  const refundTransaction = refundPaymentObj.transactions;
-  const index = refundTransaction.findIndex((transaction, index) => {
-    if (Constants.CHARGE == transaction.type) {
-      return true;
-    }
-    return index;
-  });
-  if (Constants.VAL_ZERO <= index) {
-    const capturedAmount = Number(refundTransaction[index].amount.centAmount);
-    let refundedAmount = 0;
-    refundTransaction.forEach((transaction) => {
-      if (
-        Constants.REFUND == transaction.type &&
-        Constants.SUCCESS == transaction.state
-      ) {
-        refundedAmount = refundedAmount + Number(transaction.amount.centAmount);
+  try {
+    if (null != refundPaymentObj) {
+      refundTransaction = refundPaymentObj.transactions;
+      indexValue = refundTransaction.findIndex((transaction, index) => {
+        if (Constants.CT_TRANSACTION_TYPE_CHARGE == transaction.type) {
+          return true;
+        }
+        return index;
+      });
+      if (Constants.VAL_ZERO <= indexValue) {
+        capturedAmount = Number(
+          refundTransaction[indexValue].amount.centAmount
+        );
+        refundedAmount = Constants.VAL_FLOAT_ZERO;
+        refundTransaction.forEach((transaction) => {
+          if (
+            Constants.CT_TRANSACTION_TYPE_REFUND == transaction.type &&
+            Constants.CT_TRANSACTION_STATE_SUCCESS == transaction.state
+          ) {
+            refundedAmount =
+              refundedAmount + Number(transaction.amount.centAmount);
+          }
+        });
+        pendingCaptureAmount = capturedAmount - refundedAmount;
+        pendingCaptureAmount = convertCentToAmount(pendingCaptureAmount);
       }
-    });
-    pendingCaptureAmount = capturedAmount - refundedAmount;
-    pendingCaptureAmount = convertCentToAmount(pendingCaptureAmount);
+    } else {
+      console.log(Constants.ERROR_MSG_INVALID_OPERATION);
+    }
+  } catch (exception) {
+    console.log(Constants.STRING_EXCEPTION, exception);
   }
   return pendingCaptureAmount;
 };
@@ -362,7 +490,7 @@ const invalidInputResponse = () => {
 
 export default {
   fieldMapper,
-  transactionDetails,
+  //transactionDetails,
   changeState,
   failureResponse,
   getAuthResponse,

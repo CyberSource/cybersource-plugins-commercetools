@@ -12,7 +12,7 @@
     "clean": "rimraf build:*",
     "tsc": "tsc",
     "start": "npm run build && node build/main/index.js",
-    "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 src/**/*.ejs build/main",
+    "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 src/**/*.ejs src/**/*.css src/**/*.js src/**/*.png build/main",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
     "fix": "run-s fix:*",

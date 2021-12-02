@@ -1,50 +1,33 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <title>ISV Commercetools Plugin</title>
-    <style>
-      h1 {
-        text-align: center;
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        line-height: 1.2;
-        margin-top: 0;
-      }
-      h3 {
-        font-size: 1.7rem;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        line-height: 1.2;
-      }
-      table {
-        border-collapse: collapse;
-        width: 100%;
-        padding: 0.75rem;
-      }
-      td,
-      th {
-        border-top: 1px solid #dee2e6;
-        text-align: left;
-        padding: 0.75rem;
-        vertical-align: top;
-      }
-      tr:nth-child(even) {
-        background-color: rgba(0, 0, 0, 0.05);
-      }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
-          'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-      }
-      a {
-        color: #007bff;
-        text-decoration: none;
-      }
-    </style>
+    <title>ISV Commercetools Plugin</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/orders.css" />
+    <script
+      type="text/javascript"
+      src="javascript/javascriptfunctions.js"
+    ></script>
+    <% var i=0 %>
   </head>
 
   <body>
     <h1>ISV Commercetools Plugin</h1>
+    <% if(orderErrorMessage){%>
+    <div class="alert alert-error alert-dismissible">
+      <em class="mark error"></em>
+      <%=orderErrorMessage%>
+    </div>
+    <%} %> <% if(orderSuccessMessage){%>
+    <div class="alert alert-success alert-dismissible">
+      <em class="mark check"></em>
+      <%=orderSuccessMessage%>
+    </div>
+    <%} %>
+    <a class="abutton" href="/decisionsync" role="button" onclick="showDiv()"
+      >Run Decision Sync</a
+    >
     <table>
       <h3>Payments</h3>
       Most recent <%=count%> of <%=total%>
@@ -57,10 +40,13 @@
       </tr>
       <% if (JSON.stringify(count)==(JSON.stringify(0)) ) { %>
       <h2>No orders count = <%= count %></h2>
-      <% } else{ %> <% orderlist.forEach(function(list){ %>
+      <% } else{ %> <% orderlist.forEach(function(list){ %> <%
+      if(list.transactions.length !=0) { %>
       <tr>
         <td>
-          <a href="/paymentdetails?id= <%=list.id %>"><%=list.id %></a>
+          <a id="cell-<%= i++ %>" href="/paymentdetails?id= <%=list.id %>">
+            <%=list.id %>
+          </a>
         </td>
         <td>
           <%= moment(list.lastModifiedAt).format( 'DD/MM/YYYY HH:mm:ss' ) %>
@@ -76,7 +62,8 @@
         </td>
         <td><%=list.custom.fields.isv_token%></td>
       </tr>
-      <% }) %> <% } %>
+      <% } %> <% }) %> <% } %>
     </table>
+    <div id="loading"><span> Loading... </span></div>
   </body>
 </html>
