@@ -1,69 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <title>ISV Commercetools Plugin</title>
-    <title>ISV Commercetools Plugin</title>
-    <base href="/" />
-    <link rel="stylesheet" href="css/orders.css" />
+    <base href="/"> 
+    <link rel="stylesheet" href="styles.css" />
     <script
       type="text/javascript"
-      src="javascript/javascriptfunctions.js"
+      src="javascriptfunctions.js"
     ></script>
     <% var i=0 %>
   </head>
 
   <body>
-    <h1>ISV Commercetools Plugin</h1>
+    <h1 class="order">ISV Commercetools Plugin</h1>
     <% if(orderErrorMessage){%>
-    <div class="alert alert-error alert-dismissible">
-      <em class="mark error"></em>
-      <%=orderErrorMessage%>
-    </div>
+        <div class="alert alert-error alert-dismissible">
+          <em class="mark error"></em>
+          <%=orderErrorMessage%>
+        </div>
     <%} %> <% if(orderSuccessMessage){%>
-    <div class="alert alert-success alert-dismissible">
-      <em class="mark check"></em>
-      <%=orderSuccessMessage%>
-    </div>
+        <div class="alert alert-success alert-dismissible">
+          <em class="mark check"></em>
+          <%=orderSuccessMessage%>
+        </div>
     <%} %>
-    <a class="abutton" href="/decisionsync" role="button" onclick="showDiv()"
-      >Run Decision Sync</a
-    >
-    <table>
-      <h3>Payments</h3>
-      Most recent <%=count%> of <%=total%>
-      <tr>
-        <th>Payment Id</th>
-        <th>Payment Date</th>
-        <th>Payment Method</th>
-        <th>Amount</th>
-        <th>Token</th>
-      </tr>
-      <% if (JSON.stringify(count)==(JSON.stringify(0)) ) { %>
-      <h2>No orders count = <%= count %></h2>
-      <% } else{ %> <% orderlist.forEach(function(list){ %> <%
-      if(list.transactions.length !=0) { %>
-      <tr>
-        <td>
-          <a id="cell-<%= i++ %>" href="/paymentdetails?id= <%=list.id %>">
-            <%=list.id %>
-          </a>
-        </td>
-        <td>
-          <%= moment(list.lastModifiedAt).format( 'DD/MM/YYYY HH:mm:ss' ) %>
-        </td>
-        <% if (list.paymentMethodInfo.name) { %>
-        <td><%=list.paymentMethodInfo.name.en%></td>
-        <% } else { %>
-        <td></td>
-        <% } %>
-        <td>
-          <%= list.amountPlanned.currencyCode%> <%=
-          amountConversion(list.amountPlanned.centAmount) %>
-        </td>
-        <td><%=list.custom.fields.isv_token%></td>
-      </tr>
-      <% } %> <% }) %> <% } %>
+    
+    <div id="left"><h2>Orders</h2></div>
+    <div class="buttonright"><a class="button" href="/decisionsync" role="button" onclick="showDiv()"
+      >Run Decision Sync</a></div>
+    <table class="order">
+        <tr>
+            <th>Payment Id</th>
+            <th>Order Total</th>
+            <th>Payment Method</th>
+            <th>Date Created</th>
+            <th>Date Modified</th>
+        </tr>
+        <% if (JSON.stringify(count)==(JSON.stringify(0)) ) { %>
+            <h2>No orders count = <%= count %></h2>
+        <% } else{ %> <% orderlist.forEach(function(list){ %>
+          <% if(list.transactions.length!=0) 
+          {%>
+        <tr id="cell-<%= i++ %>" class="row" onclick="window.location='/paymentdetails?id=<%=list.id %>'">
+           <td><%=list.id %></td>
+           <td>
+            <%= list.amountPlanned.currencyCode%> 
+            <%=amountConversion(list.amountPlanned.centAmount) %>
+           </td>
+           <% if (list.paymentMethodInfo.name) { %>
+            <td><%=list.paymentMethodInfo.name.en%></td>
+            <% } else { %>
+            <td><%=list.paymentMethodInfo.method%></td>
+            <% } %>
+           <td>
+            <%= moment(list.createdAt).format('DD/MM/YYYY HH:mm:ss') %>
+           </td>
+           <td>
+            <%= moment(list.lastModifiedAt).format('DD/MM/YYYY HH:mm:ss') %>
+           </td>
+        </tr>
+      <% }%>
+      <% }) %> <% } %>
     </table>
-    <div id="loading"><span> Loading... </span></div>
-  </body>
+    <b>Most recent <%=count%> of <%=total%></b>
+ </body>
 </html>

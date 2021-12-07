@@ -1,149 +1,266 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
+<html>
+  <head>
     <title>ISV Commercetools Plugin</title>
-    <base href="/">
-    <link rel="stylesheet" href="css/paymentdetails.css">
-    <script type="text/javascript" src="javascript/javascriptfunctions.js"></script>
-</head>
+    <base href="/" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="text/javascript" src="javascriptfunctions.js"></script>
+    <% var totalamount=0 %> <% var currencyCode = "" %>
+  </head>
 
-<body>
+  <body>
     <% if(errorMessage){%>
-        <div class="alert alert-error alert-dismissible"><em class="mark error"></em>
-            <%=errorMessage%>
+    <div class="alert alert-error alert-dismissible">
+      <em class="mark error"></em>
+      <%=errorMessage%>
+    </div>
+    <%} %> <% if(successMessage){%>
+    <div id="message" class="alert alert-success alert-dismissible">
+      <em class="mark check"></em>
+      <%=successMessage%>
+    </div>
+    <%} %> <% if(payments){%> <% var latestTransaction = payments.transactions[payments.transactions.length-1]%>
+    <div id="left">
+      <h1 class="payment">Payment Details</h1>
+    </div>
+    <div class="buttonright">
+      <a class="button" href="/orders" role="button">Back</a>
+    </div>
+    <% if(payments){%>
+    <div class="panel card4 padding16">
+      <h2>Customer Details</h2>
+      <hr />
+      <div>
+        <div id="left">
+          <div class="div-font div-padding"><img src="shippingImage.png" /><b>Shipping Address</b></div>
+          <br />
+          <div class="div-padding">
+            <div>
+              <b>Name: </b>
+              <%= cart.shippingAddress.firstName%> <%= cart.billingAddress.lastName%>
+            </div>
+            <div>
+              <b>Address: </b>
+              <%= cart.shippingAddress.streetName%>
+            </div>
+            <% if(cart.shippingAddress.additionalStreetInfo){%>
+            <div>
+              <b>Additional Street Info: </b>
+              <%= cart.shippingAddress.additionalStreetInfo%>
+            </div>
+            <%} %>
+            <div>
+              <b>City: </b>
+              <%= cart.shippingAddress.city%>
+            </div>
+            <div>
+              <b>Postal Code: </b>
+              <%= cart.shippingAddress.postalCode%>
+            </div>
+            <div>
+              <b>Region: </b>
+              <%= cart.shippingAddress.region%>
+            </div>
+            <div>
+              <b>Country: </b>
+              <%= cart.shippingAddress.country%>
+            </div>
+            <% if(cart.shippingAddress.phone){%>
+            <div>
+              <b>Phone: </b>
+              <%= cart.shippingAddress.phone%>
+            </div>
+            <%} %>
+            <div>
+              <b>Email: </b>
+              <%= cart.shippingAddress.email%>
+            </div>
+          </div>
         </div>
-    <%} %>
-    <% if(successMessage){%>
-        <div class="alert alert-success alert-dismissible"><em class="mark check"></em>
-            <%=successMessage%>
+        <div id="right">
+          <div class="div-font"><img src="billingImage.png" /><b>Billing Address</b></div>
+          <br />
+          <div>
+            <b>Name: </b>
+            <%= cart.billingAddress.firstName%> <%= cart.billingAddress.lastName%>
+          </div>
+          <div>
+            <b>Address: </b>
+            <%= cart.billingAddress.streetName%>
+          </div>
+          <% if(cart.billingAddress.additionalStreetInfo){%>
+          <div>
+            <b>Additional Street Info: </b>
+            <%= cart.billingAddress.additionalStreetInfo%>
+          </div>
+          <%} %>
+          <div>
+            <b>City: </b>
+            <%= cart.billingAddress.city%>
+          </div>
+          <div>
+            <b>Postal Code: </b>
+            <%= cart.billingAddress.postalCode%>
+          </div>
+          <div>
+            <b>Region: </b>
+            <%= cart.billingAddress.region%>
+          </div>
+          <div>
+            <b>Country: </b>
+            <%= cart.billingAddress.country%>
+          </div>
+          <% if(cart.billingAddress.phone){%>
+          <div>
+            <b>Phone: </b>
+            <%= cart.billingAddress.phone%>
+          </div>
+          <%} %>
+          <div>
+            <b>Email: </b>
+            <%= cart.billingAddress.email%>
+          </div>
         </div>
+      </div>
+    </div>
     <%} %>
-    <table>
-        <% var latestTransaction=payments.transactions[payments.transactions.length-1]%>
-        <th>Payment details</th>
+    <br />
+    <div class="panel card4 padding16">
+      <h2>Order Items</h2>
+      <hr />
+      <table class="paymenttable1">
         <tr>
-            <td>Payment Id:</td>
-            <td>
-                <%= payments.id%>
-            </td>
+          <th>Product</th>
+          <th>Unit price</th>
+          <th>Qty</th>
+          <th>Total</th>
+        </tr>
+        <% cart.lineItems.forEach(function(item){ %>
+        <tr>
+          <td><%=item.name.en %></td>
+          <td><%= item.price.value.currencyCode%><%= amountConversion(item.price.value.centAmount)%></td>
+          <td><%= item.quantity%></td>
+          <td><%=item.totalPrice.currencyCode%> <%=amountConversion(item.totalPrice.centAmount)%></td>
+          <% totalamount = totalamount+amountConversion(item.totalPrice.centAmount)%><% currencyCode = item.totalPrice.currencyCode %>
+        </tr>
+        <%})%>
+        <tr>
+          <td></td>
+          <td></td>
+          <td><b>Total</b></td>
+          <td><b><%=currencyCode%> <%= totalamount %></b></td>
+        </tr>
+      </table>
+    </div>
+    <div class="panel card4 padding16">
+      <h2>Payment Details</h2>
+      <hr />
+      <table class="paymenttable1">
+        <tr>
+          <th>Payment Method Name</th>
+          <th>Payment Method</th>
+          <th>Payment Service Provider(PSP)</th>
+          <th>Amount Planned</th>
         </tr>
         <tr>
-            <td>Amount:</th>
-            <td>
-                <%=payments.amountPlanned.currencyCode%>
-                <%=amountConversion(payments.amountPlanned.centAmount)%>
-            </td>
+          <% if (payments.paymentMethodInfo.name) { %>
+          <td><%=payments.paymentMethodInfo.name.en%></td>
+          <% } else { %>
+          <td>-</td>
+          <% } %>
+          <td><%= payments.paymentMethodInfo.method%></td>
+          <td><%= payments.paymentMethodInfo.paymentInterface%></td>
+          <td><%=payments.amountPlanned.currencyCode%> <%=amountConversion(payments.amountPlanned.centAmount)%></td>
         </tr>
+      </table>
+    </div>
+    <br />
+    <div class="panel card4 padding16">
+      <h2>Payment Transactions</h2>
+      <hr />
+      <table class="paymenttable1">
         <tr>
-            <td>Payment Interface:</td>
-            <td>
-                <%= payments.paymentMethodInfo.paymentInterface%>
-            </td>
+          <th>Transaction Type</th>
+          <th>Status</th>
+          <th>Amount</th>
+          <th>Interaction ID</th>
+          <th>Transaction ID</th>
         </tr>
+        <% payments.transactions.forEach(function(transaction){ %>
         <tr>
-            <td>Payment Method:</td>
-            <td>
-                <%= payments.paymentMethodInfo.method%>
-            </td>
+          <td><%= transaction.type%></td>
+          <td><%= transaction.state%></td>
+          <td><%= transaction.amount.currencyCode%> <%=amountConversion(transaction.amount.centAmount)%></td>
+          <td><%= transaction.interactionId%></td>
+          <td><%= transaction.id%></td>
         </tr>
-        <% if(payments.custom.fields.isv_token!="" ) {%>
-            <tr>
-                <td>Token:</td>
-                <td>
-                    <%=payments.custom.fields.isv_token%>
-                </td>
-            </tr>
-        <% } %>
-        <tr>
-            <td>Credit Card Number:</td>
-            <td>
-                <%= payments.custom.fields.isv_maskedPan %>
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Type:</td>
-            <td>
-                <%= payments.custom.fields.isv_cardType %>
-            </td>
-        </tr>
-        <tr>
-            <td>Credit Card Expiry:</td>
-            <td>
-                <%=payments.custom.fields.isv_cardExpiryMonth%>/
-                    <%=payments.custom.fields.isv_cardExpiryYear %>
-            </td>
-        </tr>
-        <% if(latestTransaction){ %>
-            <tr>
-                <td>Latest Transaction Id:</td>
-                <td>
-                    <%=latestTransaction.id%>
-                </td>
-            </tr>
-            <tr>
-                <td>Latest Transaction Interaction Id:</td>
-                <td>
-                    <%=latestTransaction.interactionId%>
-                </td>
-            </tr>
-            <tr>
-                <td>Latest Transaction Amount:</td>
-                <td>
-                    <%=latestTransaction.amount.currencyCode%>
-                        <%=amountConversion(latestTransaction.amount.centAmount)%>
-                </td>
-            </tr>
-            <tr>
-                <td>Latest Transaction Type:</td>
-                <td>
-                    <%=latestTransaction.type%>
-                </td>
-            </tr>
-            <tr>
-                <td>Latest Transaction State:</td>
-                <td>
-                    <%=latestTransaction.state %>
-                </td>
-            </tr>
-        <% } %>
-    </table>
-    <br>
-    <% if((captureAmount) && (!(latestTransaction.type=="Charge" && latestTransaction.state=="Initial"
-    ))) { %>
-        You can refund amount <%= captureAmount%>
-    <% } %>
-    <br>
-    <a class="abutton" href="/orders" role="button">Back</a>
-    <% if(latestTransaction) { %>
-        <% if((latestTransaction.type=='Authorization' && latestTransaction.state=='Success'
-        ) || (latestTransaction.type=='Charge' && latestTransaction.state=='Initial' )
-        || (latestTransaction.type=='CancelAuthorization' &&
-        latestTransaction.state=='Initial' )) { %>
-            <a class="abutton" id="captureId" href="/capture?id=<%=id%>" role="button"
-            onclick="showDiv()">Capture</a>
-            <a class="abutton" id="authreversalId" href="/authreversal?id=<%=id%>"
-            role="button" onclick="showDiv()">Reverse</a>
-        <% } %>
-        <% if(("Charge"==latestTransaction.type
-        && "Success"==latestTransaction.state) || ((captureAmount
-        && "Refund"==latestTransaction.type) &&
-        (("Success"==latestTransaction.state) ||
-        ("Failure"==latestTransaction.state) ||
-        ("Initial"==latestTransaction.state)))) {%>
-            <form action="/refund">
-                <input type="hidden" name="refundId" id="refundId"
-                    value="<%=id%>" />
-                Refund amount: <input type="text" name="refundAmount"
-                    id="refundAmount" size="6" value=""
-                    oninput="validateamount(this)" required />
-                <button type="submit" id="refundbutton" class="abutton"
-                    onclick="showDiv()">Refund</button>
-            </form>
-        <% } %>
-    <% } %>
-    <div id="loading"><span> Loading... </span></div>
-    <div id="msg"></div>
-</body>
+        <% }) %>
+      </table>
 
+      <% if(latestTransaction) { %> <% if((latestTransaction.type=='Authorization' && latestTransaction.state=='Success' ) || (latestTransaction.type=='Charge' && latestTransaction.state=='Initial')
+      || (latestTransaction.type=='CancelAuthorization' && latestTransaction.state=='Initial' )) { %>
+      <div class="div-padding">
+        <a class="button" id="capture" href="/capture?id=<%=id%>" role="button" onclick="showDiv()">Capture </a>
+        <a class="button" id="auth" href="/authreversal?id=<%=id%>" role="button" onclick="showDiv()">Reverse </a>
+        <% } %> <% if(("Charge"==latestTransaction.type && "Success"==latestTransaction.state) || ((captureAmount && "Refund"==latestTransaction.type) && (("Success"==latestTransaction.state) ||
+        ("Failure"==latestTransaction.state) || ("Initial"==latestTransaction.state)))) {%> <% if((captureAmount) && (!(latestTransaction.type=="Charge" && latestTransaction.state=="Initial" ))) { %>
+        <div class="div-padding">You can refund amount <%= captureAmount%></div>
+        <% } %>
+        <form action="/refund" class="div-padding">
+          <input type="hidden" name="refundId" id="refundId" value="<%=id%>" />
+          Refund amount: <input type="text" name="refundAmount" id="refundAmount" size="6" value="" oninput="validateamount(this)" required />
+          <button type="submit" id="refundbutton" class="button" onclick="showDiv()">Refund</button>
+        </form>
+        <% } %>
+      </div>
+      <% } %>
+
+      <div id="msg"></div>
+    </div>
+    <br />
+    <div class="panel card4 padding16">
+      <h2>Payment Card Details</h2>
+      <hr />
+      <table class="paymenttable1">
+        <tr>
+          <th>Masked Card Number</th>
+          <th>Card Type</th>
+          <th>Card Expiry Year</th>
+        </tr>
+        <tr>
+          <td><%= payments.custom.fields.isv_maskedPan%></td>
+          <td><%= payments.custom.fields.isv_cardType%></td>
+          <td><%= payments.custom.fields.isv_cardExpiryYear%></td>
+        </tr>
+      </table>
+    </div>
+    <br />
+    <div class="panel card4 padding16">
+      <h2>ISV Payment Service Custom Payment Fields</h2>
+      <% if (payments.custom.fields.isv_token) { %>
+      <table class="paymenttable2">
+        <tr>
+          <td><b>Token</b></td>
+          <td><%= payments.custom.fields.isv_token%></td>
+        </tr>
+        <tr>
+          <td><b>Token Verification Context</b></td>
+          <td><%= payments.custom.fields.isv_tokenVerificationContext%></td>
+        </tr>
+      </table>
+      <% } else { %>
+      <table class="paymenttable2">
+        <tr>
+          <td><b>Token Alias</b></td>
+          <td><%= payments.custom.fields.isv_tokenAlias%></td>
+        </tr>
+        <tr>
+          <td><b>Saved Token</b></td>
+          <td><%= payments.custom.fields.isv_savedToken%></td>
+        </tr>
+      </table>
+      <% } %>
+    </div>
+    <div id="loading"><span> Loading... </span></div>
+    <%} %>
+  </body>
 </html>
