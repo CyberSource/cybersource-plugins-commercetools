@@ -1,14 +1,17 @@
 import fetch from 'node-fetch';
+import path from 'path';
 import { createRequestBuilder } from '@commercetools/api-request-builder';
 import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth';
 import { createHttpMiddleware } from '@commercetools/sdk-middleware-http';
 import { createClient } from '@commercetools/sdk-client';
 import { Constants } from '../../constants';
+import paymentService from './../PaymentService';
 
 function getClient() {
   let client: any;
   let projectKey: any;
   let authMiddleware: any;
+  let exceptionData: any;
   try {
     projectKey = process.env.CT_PROJECT_KEY;
     authMiddleware = createAuthMiddlewareForClientCredentialsFlow({
@@ -30,10 +33,14 @@ function getClient() {
       ],
     });
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_COMMERCETOOLS_CONNECT,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_COMMERCETOOLS_CONNECT + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_COMMERCETOOLS_CONNECT + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_COMMERCETOOLS_CONNECT + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CLIENT, Constants.LOG_ERROR, exceptionData);
   }
   return client;
 }
@@ -44,6 +51,7 @@ const retrieveCartByAnonymousId = async (anonymousId) => {
   let requestBuilder: any;
   let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
   try {
     if (null != anonymousId) {
       client = getClient();
@@ -53,10 +61,7 @@ const retrieveCartByAnonymousId = async (anonymousId) => {
         });
         uri = requestBuilder.carts
           .parse({
-            where: [
-              `${Constants.ANONYMOUS_ID} = "${anonymousId}"`,
-              `${Constants.ACTIVE_CART_STATE}`,
-            ],
+            where: [`${Constants.ANONYMOUS_ID} = "${anonymousId}"`, `${Constants.ACTIVE_CART_STATE}`],
           })
           .build();
         channelsRequest = {
@@ -65,16 +70,20 @@ const retrieveCartByAnonymousId = async (anonymousId) => {
         };
         anonymousIdResponse = await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_CART_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, Constants.ERROR_MSG_CART_DETAILS);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_CART_DETAILS,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_ERROR, exceptionData);
   }
   if (null != anonymousIdResponse) {
     anonymousIdResponse = anonymousIdResponse.body;
@@ -88,6 +97,7 @@ const retrieveCartByCustomerId = async (customerId) => {
   let requestBuilder: any;
   let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
   try {
     if (null != customerId) {
       client = getClient();
@@ -97,10 +107,7 @@ const retrieveCartByCustomerId = async (customerId) => {
         });
         uri = requestBuilder.carts
           .parse({
-            where: [
-              `${Constants.CUSTOMER_ID} = "${customerId}"`,
-              `${Constants.ACTIVE_CART_STATE}`,
-            ],
+            where: [`${Constants.CUSTOMER_ID} = "${customerId}"`, `${Constants.ACTIVE_CART_STATE}`],
           })
           .build();
         channelsRequest = {
@@ -109,16 +116,20 @@ const retrieveCartByCustomerId = async (customerId) => {
         };
         customerIdResponse = await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_CART_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_INFO, Constants.ERROR_MSG_CART_DETAILS);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_CART_DETAILS,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_ERROR, exceptionData);
   }
   if (null != customerIdResponse) {
     customerIdResponse = customerIdResponse.body;
@@ -132,6 +143,7 @@ const retrieveCartByPaymentId = async (paymentId) => {
   let requestBuilder: any;
   let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
   try {
     if (null != paymentId) {
       client = getClient();
@@ -139,25 +151,27 @@ const retrieveCartByPaymentId = async (paymentId) => {
         requestBuilder = createRequestBuilder({
           projectKey: process.env.CT_PROJECT_KEY,
         });
-        uri = requestBuilder.carts
-          .parse({ where: [`paymentInfo(payments(id="${paymentId}"))`] })
-          .build();
+        uri = requestBuilder.carts.parse({ where: [`paymentInfo(payments(id="${paymentId}"))`] }).build();
         channelsRequest = {
           uri: uri,
           method: Constants.HTTP_METHOD_GET,
         };
         paymentIdResponse = await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_ERROR, exceptionData);
   }
   if (null != paymentIdResponse) {
     paymentIdResponse = paymentIdResponse.body;
@@ -171,30 +185,31 @@ const retrievePayment = async (paymentId) => {
   let requestBuilder: any;
   let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
   try {
-    if (null != paymentId) {
-      client = getClient();
-      if (null != client) {
-        requestBuilder = createRequestBuilder({
-          projectKey: process.env.CT_PROJECT_KEY,
-        });
-        uri = requestBuilder.payments.byId(paymentId).build();
-        channelsRequest = {
-          uri: uri,
-          method: Constants.HTTP_METHOD_GET,
-        };
-        paymentResponse = await client.execute(channelsRequest);
-      } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
-      }
+    client = getClient();
+    if (null != client) {
+      requestBuilder = createRequestBuilder({
+        projectKey: process.env.CT_PROJECT_KEY,
+      });
+      uri = requestBuilder.payments.byId(paymentId).build();
+      channelsRequest = {
+        uri: uri,
+        method: Constants.HTTP_METHOD_GET,
+      };
+      paymentResponse = await client.execute(channelsRequest);
     } else {
-      console.log(Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_PAYMENT, Constants.LOG_ERROR, exceptionData);
   }
   if (null != paymentResponse) {
     paymentResponse = paymentResponse.body;
@@ -208,6 +223,7 @@ const addTransaction = async (transactionObject) => {
   let requestBuilder: any;
   let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
   try {
     if (null != transactionObject) {
       client = getClient();
@@ -236,16 +252,20 @@ const addTransaction = async (transactionObject) => {
         };
         transactionResonse = await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_FETCH_TRANSACTIONS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.ERROR_MSG_FETCH_TRANSACTIONS);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_ADD_TRANSACTION,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_ADD_TRANSACTION + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_ADD_TRANSACTION + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_ADD_TRANSACTION + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_ERROR, exceptionData);
   }
   if (null != transactionResonse) {
     transactionResonse = transactionResonse.body;
@@ -253,12 +273,13 @@ const addTransaction = async (transactionObject) => {
   return transactionResonse;
 };
 
-const getorders = async () => {
+const getOrders = async () => {
   let orderResponse: any;
   let client: any;
   let requestBuilder: any;
   let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
   try {
     client = getClient();
     if (null != client) {
@@ -267,9 +288,7 @@ const getorders = async () => {
       });
       uri = requestBuilder.payments
         .parse({
-          sort: [
-            { by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER },
-          ],
+          sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }],
         })
         .build();
       channelsRequest = {
@@ -278,13 +297,17 @@ const getorders = async () => {
       };
       orderResponse = await client.execute(channelsRequest);
     } else {
-      console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ORDERS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ORDERS, Constants.LOG_ERROR, exceptionData);
   }
   if (null != orderResponse) {
     orderResponse = orderResponse.body;
@@ -298,6 +321,7 @@ const updateCartbyPaymentId = async (cartId, cartVersion, visaCheckoutData) => {
   let requestBuilder: any;
   let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
   try {
     if (null != cartId && null != cartVersion && null != visaCheckoutData) {
       client = getClient();
@@ -332,13 +356,20 @@ const updateCartbyPaymentId = async (cartId, cartVersion, visaCheckoutData) => {
         };
         orderResponse = await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_EMPTY_CART);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_CART);
     }
   } catch (exception) {
-    console.log(Constants.EXCEPTION_MSG_CART_UPDATE, JSON.stringify(exception));
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CART_UPDATE + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CART_UPDATE + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CART_UPDATE + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_ERROR, exceptionData);
   }
   if (null != orderResponse) {
     orderResponse = orderResponse.body;
@@ -354,16 +385,12 @@ const setCustomerTokens = async (paymentInstrumentId, updatePaymentObj) => {
   let stringTokenData: string;
   let isvTokens: any;
   let mappedTokens: any;
+  let exceptionData: any;
   let length: number;
   let tokenArray: Array<string>;
   let customerId = null;
   try {
-    if (
-      null != paymentInstrumentId &&
-      null != updatePaymentObj &&
-      Constants.STRING_CUSTOMER in updatePaymentObj &&
-      Constants.STRING_ID in updatePaymentObj.customer
-    ) {
+    if (null != paymentInstrumentId && null != updatePaymentObj && Constants.STRING_CUSTOMER in updatePaymentObj && Constants.STRING_ID in updatePaymentObj.customer) {
       customerId = updatePaymentObj.customer.id;
       client = getClient();
       if (null != client && null != customerId) {
@@ -378,12 +405,7 @@ const setCustomerTokens = async (paymentInstrumentId, updatePaymentObj) => {
           cardExpiryYear: updatePaymentObj.custom.fields.isv_cardExpiryYear,
         };
         stringTokenData = JSON.stringify(tokenData);
-        if (
-          null != customerInfo &&
-          Constants.STRING_CUSTOM in customerInfo &&
-          Constants.STRING_FIELDS in customerInfo.custom &&
-          Constants.ISV_TOKENS in customerInfo.custom.fields
-        ) {
+        if (null != customerInfo && Constants.STRING_CUSTOM in customerInfo && Constants.STRING_FIELDS in customerInfo.custom && Constants.ISV_TOKENS in customerInfo.custom.fields) {
           isvTokens = customerInfo.custom.fields.isv_tokens;
           mappedTokens = isvTokens.map((item) => item);
           length = mappedTokens.length;
@@ -394,16 +416,20 @@ const setCustomerTokens = async (paymentInstrumentId, updatePaymentObj) => {
           tokenResponse = await setCustomType(customerId, tokenArray);
         }
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, Constants.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_CUSTOMER_UPDATE,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_ERROR, exceptionData);
   }
   return tokenResponse;
 };
@@ -412,8 +438,9 @@ const getCustomer = async (customerId) => {
   let customerResponse: any;
   let client: any;
   let requestBuilder: any;
-  let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
+  let uri: string;
   try {
     if (null != customerId) {
       client = getClient();
@@ -428,16 +455,20 @@ const getCustomer = async (customerId) => {
         };
         customerResponse = await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_INFO, Constants.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_ERROR, exceptionData);
   }
   if (null != customerResponse) {
     customerResponse = customerResponse.body;
@@ -448,6 +479,7 @@ const getCustomer = async (customerId) => {
 const setCustomType = async (customerId, fieldsdata) => {
   let customResponse: any;
   let customerInfo: any;
+  let exceptionData: any;
   try {
     if (null != customerId && null != fieldsdata) {
       const client = getClient();
@@ -478,16 +510,20 @@ const setCustomType = async (customerId, fieldsdata) => {
         };
         customResponse = await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUTSOM_TYPE, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUTSOM_TYPE, Constants.LOG_INFO, Constants.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
-    console.log(
-      Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS,
-      JSON.stringify(exception)
-    );
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUTSOM_TYPE, Constants.LOG_ERROR, exceptionData);
   }
   if (null != customResponse) {
     customResponse = customResponse.body;
@@ -498,8 +534,9 @@ const setCustomType = async (customerId, fieldsdata) => {
 const updateDecisionSync = async (decisionUpdateObject) => {
   let client: any;
   let requestBuilder: any;
-  let uri: string;
   let channelsRequest: any;
+  let exceptionData: any;
+  let uri: string;
   try {
     if (null != decisionUpdateObject) {
       client = getClient();
@@ -524,13 +561,20 @@ const updateDecisionSync = async (decisionUpdateObject) => {
         };
         await client.execute(channelsRequest);
       } else {
-        console.log(Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      console.log(Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
-    console.log(Constants.EXCEPTION_MSG_DECISON_SYNC, exception);
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_DECISON_SYNC + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_DECISON_SYNC + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_DECISON_SYNC + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_ERROR, exceptionData);
   }
 };
 
@@ -540,7 +584,7 @@ export default {
   retrieveCartByPaymentId,
   retrievePayment,
   addTransaction,
-  getorders,
+  getOrders,
   updateCartbyPaymentId,
   setCustomerTokens,
   updateDecisionSync,
