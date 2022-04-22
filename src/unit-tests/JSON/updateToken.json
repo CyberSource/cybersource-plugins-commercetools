@@ -1,0 +1,12 @@
+{
+    "alias": "card2",
+    "value": "D605360941117CECE053AF598E0A6EEC",
+    "cardType": "001",
+    "cardName": "001",
+    "cardNumber": "411111XXXXXX1111",
+    "cardExpiryMonth": "12",
+    "cardExpiryYear": "2031",
+    "paymentToken": "D605418402B2E488E053AF598E0A99B5",
+    "oldExpiryMonth": "11",
+    "oldExpiryYear": "2031"
+}

@@ -1,0 +1,246 @@
+h1.order {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-top: 0;
+}
+h1.payment {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-left: 10px;
+}
+h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-left: 10px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+table.paymenttable1 {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  table-layout: fixed;
+}
+table.paymenttable2 {
+  border-spacing: 0px;
+  table-layout: fixed;
+  width: 100%;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+th {
+  border: 1px black;
+  background-color: #001a33;
+  color: white;
+}
+td,
+th {
+  border-top: 1px solid #dee2e6;
+  text-align: left;
+  padding: 0.75rem;
+  vertical-align: top;
+  width: auto;
+}
+tr.row:hover {
+  background-color: #b3cce6;
+}
+tr.row {
+  cursor: pointer;
+}
+.buttonright {
+  float: right;
+  margin: 10px;
+}
+.button {
+  display: inline-block;
+  font-weight: 400;
+  color: white;
+  background-color: #001a33;
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: middle;
+  box-sizing: content-box;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  padding: 8px 10px;
+  margin: 5px 4px 10px 0;
+}
+form {
+  display: inline;
+}
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.alert-dismissible {
+  padding-right: 4rem;
+}
+
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  border-top-color: #b1dfbb;
+}
+
+.mark {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  width: 21px;
+  height: 21px;
+  border: 2px solid #c4cbd2;
+  border-radius: 100px;
+}
+
+.mark:before,
+.mark:after {
+  content: '';
+  display: block;
+  position: absolute;
+}
+
+.check:before {
+  top: 11px;
+  left: 10px;
+  margin: -5px 0 0 -6px;
+  height: 3px;
+  width: 10px;
+  border: solid #39ca74;
+  border-width: 0 0 3px 3px;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.error:before {
+  top: 8%;
+  left: 30%;
+  height: 30%;
+  width: 25%;
+  border: solid #c0392b;
+  border-width: 0 0 3px 3px;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.error:after {
+  top: 48%;
+  left: 30%;
+  height: 30%;
+  width: 25%;
+  border: solid #c0392b;
+  border-width: 0 0 3px 3px;
+  -webkit-transform: rotate(135deg);
+  -moz-transform: rotate(135deg);
+  -ms-transform: rotate(135deg);
+  -o-transform: rotate(135deg);
+  transform: rotate(135deg);
+}
+span {
+  color: whitesmoke;
+  font-weight: 800;
+  font-weight: bold;
+  vertical-align: middle;
+  line-height: normal;
+  background: rgba(0, 0, 0, 0.5);
+  width: 35%;
+  height: 35%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+img {
+  display: inline-block;
+  position: relative;
+  border: none;
+  outline: none;
+  width: 27px;
+  height: 13px;
+}
+.panel {
+  content: '';
+  display: table;
+  clear: both;
+}
+.card4 {
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 4px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.padding16 {
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+  width: 100%;
+}
+
+div.div-font {
+  font-size: 100%;
+}
+.div-padding {
+  padding-left: 10px;
+}
+#msg {
+  color: red;
+  padding-left: 10px;
+  display: none;
+}
+#loading {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9;
+}
+#right {
+  width: 50%;
+  float: right;
+  font-size: 0.9rem;
+}
+.leftDiv {
+  width: 50%;
+  float: left;
+  font-size: 0.9rem;
+}
+td.text-align {
+  text-align: center;
+}

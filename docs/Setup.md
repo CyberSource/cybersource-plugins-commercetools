@@ -1,65 +1,60 @@
 # Setup
 
-# Getting Started With The Reference Application
+# Getting Started With The Commerectools-Cybersource Plugin
 
-The following section contains steps to get started with an generic
-integration between commercetools and CyberSource using the provided
-Spring Boot reference implementation.
+The following section contains steps to get started with an generic integration between Commercetools and Cybersource using the typescript plugin.
 
-## 0. Prerequisites
+## Prerequisites
 
-  - An installation of a Java Development Kit (JDK) version 11 (currently tested against the Zulu Community builds of OpenJDK: https://www.azul.com/downloads/zulu-community)
+- An installation of node JS is required before running the application.
 
 ## 1. Create Access Keys
 
-To allow access to both commercetools and CyberSource authorisation is
+To allow access to both Commercetools and Cybersource authorization is
 enabled via access keys supplied by the associative provider.
 
-  - Commercetools API Keys can be created from within the commercetools
-    Merchant Center. See [Key Creation](Key-Creation.md) for
-    more details.
-  - The CyberSource integration contains 3 touchpoints to support 3D
-    Secure, Card Tokenisation and Payment processing. For more detail
-    about how to setup these see [Key
-    Creation](Key-Creation.md) for more details.
-      - 3D Secure: Cardinal
-      - Card Tokenisation: Shared Secret
-      - Payment Process: Simple Order API Keys
+- Commercetools API Keys can be created from within the Commercetools
+  Merchant Center. See [Key Creation](Key-Creation.md) for
+  more details.
+- The Cybersource integration supports Card Tokenization and Payment processing. For more detail
+  about how to setup these see [Key
+  Creation](Key-Creation.md) for more details.
+  - Card Tokenization & Payment Process: REST Shared Secret
 
 ## 2\. Extend Commercetools
 
 Commercetools needs to be extended to support the interactions between
-commercetools and CyberSource. The customisations are as follows:
+Commercetools and Cybersource. The customizations are as follows:
 
-  - API Extensions:
-      - Create Payment Event
-      - Update Payment Event
-  - Data Model Changes:
-      - Payment
-      - Payment Interactions
+- API Extensions:
+  - Create Payment Event
+  - Update Payment Event
+  - Update Customer Event
+- Data Model Changes:
+  - Payment Interactions
 
-The details of the specific customisations listed above is documented
+The details of the specific customizations listed above is documented
 here: [Commercetools Setup](Commercetools-Setup.md).
 
 ## 3\. Application Setup
 
-Configuration of the application allows you to set the propertires
-required for access to both commercetools and CyberSource. This includes
-properties such as the commercetools project key and the CyberSource
-merchant ID. For more information about what properties need to be set
+Configuration of the Plugin allows you to set the properties
+required for access to both Commercetools and Cybersource. This includes
+properties such as the Commercetools project key and the Cybersource
+merchant id. For more information about what properties need to be set
 and how they can be configure, please see [API Extension
 Setup](API-Extension-Setup.md) for more details.
 
 ## 4\. Front-end Setup
 
-The bulk of the integration work when using the CyberSource
-commercetools extension is within the user-interface. This is because
-commercetools does not come with a user-interface and therefore all
+The bulk of the integration work when using the Commerectools-Cybersource plugin
+is within the user-interface. This is because
+Commercetools does not come with a user-interface and therefore all
 implementations will be different.
 
-  - For setting up the client-side application to work with 3D Secure,
-    use the following guide: [3D Secure
-    Setup](3D-Secure-Setup.md)
-  - For setting up the client-side application to work with Visa
-    Checkout, use the following guide: [Visa Checkout
-    Setup](Visa-Checkout-Setup.md)
+- For setting up the client-side application to work with Visa
+  Click to Pay, use the following guide: [Visa Click to Pay Setup](Visa-ClicktoPay-Setup.md)
+- For setting up the client-side application to work with Google
+  Pay, use the following guide: [Google Pay Setup](GooglePay-Setup.md)
+- For setting up the client-side application to work with Apple
+  Pay, use the following guide: [Apple Pay Setup](ApplePay-Setup.md)

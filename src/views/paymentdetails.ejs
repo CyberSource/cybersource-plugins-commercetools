@@ -1,0 +1,348 @@
+<html>
+  <head>
+    <title>ISV Commercetools Plugin</title>
+    <base href="/" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="text/javascript" src="orders.js"></script>
+    <% var currencyCode = "" %> <%var discountAmount = 0.0 %> <% var subTotal = 0.0 %> <% var shippingCost = 0.0 %> <% var cartDiscount = false %> <% var customLineItemDiscount = false %> <% var shippingDiscount = false %>
+  </head>
+
+  <body>
+    <% if(errorMessage){%>
+    <div class="alert alert-error alert-dismissible" id="paymentErrorMessage">
+      <em class="mark error"></em>
+      <%=errorMessage%>
+    </div>
+    <% } if(successMessage){%>
+    <div id="message" class="alert alert-success alert-dismissible" id="paymentSuccessMessage">
+      <em class="mark check"></em>
+      <%=successMessage%>
+    </div>
+    <% } if(payments){%>
+    <div class="leftDiv">
+      <h1 class="payment">Payment Details</h1>
+    </div>
+    <div class="buttonright">
+      <a id="backButton" class="button" href="/orders" role="button">Back</a>
+    </div>
+    <% if(cart){%>
+    <div class="panel card4 padding16" id="customerDetails">
+      <h2>Customer Details</h2>
+      <hr />
+      <div>
+        <% if(cart.shippingAddress){%>
+        <div class="leftDiv">
+          <div class="div-font div-padding"><img src="shippingImage.png" /><b>Shipping Address</b></div>
+          <br />
+          <div class="div-padding">
+            <div>
+              <b>Name: </b>
+              <%= cart.shippingAddress.firstName%> <%= cart.shippingAddress.lastName%>
+            </div>
+            <div>
+              <b>Address: </b>
+              <%= cart.shippingAddress.streetName%>
+            </div>
+            <% if(cart.shippingAddress.additionalStreetInfo){%>
+            <div>
+              <b>Additional Street Info: </b>
+              <%= cart.shippingAddress.additionalStreetInfo%>
+            </div>
+            <%} %>
+            <div>
+              <b>City: </b>
+              <%= cart.shippingAddress.city%>
+            </div>
+            <div>
+              <b>Postal Code: </b>
+              <%= cart.shippingAddress.postalCode%>
+            </div>
+            <div>
+              <b>Region: </b>
+              <%= cart.shippingAddress.region%>
+            </div>
+            <div>
+              <b>Country: </b>
+              <%= cart.shippingAddress.country%>
+            </div>
+            <% if(cart.shippingAddress.phone){%>
+            <div>
+              <b>Phone: </b>
+              <%= cart.shippingAddress.phone%>
+            </div>
+            <%} %>
+            <div>
+              <b>Email: </b>
+              <%= cart.shippingAddress.email%>
+            </div>
+          </div>
+        </div>
+        <% } if(cart.billingAddress){%>
+        <div id="right">
+          <div class="div-font"><img src="billingImage.png" /><b>Billing Address</b></div>
+          <br />
+          <div>
+            <b>Name: </b>
+            <%= cart.billingAddress.firstName%> <%= cart.billingAddress.lastName%>
+          </div>
+          <div>
+            <b>Address: </b>
+            <%= cart.billingAddress.streetName%>
+          </div>
+          <% if(cart.billingAddress.additionalStreetInfo){%>
+          <div>
+            <b>Additional Street Info: </b>
+            <%= cart.billingAddress.additionalStreetInfo%>
+          </div>
+          <%} %>
+          <div>
+            <b>City: </b>
+            <%= cart.billingAddress.city%>
+          </div>
+          <div>
+            <b>Postal Code: </b>
+            <%= cart.billingAddress.postalCode%>
+          </div>
+          <div>
+            <b>Region: </b>
+            <%= cart.billingAddress.region%>
+          </div>
+          <div>
+            <b>Country: </b>
+            <%= cart.billingAddress.country%>
+          </div>
+          <% if(cart.billingAddress.phone){%>
+          <div>
+            <b>Phone: </b>
+            <%= cart.billingAddress.phone%>
+          </div>
+          <%} %>
+          <div>
+            <b>Email: </b>
+            <%= cart.billingAddress.email%>
+          </div>
+        </div>
+        <%} %>
+      </div>
+    </div>
+    <br />
+    <% if(cart.lineItems){%>
+    <div class="panel card4 padding16" id="productDetails">
+      <h2>Order Items</h2>
+      <hr />
+      <table class="paymenttable1">
+        <tr>
+          <th>Product</th>
+          <th>Unit price</th>
+          <th>Qty</th>
+          <%cart.lineItems.forEach(function(lineItem){%> <%if(lineItem.discountedPricePerQuantity.length > 0 && !cartDiscount){%> <%cartDiscount = true%> <%} })%> <%if(cart.customLineItems.length>0){%> <%cart.customLineItems.forEach(function(customLineItem){%>
+          <%if(customLineItem.discountedPricePerQuantity.length>0 && !customLineItemDiscount){%> <%customLineItemDiscount = true%> <%} }) }%> <%if(cart.shippingInfo && cart.shippingInfo.discountedPrice){%> <%shippingDiscount=true%> <%}%> <%if(cartDiscount ||
+          customLineItemDiscount || shippingDiscount){%>
+          <th>DiscountAmount</th>
+          <%}%>
+          <th>Total</th>
+        </tr>
+        <% cart.lineItems.forEach(function(item){ %> <%subTotal = 0.0%> <%if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length == 0){%> <%if(item.price.discounted){%> <% unitPrice = amountConversion(item.price.discounted.value.centAmount)%> <%}else{%>
+        <% unitPrice = amountConversion(item.price.value.centAmount)%> <%}%>
+        <tr>
+          <% if(locale){%>
+          <td><%=item.name[locale] %></td>
+          <% } else if("en" in item.name) { %>
+          <td><%=item.name.en %></td>
+          <% } else if("de" in item.name) { %>
+          <td><%=item.name.de %></td>
+          <% } %>
+          <td><%= item.price.value.currencyCode%> <%= unitPrice%></td>
+          <td><%= item.quantity%></td>
+          <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
+          <td><%=roundOff(discountAmount)%></td>
+          <%}%>
+          <td><%=item.totalPrice.currencyCode%> <%=amountConversion(item.totalPrice.centAmount)%></td>
+          <% currencyCode = item.totalPrice.currencyCode %>
+        </tr>
+        <%}else if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length > 0){%> <%item.discountedPricePerQuantity.forEach(function(discountObject){%> <%discountAmount=0.0%> <%subTotal = 0.0%> <%unitPrice =
+        amountConversion(discountObject.discountedPrice.value.centAmount)%> <%subTotal = unitPrice * discountObject.quantity %> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
+        amountConversion(includedDiscount.discountedAmount.centAmount)*discountObject.quantity%> <%})%>
+        <tr>
+          <td><%=item.name[locale] %></td>
+          <td><%= item.price.value.currencyCode%> <%= unitPrice%></td>
+          <td><%= discountObject.quantity%></td>
+          <td><%=roundOff(discountAmount)%></td>
+          <td><%=item.totalPrice.currencyCode%> <%=roundOff(subTotal)%></td>
+          <% currencyCode = item.totalPrice.currencyCode %>
+        </tr>
+        <%}) } })%> <%if(cart.customLineItems.length > 0){%> <% cart.customLineItems.forEach(function(item){ %> <%discountAmount = 0.0 %> <%if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length == 0){%> <% unitPrice =
+        amountConversion(item.money.centAmount)%>
+        <tr>
+          <td><%=item.name[locale] %></td>
+          <td><%= item.money.currencyCode%> <%= unitPrice%></td>
+          <td><%= item.quantity%></td>
+          <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
+          <td><%=roundOff(discountAmount)%></td>
+          <%}%>
+          <td><%=item.totalPrice.currencyCode%> <%=amountConversion(item.totalPrice.centAmount)%></td>
+          <% currencyCode = item.totalPrice.currencyCode %>
+        </tr>
+        <%}else if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length > 0){%> <%item.discountedPricePerQuantity.forEach(function(discountObject){%> <%discountAmount=0.0%> <%subTotal = 0.0%> <%unitPrice =
+        amountConversion(discountObject.discountedPrice.value.centAmount)%> <%subTotal = unitPrice * discountObject.quantity%> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
+        amountConversion(includedDiscount.discountedAmount.centAmount)*discountObject.quantity%> <%})%>
+        <tr>
+          <td><%=item.name[locale] %></td>
+          <td><%= item.money.currencyCode%> <%= unitPrice%></td>
+          <td><%= discountObject.quantity%></td>
+          <td><%=roundOff(discountAmount)%></td>
+          <td><%=item.totalPrice.currencyCode%> <%=roundOff(subTotal)%></td>
+          <% currencyCode = item.totalPrice.currencyCode %>
+        </tr>
+        <%}) } }) }%> <% if(cart.shippingInfo){ %> <%discountAmount = 0.0 %> <%if(cart.shippingInfo.discountedPrice){%> <%shippingCost = amountConversion(cart.shippingInfo.discountedPrice.value.centAmount)%> <%if(cart.shippingInfo.discountedPrice.includedDiscounts){%>
+        <%cart.shippingInfo.discountedPrice.includedDiscounts.forEach(function(shippingDiscount){%> <%discountAmount = amountConversion(shippingDiscount.discountedAmount.centAmount) + discountAmount%> <%}) }%> <%}else{%> <%shippingCost =
+        amountConversion(cart.shippingInfo.price.centAmount)%> <%}%>
+        <tr>
+          <td><b>Shipping Cost</b></td>
+          <td><%=currencyCode%> <%=shippingCost%></td>
+          <td>1</td>
+          <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
+          <td><%=roundOff(discountAmount)%></td>
+          <%}%>
+          <td><%= cart.shippingInfo.price.currencyCode %> <%=shippingCost%></td>
+        </tr>
+        <% } %>
+        <tr>
+          <td></td>
+          <td></td>
+          <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
+          <td></td>
+          <%}%>
+          <td><b>Total</b></td>
+          <td><b><%=currencyCode%> <%= amountConversion(cart.totalPrice.centAmount) %></b></td>
+        </tr>
+      </table>
+    </div>
+    <br />
+    <% } } %>
+    <div class="panel card4 padding16" id="paymentDetails">
+      <h2>Payment Details</h2>
+      <hr />
+      <table class="paymenttable1" id="paymentDetailsTable">
+        <tr>
+          <th>Payment Method Name</th>
+          <th>Payment Method</th>
+          <th>Payment Service Provider(PSP)</th>
+          <th>Amount Planned</th>
+        </tr>
+        <tr>
+          <% if (payments.paymentMethodInfo.name) { %>
+          <td><%=payments.paymentMethodInfo.name.en%></td>
+          <% } else { %>
+          <td>-</td>
+          <% } %>
+          <td><%= payments.paymentMethodInfo.method%></td>
+          <td><%= payments.paymentMethodInfo.paymentInterface%></td>
+          <td><%=payments.amountPlanned.currencyCode%> <%=amountConversion(payments.amountPlanned.centAmount)%></td>
+        </tr>
+      </table>
+    </div>
+    <br />
+    <div class="panel card4 padding16" id="paymentTransactions">
+      <h2>Payment Transactions</h2>
+      <hr />
+      <table class="paymenttable1" id="paymentTransactionsTable">
+        <tr>
+          <th>Transaction Type</th>
+          <th>Status</th>
+          <th>Amount</th>
+          <th>Interaction ID</th>
+          <th>Transaction ID</th>
+        </tr>
+        <% payments.transactions.forEach(function(transaction){ %>
+        <tr>
+          <td><%= transaction.type%></td>
+          <td><%= transaction.state%></td>
+          <td><%= transaction.amount.currencyCode%> <%=amountConversion(transaction.amount.centAmount)%></td>
+          <td><%= transaction.interactionId%></td>
+          <td><%= transaction.id%></td>
+        </tr>
+        <% }) %>
+      </table>
+      <% if(payments){ var transactions = payments.transactions; var authPresent = false ; var capturePresent = false; var authReversalPresent = false; var refundPresent = false; if(transactions){ transactions.forEach(function(element){ if ('Authorization' == element.type &&
+      'Success' == element.state) { authPresent = true; } if('Charge' == element.type && 'Success' == element.state){ capturePresent = true; } if('Refund' == element.type && 'Success' == element.state){ refundPresent = true; } if('CancelAuthorization' == element.type &&
+      'Success' == element.state){ authReversalPresent = true; } }) } %>
+      <div class="div-padding" id="buttonsDiv">
+        <% if(authPresent && !capturePresent && !authReversalPresent && !refundPresent){ %>
+        <a class="button" id="capture" href="/capture?id=<%=id%>" role="button" onclick="showDiv()">Capture </a>
+        <a class="button" id="auth" href="/authreversal?id=<%=id%>" role="button" onclick="showDiv()">Reverse </a>
+        <% } if(capturePresent && authPresent && !authReversalPresent &&((refundPresent && captureAmount) || (!refundPresent && captureAmount))){ %>
+        <div class="div-padding">You can refund amount <%= captureAmount%></div>
+        <form action="/refund" class="div-padding" id="refundForm">
+          <input type="hidden" name="refundId" id="refundId" value="<%=id%>" />
+          Refund amount: <input type="text" name="refundAmount" id="refundAmount" size="6" value="" autocomplete="off" oninput="validateAmount(this)" required />
+          <button type="submit" id="refundbutton" class="button" onclick="validate()">Refund</button>
+        </form>
+        <% } %>
+        <div id="msg"><%= refundErrorMessage%></div>
+      </div>
+      <% } %>
+    </div>
+    <br />
+    <% if(null != payments.custom && null != payments.custom.fields && null != payments.custom.fields.isv_maskedPan){ %>
+    <div class="panel card4 padding16" id="paymentCardDetails">
+      <h2>Payment Card Details</h2>
+      <hr />
+      <table class="paymenttable1" id="paymentCardDetailsTable">
+        <tr>
+          <th>Masked Card Number</th>
+          <% if(null != payments.custom.fields.isv_cardType){ %>
+          <th>Card Type</th>
+          <% } %> <% if(null != payments.custom.fields.isv_cardExpiryMonth){ %>
+          <th>Card Expiry Month</th>
+          <% } %> <% if(null != payments.custom.fields.isv_cardExpiryYear){ %>
+          <th>Card Expiry Year</th>
+          <% } %>
+        </tr>
+        <tr>
+          <td><%= payments.custom.fields.isv_maskedPan%></td>
+          <% if(null != payments.custom.fields.isv_cardType){ %>
+          <td><%= payments.custom.fields.isv_cardType%></td>
+          <% } %> <% if(null != payments.custom.fields.isv_cardExpiryMonth){ %>
+          <td><%= payments.custom.fields.isv_cardExpiryMonth%></td>
+          <% } %> <% if(null != payments.custom.fields.isv_cardExpiryYear){ %>
+          <td><%= payments.custom.fields.isv_cardExpiryYear%></td>
+          <% } %>
+        </tr>
+      </table>
+    </div>
+    <br />
+    <% } if (null != payments.custom && null != payments.custom.fields) { %>
+    <div class="panel card4 padding16" id="paymentCustomFields">
+      <h2>ISV Payment Service Custom Payment Fields</h2>
+      <% if (payments.custom.fields.isv_token) { %>
+      <table class="paymenttable2" id="customCaptureContextTable">
+        <tr>
+          <td><b>Token</b></td>
+          <td><%= payments.custom.fields.isv_token%></td>
+        </tr>
+        <% if(payments.custom.fields.isv_tokenVerificationContext) { %>
+        <tr>
+          <td><b>Token Verification Context</b></td>
+          <td><%= payments.custom.fields.isv_tokenVerificationContext%></td>
+        </tr>
+        <% } %>
+      </table>
+      <% } else { %>
+      <table class="paymenttable2" id="customSavedTokensTable">
+        <tr>
+          <td><b>Token Alias</b></td>
+          <td><%= payments.custom.fields.isv_tokenAlias%></td>
+        </tr>
+        <tr>
+          <td><b>Saved Token</b></td>
+          <td><%= payments.custom.fields.isv_savedToken%></td>
+        </tr>
+      </table>
+      <% } %>
+    </div>
+    <% } %>
+    <div id="loading"><span> Loading... </span></div>
+    <%} %>
+  </body>
+</html>
