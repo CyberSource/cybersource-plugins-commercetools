@@ -1,5 +1,0 @@
-env:
-  commercetools:
-    apiUrl: http://localhost:8900
-  cybersource:
-    runEnvironment: localhost:8080
