@@ -109,7 +109,7 @@ The Cybersource Plugin has environment variable for decision manager as PAYMENT_
 
 ## Optional fields
 
-To pass additional data to Decision Manager it is possible to customize your Commercetools resources to add extra fields. If these fields exist and there are values present for these then the extension will pass the values on to Cybersource in the appropriate request
+To pass additional data to Decision Manager it is possible to customize your Commercetools resources to add extra fields. If these fields exist and there are values present for these then the plugin will pass the values on to Cybersource in the appropriate request
 
 <table>
 <thead>

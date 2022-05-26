@@ -2,7 +2,7 @@
 
 ## Authorization Reversal Service Sequence Diagram
 
-![Authorization Reversal service flow](images/Authorization-Reversal-Flow.svg)
+![Authorization Reversal service flow](images/Flow-Diagram-Reverse-a-Payment.svg)
 
 ## Process
 

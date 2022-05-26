@@ -7,24 +7,32 @@
 - [Resource
   Customisations](#ResourceCustomisations)
   - [Payment Interactions](#PaymentInteractions)
-    - [Customer tokens](#Paymentauthorisationfailed)
-    - [Line item data](#LineItemData)
+    - [Customer tokens](#CustomerTokens)
     - [Payment data](#PaymentData)
     - [Payer authentication enrolment check](#PayerAuthenticationEnrolmentCheck)
     - [Payer authentication validate result](#PayerAuthenticationValidation)
     - [Payment error](#PaymentError)
     - [Payment failure](#PaymentFailure)
 
-The customizations below are required for the API Extension to work
-correctly. JSON versions of these definitions can be found in the
-Installation Guide for Commerectools Cybersource Plugin.
+The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in the plugin and can be run as a script to load them to Commercetools.
+
+> **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms</li></ul>
+
+Below is the Endpoint to run the script to load these API extension setup and custmizations
+
+| Endpoint                  | Note                                                                                                                                                                                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| {baseUrl}/configurePlugin | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md) to know what values to be passed for the fields required before running the script |
+
+> **_NOTE:_** Any errors occured while running the script or while processing the payments are logged in src/loggers folder of the plugin.
+
 
 # <a name="APIExtensionSetup"></a>API Extension Setup
 
 ## <a name="PaymentCreate"></a>Payment Create
 
-An extension triggered by payment create is required to process any
-actions on a payment.
+An extension triggered by payment create is required to process create
+action on a payment resource.
 
 | Property                   | Value                                  | Note                                                                                                  |
 | -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -39,8 +47,7 @@ actions on a payment.
 
 ## <a name="PaymentUpdate"></a>Payment Update
 
-An extension triggered by payment updates is required to process
-authorizations
+An extension triggered by payment updates is required to process any update actions on a payment resource
 
 | Property                   | Value                                  | Note                                                                                                  |
 | -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -55,7 +62,7 @@ authorizations
 
 ## <a name="CustomerUpdate"></a>Customer Update
 
-An extension triggered by customer update is required to process any action on customer token.
+An extension triggered by customer update is required to process any update actions on customer resource. 
 
 | Property                   | Value                                  | Note                                                                                                  |
 | -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -64,7 +71,7 @@ An extension triggered by customer update is required to process any action on c
 | url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production       |
 | authentication.type        | AuthorizationHeader                    |                                                                                                       |
 | authentication.headerValue | Basic {credentials}                    | Replace Base 64 encode value of the pair (username: password) of Commercetools with the {credentials} |
-| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                           |
+| timeoutInMs                | 3000                                 | You will need Commercetools support to increase the allowable maximum value                           |
 | actions                    | Update                                 |                                                                                                       |
 | resourceTypeId             | customer                               |                                                                                                       |
 
@@ -80,22 +87,24 @@ An extension triggered by customer update is required to process any action on c
 
 Fields
 
-| Name       | Type   | Required |
-| ---------- | ------ | -------- |
-| isv_tokens | String | false    |
-
-### <a name="LineItemData"></a>Line Item Data
-
-| Type    | Key                         | Purpose                                                   |
-| ------- | --------------------------- | --------------------------------------------------------- |
-| payment | isv_payments_line_item_data | Custom data type for Cybersource custom line item fields. |
-
-Fields
-
-| Name            | Type | Required |
-| --------------- | ---- | -------- |
-| isv_productCode | Enum | false    |
-| isv_productRisk | Enum | false    |
+| Name                             | Type    | Required |
+| -------------------------------- | ------- | -------- |
+| isv_tokens                       | String  | false    |
+| isv_token                        | String  | false    |
+| isv_tokenAlias                   | String  | false    |
+| isv_savedToken                   | String  | false    |
+| isv_tokenVerificationContext     | String  | false    |
+| isv_tokenCaptureContextSignature | String  | false    |
+| isv_cardType                     | String  | false    |
+| isv_maskedPan                    | String  | false    |
+| isv_cardExpiryMonth              | String  | false    |
+| isv_cardExpiryYear               | String  | false    |
+| isv_addressId                    | String  | false    |
+| isv_deviceFingerprintId          | String  | false    |
+| isv_tokenAction                  | String  | false    |
+| isv_cardNewExpiryMonth           | String  | false    |
+| isv_cardNewExpiryYear            | String  | false    |
+| isv_tokenUpdated                 | Boolean | false    |
 
 ### <a name="PaymentData"></a>Payment Data
 
@@ -136,6 +145,8 @@ Fields
 | isv_payerEnrollTransactionId         | String  | false    |
 | isv_payerEnrollStatus                | String  | false    |
 | isv_payerEnrollHttpCode              | Number  | false    |
+| isv_saleEnabled                      | Boolean | false    |
+| isv_enabledMoto                      | Boolean | false    |
 
 ### <a name="PayerAuthenticationEnrolmentCheck"></a>Payer authentication enrolment check
 

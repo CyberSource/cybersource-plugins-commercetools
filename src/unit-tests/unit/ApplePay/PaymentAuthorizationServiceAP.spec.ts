@@ -8,7 +8,7 @@ import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { cart, cardTokens, payment, payments, service, dontSaveTokenFlag } from '../../const/ApplePay/PaymentAuthorizationServiceConstAP';
+import { cart, cardTokens, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/ApplePay/PaymentAuthorizationServiceConstAP';
 import auth from '../../../service/payment/PaymentAuthorizationService';
 
 let paymentResponse = {
@@ -17,7 +17,7 @@ let paymentResponse = {
 };
 
 test.serial('Authorizing a payment and check http code', async (t) => {
-  const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag);
+  const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.is(paymentResponse.httpCode, 201);
@@ -34,7 +34,7 @@ test.serial('Check status for payment authorization ', async (t) => {
 });
 
 test.serial('Authorizing a payment using invalid token and check http code', async (t) => {
-  const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag);
+  const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, 201);

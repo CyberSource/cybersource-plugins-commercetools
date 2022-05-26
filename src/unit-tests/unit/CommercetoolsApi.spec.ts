@@ -5,23 +5,23 @@ import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {anonymousId, customerId, paymentId, startTime, endTime} from '../const/CommercetoolsApiConst';
+import {anonymousId, customerId, paymentId} from '../const/CommercetoolsApiConst';
 import commercetoolsApi  from '../../utils/api/CommercetoolsApi';
 
 
 test.serial('Retrieving cart using customerid ', async(t)=>{
     const result = await commercetoolsApi.retrieveCartByCustomerId(customerId);
-        if(result.count>0)
-        {
-            t.is(result.count, 1);
-            t.is(result.results[0].type, 'Cart');
-            t.is(result.results[0].cartState, 'Active');
-        }
-        else
-        {
-            t.is(result.count, 0);
-            t.is(result.total, 0);
-        }     
+    if(result.count>0)
+    {
+        t.is(result.count, 1);
+        t.is(result.results[0].type, 'Cart');
+        t.is(result.results[0].cartState, 'Active');
+    }
+    else
+    {
+        t.is(result.count, 0);
+        t.is(result.total, 0);
+    }
 })
 
 test.serial('Retrieving cart using paymentid ', async(t)=>{
@@ -85,30 +85,6 @@ test.serial('Retrieving cart by anonymous id ', async(t)=>{
         t.is(result.count, 0);
         t.is(result.total, 0);
     }
-})
-
-test.serial('Retrieve payment by customer id ', async(t)=>{
-    const result = await commercetoolsApi.retrievePaymentByCustomerId(customerId, startTime, endTime);
-    if(result.count>0)
-        {
-        
-            var i=0;
-            if('id' in result.results[0] && 'version' in result.results[0] && 'customer' in result.results[0] && 'paymentMethodInfo' in result.results[0])
-                {
-                    i++;
-                }
-            t.is(i,1);
-         }
-         else{
-             var i =0;
-             if('limit' in result &&'offset' in result && 'count' in result &&'total' in result)
-             {
-                 i++;
-             }
-             t.is(i, 1);
-         }
-        
-       
 })
 
 

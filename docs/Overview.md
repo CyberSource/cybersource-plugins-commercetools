@@ -8,7 +8,7 @@
   - [Cybersource request failures](#Cybersourcerequestfailures)
   - [API Extension errors](#APIExtensionerrors)
 
-The Cybersource Commercetools Plugin is an implementation of the Cybersource Services in typescript, using the cybersource-rest-client node package manager.The plugin allows processing payments registered in
+The Cybersource Commercetools Plugin is an implementation of the Cybersource Services in typescript, using the cybersource-rest-client node package manager.The plugin allows processing of payments registered in
 Commercetools through the Cybersource payment gateway. It is realized by
 the usage of a Typescript application configured as a Payment Create,
 Payment Update API and Customer Update API extensions for a Commercetools project, and interacts

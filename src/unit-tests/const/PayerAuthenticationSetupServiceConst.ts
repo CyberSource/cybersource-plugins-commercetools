@@ -161,7 +161,7 @@ export const paymentSavedTokens  = {
   };
 export const cardTokensObjects = {
     customerTokenId: creditCard.savedTokenId,
-    paymentInstrumentId: null
+    paymentInstrumentId: creditCard.savedToken
   } 
 
 export const cardTokensInvalidCustomerObjects = {

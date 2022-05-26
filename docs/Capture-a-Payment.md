@@ -2,11 +2,11 @@
 
 ## Capture Service Sequence Diagram
 
-![Capture service flow](images/Capture-Flow.svg)
+![Capture service flow](images/Flow-Diagram-Capture-a-Payment.svg)
 
 ## Process
 
-To capture a payment, an Authorization must have been completed. When the Payment Update API Extension receives a payment that contains an INITIAL CHARGE transaction, it will attempt to capture the requested amount on the transaction using the `interactionId` of the existing SUCCESS AUTHORIZATION transaction on the payment.
+To capture a payment, an Authorization must have been completed. When the Payment Update API plugin receives a payment that contains an INITIAL CHARGE transaction, it will attempt to capture the requested amount on the transaction using the `interactionId` of the existing SUCCESS AUTHORIZATION transaction on the payment.
 
 ## Steps
 

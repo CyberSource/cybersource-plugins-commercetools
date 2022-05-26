@@ -11,7 +11,7 @@ This process is required for a few reasons:
 
 ## Implementation
 
-For using Synchronizing services , they might be enabled from the configuration file. See the [API Extension Setup](API-Extension-Setup.md) for more details.
+For using Synchronizing services, they might be enabled from the configuration file. See the [API Extension Setup](API-Extension-Setup.md) for more details.
 
 > **_NOTE:_** These fields are case sensitive
 
@@ -19,19 +19,18 @@ The `run sync` button in plugin UI (<https://{domain_where_plugin_is_hosted}/or
 
 Alternatively, Cron job can be used to run the sync periodically. Below are the endpoints for synchronization:
 
-| Sync service                   | Endpoint                                  | Note                                                                                                  |
-| -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Decision sync                        | {baseUrl}/decisionSync          | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production                                                                                                      |
-| Run sync                        | {baseUrl}/sync          | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production                                                                                                      |
+| Sync service  | Endpoint               | Note                                                                                            |
+| ------------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
+| Decision sync | {baseUrl}/decisionSync | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production |
+| Run sync      | {baseUrl}/sync         | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production |
 
 ## Process
 
 ### Updating Pending Transactions
 
-#### Sequence Diagram 
+#### Sequence Diagram  (Synchronizing Decisions)
 
-TODO
-
+![Synchronizing Decisions](images/Synchronizing-Decisions.svg)
 ### Synchronizing Missing Transactions
 
 #### Sequence Diagram (Synchronizing Missing Transaction)

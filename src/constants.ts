@@ -9,8 +9,11 @@ export abstract class Constants {
   static readonly POST_CUSTOMER_UPDATE = 'postCustomerUpdate';
   static readonly POST_PAYMENT_CREATE = 'postPaymentCreate';
   static readonly POST_PAYMENT_UPDATE = 'postPaymentUpdate';
+  static readonly POST_CONFIGURE_PLUGIN = 'postconfigurePlugin';
 
+  static readonly FUNC_ADD_CUSTOM_TYPES = 'FuncAddCustomTypes';
   static readonly FUNC_ADD_TRANSACTION = 'FuncAddTransaction';
+  static readonly FUNC_ADD_EXTENSIONS = 'FuncAddExtensions';
   static readonly FUNC_APPLE_PAY_SESSION_HANDLER = 'FuncApplePaySessionHandler';
   static readonly FUNC_AUTHORIZATION_HANDLER = 'FuncAuthorizationHandler';
   static readonly FUNC_AUTHORIZATION_RESPONSE = 'FuncAuthorizationResponse';
@@ -22,22 +25,22 @@ export abstract class Constants {
   static readonly FUNC_CREATE_RESPONSE = 'FuncCreateResponse';
   static readonly FUNC_DELETE_CARD_HANDLER = 'FuncDeleteCardHandler';
   static readonly FUNC_DELETE_CUSTOMER_TOKEN = 'FuncDeleteCustomerToken';
-  static readonly FUNC_DELETE_TOKEN = 'FunDeleteToken';
   static readonly FUNC_FAILURE_RESPONSE = 'FuncFailureResponse';
   static readonly FUNC_FIELD_MAPPER = 'FuncFieldMapper';
+  static readonly FUNC_FIELD_MAPPER_NULL = 'FuncFieldMapperNull';
   static readonly FUNC_GET_APPLICATIONS_PRESENT = 'FuncGetApplicationsPresent';
   static readonly FUNC_GET_AUTH_RESPONSE = 'FuncGetAuthResponse';
   static readonly FUNC_GET_CAPTURED_AMOUNT = 'FuncGetCapturedAmount';
-  static readonly FUNC_GET_CARD_WITH_3DS_RESPONSE = 'FuncGetCardWith3dsResponse';
-  static readonly FUNC_GET_CARD_WITHOUT_3DS_RESPONSE = 'FuncGetCardWithout3dsResponse';
+  static readonly FUNC_GET_CREDIT_CARD_RESPONSE = 'FuncGetCreditCardResponse';
   static readonly FUNC_GET_CART_DETAILS_BY_PAYMENT_ID = 'FuncGetCartDetailsByPaymentId';
   static readonly FUNC_GET_CLIENT = 'FuncGetClient';
   static readonly FUNC_GET_CUSTOMER = 'FuncGetCustomer';
   static readonly FUNC_GET_TRANSACTION_SEARCH_RESPONSE = 'FuncGetTransactionSearchResponse';
   static readonly FUNC_GET_ORDERS = 'FuncGetOrders';
-  static readonly FUNC_GET_PAYER_AUTH_ENROLL_AUTH_REVERSAL_HANDLER = 'FuncGetPayerAuthEnrollAuthReversalHandler';
+  static readonly FUNC_GET_PAYER_AUTH_REVERSAL_HANDLER = 'FuncGetPayerAuthReversalHandler';
   static readonly FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE = 'FuncGetPayerAuthEnrollResponse';
   static readonly FUNC_GET_PAYER_AUTH_SETUP_RESPONSE = 'FuncGetPayerAuthSetUpResponse';
+  static readonly FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE = 'FuncGetPayerAuthValidateResponse';
   static readonly FUNC_GET_SERVICE_RESPONSE = 'FuncGetOMServiceResponse';
   static readonly FUNC_GET_VISA_CHECKOUT_DATA = 'FuncGetVisaCheckoutData';
   static readonly FUNC_GOOGLE_PAY_RESPONSE = 'FuncGooglePayResponse';
@@ -67,6 +70,7 @@ export abstract class Constants {
   static readonly FUNC_SYNC_VISA_CARD_DETAILS = 'FuncSyncVisaCardDetails';
   static readonly FUNC_UPDATE_VISA_DETAILS = 'FuncUpdateVisaDetails';
   static readonly FUNC_VISA_CARD_DETAILS_ACTION = 'FuncVisaCardDetailsAction';
+  static readonly FUNC_ADD_TOKEN_RESPONSE = 'FuncAddTokenResponse'
 
   //Numbers
   static readonly VAL_NEGATIVE_ONE = -1;
@@ -92,12 +96,14 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_APPLE_PAY_INITIATIVE = 'web';
   static readonly PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION = '001';
   static readonly PAYMENT_GATEWAY_AUTHENTICATION_TYPE = 'http_signature';
+  static readonly PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION = 'visaCheckout';
   static readonly PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION = 'CONSUMER_AUTHENTICATION';
   static readonly PAYMENT_GATEWAY_DECISION_SKIP = 'DECISION_SKIP';
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
   static readonly PAYMENT_GATEWAY_JWT_FORMAT = 'JWT';
   static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'YBBY8SIG';
+  static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_CREATE = 'TOKEN_CREATE';
@@ -116,6 +122,7 @@ export abstract class Constants {
   static readonly API_STATUS_AUTHORIZED = 'AUTHORIZED';
   static readonly API_STATUS_AUTHORIZED_RISK_DECLINED = 'AUTHORIZED_RISK_DECLINED';
   static readonly API_STATUS_COMPLETED = 'COMPLETED';
+  static readonly API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED = 'CUSTOMER_AUTHENTICATION_REQUIRED';
   static readonly API_STATUS_PENDING = 'PENDING';
   static readonly API_STATUS_PENDING_REVIEW = 'AUTHORIZED_PENDING_REVIEW';
   static readonly API_STATUS_PENDING_AUTHENTICATION = 'PENDING_AUTHENTICATION';
@@ -125,21 +132,23 @@ export abstract class Constants {
 
   //Regex
   static readonly CLICK_TO_PAY_CARD_MASK = 'XXXXXX';
+  static readonly DOMAIN_REGEX = /^[^:/.]*[:/]+/i;
   static readonly REGEX_DOUBLE_SLASH = '//';
   static readonly REGEX_DOT = '.';
+  static readonly REGEX_HYPHEN = '-';
   static readonly STRING_EMPTY = '';
   static readonly STRING_HYPHEN = ' - ';
-  static readonly DOMAIN_REGEX = /^[^:/.]*[:/]+/i;
-  static readonly REGEX_HYPHEN = '-';
+  static readonly STRING_SEMICOLON = ': ';
 
   //Payment methods
   static readonly CREDIT_CARD = 'creditCard';
   static readonly CC_PAYER_AUTHENTICATION = 'creditCardWithPayerAuthentication';
-  static readonly VISA_CHECKOUT = 'visaCheckout';
+  static readonly CLICK_TO_PAY = 'clickToPay';
   static readonly APPLE_PAY = 'applePay';
   static readonly GOOGLE_PAY = 'googlePay';
 
   //Strings
+  static readonly AUTENTICATION_SCHEME = 'Basic ';
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
   static readonly ANONYMOUS_ID = 'anonymousId';
   static readonly CUSTOMER_ID = 'customerId';
@@ -158,9 +167,12 @@ export abstract class Constants {
   static readonly STRING_CARD_EXPIRY_YEAR = 'cardExpiryYear';
   static readonly STRING_CART_STATE = 'Active';
   static readonly STATUS_CODE = 'statusCode';
+  static readonly STRING_CONSUMER_AUTHENTICATION = 'consumerAuthenticationInformation';
   static readonly STRING_CUSTOM = 'custom';
   static readonly STRING_CUSTOMER = 'customer';
+  static readonly STRING_DATA = 'data';
   static readonly STRING_DELETE = 'delete';
+  static readonly STRING_EMAIL = 'email';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
   static readonly STRING_EXPIRATION_MONTH = 'expirationMonth';
   static readonly STRING_EXPIRATION_YEAR = 'expirationYear';
@@ -174,6 +186,7 @@ export abstract class Constants {
   static readonly STRING_PAYMENT_TOKEN = 'paymentToken';
   static readonly STRING_PREFIX = 'prefix';
   static readonly STRING_QUERY = 'query';
+  static readonly STRING_REASON = 'reason';
   static readonly STRING_RESOURCE = 'resource';
   static readonly STRING_RESPONSE = 'response';
   static readonly STRING_RESPONSE_STATUS = 'status';
@@ -189,13 +202,14 @@ export abstract class Constants {
   static readonly STRING_TRANSACTIONS = 'transactions';
   static readonly STRING_TRUE = 'true';
   static readonly STRING_TEXT = 'text';
-  static readonly STRING_PAYER_AUTH_RETURN_URL = '/payerAuthReturnUrl';
   static readonly STRING_UPDATE = 'update';
   static readonly STRING_UPDATED = 'updated';
   static readonly STRING_VALUE = 'value';
   static readonly STRING_VISA = 'visa';
+  static readonly STRING_MOTO = 'MOTO';
 
   static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
+  static readonly ERROR_INFORMATION = 'errorInformation';
   static readonly LOG_ERROR = 'error';
   static readonly LOG_INFO = 'info';
   static readonly TOKEN_INFORMATION = 'tokenInformation';
@@ -226,9 +240,11 @@ export abstract class Constants {
   static readonly ADD_TRANSACTION = 'addTransaction';
   static readonly CHANGE_TRANSACTION_INTERACTION_ID = 'changeTransactionInteractionId';
   static readonly CHANGE_TRANSACTION_STATE = 'changeTransactionState';
+  static readonly CUSTOMER_UPDATE_KEY = 'isv_customer_update_extension';
   static readonly INVALID_OPERATION = 'InvalidOperation';
   static readonly INVALID_INPUT = 'InvalidInput';
   static readonly ISV_ACCEPT_HEADER = 'isv_acceptHeader';
+  static readonly ISV_ADDRESS_ID = 'isv_addressId';
   static readonly ISV_APPLE_PAY_DISPLAY_NAME = 'isv_applePayDisplayName';
   static readonly ISV_APPLE_PAY_VALIDATION_URL = 'isv_applePayValidationUrl';
   static readonly ISV_ACS_URL = 'isv_payerAuthenticationAcsUrl';
@@ -259,6 +275,10 @@ export abstract class Constants {
   static readonly ISV_TOKEN_VERIFICATION_CONTEXT = 'isv_tokenVerificationContext';
   static readonly ISV_TOKENS = 'isv_tokens';
   static readonly ISV_USER_AGENT_HEADER = 'isv_userAgentHeader';
+  static readonly PAYMENT_CREATE_KEY = 'isv_payment_create_extension';
+  static readonly PAYMENT_UPDATE_KEY = 'isv_payment_update_extension';
+  static readonly ISV_SALE_ENABLED = 'isv_saleEnabled';
+  static readonly ISV_ENABLED_MOTO = 'isv_enabledMoto';
   static readonly SET_BILLING_ADDRESS = 'setBillingAddress';
   static readonly SET_CUSTOM_FIELD = 'setCustomField';
   static readonly SET_CUSTOM_TYPE = 'setCustomType';
@@ -272,15 +292,18 @@ export abstract class Constants {
   static readonly SUCCESS_MSG_REFUND_SERVICE = 'Refund is completed successfully';
   static readonly SUCCESS_MSG_REVERSAL_SERVICE = 'Authorization reversal is completed successfully';
   static readonly SUCCESS_MSG_SYNC_SERVICE = 'Successfully updated payment details';
+  static readonly SUCCESS_MSG_SCRIPT_PLUGIN = 'Successfully executed the script';
   static readonly SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS = 'Updated click to pay card details successfully';
 
   //Exception messages
+  static readonly EXCEPTION_MSG_ADD_EXTENSION = 'An exception occurred while adding extension to Commercetools';
   static readonly EXCEPTION_MSG_ADD_TRANSACTION = 'An exception occurred while adding transaction to the payment';
   static readonly EXCEPTION_MSG_AUTHORIZING_PAYMENT = 'An exception occurred while authorizing the payment';
   static readonly EXCEPTION_MSG_CART_UPDATE = 'An exception occurred while updating the cart';
   static readonly EXCEPTION_MSG_CART_DETAILS = 'An exception occurred while fetching cart details';
   static readonly EXCEPTION_MSG_COMMERCETOOLS_CONNECT = 'An exception occurred while connecting to commercetools';
   static readonly EXCEPTION_MSG_CONVERSION_DETAILS = 'An exception occurred while fetching conversion details';
+  static readonly EXCEPTION_MSG_CUSTOM_TYPE = 'An exception occurred while adding custom type to Commercetools';
   static readonly EXCEPTION_MSG_CUSTOMER_UPDATE = 'An exception occurred while updating card tokens to customer';
   static readonly EXCEPTION_MSG_DECISION_SYNC = 'An exception occurred while fetching conversion detail report';
   static readonly EXCEPTION_MSG_FETCH_PAYMENT_DETAILS = 'An exception occurred while fetching payment details';
@@ -303,10 +326,12 @@ export abstract class Constants {
   static readonly ERROR_MSG_CANNOT_PROCESS = 'Unable to process your transaction, please try again';
   static readonly ERROR_MSG_CLICK_TO_PAY_DATA = 'There was an error while fetching click to pay data';
   static readonly ERROR_MSG_COMMERCETOOLS_CONNECT = 'There was an error connecting to Commercetools';
+  static readonly ERROR_MSG_CREATE_CUSTOM_TYPE = 'There was an error creating custom type';
   static readonly ERROR_MSG_CUSTOMER_DETAILS = 'Unable to fetch customer details';
   static readonly ERROR_MSG_EMPTY_CART = 'There is no cart available for the payment';
   static readonly ERROR_MSG_EMPTY_CUSTOM_FIELDS = 'There was an error processing your request';
   static readonly ERROR_MSG_ENABLE_DECISION_SYNC = 'Please enable Decision sync';
+  static readonly ERROR_MSG_CREATE_EXTENSION = 'There was an error creating extension';
   static readonly ERROR_MSG_FETCH_TRANSACTIONS = 'Unable to fetch transactions details';
   static readonly ERROR_MSG_FLEX_TOKEN_KEYS = 'Failed to generate one time key for Flex token';
   static readonly ERROR_MSG_INVALID_CUSTOMER_INPUT = 'Cannot delete the token due to invalid input';
@@ -333,4 +358,965 @@ export abstract class Constants {
   static readonly ERROR_MSG_TOKEN_UPDATE = 'Failed to update card tokens';
   static readonly ERROR_MSG_UPDATE_CART = 'Unable to update the cart';
   static readonly ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA = 'Unable to update click to pay card details';
+
+  //script data
+  static readonly PAYMENT_CREATE_DESTINATION_URL = '/api/extension/payment/create';
+  static readonly PAYMENT_UPDATE_DESTINATION_URL = '/api/extension/payment/update';
+  static readonly CUSTOMER_CREATE_DESTINATION_URL = '/api/extension/customer/update';
+  static readonly ISV_PAYMENT_CUSTOM_TYPE_DATA = {
+    key: 'isv_payment_data',
+    name: {
+      en: 'ISV payment service custom payment fields',
+    },
+    resourceTypeIds: ['payment'],
+    fieldDefinitions: [
+      {
+        name: 'isv_token',
+        label: {
+          en: 'Token',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenAlias',
+        label: {
+          en: 'Save token with alias',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_savedToken',
+        label: {
+          en: 'Saved token (subscription)',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenVerificationContext',
+        label: {
+          en: 'Token verification context',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenCaptureContextSignature',
+        label: {
+          en: 'Token capture context signature',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardType',
+        label: {
+          en: 'Card type',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_maskedPan',
+        label: {
+          en: 'Masked card number',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardExpiryMonth',
+        label: {
+          en: 'Card expiry month',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardExpiryYear',
+        label: {
+          en: 'Card expiry year',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_requestJwt',
+        label: {
+          en: '3DSecure JWT sent to Cardinal',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_responseJwt',
+        label: {
+          en: '3DSecure JWT received from Cardinal',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_payerAuthenticationRequired',
+        label: {
+          en: 'Flag indicating 3DSecure authentication is required',
+        },
+        required: false,
+        type: {
+          name: 'Boolean',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_payerAuthenticationTransactionId',
+        label: {
+          en: '3DSecure transaction id',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_payerAuthenticationAcsUrl',
+        label: {
+          en: '3DSecure ACS URL',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_payerAuthenticationPaReq',
+        label: {
+          en: '3DSecure PAReq',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardinalReferenceId',
+        label: {
+          en: 'Reference id used for enrollment check',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_deviceDataCollectionUrl',
+        label: {
+          en: 'Device Data Collection URL for payer auth setup',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_stepUpUrl',
+        label: {
+          en: 'Step Up URL for enrollment check',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_payerEnrollTransactionId',
+        label: {
+          en: '3DSecure payer authentication enroll transaction id',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_payerEnrollStatus',
+        label: {
+          en: 'Status of payer auth enroll check call',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_payerEnrollHttpCode',
+        label: {
+          en: 'Http code of payer auth enroll check call',
+        },
+        required: false,
+        type: {
+          name: 'Number',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_acceptHeader',
+        label: {
+          en: 'Value of accept header from browser',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_userAgentHeader',
+        label: {
+          en: 'Value of user agent header from browser',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_deviceFingerprintId',
+        label: {
+          en: 'Session id used for device fingerprinting',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_customerIpAddress',
+        label: {
+          en: 'Customer IP address',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_applePayValidationUrl',
+        label: {
+          en: 'Validation URL for Apple pay session',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_applePayDisplayName',
+        label: {
+          en: 'Display name for Apple pay',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_applePaySessionData',
+        label: {
+          en: 'Session data for session',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_saleEnabled',
+        label: {
+          en: 'Flag indicating sale transaction',
+        },
+        required: false,
+        type: {
+          name: 'Boolean',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_enabledMoto',
+        label: {
+          en: 'Flag indicating MOTO transaction',
+        },
+        required: false,
+        type: {
+          name: 'Boolean',
+        },
+        inputHint: 'SingleLine',
+      },
+    ],
+  };
+  static readonly ISV_PAYMENT_CUSTOM_TYPE_CUSTOMER_TOKENS = {
+    key: 'isv_payments_customer_tokens',
+    name: {
+      en: 'Payment service customer tokens',
+    },
+    resourceTypeIds: ['customer'],
+    fieldDefinitions: [
+      {
+        name: 'isv_tokens',
+        label: {
+          en: 'Payment service card tokens',
+        },
+        required: false,
+        type: {
+          name: 'Set',
+          elementType: {
+            name: 'String',
+          },
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_token',
+        label: {
+          en: 'Token',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenAlias',
+        label: {
+          en: 'Save token with alias',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_savedToken',
+        label: {
+          en: 'Saved token (subscription)',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenVerificationContext',
+        label: {
+          en: 'Token verification context',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenCaptureContextSignature',
+        label: {
+          en: 'Token capture context signature',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardType',
+        label: {
+          en: 'Card type',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_maskedPan',
+        label: {
+          en: 'Masked card number',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardExpiryMonth',
+        label: {
+          en: 'Card expiry month',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardExpiryYear',
+        label: {
+          en: 'Card expiry year',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_addressId',
+        label: {
+          en: 'Address Id',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_deviceFingerprintId',
+        label: {
+          en: 'Session id used for device fingerprinting',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardNewExpiryMonth',
+        label: {
+          en: 'Card new expiry month to be updated',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_cardNewExpiryYear',
+        label: {
+          en: 'Card new expiry year to be updated',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenUpdated',
+        label: {
+          en: 'Flag indicating token is updated',
+        },
+        required: false,
+        type: {
+          name: 'Boolean',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_tokenAction',
+        label: {
+          en: 'Action to trigger update or delete token',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+    ],
+  };
+  static readonly ISV_PAYMENT_CUSTOM_TYPE_PAYER_AUTHENTICATION_ENROLMENT_CHECK = {
+    key: 'isv_payments_payer_authentication_enrolment_check',
+    name: {
+      en: 'ISV payment service interaction for payer authentication enrolment check',
+    },
+    resourceTypeIds: ['payment-interface-interaction'],
+    fieldDefinitions: [
+      {
+        name: 'cardinalReferenceId',
+        label: {
+          en: 'Reference id used for enrolment check',
+        },
+        required: true,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'authenticationRequired',
+        label: {
+          en: 'User needs to authenticate',
+        },
+        required: true,
+        type: {
+          name: 'Boolean',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'authorizationAllowed',
+        label: {
+          en: 'Payment can be authorized',
+        },
+        required: true,
+        type: {
+          name: 'Boolean',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'authenticationTransactionId',
+        label: {
+          en: '3D Secure authentication transaction id',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'paReq',
+        label: {
+          en: '3D Secure paReq value',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'acsUrl',
+        label: {
+          en: '3D Secure ACS URL',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'xid',
+        label: {
+          en: '3D Secure Transaction id',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'proofXml',
+        label: {
+          en: '3D Secure Proof XML',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'specificationVersion',
+        label: {
+          en: '3D Secure Specification Version',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'directoryServerTransactionId',
+        label: {
+          en: '3D Secure Directory Server Transaction id',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'veresEnrolled',
+        label: {
+          en: '3D Secure Enrolment Check Result',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'commerceIndicator',
+        label: {
+          en: '3D Secure Commerce Indicator',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'eci',
+        label: {
+          en: '3D Secure Electronic Commerce Indicator',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+    ],
+  };
+  static readonly ISV_PAYMENT_CUSTOM_TYPE_PAYER_AUTHENTICATION_VALIDATE_RESULT = {
+    key: 'isv_payments_payer_authentication_validate_result',
+    name: {
+      en: 'ISV payment service interaction for result of payer auth validate call',
+    },
+    resourceTypeIds: ['payment-interface-interaction'],
+    fieldDefinitions: [
+      {
+        name: 'authenticationResult',
+        label: {
+          en: 'Result of authentication call',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'authenticationStatusMessage',
+        label: {
+          en: 'Description of result of authentication call',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'ucafCollectionIndicator',
+        label: {
+          en: 'Collection indicator',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'ucafAuthenticationData',
+        label: {
+          en: 'AAV',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'cavv',
+        label: {
+          en: 'CAVV',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'cavvAlgorithm',
+        label: {
+          en: 'CAVV algorithm',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'xid',
+        label: {
+          en: 'XID',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'specificationVersion',
+        label: {
+          en: 'Specification Version',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'directoryServerTransactionId',
+        label: {
+          en: 'Directory server transaction id',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'commerceIndicator',
+        label: {
+          en: 'Commerce indicator',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'eci',
+        label: {
+          en: 'Electronic commerce indicator',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'eciRaw',
+        label: {
+          en: 'Electronic commerce indicator (raw)',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'paresStatus',
+        label: {
+          en: 'paRes Status',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+    ],
+  };
+  static readonly ISV_PAYMENT_CUSTOM_TYPE_ERROR = {
+    key: 'isv_payment_error',
+    name: {
+      en: 'Created when the payment service throws an unhandled exception',
+    },
+    resourceTypeIds: ['payment-interface-interaction'],
+    fieldDefinitions: [
+      {
+        name: 'reason',
+        label: {
+          en: 'Reason',
+        },
+        required: true,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'transactionId',
+        label: {
+          en: 'Transaction ID',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+    ],
+  };
+  static readonly ISV_PAYMENT_CUSTOM_TYPE_FAILURE = {
+    key: 'isv_payment_failure',
+    name: {
+      en: 'Interaction for a payment that been rejected or has failed in payment service',
+    },
+    resourceTypeIds: ['payment-interface-interaction'],
+    fieldDefinitions: [
+      {
+        name: 'reasonCode',
+        label: {
+          en: 'Reason Code',
+        },
+        required: true,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'transactionId',
+        label: {
+          en: 'Transaction ID',
+        },
+        required: true,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+    ],
+  };
+  static readonly CUSTOM_TYPES = [
+    Constants.ISV_PAYMENT_CUSTOM_TYPE_DATA,
+    Constants.ISV_PAYMENT_CUSTOM_TYPE_CUSTOMER_TOKENS,
+    Constants.ISV_PAYMENT_CUSTOM_TYPE_PAYER_AUTHENTICATION_ENROLMENT_CHECK,
+    Constants.ISV_PAYMENT_CUSTOM_TYPE_PAYER_AUTHENTICATION_VALIDATE_RESULT,
+    Constants.ISV_PAYMENT_CUSTOM_TYPE_ERROR,
+    Constants.ISV_PAYMENT_CUSTOM_TYPE_FAILURE,
+  ];
+  static readonly PAYMENT_CREATE_EXTENSION = {
+    destination: {
+      type: 'HTTP',
+      url: '',
+      authentication: {
+        type: 'AuthorizationHeader',
+        headerValue: '',
+      },
+    },
+    triggers: [
+      {
+        resourceTypeId: 'payment',
+        actions: ['Create'],
+      },
+    ],
+    timeoutInMs: 10000,
+    key: 'isv_payment_create_extension',
+  };
+  static readonly PAYMENT_UPDATE_EXTENSION = {
+    destination: {
+      type: 'HTTP',
+      url: '',
+      authentication: {
+        type: 'AuthorizationHeader',
+        headerValue: '',
+      },
+    },
+    triggers: [
+      {
+        resourceTypeId: 'payment',
+        actions: ['Update'],
+      },
+    ],
+    timeoutInMs: 10000,
+    key: 'isv_payment_update_extension',
+  };
+  static readonly CUSTOMER_UPDATE_EXTENSION = {
+    destination: {
+      type: 'HTTP',
+      url: '',
+      authentication: {
+        type: 'AuthorizationHeader',
+        headerValue: '',
+      },
+    },
+    triggers: [
+      {
+        resourceTypeId: 'customer',
+        actions: ['Update'],
+      },
+    ],
+    timeoutInMs: 3000,
+    key: 'isv_customer_update_extension',
+  };
+  static readonly ISV_PAYMENT_EXTENSIONS = [Constants.PAYMENT_CREATE_EXTENSION, Constants.PAYMENT_UPDATE_EXTENSION, Constants.CUSTOMER_UPDATE_EXTENSION];
 }

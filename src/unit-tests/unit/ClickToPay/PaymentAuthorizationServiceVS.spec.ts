@@ -4,7 +4,7 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 
-import { cardTokens, cart, payment, payments, service, dontSaveTokenFlag } from '../../const/ClickToPay/PaymentAuthorizationServiceVsConst';
+import { cardTokens, cart, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/ClickToPay/PaymentAuthorizationServiceVsConst';
 import auth from '../../../service/payment/PaymentAuthorizationService';
 dotenv.config();
 
@@ -15,7 +15,7 @@ let paymentResponse = {
 };
 
 test.serial('Authorizing a payment and check http code', async (t) => {
-  const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag);
+  const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.is(paymentResponse.httpCode, 201);
@@ -32,7 +32,7 @@ test.serial('Check status of payment authorization', async (t) => {
 });
 
 test.serial('Authorizing a payment using invalid token', async (t) => {
-  const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag);
+  const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, 201);

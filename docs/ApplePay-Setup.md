@@ -27,4 +27,4 @@ See the [Apple Pay JS API](https://developer.apple.com/documentation/apple_pay_
 
 See the [PassKit (Apple Pay and Wallet)](https://developer.apple.com/documentation/passkit) document from the Apple Pay developer center to setup Apple Pay in your App.
 
-Once the Apple Pay is setup and you are receiving an Apple Pay Payment Token, you can continue to the [Authorize a Payment (Apple Pay)](Authorize-a-Payment-ApplePay.md) process.
+Once the Apple Pay is setup and you are receiving an Apple Pay Payment Token, you can continue to the [Process a Payment (Apple Pay)](Process-a-Payment-ApplePay.md) process.

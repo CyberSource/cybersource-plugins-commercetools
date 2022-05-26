@@ -13,40 +13,15 @@
 
 The API Extension and the Synchronization Service require an API key which will be used throughout the payments process. The scopes required for this API key are:
 
-<table>
-<thead>
-<tr class="header">
-<th>Scope</th>
-<th>Reason</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>manage_payments</td>
-<td><p>This is used for adding and updating transactions during synchronization process</p></td>
-</tr>
-<tr class="even">
-<td>manage_orders</td>
-<td><p>This is used for:</p>
-<ul>
-<li>Updating the cart with Billing and Shipping addresses while using Visa Click to Pay</li>
-<li>Extracting line item data from the cart to send while using Decision Manager</li>
-</ul></td>
-</tr>
-<tr class="odd">
-<td>view_types</td>
-<td>This is used to get the id of the custom payment and payment interface interaction types on API Extension startup</td>
-</tr>
-<tr class="even">
-<td>view_customer</td>
-<td>This is used for viewing the customer created and dealing with their custom data</td>
-</tr>
-<tr class="odd">
-<td>manage_customers</td>
-<td>This is used for managing the customer. It is required for creating and updating the customer </td>
-</tr>
-</tbody>
-</table>
+| Scope             | Reason                                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| manage_payments   | This is used for adding and updating transactions during synchronization process                                                                                                                             |
+| manage_orders     | This is used for <ul> <li>Updating the cart with Billing and Shipping addresses while using Visa Click to Pay</li><li>Extracting line item data from the cart to send while using Decision Manager</li></ul> |
+| view_types        | This is used to get the id of the custom payment and payment interface interaction types on API Extension startup                                                                                            |
+| view_customer     | This is used for viewing the customer created and dealing with their custom data                                                                                                                             |
+| manage_customers  | This is used for managing the customer. It is required for creating and updating the customer                                                                                                                |
+| manage_types      | This is used for creating custom types required to process payments and tokens                                                                                                                               |
+| manage_extensions | This is used for extending payment create, update and customer update APIs                                                                                                                                   |
 
 ## <a name="FrontendAPIKey"></a>Frontend API Key
 
@@ -62,8 +37,6 @@ To be used for frontend applications in order to create and manage payments and 
 | manage_my_orders        | Adding Payments to an Order                                                                    |
 | manage_my_profile       | Access to the current customers profile so it can be associated with the Payment and Order     |
 | create_anonymous_token  | (optional) If you are using the key to control the customers session                           |
-
-## <a name="APIKeysforCustomData"></a>API Keys for Custom Data
 
 # <a name="Cybersource"></a>Cybersource
 

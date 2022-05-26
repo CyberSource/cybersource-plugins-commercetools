@@ -271,7 +271,7 @@
         <% if(authPresent && !capturePresent && !authReversalPresent && !refundPresent){ %>
         <a class="button" id="capture" href="/capture?id=<%=id%>" role="button" onclick="showDiv()">Capture </a>
         <a class="button" id="auth" href="/authreversal?id=<%=id%>" role="button" onclick="showDiv()">Reverse </a>
-        <% } if(capturePresent && authPresent && !authReversalPresent &&((refundPresent && captureAmount) || (!refundPresent && captureAmount))){ %>
+        <% } if(capturePresent && !authReversalPresent &&((refundPresent && captureAmount) || (!refundPresent && captureAmount))){ %>
         <div class="div-padding">You can refund amount <%= captureAmount%></div>
         <form action="/refund" class="div-padding" id="refundForm">
           <input type="hidden" name="refundId" id="refundId" value="<%=id%>" />

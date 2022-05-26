@@ -64,329 +64,248 @@ export const payment =
   }
 
 
-export const cart = {
-    "limit": 20,
-    "offset": 0,
-    "count": 1,
-    "total": 1,
-    "results": [
-      {
-        "type": "Cart",
-        "id": "ecddb55a-646d-4120-a8b8-9f900476dfe5",
-        "version": 20,
-        "lastMessageSequenceNumber": 1,
-        "createdAt": "2022-04-11T08:33:23.168Z",
-        "lastModifiedAt": "2022-04-11T08:34:17.468Z",
-        "lastModifiedBy": {
-          "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
-          "isPlatformClient": false,
-          "customer": {
-            "typeId": "customer",
-            "id": "def6c669-eed5-4c57-ba2e-5fb04bfed1fa"
-          }
-        },
-        "createdBy": {
-          "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
-          "isPlatformClient": false,
-          "customer": {
-            "typeId": "customer",
-            "id": "def6c669-eed5-4c57-ba2e-5fb04bfed1fa"
-          }
-        },
-        "customerId": "def6c669-eed5-4c57-ba2e-5fb04bfed1fa",
-        "locale": "en-US",
-        "lineItems": [
-          {
-            "id": "72dd04a7-918e-40d8-be33-1c4de9bfcdbd",
-            "productId": "7e3ccfc6-36ee-4995-ab1d-bb5095b08bbe",
-            "name": {
-              "en": "Sherwani"
+export const cart = 
+{
+    "type":"Cart",
+    "id":"3e6cdfa7-2ad0-4261-9135-e4d0a8ed6a9c",
+    "version":11,
+    "lastMessageSequenceNumber":1,
+    "createdAt":"2021-12-22T07:46:20.541Z",
+    "lastModifiedAt":"2021-12-22T07:46:58.887Z",
+    "lastModifiedBy":
+    {
+        "clientId":"iFOAd29Lew5ADrpakIhQkz_N",
+        "isPlatformClient":false,
+        "customer":
+        {
+            "typeId":"customer",
+            "id":"88c278f9-82d9-427c-96df-f98a4f23e543"
+        }
+    },
+    "createdBy":
+    {
+        "clientId":"iFOAd29Lew5ADrpakIhQkz_N",
+        "isPlatformClient":false,
+        "customer":
+        {
+            "typeId":"customer",
+            "id":"88c278f9-82d9-427c-96df-f98a4f23e543"
+        }
+    },
+    "customerId":"88c278f9-82d9-427c-96df-f98a4f23e543",
+    "lineItems":
+    [
+        {
+            "id":"213df455-eae9-4cbc-8dca-c3340dafbcc7",
+            "productId":"7e3ccfc6-36ee-4995-ab1d-bb5095b08bbe",
+            "name":
+            {
+                "en":"Sherwani"
             },
-            "productType": {
-              "typeId": "product-type",
-              "id": "31d56c4e-d578-4dab-a313-780b5f1e7556",
-              "version": 1
+            "productType":
+            {
+                "typeId":"product-type",
+                "id":"31d56c4e-d578-4dab-a313-780b5f1e7556",
+                "version":1
             },
-            "productSlug": {
-              "en": "a1"
+            "productSlug":
+            {
+                "en":"a1"
             },
-            "variant": {
-              "id": 1,
-              "sku": "SKU-1",
-              "prices": [
-                {
-                  "id": "1fbaed84-99cc-4922-9776-c1ea3cd553e6",
-                  "value": {
-                    "type": "centPrecision",
-                    "currencyCode": "EUR",
-                    "centAmount": 15845,
-                    "fractionDigits": 2
-                  },
-                  "country": "US",
-                  "discounted": {
-                    "value": {
-                      "type": "centPrecision",
-                      "currencyCode": "EUR",
-                      "centAmount": 7922,
-                      "fractionDigits": 2
+            "variant":
+            {
+                "id":1,
+                "sku":"SKU-1",
+                "prices":
+                [
+                    {
+                        "value":
+                        {
+                            "type":"centPrecision",
+                            "currencyCode":"EUR",
+                            "centAmount":15845,
+                            "fractionDigits":2
+                        },
+                        "id":"1fbaed84-99cc-4922-9776-c1ea3cd553e6",
+                        "country":"US"
                     },
-                    "discount": {
-                      "typeId": "product-discount",
-                      "id": "9360ab21-ba82-4dca-8c39-ae0577547c8e"
+                    {
+                        "value":
+                        {
+                            "type":"centPrecision",
+                            "currencyCode":"USD",
+                            "centAmount":5980,
+                            "fractionDigits":2
+                        },
+                        "id":"68018b50-2c8a-4304-b67a-ae15389be32d",
+                        "country":"US"
                     }
-                  }
-                },
+                ],
+                "images":
+                [
+                    {
+                        "url":"https://ik.imagekit.io/ldqsn9vvwgg/images/505833.jpg",
+                        "dimensions":
+                        {
+                            "w":300,
+                            "h":375
+                        }
+                    }
+                ],
+                "attributes":[],
+                "assets":[]
+            },
+            "price":
+            {
+                "value":
                 {
-                  "id": "68018b50-2c8a-4304-b67a-ae15389be32d",
-                  "value": {
-                    "type": "centPrecision",
-                    "currencyCode": "USD",
-                    "centAmount": 5980,
-                    "fractionDigits": 2
-                  },
-                  "country": "US",
-                  "discounted": {
-                    "value": {
-                      "type": "centPrecision",
-                      "currencyCode": "USD",
-                      "centAmount": 2990,
-                      "fractionDigits": 2
+                    "type":"centPrecision",
+                    "currencyCode":"USD",
+                    "centAmount":5980,
+                    "fractionDigits":2
+                },
+                "id":"68018b50-2c8a-4304-b67a-ae15389be32d",
+                "country":"US"
+            },
+            "quantity":1,
+            "discountedPricePerQuantity":[],
+            "taxRate":
+            {
+                "name":"test-tax-category",
+                "amount":0.2,
+                "includedInPrice":true,
+                "country":"US",
+                "id":"HxMyojUT",
+                "subRates":[]
+            },
+            "addedAt":"2021-12-22T07:46:20.849Z",
+            "lastModifiedAt":"2021-12-22T07:46:20.849Z",
+            "state":
+            [
+                {
+                    "quantity":1,
+                    "state":
+                    {
+                        "typeId":"state",
+                        "id":"438c0901-36c4-41ec-9a86-2853d6c73d0d"
+                    }
+                }],
+                "priceMode":"Platform",
+                "totalPrice":
+                {
+                    "type":"centPrecision",
+                    "currencyCode":"USD",
+                    "centAmount":5980,
+                    "fractionDigits":2
+                },
+                "taxedPrice":
+                {
+                    "totalNet":
+                    {
+                        "type":"centPrecision",
+                        "currencyCode":"USD",
+                        "centAmount":4983,
+                        "fractionDigits":2
                     },
-                    "discount": {
-                      "typeId": "product-discount",
-                      "id": "9360ab21-ba82-4dca-8c39-ae0577547c8e"
+                    "totalGross":
+                    {
+                        "type":"centPrecision",
+                        "currencyCode":"USD",
+                        "centAmount":5980,
+                        "fractionDigits":2
                     }
-                  }
-                }
-              ],
-              "images": [
-                {
-                  "url": "https://ik.imagekit.io/ldqsn9vvwgg/images/505833.jpg",
-                  "dimensions": {
-                    "w": 300,
-                    "h": 375
-                  }
-                }
-              ],
-              "attributes": [],
-              "assets": []
-            },
-            "price": {
-              "id": "68018b50-2c8a-4304-b67a-ae15389be32d",
-              "value": {
-                "type": "centPrecision",
-                "currencyCode": "USD",
-                "centAmount": 5980,
-                "fractionDigits": 2
-              },
-              "country": "US",
-              "discounted": {
-                "value": {
-                  "type": "centPrecision",
-                  "currencyCode": "USD",
-                  "centAmount": 2990,
-                  "fractionDigits": 2
                 },
-                "discount": {
-                  "typeId": "product-discount",
-                  "id": "9360ab21-ba82-4dca-8c39-ae0577547c8e"
-                }
-              }
-            },
-            "quantity": 1,
-            "discountedPricePerQuantity": [],
-            "taxRate": {
-              "name": "test-tax-category",
-              "amount": 0.2,
-              "includedInPrice": true,
-              "country": "US",
-              "id": "HxMyojUT",
-              "subRates": []
-            },
-            "addedAt": "2022-04-11T08:33:23.498Z",
-            "lastModifiedAt": "2022-04-11T08:33:23.498Z",
-            "state": [
-              {
-                "quantity": 1,
-                "state": {
-                  "typeId": "state",
-                  "id": "438c0901-36c4-41ec-9a86-2853d6c73d0d"
-                }
-              }
-            ],
-            "priceMode": "Platform",
-            "totalPrice": {
-              "type": "centPrecision",
-              "currencyCode": "USD",
-              "centAmount": 2990,
-              "fractionDigits": 2
-            },
-            "taxedPrice": {
-              "totalNet": {
-                "type": "centPrecision",
-                "currencyCode": "USD",
-                "centAmount": 2492,
-                "fractionDigits": 2
-              },
-              "totalGross": {
-                "type": "centPrecision",
-                "currencyCode": "USD",
-                "centAmount": 2990,
-                "fractionDigits": 2
-              },
-              "totalTax": {
-                "type": "centPrecision",
-                "currencyCode": "USD",
-                "centAmount": 498,
-                "fractionDigits": 2
-              }
-            },
-            "lineItemMode": "Standard"
-          }
+                "lineItemMode":"Standard"
+            }
         ],
-        "cartState": "Ordered",
-        "totalPrice": {
-          "type": "centPrecision",
-          "currencyCode": "USD",
-          "centAmount": 3980,
-          "fractionDigits": 2
+        "cartState":"Ordered",
+        "totalPrice":
+        {
+            "type":"centPrecision",
+            "currencyCode":"USD",
+            "centAmount":5980,
+            "fractionDigits":2
         },
-        "taxedPrice": {
-          "totalNet": {
-            "type": "centPrecision",
-            "currencyCode": "USD",
-            "centAmount": 3317,
-            "fractionDigits": 2
-          },
-          "totalGross": {
-            "type": "centPrecision",
-            "currencyCode": "USD",
-            "centAmount": 3980,
-            "fractionDigits": 2
-          },
-          "taxPortions": [
+        "taxedPrice":
+        {
+            "totalNet":
             {
-              "rate": 0.2,
-              "amount": {
-                "type": "centPrecision",
-                "currencyCode": "USD",
-                "centAmount": 663,
-                "fractionDigits": 2
-              },
-              "name": "test-tax-category"
-            }
-          ],
-          "totalTax": {
-            "type": "centPrecision",
-            "currencyCode": "USD",
-            "centAmount": 663,
-            "fractionDigits": 2
-          }
-        },
-        "country": "US",
-        "shippingInfo": {
-          "shippingMethodName": "UHL",
-          "price": {
-            "type": "centPrecision",
-            "currencyCode": "USD",
-            "centAmount": 990,
-            "fractionDigits": 2
-          },
-          "shippingRate": {
-            "price": {
-              "type": "centPrecision",
-              "currencyCode": "USD",
-              "centAmount": 990,
-              "fractionDigits": 2
+                "type":"centPrecision",
+                "currencyCode":"USD",
+                "centAmount":4983,
+                "fractionDigits":2
             },
-            "tiers": []
-          },
-          "taxRate": {
-            "name": "test-tax-category",
-            "amount": 0.2,
-            "includedInPrice": true,
-            "country": "US",
-            "id": "HxMyojUT",
-            "subRates": []
-          },
-          "taxCategory": {
-            "typeId": "tax-category",
-            "id": "44e3081f-e822-44cc-918a-e79240a7284f"
-          },
-          "deliveries": [],
-          "shippingMethod": {
-            "typeId": "shipping-method",
-            "id": "d7a87341-36bb-4fe2-96a9-5d5d1eada503"
-          },
-          "taxedPrice": {
-            "totalNet": {
-              "type": "centPrecision",
-              "currencyCode": "USD",
-              "centAmount": 825,
-              "fractionDigits": 2
-            },
-            "totalGross": {
-              "type": "centPrecision",
-              "currencyCode": "USD",
-              "centAmount": 990,
-              "fractionDigits": 2
-            },
-            "totalTax": {
-              "type": "centPrecision",
-              "currencyCode": "USD",
-              "centAmount": 165,
-              "fractionDigits": 2
-            }
-          },
-          "shippingMethodState": "MatchesCart"
-        },
-        "customLineItems": [],
-        "discountCodes": [],
-        "directDiscounts": [],
-        "paymentInfo": {
-          "payments": [
+            "totalGross":
             {
-              "typeId": "payment",
-              "id": "029bd8ed-ea47-480f-8bd0-959c1805604d"
-            }
-          ]
+                "type":"centPrecision",
+                "currencyCode":"USD",
+                "centAmount":5980,
+                "fractionDigits":2
+            },
+            "taxPortions":
+            [
+                {
+                    "rate":0.2,
+                    "amount":
+                    {
+                        "type":"centPrecision",
+                        "currencyCode":"USD",
+                        "centAmount":997,
+                        "fractionDigits":2
+                    },
+                    "name":"test-tax-category"
+                }
+            ]
         },
-        "inventoryMode": "None",
-        "taxMode": "Platform",
-        "taxRoundingMode": "HalfEven",
-        "taxCalculationMode": "LineItemLevel",
-        "deleteDaysAfterLastModification": 90,
-        "refusedGifts": [],
-        "origin": "Customer",
-        "shippingAddress": {
-          "firstName": "shakshi",
-          "lastName": "poddar",
-          "streetName": "1295 Charleston Road",
-          "additionalStreetInfo": "5th lane",
-          "postalCode": "94043",
-          "city": "Mountain View",
-          "region": "CA",
-          "country": "US",
-          "phone": "9876543210",
-          "email": "shakshi.poddar@wipro.com"
+        "country":"US",
+        "customLineItems":[],
+        "discountCodes":[],
+        "paymentInfo":
+        {
+            "payments":
+            [
+                {
+                    "typeId":"payment",
+                    "id":"6b3158a4-6c72-403e-bda1-48d95367cb02"
+                }
+            ]
         },
-        "billingAddress": {
-          "firstName": "shakshi",
-          "lastName": "poddar",
-          "streetName": "1295 Charleston Road",
-          "additionalStreetInfo": "5th lane",
-          "postalCode": "94043",
-          "city": "Mountain View",
-          "region": "CA",
-          "country": "US",
-          "phone": "9876543210",
-          "email": "shakshi.poddar@wipro.com"
+        "inventoryMode":"None",
+        "taxMode":"Platform",
+        "taxRoundingMode":"HalfEven",
+        "taxCalculationMode":"LineItemLevel",
+        "deleteDaysAfterLastModification":90,
+        "refusedGifts":[],
+        "origin":"Customer",
+        "shippingAddress":
+        {
+            "firstName":"shakshi",
+            "lastName":"poddar",
+            "streetName":"1295 Charleston Road",
+            "additionalStreetInfo":"5th lane",
+            "postalCode":"94043",
+            "city":"Mountain View",
+            "region":"CA",
+            "country":"US",
+            "phone":"08808906634",
+            "email":"shakshi.poddar@wipro.com"
         },
-        "itemShippingAddresses": [],
-        "totalLineItemQuantity": 1
-      }
-    ]
-  }
+        "billingAddress":
+        {
+            "firstName":"shakshi",
+            "lastName":"poddar",
+            "streetName":"1295 Charleston Road",
+            "additionalStreetInfo":"5th lane",
+            "postalCode":"94043",
+            "city":"Mountain View",
+            "region":"CA",
+            "country":"US",
+            "phone":"08808906634",
+            "email":"shakshi.poddar@wipro.com"
+        },
+        "itemShippingAddresses":[]
+    }
+
 export const authReversalId= applePay.authReversalId
 
 export const  authReversalID = '64311367635468863039'

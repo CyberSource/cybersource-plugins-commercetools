@@ -7,7 +7,7 @@ import { createClient } from '@commercetools/sdk-client';
 import { Constants } from '../../constants';
 import paymentService from './../PaymentService';
 
-function getClient() {
+const getClient = () => {
   let client: any;
   let projectKey: any;
   let authMiddleware: any;
@@ -43,7 +43,7 @@ function getClient() {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CLIENT, Constants.LOG_ERROR, exceptionData);
   }
   return client;
-}
+};
 
 const retrieveCartByAnonymousId = async (anonymousId) => {
   let anonymousIdResponse: any;
@@ -363,12 +363,14 @@ const getOrders = async () => {
   return orderResponse;
 };
 
-const updateCartByPaymentId = async (cartId, cartVersion, visaCheckoutData) => {
+const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckoutData) => {
   let orderResponse: any;
   let client: any;
   let requestBuilder: any;
   let channelsRequest: any;
   let exceptionData: any;
+  let cartData: any;
+  let shippingEmail: any;
   let uri: string;
   let actions = [] as any;
   try {
@@ -391,6 +393,12 @@ const updateCartByPaymentId = async (cartId, cartVersion, visaCheckoutData) => {
         });
       }
       if (null != visaCheckoutData.shipToFieldGroup && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup).length) {
+        if (visaCheckoutData.shipToFieldGroup.hasOwnProperty(Constants.STRING_EMAIL) === true && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup.email).length) {
+          shippingEmail = visaCheckoutData.shipToFieldGroup.email;
+        } else {
+          cartData = await retrieveCartByPaymentId(paymentId);
+          shippingEmail = cartData.results[Constants.VAL_ZERO].shippingAddress.email;
+        }
         actions.push({
           action: Constants.SET_SHIPPING_ADDRESS,
           address: {
@@ -403,7 +411,7 @@ const updateCartByPaymentId = async (cartId, cartVersion, visaCheckoutData) => {
             region: visaCheckoutData.shipToFieldGroup.administrativeArea,
             country: visaCheckoutData.shipToFieldGroup.country,
             phone: visaCheckoutData.shipToFieldGroup.phoneNumber,
-            email: visaCheckoutData.shipToFieldGroup.email,
+            email: shippingEmail,
           },
         });
       }
@@ -811,6 +819,70 @@ const syncAddTransaction = async (syncUpdateObject) => {
   return syncAddTransactionResponse;
 };
 
+const addCustomTypes = async (customType) => {
+  let customeTypeResponse: any;
+  let exceptionData: any;
+  try {
+    const client = getClient();
+    if (null != client) {
+      const requestBuilder = createRequestBuilder({
+        projectKey: process.env.CT_PROJECT_KEY,
+      });
+      const uri = requestBuilder.types.build();
+      const channelsRequest = {
+        uri: uri,
+        method: Constants.HTTP_METHOD_POST,
+        body: JSON.stringify(customType),
+      };
+      customeTypeResponse = await client.execute(channelsRequest);
+    } else {
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + customType.key + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + customType.key + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + customType.key + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, exceptionData);
+  }
+  return customeTypeResponse;
+};
+
+const addExtensions = async (extension) => {
+  let customeTypeResponse: any;
+  let exceptionData: any;
+  try {
+    const client = getClient();
+    if (null != client) {
+      const requestBuilder = createRequestBuilder({
+        projectKey: process.env.CT_PROJECT_KEY,
+      });
+      const uri = requestBuilder.extensions.build();
+      const channelsRequest = {
+        uri: uri,
+        method: Constants.HTTP_METHOD_POST,
+        body: JSON.stringify(extension),
+      };
+      customeTypeResponse = await client.execute(channelsRequest);
+    } else {
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_EXTENSIONS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_EXTENSIONS, Constants.LOG_ERROR, exceptionData);
+  }
+  return customeTypeResponse;
+};
+
 export default {
   retrieveCartByAnonymousId,
   retrieveCartByCustomerId,
@@ -827,4 +899,6 @@ export default {
   syncVisaCardDetails,
   syncAddTransaction,
   retrievePaymentByCustomerId,
+  addCustomTypes,
+  addExtensions,
 };
