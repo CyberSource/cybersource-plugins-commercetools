@@ -16,7 +16,6 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
     httpCode: null,
     transactionId: null,
     status: null,
-    message: null,
   };
   try {
     if (null != payment) {
@@ -65,7 +64,6 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
             paymentResponse.status = data.status;
-            paymentResponse.message = data.message;
             paymentResponse.accessToken = data.consumerAuthenticationInformation.accessToken;
             paymentResponse.referenceId = data.consumerAuthenticationInformation.referenceId;
             paymentResponse.deviceDataCollectionUrl = data.consumerAuthenticationInformation.deviceDataCollectionUrl;

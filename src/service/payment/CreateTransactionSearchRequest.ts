@@ -9,7 +9,6 @@ const getTransactionSearchResponse = async (query, sort) => {
   let exceptionData: any;
   let searchResponse = {
     httpCode: null,
-    message: null,
     data: null,
   };
   try {

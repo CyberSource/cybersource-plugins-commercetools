@@ -26,8 +26,7 @@ const authorizationHandler = async (updatePaymentObj, updateTransactions) => {
   let serviceResponse: any;
   let exceptionData: any;
   let cardTokens: any;
-  let authReversalResponse: any;
-  let stateChangeResponse: any;
+  let reversalAction: any;
   let customerInfo: any;
   let paymentInstrumentToken = null;
   let errorFlag = false;
@@ -114,35 +113,9 @@ const authorizationHandler = async (updatePaymentObj, updateTransactions) => {
           });
         }
         if (null != paymentResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status) {
-          authReversalResponse = await paymentAuthReversal.authReversalResponse(updatePaymentObj, cartObj, paymentResponse.transactionId);
-          if (null != authReversalResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE == authReversalResponse.httpCode && Constants.API_STATUS_REVERSED == authReversalResponse.status) {
-            stateChangeResponse = await commercetoolsApi.retrievePayment(updatePaymentObj.id);
-            if (null != stateChangeResponse && Constants.STRING_AMOUNT_PLANNED in stateChangeResponse) {
-              authResponse.actions.push({
-                action: Constants.ADD_TRANSACTION,
-                transaction: {
-                  type: Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION,
-                  timestamp: new Date(Date.now()).toISOString(),
-                  amount: stateChangeResponse.amountPlanned,
-                  state: Constants.CT_TRANSACTION_STATE_SUCCESS,
-                  interactionId: authReversalResponse.transactionId,
-                },
-              });
-            }
-          } else {
-            stateChangeResponse = await commercetoolsApi.retrievePayment(updatePaymentObj.id);
-            if (null != stateChangeResponse && Constants.STRING_AMOUNT_PLANNED in stateChangeResponse) {
-              authResponse.actions.push({
-                action: Constants.ADD_TRANSACTION,
-                transaction: {
-                  type: Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION,
-                  timestamp: new Date(Date.now()).toISOString(),
-                  amount: stateChangeResponse.amountPlanned,
-                  state: Constants.CT_TRANSACTION_STATE_FAILURE,
-                  interactionId: authReversalResponse.transactionId,
-                },
-              });
-            }
+          reversalAction = await checkAuthReversalTriggered(updatePaymentObj, cartObj, paymentResponse);
+          if (null != reversalAction) {
+            authResponse.actions.push(reversalAction);
           }
         }
       } else {
@@ -168,6 +141,69 @@ const authorizationHandler = async (updatePaymentObj, updateTransactions) => {
     authResponse = paymentService.invalidInputResponse();
   }
   return authResponse;
+};
+
+const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResponse) => {
+  let transactionDetail: any;
+  let transactionSummaries: any;
+  let applications: any;
+  let authReversalResponse: any;
+  let exceptionData: any;
+  let query = Constants.STRING_EMPTY;
+  let authReversalTriggered = false;
+  let returnAction = {
+    action: Constants.ADD_TRANSACTION,
+    transaction: {
+      type: Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION,
+      timestamp: new Date(Date.now()).toISOString(),
+      amount: null,
+      state: Constants.STRING_EMPTY,
+      interactionId: null,
+    },
+  };
+  try {
+    returnAction.transaction.amount = updatePaymentObj.amountPlanned;
+    query = Constants.PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE + updatePaymentObj.id + Constants.STRING_AND + Constants.STRING_SYNC_QUERY;
+    transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, Constants.STRING_SYNC_SORT);
+    if (null != transactionDetail && Constants.HTTP_CODE_TWO_HUNDRED_ONE == transactionDetail.httpCode) {
+      transactionSummaries = transactionDetail.data._embedded.transactionSummaries;
+      for (let element of transactionSummaries) {
+        applications = element.applicationInformation.applications;
+        for (let application of applications) {
+          if (application.name == Constants.STRING_SYNC_AUTH_REVERSAL_NAME) {
+            authReversalTriggered = true;
+            if (Constants.APPLICATION_RCODE == application.rCode && Constants.APPLICATION_RFLAG == application.rFlag) {
+              returnAction.transaction.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
+              returnAction.transaction.interactionId = element.id;
+            } else {
+              returnAction.transaction.state = Constants.CT_TRANSACTION_STATE_FAILURE;
+              returnAction.transaction.interactionId = element.id;
+            }
+          }
+        }
+      }
+    }
+    if (!authReversalTriggered) {
+      authReversalResponse = await paymentAuthReversal.authReversalResponse(updatePaymentObj, cartObj, paymentResponse.transactionId);
+      if (null != authReversalResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE == authReversalResponse.httpCode && Constants.API_STATUS_REVERSED == authReversalResponse.status) {
+        returnAction.transaction.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
+        returnAction.transaction.interactionId = authReversalResponse.transactionId;
+      } else {
+        returnAction.transaction.state = Constants.CT_TRANSACTION_STATE_FAILURE;
+        returnAction.transaction.interactionId = authReversalResponse.transactionId;
+      }
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CHECK_AUTH_REVERSAL_TRIGGERED, Constants.LOG_ERROR, exceptionData);
+  }
+  return returnAction;
 };
 
 const getPayerAuthSetUpResponse = async (updatePaymentObj) => {
@@ -265,17 +301,13 @@ const getPayerAuthEnrollResponse = async (updatePaymentObj) => {
           }
         }
         if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER && Constants.STRING_CUSTOMER in updatePaymentObj && Constants.STRING_ID in updatePaymentObj.customer && null != updatePaymentObj.customer.id) {
-          if (Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME) {
-            cardRate = process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
-            cardRateCount = process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
-            startTime = new Date();
-            startTime.setHours(startTime.getHours() - cardRate);
-            limiterResponse = await commercetoolsApi.retrievePaymentByCustomerId(updatePaymentObj.customer.id, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
-            if (null != limiterResponse && limiterResponse.count > parseInt(cardRateCount)) {
-              dontSaveTokenFlag = true;
-            }
-          } else {
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_RATE_LIMITER);
+          cardRate = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME ? process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME : Constants.DEFAULT_PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
+          cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
+          startTime = new Date();
+          startTime.setHours(startTime.getHours() - cardRate);
+          limiterResponse = await commercetoolsApi.retrievePaymentByCustomerId(updatePaymentObj.customer.id, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
+          if (null != limiterResponse && limiterResponse.count > parseInt(cardRateCount)) {
+            dontSaveTokenFlag = true;
           }
         }
         if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == updatePaymentObj.custom.fields.isv_payerEnrollHttpCode && Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED == updatePaymentObj.custom.fields.isv_payerEnrollStatus) {
@@ -318,7 +350,6 @@ const getPayerAuthEnrollResponse = async (updatePaymentObj) => {
 
 const getPayerAuthReversalHandler = async (updatePaymentObj, paymentResponse, updateTransactions, updateActions) => {
   let authReversalResponse: any;
-  let stateChangeResponse: any;
   let cartObj: any;
   if (null != updatePaymentObj && null != updateTransactions && null != updateActions && null != paymentResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status) {
     cartObj = await commercetoolsApi.retrieveCartByPaymentId(updatePaymentObj.id);
@@ -329,35 +360,9 @@ const getPayerAuthReversalHandler = async (updatePaymentObj, paymentResponse, up
         cartObj = await commercetoolsApi.retrieveCartByAnonymousId(updatePaymentObj.anonymousId);
       }
     }
-    authReversalResponse = await paymentAuthReversal.authReversalResponse(updatePaymentObj, cartObj, paymentResponse.transactionId);
-    if (null != authReversalResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE == authReversalResponse.httpCode && Constants.API_STATUS_REVERSED == authReversalResponse.status) {
-      stateChangeResponse = await commercetoolsApi.retrievePayment(updatePaymentObj.id);
-      if (null != stateChangeResponse && Constants.STRING_AMOUNT_PLANNED in stateChangeResponse) {
-        updateActions.actions.push({
-          action: Constants.ADD_TRANSACTION,
-          transaction: {
-            type: Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION,
-            timestamp: new Date(Date.now()).toISOString(),
-            amount: stateChangeResponse.amountPlanned,
-            state: Constants.CT_TRANSACTION_STATE_SUCCESS,
-            interactionId: authReversalResponse.transactionId,
-          },
-        });
-      }
-    } else {
-      stateChangeResponse = await commercetoolsApi.retrievePayment(updatePaymentObj.id);
-      if (null != stateChangeResponse && Constants.STRING_AMOUNT_PLANNED in stateChangeResponse) {
-        updateActions.actions.push({
-          action: Constants.ADD_TRANSACTION,
-          transaction: {
-            type: Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION,
-            timestamp: new Date(Date.now()).toISOString(),
-            amount: stateChangeResponse.amountPlanned,
-            state: Constants.CT_TRANSACTION_STATE_FAILURE,
-            interactionId: authReversalResponse.transactionId,
-          },
-        });
-      }
+    authReversalResponse = await checkAuthReversalTriggered(updatePaymentObj, cartObj, paymentResponse);
+    if (null != authReversalResponse) {
+      updateActions.actions.push(authReversalResponse);
     }
   } else {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_REVERSAL_HANDLER, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
@@ -382,17 +387,13 @@ const getCreditCardResponse = async (updatePaymentObj, cartObj, updateTransactio
     errorFlag: false,
   };
   if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER && null != updatePaymentObj && Constants.STRING_CUSTOMER in updatePaymentObj && Constants.STRING_ID in updatePaymentObj.customer && null != updatePaymentObj.customer.id) {
-    if (Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME) {
-      cardRate = process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
-      cardRateCount = process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
-      startTime = new Date();
-      startTime.setHours(startTime.getHours() - cardRate);
-      limiterResponse = await commercetoolsApi.retrievePaymentByCustomerId(updatePaymentObj.customer.id, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
-      if (null != limiterResponse && limiterResponse.count > parseInt(cardRateCount)) {
-        dontSaveTokenFlag = true;
-      }
-    } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CREDIT_CARD_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_RATE_LIMITER);
+    cardRate = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME ? process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME : Constants.DEFAULT_PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
+    cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
+    startTime = new Date();
+    startTime.setHours(startTime.getHours() - cardRate);
+    limiterResponse = await commercetoolsApi.retrievePaymentByCustomerId(updatePaymentObj.customer.id, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
+    if (null != limiterResponse && limiterResponse.count > parseInt(cardRateCount)) {
+      dontSaveTokenFlag = true;
     }
   }
   paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_CARD, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
@@ -470,17 +471,13 @@ const getPayerAuthValidateResponse = async (updatePaymentObj) => {
           }
         }
         if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER && Constants.STRING_CUSTOMER in updatePaymentObj && Constants.STRING_ID in updatePaymentObj.customer && null != updatePaymentObj.customer.id) {
-          if (Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME) {
-            cardRate = process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
-            cardRateCount = process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
-            startTime = new Date();
-            startTime.setHours(startTime.getHours() - cardRate);
-            limiterResponse = await commercetoolsApi.retrievePaymentByCustomerId(updatePaymentObj.customer.id, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
-            if (null != limiterResponse && limiterResponse.count > parseInt(cardRateCount)) {
-              dontSaveTokenFlag = true;
-            }
-          } else {
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_RATE_LIMITER);
+          cardRate = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME ? process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME : Constants.DEFAULT_PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
+          cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
+          startTime = new Date();
+          startTime.setHours(startTime.getHours() - cardRate);
+          limiterResponse = await commercetoolsApi.retrievePaymentByCustomerId(updatePaymentObj.customer.id, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
+          if (null != limiterResponse && limiterResponse.count > parseInt(cardRateCount)) {
+            dontSaveTokenFlag = true;
           }
         }
         paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj.results[Constants.VAL_ZERO], Constants.VALIDATION, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
@@ -538,11 +535,11 @@ const getPayerAuthValidateResponse = async (updatePaymentObj) => {
         }
         authResponse = await setCustomerTokenData(cardTokens, paymentResponse, authResponse, false, updatePaymentObj.paymentMethodInfo.method, updatePaymentObj);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_NO_CARD_DETAILS);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_NO_CARD_DETAILS);
         errorFlag = true;
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_NO_CARD_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_NO_CARD_DETAILS);
       errorFlag = true;
     }
   } catch (exception) {
@@ -553,7 +550,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE, Constants.LOG_ERROR, exceptionData);
     errorFlag = true;
   }
   if (errorFlag) {
@@ -835,6 +832,8 @@ const getCardTokens = async (customerInfo, isvSavedToken) => {
         cardTokens.customerTokenId = newToken.value;
       }
     });
+  } else {
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CARD_TOKENS, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
   }
   return cardTokens;
 };
@@ -918,7 +917,7 @@ const processTokens = async (customerTokenId, paymentInstrumentId, instrumentIde
       parsedTokens.cardExpiryMonth = updatePaymentObj.custom.fields.isv_cardExpiryMonth;
       parsedTokens.cardExpiryYear = updatePaymentObj.custom.fields.isv_cardExpiryYear;
       existingTokensMap.set(length, JSON.stringify(parsedTokens));
-      updateTokenResponse = await commercetoolsApi.setCustomType(customerId, existingTokensMap);
+      updateTokenResponse = await commercetoolsApi.setCustomType(customerId, existingTokensMap, updatePaymentObj.custom.fields.isv_failedTokens);
     }
   }
   if (!existingCardFlag) {
@@ -999,7 +998,7 @@ const updateCardHandler = async (tokens, customerId, customerObj) => {
         existingTokensMap = [JSON.stringify(tokens)];
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CARD_HANDLER, Constants.LOG_INFO, Constants.ERROR_MSG_SERVICE_PROCESS);
       }
-      returnResponse = paymentService.getUpdateTokenActions(existingTokensMap, errorFlag);
+      returnResponse = paymentService.getUpdateTokenActions(existingTokensMap, customerInfo.custom.fields.isv_failedTokens, errorFlag);
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CARD_HANDLER, Constants.LOG_INFO, Constants.ERROR_MSG_NO_TOKENS);
     }
@@ -1050,7 +1049,7 @@ const deleteCardHandler = async (updateCustomerObj, customerId) => {
       }
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DELETE_CARD_HANDLER, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_CUSTOMER_INPUT);
     }
-    customerTokenHandlerResponse = paymentService.getUpdateTokenActions(isvTokensObj, true);
+    customerTokenHandlerResponse = paymentService.getUpdateTokenActions(isvTokensObj, customerObj.custom.fields.isv_failedTokens, true);
   } else {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DELETE_CARD_HANDLER, Constants.LOG_INFO, Constants.ERROR_MSG_CUSTOMER_DETAILS);
   }
@@ -1068,16 +1067,34 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
   let parsedTokens: any;
   let tokenData: any;
   let exceptionData: any;
+  let failedTokens: any;
+  let existingFailedTokens: any;
+  let existingFailedTokensMap: any;
+  let startTime: any;
+  let limiterResponse: any;
+  let cardRate: any;
+  let cardRateCount: any;
   let paymentInstrumentId = null;
   let instrumentIdentifier = null;
   let customerTokenId = null;
   let newTokenFlag = false;
   let tokensExists = false;
+  let dontSaveTokenFlag = false;
   let length = Constants.VAL_NEGATIVE_ONE;
+  let failedTokenLength = Constants.VAL_NEGATIVE_ONE;
   try {
+    if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER && null != customerId && null != customerObj) {
+      cardRate = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME ? process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME : Constants.DEFAULT_PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
+      cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
+      startTime = new Date();
+      startTime.setHours(startTime.getHours() - cardRate);
+      limiterResponse = await rateLimiterAddToken(customerObj, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
+      if (null != limiterResponse && limiterResponse >= parseInt(cardRateCount)) {
+        dontSaveTokenFlag = true;
+      }
+    }
     if (
-      null != customerId &&
-      null != customerObj &&
+      !dontSaveTokenFlag &&
       Constants.STRING_CUSTOM in customerObj &&
       Constants.STRING_FIELDS in customerObj.custom &&
       Constants.ISV_ADDRESS_ID in customerObj.custom.fields &&
@@ -1103,7 +1120,7 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
         customerTokenId = cardResponse.data.tokenInformation.hasOwnProperty(Constants.STRING_CUSTOMER) && Constants.VAL_ZERO < Object.keys(cardResponse.data.tokenInformation.customer).length ? cardResponse.data.tokenInformation.customer.id : cardTokens.customerTokenId;
         paymentInstrumentId = cardResponse.data.tokenInformation.paymentInstrument.id;
         instrumentIdentifier = cardResponse.data.tokenInformation.instrumentIdentifier.id;
-        if (Constants.ISV_TOKENS in customerObj.custom.fields && null != customerObj.custom.fields.isv_tokens) {
+        if (Constants.ISV_TOKENS in customerObj.custom.fields && Constants.STRING_EMPTY != customerObj.custom.fields.isv_tokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_tokens.length) {
           existingTokens = customerObj.custom.fields.isv_tokens;
           existingTokensMap = existingTokens.map((item) => item);
           existingTokensMap.forEach((token, index) => {
@@ -1119,6 +1136,7 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
             parsedTokens.paymentToken = paymentInstrumentId;
             parsedTokens.cardExpiryMonth = customerObj.custom.fields.isv_cardExpiryMonth;
             parsedTokens.cardExpiryYear = customerObj.custom.fields.isv_cardExpiryYear;
+            parsedTokens.isv_addressId = customerObj.custom.fields.isv_addressId;
             existingTokensMap.set(length, JSON.stringify(parsedTokens));
           } else {
             newTokenFlag = true;
@@ -1139,6 +1157,7 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
             cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
             cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
             addressId: customerObj.custom.fields.isv_addressId,
+            timeStamp: new Date(Date.now()).toISOString(),
           };
           if (tokensExists) {
             length = existingTokensMap.length;
@@ -1146,9 +1165,37 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
           } else {
             existingTokensMap = [JSON.stringify(tokenData)];
           }
+          customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokensMap, customerObj.custom.fields.isv_failedTokens, true);
+        } else {
+          customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokensMap, customerObj.custom.fields.isv_failedTokens, false);
         }
-        customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokensMap, true);
+      } else {
+        failedTokens = {
+          alias: customerObj.custom.fields.isv_tokenAlias,
+          cardType: customerObj.custom.fields.isv_cardType,
+          cardName: customerObj.custom.fields.isv_cardType,
+          cardNumber: customerObj.custom.fields.isv_maskedPan,
+          cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
+          cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
+          timeStamp: new Date(Date.now()).toISOString(),
+        };
+        if (Constants.ISV_FAILED_TOKENS in customerObj.custom.fields && Constants.STRING_EMPTY != customerObj.custom.fields.isv_failedTokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_failedTokens.length) {
+          existingFailedTokens = customerObj.custom.fields.isv_failedTokens;
+          existingFailedTokensMap = existingFailedTokens.map((item) => item);
+          failedTokenLength = customerObj.custom.fields.isv_failedTokens.length;
+          existingFailedTokensMap.set(failedTokenLength, JSON.stringify(failedTokens));
+        } else {
+          existingFailedTokensMap = [JSON.stringify(failedTokens)];
+        }
+        if (Constants.ISV_TOKENS in customerObj.custom.fields && Constants.STRING_EMPTY != customerObj.custom.fields.isv_tokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_tokens.length) {
+          existingTokens = customerObj.custom.fields.isv_tokens;
+        }
+        customerObj.custom.fields.isv_tokenAlias;
+        customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokens, existingFailedTokensMap, true);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.ERROR_MSG_SERVICE_PROCESS);
       }
+    } else {
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.ERROR_MSG_INVALID_INPUT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -1158,9 +1205,39 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_CONVERSION_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REPORT_HANDLER, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, exceptionData);
   }
   return customerTokenResponse;
+};
+
+const rateLimiterAddToken = async (customerObj, startTime, endTime) => {
+  let existingTokens: any;
+  let existingTokensMap: any;
+  let existingFailedTokens: any;
+  let existingFailedTokensMap: any;
+  let tokenToCompare: any;
+  let count = Constants.VAL_ZERO;
+  if (Constants.ISV_FAILED_TOKENS in customerObj.custom.fields && Constants.STRING_EMPTY != customerObj.custom.fields.isv_failedTokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_failedTokens.length) {
+    existingFailedTokens = customerObj.custom.fields.isv_failedTokens;
+    existingFailedTokensMap = existingFailedTokens.map((item) => item);
+    existingFailedTokensMap.forEach((failToken) => {
+      tokenToCompare = JSON.parse(failToken);
+      if (tokenToCompare.timeStamp > startTime && tokenToCompare.timeStamp < endTime) {
+        count++;
+      }
+    });
+  }
+  if (Constants.ISV_TOKENS in customerObj.custom.fields && Constants.STRING_EMPTY != customerObj.custom.fields.isv_tokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_tokens.length) {
+    existingTokens = customerObj.custom.fields.isv_tokens;
+    existingTokensMap = existingTokens.map((item) => item);
+    existingTokensMap.forEach((token) => {
+      tokenToCompare = JSON.parse(token);
+      if (tokenToCompare.timeStamp > startTime && tokenToCompare.timeStamp < endTime) {
+        count++;
+      }
+    });
+  }
+  return count;
 };
 
 const reportHandler = async () => {
@@ -1189,7 +1266,7 @@ const reportHandler = async () => {
           paymentDetails = await commercetoolsApi.retrievePayment(element.merchantReferenceNumber);
           if (null != paymentDetails) {
             latestTransaction = paymentDetails.transactions.pop();
-            if ((Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == latestTransaction.type || Constants.CT_TRANSACTION_TYPE_CHARGE == latestTransaction.type) && Constants.CT_TRANSACTION_STATE_PENDING == latestTransaction.state) {
+            if (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == latestTransaction.type && Constants.CT_TRANSACTION_STATE_PENDING == latestTransaction.state) {
               conversionPresent = true;
               decisionUpdateObject.id = paymentDetails.id;
               decisionUpdateObject.version = paymentDetails.version;
@@ -1457,6 +1534,11 @@ const getCartDetailsByPaymentId = async (paymentId) => {
 
 const runSyncAddTransaction = async (syncUpdateObject, reasonCode, authPresent, authReasonCodePresent) => {
   let updateSyncResponse: any;
+  let transactionDetail: any;
+  let transactionSummaries: any;
+  let applications: any;
+  let query = Constants.STRING_EMPTY;
+  let authReversalTriggered = false;
   let authReversalObject = {
     paymentId: null,
     version: null,
@@ -1477,12 +1559,35 @@ const runSyncAddTransaction = async (syncUpdateObject, reasonCode, authPresent, 
     } else if (Constants.VAL_FOUR_EIGHTY_ONE == reasonCode && authPresent && authReasonCodePresent) {
       syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
       updateSyncResponse = await commercetoolsApi.syncAddTransaction(syncUpdateObject);
-      authReversalObject.paymentId = syncUpdateObject.id;
-      authReversalObject.state = Constants.CT_TRANSACTION_STATE_INITIAL;
-      authReversalObject.type = Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION;
-      authReversalObject.amount = syncUpdateObject.amountPlanned;
-      authReversalObject.version = updateSyncResponse.version;
-      updateSyncResponse = await commercetoolsApi.addTransaction(authReversalObject);
+      query = Constants.PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE + syncUpdateObject.id + Constants.STRING_AND + Constants.STRING_SYNC_QUERY;
+      transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, Constants.STRING_SYNC_SORT);
+      if (null != transactionDetail && Constants.HTTP_CODE_TWO_HUNDRED_ONE == transactionDetail.httpCode) {
+        transactionSummaries = transactionDetail.data._embedded.transactionSummaries;
+        for (let element of transactionSummaries) {
+          applications = element.applicationInformation.applications;
+          for (let application of applications) {
+            if (application.name == Constants.STRING_SYNC_AUTH_REVERSAL_NAME) {
+              authReversalTriggered = true;
+              syncUpdateObject.version = updateSyncResponse.version;
+              syncUpdateObject.interactionId = element.id;
+              if (Constants.APPLICATION_RCODE == application.rCode && Constants.APPLICATION_RFLAG == application.rFlag) {
+                syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
+              } else {
+                syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
+              }
+              updateSyncResponse = await commercetoolsApi.syncAddTransaction(syncUpdateObject);
+            }
+          }
+        }
+      }
+      if (!authReversalTriggered) {
+        authReversalObject.paymentId = syncUpdateObject.id;
+        authReversalObject.state = Constants.CT_TRANSACTION_STATE_INITIAL;
+        authReversalObject.type = Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION;
+        authReversalObject.amount = syncUpdateObject.amountPlanned;
+        authReversalObject.version = updateSyncResponse.version;
+        updateSyncResponse = await commercetoolsApi.addTransaction(authReversalObject);
+      }
     } else if ((Constants.VAL_FOUR_EIGHTY == reasonCode || Constants.VAL_FOUR_EIGHTY_ONE == reasonCode) && authPresent && !authReasonCodePresent) {
       syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
       updateSyncResponse = await commercetoolsApi.syncAddTransaction(syncUpdateObject);

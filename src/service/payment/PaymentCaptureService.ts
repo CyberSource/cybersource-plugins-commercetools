@@ -18,7 +18,6 @@ const captureResponse = async (payment, cart, authId) => {
     httpCode: null,
     transactionId: null,
     status: null,
-    message: null,
   };
   try {
     if (null != authId && null != payment) {
@@ -50,7 +49,7 @@ const captureResponse = async (payment, cart, authId) => {
 
       if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
         var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
-        processingInformation.paymentSolution = payment.paymentMethodInfo.method;
+        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
         requestObj.processingInformation = processingInformation;
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
@@ -190,7 +189,6 @@ const captureResponse = async (payment, cart, authId) => {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
             paymentResponse.status = data.status;
-            paymentResponse.message = data.message;
             resolve(paymentResponse);
           } else if (error) {
             if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {

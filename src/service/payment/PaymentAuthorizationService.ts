@@ -19,7 +19,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
     httpCode: null,
     transactionId: null,
     status: null,
-    message: null,
     data: null,
   };
   try {
@@ -61,8 +60,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       }
       if (Constants.STRING_FALSE == process.env.PAYMENT_GATEWAY_DECISION_MANAGER) {
         actionList.push(Constants.PAYMENT_GATEWAY_DECISION_SKIP);
-      } else {
-        processingInformation.actionList = actionList;
       }
       if (Constants.STRING_ENROLL_CHECK == service) {
         actionList.push(Constants.PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION);
@@ -308,7 +305,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
             paymentResponse.status = data.status;
-            paymentResponse.message = data.message;
             paymentResponse.data = data;
             resolve(paymentResponse);
           } else if (error) {

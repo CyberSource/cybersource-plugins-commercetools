@@ -12,7 +12,6 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
     httpCode: null,
     transactionId: null,
     status: null,
-    message: null,
     data: null,
   };
   try {
@@ -46,8 +45,6 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
       var processingInformation = new restApi.Ptsv2paymentsProcessingInformation();
       if (Constants.STRING_FALSE == process.env.PAYMENT_GATEWAY_DECISION_MANAGER) {
         actionList.push(Constants.PAYMENT_GATEWAY_DECISION_SKIP);
-      } else {
-        processingInformation.actionList = actionList;
       }
       actionList.push(Constants.PAYMENT_GATEWAY_TOKEN_CREATE);
       var initiator = new restApi.Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator();
@@ -79,7 +76,7 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
       var orderInformation = new restApi.Ptsv2paymentsOrderInformation();
       var orderInformationAmountDetails = new restApi.Ptsv2paymentsOrderInformationAmountDetails();
       orderInformationAmountDetails.totalAmount = Constants.VAL_FLOAT_ZERO;
-      orderInformationAmountDetails.currency = 'USD';
+      orderInformationAmountDetails.currency = customerObj.custom.fields.isv_currencyCode;
       orderInformation.amountDetails = orderInformationAmountDetails;
 
       var orderInformationBillTo = new restApi.Ptsv2paymentsOrderInformationBillTo();
@@ -99,7 +96,7 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
       var deviceInformation = new restApi.Ptsv2paymentsDeviceInformation();
       if (Constants.ISV_DEVICE_FINGERPRINT_ID in customerObj.custom.fields && Constants.STRING_EMPTY != customerObj.custom.fields.isv_deviceFingerprintId) {
         deviceInformation.fingerprintSessionId = customerObj.custom.fields.isv_deviceFingerprintId;
-      } 
+      }
       requestObj.deviceInformation = deviceInformation;
       const instance = new restApi.PaymentsApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
@@ -108,7 +105,6 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
             paymentResponse.status = data.status;
-            paymentResponse.message = data.message;
             paymentResponse.data = data;
             resolve(paymentResponse);
           } else if (error) {

@@ -423,10 +423,51 @@ const payerEnrollActions = (response, updatePaymentObj) => {
   return action;
 };
 
-const getUpdateTokenActions = (actions, errorFlag) => {
+const getUpdateTokenActions = (actions, existingFailedTokensMap, errorFlag) => {
   let returnResponse: any;
-  if (null != actions) {
-    if (errorFlag) {
+  if (errorFlag) {
+    returnResponse = {
+      actions: [
+        {
+          action: Constants.SET_CUSTOM_TYPE,
+          type: {
+            key: Constants.ISV_PAYMENTS_CUSTOMER_TOKENS,
+            typeId: Constants.TYPE_ID_TYPE,
+          },
+          fields: {
+            isv_tokens: actions,
+            isv_tokenUpdated: false,
+            isv_failedTokens: existingFailedTokensMap,
+          },
+        },
+      ],
+      errors: [],
+    };
+  } else {
+    returnResponse = {
+      actions: [
+        {
+          action: Constants.SET_CUSTOM_TYPE,
+          type: {
+            key: Constants.ISV_PAYMENTS_CUSTOMER_TOKENS,
+            typeId: Constants.TYPE_ID_TYPE,
+          },
+          fields: {
+            isv_tokens: actions,
+            isv_tokenUpdated: true,
+          },
+        },
+      ],
+      errors: [],
+    };
+  }
+  return returnResponse;
+};
+
+const getUpdateFailedTokenActions = (existingFailedTokensMap, existingTokens) => {
+  let returnResponse: any;
+  if (null != existingFailedTokensMap) {
+    if (existingTokens) {
       returnResponse = {
         actions: [
           {
@@ -436,8 +477,8 @@ const getUpdateTokenActions = (actions, errorFlag) => {
               typeId: Constants.TYPE_ID_TYPE,
             },
             fields: {
-              isv_tokens: actions,
-              isv_tokenUpdated: false,
+              isv_tokens: existingTokens,
+              isv_failedTokens: existingFailedTokensMap,
             },
           },
         ],
@@ -453,14 +494,15 @@ const getUpdateTokenActions = (actions, errorFlag) => {
               typeId: Constants.TYPE_ID_TYPE,
             },
             fields: {
-              isv_tokens: actions,
-              isv_tokenUpdated: true,
+              isv_failedTokens: existingFailedTokensMap,
             },
           },
         ],
         errors: [],
       };
     }
+  } else {
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_UPDATE_FAILED_TOKEN_ACTIONS, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
   }
   return returnResponse;
 };
@@ -727,6 +769,7 @@ export default {
   payerAuthActions,
   payerEnrollActions,
   getUpdateTokenActions,
+  getUpdateFailedTokenActions,
   getAuthResponse,
   getOMServiceResponse,
   getCapturedAmount,

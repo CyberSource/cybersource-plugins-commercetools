@@ -464,12 +464,14 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
   let isvTokens: any;
   let mappedTokens: any;
   let exceptionData: any;
+  let failedTokens: any;
   let stringTokenData: string;
   let length: number;
   let tokenArray: Array<string>;
   let customerId = null;
   try {
     if (null != paymentInstrumentId && null != instrumentIdentifier && null != updatePaymentObj && Constants.STRING_CUSTOMER in updatePaymentObj && Constants.STRING_ID in updatePaymentObj.customer) {
+      failedTokens = updatePaymentObj.custom.fields.isv_failedTokens;
       customerId = updatePaymentObj.customer.id;
       client = getClient();
       if (null != client && null != customerId) {
@@ -486,15 +488,22 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
           cardExpiryYear: updatePaymentObj.custom.fields.isv_cardExpiryYear,
         };
         stringTokenData = JSON.stringify(tokenData);
-        if (null != customerInfo && Constants.STRING_CUSTOM in customerInfo && Constants.STRING_FIELDS in customerInfo.custom && Constants.ISV_TOKENS in customerInfo.custom.fields) {
+        if (
+          null != customerInfo &&
+          Constants.STRING_CUSTOM in customerInfo &&
+          Constants.STRING_FIELDS in customerInfo.custom &&
+          Constants.ISV_TOKENS in customerInfo.custom.fields &&
+          Constants.STRING_EMPTY != customerInfo.custom.fields.isv_tokens &&
+          Constants.VAL_ZERO < customerInfo.custom.fields.isv_tokens.length
+        ) {
           isvTokens = customerInfo.custom.fields.isv_tokens;
           mappedTokens = isvTokens.map((item) => item);
           length = mappedTokens.length;
           mappedTokens.set(length, stringTokenData);
-          tokenResponse = await setCustomType(customerId, mappedTokens);
+          tokenResponse = await setCustomType(customerId, mappedTokens, failedTokens);
         } else {
           tokenArray = [stringTokenData];
-          tokenResponse = await setCustomType(customerId, tokenArray);
+          tokenResponse = await setCustomType(customerId, tokenArray, failedTokens);
         }
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
@@ -557,7 +566,7 @@ const getCustomer = async (customerId) => {
   return customerResponse;
 };
 
-const setCustomType = async (customerId, fieldsData) => {
+const setCustomType = async (customerId, fieldsData, failedTokens) => {
   let customResponse: any;
   let customerInfo: any;
   let exceptionData: any;
@@ -584,6 +593,7 @@ const setCustomType = async (customerId, fieldsData) => {
                 },
                 fields: {
                   isv_tokens: fieldsData,
+                  isv_failedTokens: failedTokens
                 },
               },
             ],

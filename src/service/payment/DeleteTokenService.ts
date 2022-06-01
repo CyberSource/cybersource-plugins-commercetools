@@ -10,7 +10,6 @@ const deleteCustomerToken = async (customerTokenObj) => {
   let opts = new Array();
   let customerTokenDeleteResponse = {
     httpCode: null,
-    message: Constants.STRING_EMPTY,
     deletedToken: Constants.STRING_EMPTY,
   };
   try {

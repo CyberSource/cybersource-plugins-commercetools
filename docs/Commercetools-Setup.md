@@ -31,8 +31,8 @@ Below is the Endpoint to run the script to load these API extension setup and cu
 
 ## <a name="PaymentCreate"></a>Payment Create
 
-An extension triggered by payment create is required to process create
-action on a payment resource.
+An extension triggered by payment create is required to process any
+actions on a payment resource.
 
 | Property                   | Value                                  | Note                                                                                                  |
 | -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -87,24 +87,26 @@ An extension triggered by customer update is required to process any update acti
 
 Fields
 
-| Name                             | Type    | Required |
-| -------------------------------- | ------- | -------- |
-| isv_tokens                       | String  | false    |
-| isv_token                        | String  | false    |
-| isv_tokenAlias                   | String  | false    |
-| isv_savedToken                   | String  | false    |
-| isv_tokenVerificationContext     | String  | false    |
-| isv_tokenCaptureContextSignature | String  | false    |
-| isv_cardType                     | String  | false    |
-| isv_maskedPan                    | String  | false    |
-| isv_cardExpiryMonth              | String  | false    |
-| isv_cardExpiryYear               | String  | false    |
-| isv_addressId                    | String  | false    |
-| isv_deviceFingerprintId          | String  | false    |
-| isv_tokenAction                  | String  | false    |
-| isv_cardNewExpiryMonth           | String  | false    |
-| isv_cardNewExpiryYear            | String  | false    |
-| isv_tokenUpdated                 | Boolean | false    |
+| Name                             | Type           | Required |
+| -------------------------------- | -------------- | -------- |
+| isv_tokens                       | Set of Strings | false    |
+| isv_token                        | String         | false    |
+| isv_tokenAlias                   | String         | false    |
+| isv_savedToken                   | String         | false    |
+| isv_tokenVerificationContext     | String         | false    |
+| isv_tokenCaptureContextSignature | String         | false    |
+| isv_cardType                     | String         | false    |
+| isv_maskedPan                    | String         | false    |
+| isv_cardExpiryMonth              | String         | false    |
+| isv_cardExpiryYear               | String         | false    |
+| isv_addressId                    | String         | false    |
+| isv_currencyCode                 | String         | false    |
+| isv_deviceFingerprintId          | String         | false    |
+| isv_cardNewExpiryMonth           | String         | false    |
+| isv_cardNewExpiryYear            | String         | false    |
+| isv_tokenAction                  | String         | false    |
+| isv_tokenUpdated                 | Boolean        | false    |
+| isv_failedTokens                 | Set of Strings | false    |
 
 ### <a name="PaymentData"></a>Payment Data
 

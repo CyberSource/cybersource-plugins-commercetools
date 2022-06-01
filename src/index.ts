@@ -247,7 +247,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
               Constants.STRING_FIELDS in updatePaymentObj.custom &&
               Constants.ISV_SALE_ENABLED in updatePaymentObj.custom.fields &&
               updatePaymentObj.custom.fields.isv_saleEnabled))
-        ){
+        ) {
           if (Constants.CT_TRANSACTION_STATE_SUCCESS == updateTransactions.state || Constants.CT_TRANSACTION_STATE_FAILURE == updateTransactions.state || Constants.CT_TRANSACTION_STATE_PENDING == updateTransactions.state) {
             updateResponse = paymentService.getEmptyResponse();
           } else if (Constants.CC_PAYER_AUTHENTICATION == paymentMethod && Constants.STRING_CUSTOM in updatePaymentObj && Constants.STRING_FIELDS in updatePaymentObj.custom && Constants.ISV_PAYER_AUTHENTICATION_REQUIRED in updatePaymentObj.custom.fields) {
@@ -327,7 +327,8 @@ app.post('/api/extension/customer/update', async (req, res) => {
       Constants.STRING_CUSTOM in req.body.resource.obj &&
       Constants.STRING_FIELDS in req.body.resource.obj.custom &&
       Constants.ISV_TOKENS in req.body.resource.obj.custom.fields &&
-      Constants.STRING_EMPTY != req.body.resource.obj.custom.fields.isv_tokens
+      Constants.STRING_EMPTY != req.body.resource.obj.custom.fields.isv_tokens &&
+      Constants.VAL_ZERO < req.body.resource.obj.custom.fields.isv_tokens.length
     ) {
       customFields = req.body.resource.obj.custom.fields;
       tokensToUpdate = JSON.parse(customFields.isv_tokens[Constants.VAL_ZERO]);
@@ -336,17 +337,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
       } else if (Constants.STRING_UPDATE == customFields.isv_tokenAction) {
         response = await paymentHandler.updateCardHandler(tokensToUpdate, req.body.resource.id, req.body.resource.obj);
       } else {
-        customerInfo = await commercetoolsApi.getCustomer(req.body.resource.id);
-        if (
-          null != customerInfo &&
-          Constants.STRING_CUSTOM in customerInfo &&
-          Constants.STRING_FIELDS in customerInfo.custom &&
-          Constants.ISV_TOKENS in customerInfo.custom.fields &&
-          Constants.STRING_EMPTY != customerInfo.custom.fields.isv_tokens &&
-          Constants.VAL_ZERO < customerInfo.custom.fields.isv_tokens.length
-        ) {
-          response = paymentService.getUpdateTokenActions(customerInfo.custom.fields.isv_tokens, true);
-        }
+        response = paymentService.getUpdateTokenActions(customFields.isv_tokens, customFields.isv_failedTokens, true);
       }
     }
   } catch (exception) {
@@ -369,7 +360,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
       Constants.STRING_EMPTY != customerInfo.custom.fields.isv_tokens &&
       Constants.VAL_ZERO < customerInfo.custom.fields.isv_tokens.length
     ) {
-      response = paymentService.getUpdateTokenActions(customerInfo.custom.fields.isv_tokens, true);
+      response = paymentService.getUpdateTokenActions(customerInfo.custom.fields.isv_tokens, customerInfo.custom.fields.isv_failedTokens, true);
     }
   }
   res.send(response);
