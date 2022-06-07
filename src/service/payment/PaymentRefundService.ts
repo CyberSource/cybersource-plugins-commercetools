@@ -3,7 +3,7 @@ import path from 'path';
 import paymentService from '../../utils/PaymentService';
 import { Constants } from '../../constants';
 
-const refundResponse = async (payment, captureId, updateTransactions) => {
+const refundResponse = async (payment, captureId, updateTransactions, orderNo) => {
   let runEnvironment: any;
   let errorData: any;
   let exceptionData: any;
@@ -44,15 +44,30 @@ const refundResponse = async (payment, captureId, updateTransactions) => {
         var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
         requestObj.processingInformation = processingInformation;
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
         var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
         requestObj.processingInformation = processingInformation;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
         var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
         requestObj.processingInformation = processingInformation;
+      } else {
+        if (null != orderNo) {
+          var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
+          processingInformation.reconciliationId = orderNo;
+          requestObj.processingInformation = processingInformation;
+        }
       }
 
       var orderInformation = new restApi.Ptsv2paymentsidrefundsOrderInformation();

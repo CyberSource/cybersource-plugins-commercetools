@@ -48,7 +48,14 @@ const keys = async () => {
             isv_tokenVerificationContext,
           });
         } else if (error) {
-          if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+          if (
+            error.hasOwnProperty(Constants.STRING_RESPONSE) &&
+            null != error.response &&
+            Constants.VAL_ZERO < Object.keys(error.response).length &&
+            error.response.hasOwnProperty(Constants.STRING_TEXT) &&
+            null != error.response.text &&
+            Constants.VAL_ZERO < Object.keys(error.response.text).length
+          ) {
             paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, Constants.ERROR_MSG_FLEX_TOKEN_KEYS + Constants.STRING_HYPHEN + error.response.text);
           } else {
             if (typeof error === 'object') {

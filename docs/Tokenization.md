@@ -23,7 +23,7 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
     | custom.type.key                                | isv_payments_customer_tokens | Yes      |
     | custom.fields.isv_tokenCaptureContextSignature | empty string                 | Yes      |
 
-    b. If there are tokens available already, update the customer with the following custom fields
+    b. If there are tokens available already, update the customer by setting the following custom field
 
     | Property                                       | Value        | Required |
     | ---------------------------------------------- | ------------ | -------- |
@@ -53,7 +53,7 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
 
 6.  If token is created successfully, custom.fields.isv_tokens field will contain updated tokens
 
-7.  If there was an error, custom.fields.isv_tokens field either be empty if there were no tokens available or will have the old tokens which were available before adding the new token
+7.  If there was an error, custom.fields.isv_tokens field either be empty if there were no tokens available or will have the old tokens which were available before adding the new token. Also custom.fields.isv_failedTokens field will have all the failed card records
 
 ## Update Card Details
 

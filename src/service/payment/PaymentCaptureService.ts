@@ -3,7 +3,7 @@ import path from 'path';
 import paymentService from '../../utils/PaymentService';
 import { Constants } from '../../constants';
 
-const captureResponse = async (payment, cart, authId) => {
+const captureResponse = async (payment, cart, authId, orderNo) => {
   let runEnvironment: any;
   let cartData: any;
   let errorData: any;
@@ -51,15 +51,30 @@ const captureResponse = async (payment, cart, authId) => {
         var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
         requestObj.processingInformation = processingInformation;
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
         var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
         requestObj.processingInformation = processingInformation;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
         var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
         requestObj.processingInformation = processingInformation;
+      } else {
+        if (null != orderNo) {
+          var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
+          processingInformation.reconciliationId = orderNo;
+          requestObj.processingInformation = processingInformation;
+        }
       }
       const totalAmount = paymentService.convertCentToAmount(payment.amountPlanned.centAmount);
 

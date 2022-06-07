@@ -3,7 +3,7 @@ import path from 'path';
 import paymentService from '../../utils/PaymentService';
 import { Constants } from '../../constants';
 
-const authorizationResponse = async (payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag) => {
+const authorizationResponse = async (payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo) => {
   let runEnvironment: any;
   let errorData: any;
   let exceptionData: any;
@@ -52,11 +52,8 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       requestObj.clientReferenceInformation = clientReferenceInformation;
 
       var processingInformation = new restApi.Ptsv2paymentsProcessingInformation();
-      if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_ENABLED_MOTO in payment.custom.fields && payment.custom.fields.isv_enabledMoto) {
-        processingInformation.commerceIndicator = Constants.STRING_MOTO;
-      }
-      if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_SALE_ENABLED in payment.custom.fields && payment.custom.fields.isv_saleEnabled) {
-        processingInformation.capture = true;
+      if (null != orderNo) {
+        processingInformation.reconciliationId = orderNo;
       }
       if (Constants.STRING_FALSE == process.env.PAYMENT_GATEWAY_DECISION_MANAGER) {
         actionList.push(Constants.PAYMENT_GATEWAY_DECISION_SKIP);

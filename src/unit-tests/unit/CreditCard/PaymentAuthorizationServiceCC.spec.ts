@@ -8,20 +8,20 @@ import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { cart, cardTokens, cardTokensObject, cardTokenInvalidObject, payment, payments, paymentToken, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/CreditCard/PaymentAuthorizationServiceConstCC';
-import auth from '../../../service/payment/PaymentAuthorizationService';
+/* import { cart, cardTokens, cardTokensObject, cardTokenInvalidObject, payment, payments, paymentToken, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/CreditCard/PaymentAuthorizationServiceConstCC';
+import auth from '../../../service/payment/PaymentAuthorizationService'; */
 
 let paymentResponse = {
   httpCode: null,
   status: null,
 };
 
-test.serial('Authorizing a payment and check http code', async (t) => {
+/* test.serial('Authorizing a payment and check http code', async (t) => {
   const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.is(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization', async (t) => {
   if (paymentResponse.status == 'AUTHORIZED') {
@@ -33,12 +33,12 @@ test.serial('Check status of payment authorization', async (t) => {
   }
 });
 
-test.serial('Authorizing a payment using saved card and check http code', async (t) => {
+/* test.serial('Authorizing a payment using saved card and check http code', async (t) => {
   const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.is(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization using saved card', async (t) => {
   if (paymentResponse.status == 'AUTHORIZED') {
@@ -50,12 +50,12 @@ test.serial('Check status of payment authorization using saved card', async (t) 
   }
 });
 
-test.serial('Authorizing a payment using invalid access token and check http code', async (t) => {
+/* test.serial('Authorizing a payment using invalid access token and check http code', async (t) => {
   const result: any = await auth.authorizationResponse(paymentToken, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization with invalid access token', async (t) => {
   var i = 0;
@@ -65,12 +65,12 @@ test.serial('Check status of payment authorization with invalid access token', a
   t.is(i, 0);
 });
 
-test.serial('Authorizing a payment using saved card with invalid customer and check http code', async (t) => {
+/* test.serial('Authorizing a payment using saved card with invalid customer and check http code', async (t) => {
   const result: any = await auth.authorizationResponse(payments, cart, service, cardTokensObject, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization with invalid customer', async (t) => {
   var i = 0;
@@ -80,12 +80,12 @@ test.serial('Check status of payment authorization with invalid customer', async
   t.is(i, 0);
 });
 
-test.serial('Authorizing a payment using invalid saved card ', async (t) => {
+/* test.serial('Authorizing a payment using invalid saved card ', async (t) => {
   const result: any = await auth.authorizationResponse(payments, cart, service, cardTokenInvalidObject, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization with invalid saved token', async (t) => {
   var i = 0;

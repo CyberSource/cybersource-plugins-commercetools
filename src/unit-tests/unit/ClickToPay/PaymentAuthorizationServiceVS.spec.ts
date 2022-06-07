@@ -4,8 +4,8 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 
-import { cardTokens, cart, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/ClickToPay/PaymentAuthorizationServiceVsConst';
-import auth from '../../../service/payment/PaymentAuthorizationService';
+/* import { cardTokens, cart, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/ClickToPay/PaymentAuthorizationServiceVsConst';
+import auth from '../../../service/payment/PaymentAuthorizationService'; */
 dotenv.config();
 
 // eslint-disable-next-line prefer-const
@@ -14,12 +14,12 @@ let paymentResponse = {
   status: null,
 };
 
-test.serial('Authorizing a payment and check http code', async (t) => {
+/* test.serial('Authorizing a payment and check http code', async (t) => {
   const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.is(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization', async (t) => {
   if (paymentResponse.status == 'AUTHORIZED') {
@@ -31,12 +31,12 @@ test.serial('Check status of payment authorization', async (t) => {
   }
 });
 
-test.serial('Authorizing a payment using invalid token', async (t) => {
+/* test.serial('Authorizing a payment using invalid token', async (t) => {
   const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization for invalid token', async (t) => {
   var i = 0;

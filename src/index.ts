@@ -91,7 +91,7 @@ app.get('/paymentdetails', async (req, res) => {
       convertedPaymentId = paymentId.replace(/\s+/g, Constants.STRING_EMPTY);
       cartDetails = await commercetoolsApi.retrieveCartByPaymentId(convertedPaymentId);
       cartData = cartDetails.results[Constants.VAL_ZERO];
-      if (Constants.STRING_LOCALE in cartData && null != cartData.locale) {
+      if (null != cartData && Constants.STRING_LOCALE in cartData && null != cartData.locale) {
         selectedLocale = cartData.locale.split(Constants.REGEX_HYPHEN);
         locale = selectedLocale[Constants.VAL_ZERO];
       }
@@ -560,6 +560,8 @@ app.get('/sync', async (req, res) => {
 app.get('/configurePlugin', async (req, res) => {
   let scriptResponse: any;
   let url: any;
+  let getCustomType: any;
+  let typeObj: any;
   for (let extension of Constants.ISV_PAYMENT_EXTENSIONS) {
     if (Constants.PAYMENT_CREATE_KEY == extension.key) {
       url = Constants.PAYMENT_CREATE_DESTINATION_URL;
@@ -569,7 +571,7 @@ app.get('/configurePlugin', async (req, res) => {
       url = Constants.CUSTOMER_CREATE_DESTINATION_URL;
     }
     extension.destination.url = process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL + url;
-    extension.destination.authentication.headerValue = Constants.AUTENTICATION_SCHEME + process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE;
+    extension.destination.authentication.headerValue = Constants.AUTHENTICATION_SCHEME + process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE;
     scriptResponse = await commercetoolsApi.addExtensions(extension);
     if (null != scriptResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE != parseInt(scriptResponse.statusCode)) {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
@@ -578,7 +580,20 @@ app.get('/configurePlugin', async (req, res) => {
   for (let customType of Constants.CUSTOM_TYPES) {
     scriptResponse = await commercetoolsApi.addCustomTypes(customType);
     if (null != scriptResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE != scriptResponse.statusCode) {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + customType.key + Constants.STRING_HYPHEN + scriptResponse.message);
+      if (
+        Constants.HTTP_CODE_FOUR_HUNDRED == scriptResponse.statusCode &&
+        Constants.HTTP_CODE_FOUR_HUNDRED == scriptResponse.body.statusCode &&
+        Constants.STRING_ERRORS in scriptResponse.body &&
+        Constants.STRING_DUPLICATE_FIELD == scriptResponse.body.errors[Constants.VAL_ZERO].code
+      ) {
+        getCustomType = await commercetoolsApi.getCustomType(customType.key);
+        if (null != getCustomType && Constants.HTTP_CODE_TWO_HUNDRED == getCustomType.statusCode) {
+          typeObj = getCustomType.body;
+          paymentHandler.updateCustomField(customType.fieldDefinitions, typeObj.fieldDefinitions, typeObj.id, typeObj.version);
+        }
+      } else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + customType.key + Constants.STRING_HYPHEN + scriptResponse.message);
+      }
     }
   }
   orderSuccessMessage = Constants.SUCCESS_MSG_SCRIPT_PLUGIN;

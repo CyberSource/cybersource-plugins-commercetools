@@ -4,11 +4,12 @@
 ## Payment Event Usage Guides
 
 - [Create a Payment](Create-a-Payment.md)
-- [Authorize a Payment Without Payer Authentication](Authorize-a-Payment-Without-Payer-Authentication.md)
-- [Authorize a Payment With Payer Authentication](Authorize-a-Payment-With-Payer-Authentication.md)
-- [Authorize a Payment Visa Click to pay](Authorize-a-Payment-Visa-ClicktoPay.md)
-- [Authorize a Payment With Google Pay](Authorize-a-Payment-GooglePay-Authentication.md)
-- [Authorize a Payment With Apple Pay](Authorize-a-Payment-ApplePay.md)
+- [Process a Payment Without Payer Authentication](Process-a-Payment-Without-Payer-Authentication.md)
+- [Process a Payment With Payer Authentication](Process-a-Payment-With-Payer-Authentication.md)
+- [Process a Payment With Click to pay](Process-a-Payment-ClicktoPay.md)
+- [Process a Payment With Google Pay](Process-a-Payment-GooglePay-Authentication.md)
+- [Process a Payment With Apple Pay](Process-a-Payment-ApplePay.md)
+- [Process a Payment For MOTO](Process-a-Payment-MOTO.md)
 - [Reverse a Payment](Reverse-a-Payment.md)
 - [Capture a Payment](Capture-a-Payment.md)
 - [Refund a Payment](Refund-a-Payment.md)

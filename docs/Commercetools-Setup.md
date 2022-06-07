@@ -18,7 +18,7 @@ The customizations below are required for the API Extension to work correctly. J
 
 > **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms</li></ul>
 
-Below is the Endpoint to run the script to load these API extension setup and custmizations
+Below is the Endpoint to run the script to load these API extension setup and custmizations. Before running the script, Cybersource Plugin API Key must be created with the required scope, see Cybersource Plugin API Key in [Key Creation](Key-Creation.md) 
 
 | Endpoint                  | Note                                                                                                                                                                                                                                  |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

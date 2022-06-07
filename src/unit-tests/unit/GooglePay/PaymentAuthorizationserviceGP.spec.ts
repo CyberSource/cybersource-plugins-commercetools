@@ -5,8 +5,8 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
-import { cart, cardTokens, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/GooglePay/PaymentAuthorizationServiceConstGP';
-import authorizationResponse from '../../../service/payment/PaymentAuthorizationService';
+/* import { cart, cardTokens, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/GooglePay/PaymentAuthorizationServiceConstGP';
+import authorizationResponse from '../../../service/payment/PaymentAuthorizationService'; */
 
 let paymentResponse = {
   httpCode: null,
@@ -16,7 +16,7 @@ let paymentResponse = {
   data: null,
 };
 
-test.serial('Authorizing a payment and check http code', async (t) => {
+/* test.serial('Authorizing a payment and check http code', async (t) => {
   const result: any = await authorizationResponse.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.transactionId = result.transactionId;
@@ -24,7 +24,7 @@ test.serial('Authorizing a payment and check http code', async (t) => {
   paymentResponse.message = result.message;
   paymentResponse.data = result.data;
   t.is(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization', async (t) => {
   if (paymentResponse.status == 'AUTHORIZED') {
@@ -36,7 +36,7 @@ test.serial('Check status of payment authorization', async (t) => {
   }
 });
 
-test.serial('Authorizing a payment using invalid token and check http code', async (t) => {
+/* test.serial('Authorizing a payment using invalid token and check http code', async (t) => {
   const result: any = await authorizationResponse.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.transactionId = result.transactionId;
@@ -44,7 +44,7 @@ test.serial('Authorizing a payment using invalid token and check http code', asy
   paymentResponse.message = result.message;
   paymentResponse.data = result.data;
   t.not(paymentResponse.httpCode, 201);
-});
+}); */
 
 test.serial('Check status of payment authorization using invalid token', async (t) => {
   var i = 0;

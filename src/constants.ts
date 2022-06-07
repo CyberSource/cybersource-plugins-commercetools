@@ -10,12 +10,13 @@ export abstract class Constants {
   static readonly GET_ORDERS = 'getOrders';
   static readonly GET_REFUND = 'getRefund';
   static readonly GET_PAYMENT_DETAILS = 'getPaymentDetails';
+  static readonly POST_CONFIGURE_PLUGIN = 'postconfigurePlugin';
   static readonly POST_CUSTOMER_UPDATE = 'postCustomerUpdate';
   static readonly POST_PAYMENT_CREATE = 'postPaymentCreate';
   static readonly POST_PAYMENT_UPDATE = 'postPaymentUpdate';
-  static readonly POST_CONFIGURE_PLUGIN = 'postconfigurePlugin';
 
   static readonly FUNC_ADD_CARD_HANDLER = 'FuncAddCardHandler';
+  static readonly FUNC_ADD_CUSTOM_FIELD = 'FuncAddCustomField';
   static readonly FUNC_ADD_CUSTOM_TYPES = 'FuncAddCustomTypes';
   static readonly FUNC_ADD_TOKEN_RESPONSE = 'FuncAddTokenResponse';
   static readonly FUNC_ADD_TRANSACTION = 'FuncAddTransaction';
@@ -26,7 +27,7 @@ export abstract class Constants {
   static readonly FUNC_AUTH_REVERSAL_RESPONSE = 'FuncAuthReversalResponse';
   static readonly FUNC_CAPTURE_RESPONSE = 'FuncCaptureResponse';
   static readonly FUNC_CHANGE_STATE = 'FuncChangeState ';
-  static readonly FUNC_CHECK_AUTH_REVERSAL_TRIGGERED = 'checkAuthReversalTriggered';
+  static readonly FUNC_CHECK_AUTH_REVERSAL_TRIGGERED = 'FuncCheckAuthReversalTriggered';
   static readonly FUNC_CLICK_TO_PAY = 'FuncClickToPayResponse';
   static readonly FUNC_CONVERSION_DETAILS = 'FuncConversionDetails';
   static readonly FUNC_CREATE_RESPONSE = 'FuncCreateResponse';
@@ -64,6 +65,8 @@ export abstract class Constants {
   static readonly FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID = 'FuncRetrieveCartByAnonymousId';
   static readonly FUNC_RETRIEVE_CART_BY_CUSTOMER_ID = 'FuncRetrieveCartByCustomerId';
   static readonly FUNC_RETRIEVE_CART_BY_PAYMENT_ID = 'FuncRetrieveCartByPaymentId';
+  static readonly FUNC_RETRIEVE_ORDER_BY_CART_ID = 'FuncRetrieveOrderByCartId';
+  static readonly FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID = 'FuncRetrieveOrderByPaymentId';
   static readonly FUNC_RETRIEVE_PAYMENT = 'FuncRetrievePayment';
   static readonly FUNC_RUN_SYNC_ADD_TRANSACTION = 'FuncRunSyncAddTransaction';
   static readonly FUNC_SET_CUSTOMER_TOKEN_DATA = 'FuncSetCustomerTokenData';
@@ -73,6 +76,7 @@ export abstract class Constants {
   static readonly FUNC_SYNC_HANDLER = 'FuncSyncHandler';
   static readonly FUNC_UPDATE_CART_BY_PAYMENT_ID = 'FuncUpdateCartByPaymentId';
   static readonly FUNC_UPDATE_CARD_HANDLER = 'FuncUpdateCardHandler';
+  static readonly FUNC_UPDATE_CUSTOM_FIELDS = 'FuncUpdateCustomField';
   static readonly FUNC_UPDATE_DECISION_SYNC = 'FuncUpdateDecisionSync';
   static readonly FUNC_UPDATE_TOKEN_RESPONSE = 'FuncUpdateTokenResponse';
   static readonly FUNC_UPDATE_SYNC = 'FuncUpdateSync';
@@ -88,6 +92,7 @@ export abstract class Constants {
   static readonly VAL_ONE = 1;
   static readonly VAL_TWO = 2;
   static readonly VAL_TWENTY_THREE = 23;
+  static readonly VAL_THIRTY_SIX = 36;
   static readonly VAL_FIFTY = 50;
   static readonly VAL_FIFTY_NINE = 59;
   static readonly VAL_HUNDRED = 100;
@@ -127,6 +132,7 @@ export abstract class Constants {
   static readonly HTTP_CODE_TWO_HUNDRED = 200;
   static readonly HTTP_CODE_TWO_HUNDRED_ONE = 201;
   static readonly HTTP_CODE_TWO_HUNDRED_FOUR = 204;
+  static readonly HTTP_CODE_FOUR_HUNDRED = 400;
 
   //Payment response
   static readonly API_STATUS_AUTHORIZED = 'AUTHORIZED';
@@ -161,7 +167,7 @@ export abstract class Constants {
   //Strings
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
   static readonly ANONYMOUS_ID = 'anonymousId';
-  static readonly AUTENTICATION_SCHEME = 'Basic ';
+  static readonly AUTHENTICATION_SCHEME = 'Basic ';
   static readonly CUSTOMER_ID = 'customerId';
   static readonly DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
   static readonly DESC_ORDER = 'desc';
@@ -184,8 +190,10 @@ export abstract class Constants {
   static readonly STRING_CUSTOMER = 'customer';
   static readonly STRING_DATA = 'data';
   static readonly STRING_DELETE = 'delete';
+  static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
   static readonly STRING_EMAIL = 'email';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
+  static readonly STRING_ERRORS = 'errors';
   static readonly STRING_EXPIRATION_MONTH = 'expirationMonth';
   static readonly STRING_EXPIRATION_YEAR = 'expirationYear';
   static readonly STRING_FALSE = 'false';
@@ -196,6 +204,7 @@ export abstract class Constants {
   static readonly STRING_ID = 'id';
   static readonly STRING_MOTO = 'MOTO';
   static readonly STRING_OBJ = 'obj';
+  static readonly STRING_ORDER_NUMBER = 'orderNumber';
   static readonly STRING_PAYMENT_TOKEN = 'paymentToken';
   static readonly STRING_PREFIX = 'prefix';
   static readonly STRING_QUERY = 'query';
@@ -248,6 +257,7 @@ export abstract class Constants {
   static readonly CT_TRANSACTION_STATE_SUCCESS = 'Success';
 
   //CT custom fields
+  static readonly ADD_FIELD_DEFINITION = 'addFieldDefinition';
   static readonly ADD_INTERFACE_INTERACTION = 'addInterfaceInteraction';
   static readonly ADD_TRANSACTION = 'addTransaction';
   static readonly CHANGE_TRANSACTION_INTERACTION_ID = 'changeTransactionInteractionId';
@@ -370,6 +380,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_SYNC_PAYMENT_DETAILS = 'An error occurred while trying to sync the payments details';
   static readonly ERROR_MSG_TOKEN_UPDATE = 'Failed to update card tokens';
   static readonly ERROR_MSG_UPDATE_CART = 'Unable to update the cart';
+  static readonly ERROR_MSG_UPDATE_CUSTOM_TYPE = 'There was an error updating custom type';
   static readonly ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA = 'Unable to update click to pay card details';
 
   //script data
