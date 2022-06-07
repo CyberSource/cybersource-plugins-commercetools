@@ -166,7 +166,6 @@ const getCreditCardResponse = async (updatePaymentObj, customerInfo, cartObj, up
     cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
     startTime = new Date();
     startTime.setHours(startTime.getHours() - cardRate);
-    console.log('here');
     limiterResponse = await rateLimiterAddToken(customerInfo, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
     if (null != limiterResponse && limiterResponse.count > parseInt(cardRateCount)) {
       dontSaveTokenFlag = true;
