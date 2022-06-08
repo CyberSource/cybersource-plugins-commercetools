@@ -164,7 +164,13 @@
         amountConversion(discountObject.discountedPrice.value.centAmount)%> <%subTotal = unitPrice * discountObject.quantity %> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
         amountConversion(includedDiscount.discountedAmount.centAmount)*discountObject.quantity%> <%})%>
         <tr>
-          <td><%=item.name[locale] %></td>
+          <% if(locale){%>
+            <td><%=item.name[locale] %></td>
+            <% } else if("en" in item.name) { %>
+            <td><%=item.name.en %></td>
+            <% } else if("de" in item.name) { %>
+            <td><%=item.name.de %></td>
+            <% } %>
           <td><%= item.price.value.currencyCode%> <%= unitPrice%></td>
           <td><%= discountObject.quantity%></td>
           <td><%=roundOff(discountAmount)%></td>
@@ -174,7 +180,13 @@
         <%}) } })%> <%if(cart.customLineItems.length > 0){%> <% cart.customLineItems.forEach(function(item){ %> <%discountAmount = 0.0 %> <%if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length == 0){%> <% unitPrice =
         amountConversion(item.money.centAmount)%>
         <tr>
-          <td><%=item.name[locale] %></td>
+          <% if(locale){%>
+            <td><%=item.name[locale] %></td>
+            <% } else if("en" in item.name) { %>
+            <td><%=item.name.en %></td>
+            <% } else if("de" in item.name) { %>
+            <td><%=item.name.de %></td>
+            <% } %>
           <td><%= item.money.currencyCode%> <%= unitPrice%></td>
           <td><%= item.quantity%></td>
           <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
@@ -187,7 +199,13 @@
         amountConversion(discountObject.discountedPrice.value.centAmount)%> <%subTotal = unitPrice * discountObject.quantity%> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
         amountConversion(includedDiscount.discountedAmount.centAmount)*discountObject.quantity%> <%})%>
         <tr>
-          <td><%=item.name[locale] %></td>
+          <% if(locale){%>
+            <td><%=item.name[locale] %></td>
+            <% } else if("en" in item.name) { %>
+            <td><%=item.name.en %></td>
+            <% } else if("de" in item.name) { %>
+            <td><%=item.name.de %></td>
+            <% } %>
           <td><%= item.money.currencyCode%> <%= unitPrice%></td>
           <td><%= discountObject.quantity%></td>
           <td><%=roundOff(discountAmount)%></td>
@@ -328,6 +346,27 @@
         </tr>
         <% } %>
       </table>
+      <% } else if(payments.paymentMethodInfo.method == "eCheck"){ %>
+        <table class="paymenttable2" id="customSavedTokensTable">
+          <tr>
+            <td><b>Account Number</b></td>
+            <td><%= payments.custom.fields.isv_accountNumber%></td>
+          </tr>
+          <tr>
+            <td><b>Routing Number</b></td>
+            <td><%= payments.custom.fields.isv_routingNumber%></td>
+          </tr>
+          <tr>
+            <td><b>Account Type</b></td>
+            <% if(payments.custom.fields.isv_accountType == "C"){%>
+            <td>Checking</td>
+            <%}else if(payments.custom.fields.isv_accountType == "S"){%>
+            <td>Savings</td>
+            <%}else if(payments.custom.fields.isv_accountType == "X"){%>
+            <td>Corporate Checking</td>
+            <%}%>
+          </tr>
+        </table>
       <% } else { %>
       <table class="paymenttable2" id="customSavedTokensTable">
         <tr>

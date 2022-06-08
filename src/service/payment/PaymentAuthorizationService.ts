@@ -133,12 +133,39 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         paymentInformation.fluidData = fluidData;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
         var paymentInformationFluidData = new restApi.Ptsv2paymentsPaymentInformationFluidData();
         paymentInformationFluidData.value = payment.custom.fields.isv_token;
         paymentInformationFluidData.descriptor = Constants.PAYMENT_GATEWAY_APPLE_PAY_DESCRIPTOR;
         paymentInformationFluidData.encoding = Constants.PAYMENT_GATEWAY_APPLE_PAY_ENCODING;
         paymentInformation.fluidData = paymentInformationFluidData;
+      }else if (Constants.ECHECK == payment.paymentMethodInfo.method) {
+        var banktransaferOptions = new restApi.Ptsv2creditsProcessingInformationBankTransferOptions();
+        if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_ENABLED_MOTO in payment.custom.fields && payment.custom.fields.isv_enabledMoto) {
+          banktransaferOptions.secCode = Constants.SEC_CODE_TEL;
+        } else {
+          banktransaferOptions.secCode = Constants.SEC_CODE_WEB;
+        }
+
+        banktransaferOptions.fraudScreeningLevel = Constants.VAL_ONE;
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
+        processingInformation.bankTransferOptions = banktransaferOptions;
+        var paymentInformationBank = new restApi.Ptsv2paymentsPaymentInformationBank();
+        var paymentInformationBankAccount = new restApi.Ptsv2paymentsPaymentInformationBankAccount();
+        paymentInformationBankAccount.type = payment.custom.fields.isv_accountType;
+        paymentInformationBankAccount.number = payment.custom.fields.isv_accountNumber;
+        paymentInformationBank.account = paymentInformationBankAccount;
+        paymentInformationBank.routingNumber = payment.custom.fields.isv_routingNumber;
+        paymentInformation.bank = paymentInformationBank;
+        var paymentInformationPaymentType = new restApi.Ptsv2paymentsPaymentInformationPaymentType();
+        paymentInformationPaymentType.name = Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE;
+        paymentInformation.paymentType = paymentInformationPaymentType;
       }
+
 
       requestObj.processingInformation = processingInformation;
       requestObj.paymentInformation = paymentInformation;

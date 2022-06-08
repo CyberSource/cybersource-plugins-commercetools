@@ -62,6 +62,24 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
           processingInformation.reconciliationId = orderNo;
         }
         requestObj.processingInformation = processingInformation;
+      } else if (Constants.ECHECK == payment.paymentMethodInfo.method) {
+        var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
+        if (null != orderNo) {
+          processingInformation.reconciliationId = orderNo;
+        }
+        requestObj.processingInformation = processingInformation;
+        var paymentInformation = new restApi.Ptsv2paymentsidrefundsPaymentInformation();
+        var paymentInformationBank = new restApi.Ptsv2paymentsPaymentInformationBank();
+        var paymentInformationBankAccount = new restApi.Ptsv2paymentsPaymentInformationBankAccount();
+        paymentInformationBankAccount.type = payment.custom.fields.isv_accountType;
+        paymentInformationBankAccount.number = payment.custom.fields.isv_accountNumber;
+        paymentInformationBank.account = paymentInformationBankAccount;
+        paymentInformationBank.routingNumber = payment.custom.fields.isv_routingNumber;
+        paymentInformation.bank = paymentInformationBank;
+        var paymentInformationPaymentType = new restApi.Ptsv2paymentsPaymentInformationPaymentType();
+        paymentInformationPaymentType.name = Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE;
+        paymentInformation.paymentType = paymentInformationPaymentType;
+        requestObj.paymentInformation = paymentInformation;
       } else {
         if (null != orderNo) {
           var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();

@@ -81,6 +81,13 @@ const authorizationHandler = async (updatePaymentObj, updateTransactions) => {
             errorFlag = serviceResponse.errorFlag;
             break;
           }
+          case Constants.ECHECK: {
+            serviceResponse = await getCreditCardResponse(updatePaymentObj, customerInfo, cartObj.results[Constants.VAL_ZERO], updateTransactions, cardTokens, orderNo);
+            paymentResponse = serviceResponse.paymentResponse;
+            authResponse = serviceResponse.authResponse;
+            errorFlag = serviceResponse.errorFlag;
+            break;
+          }
           default: {
             paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_HANDLER, Constants.LOG_INFO, Constants.ERROR_MSG_NO_PAYMENT_METHODS);
             errorFlag = true;
@@ -1327,7 +1334,7 @@ const reportHandler = async () => {
             paymentDetails = await commercetoolsApi.retrievePayment(element.merchantReferenceNumber);
             if (null != paymentDetails) {
               latestTransaction = paymentDetails.transactions.pop();
-              if (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == latestTransaction.type && Constants.CT_TRANSACTION_STATE_PENDING == latestTransaction.state) {
+              if ((Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == latestTransaction.type || Constants.CT_TRANSACTION_TYPE_CHARGE == latestTransaction.type) && Constants.CT_TRANSACTION_STATE_PENDING == latestTransaction.state){
                 conversionPresent = true;
                 decisionUpdateObject.id = paymentDetails.id;
                 decisionUpdateObject.version = paymentDetails.version;
@@ -1439,7 +1446,11 @@ const syncHandler = async () => {
                       syncUpdateObject.amountPlanned.centAmount = paymentService.convertAmountToCent(Number(element.orderInformation.amountDetails.totalAmount));
                     }
                     if (applicationResponse.authPresent) {
-                      syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_AUTHORIZATION;
+                      if (paymentDetails.paymentMethodInfo.method == Constants.ECHECK) {
+                        syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_CHARGE;
+                      } else {
+                        syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_AUTHORIZATION;
+                      }
                       updateSyncResponse = await runSyncAddTransaction(syncUpdateObject, element.applicationInformation.reasonCode, applicationResponse.authPresent, applicationResponse.authReasonCodePresent);
                       if (null != updateSyncResponse && paymentDetails.paymentMethodInfo.method == Constants.CLICK_TO_PAY) {
                         await updateVisaDetails(paymentDetails.id, updateSyncResponse.version, element.id);
@@ -1471,7 +1482,11 @@ const syncHandler = async () => {
                     syncUpdateObject.amountPlanned.currencyCode = paymentDetails.amountPlanned.currencyCode;
                     syncUpdateObject.amountPlanned.centAmount = paymentDetails.amountPlanned.centAmount;
                   }
-                  syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_AUTHORIZATION;
+                  if (paymentDetails.paymentMethodInfo.method == Constants.ECHECK) {
+                    syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_CHARGE;
+                  } else {
+                    syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_AUTHORIZATION;
+                  }
                   updateSyncResponse = await runSyncAddTransaction(syncUpdateObject, element.applicationInformation.reasonCode, applicationResponse.authPresent, applicationResponse.authReasonCodePresent);
                   if (null != updateSyncResponse && paymentDetails.paymentMethodInfo.method == Constants.CLICK_TO_PAY) {
                     await updateVisaDetails(paymentDetails.id, updateSyncResponse.version, element.id);
@@ -1515,11 +1530,16 @@ const getApplicationsPresent = async (applications) => {
     refundPresent: false,
   };
   if (null != applications) {
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_AUTH_NAME)) {
+    if (applications.some((item) => item.name == Constants.STRING_SYNC_AUTH_NAME) || applications.some((item) => item.name == Constants.STRING_SYNC_ECHECK_DEBIT_NAME)) {
       applicationResponse.authPresent = true;
     }
     if (applications.some((item) => item.name == Constants.STRING_SYNC_AUTH_NAME && item.reasonCode != null && Constants.VAL_HUNDRED == item.reasonCode)) {
       applicationResponse.authReasonCodePresent = true;
+    }
+    if (applications.some((item) => item.name == Constants.STRING_SYNC_ECHECK_DEBIT_NAME && item.reasonCode == null)) {
+      if (applications.some((nextItem) => nextItem.name == Constants.STRING_SYNC_DECISION_NAME && nextItem.reasonCode == Constants.VAL_FOUR_EIGHTY)) {
+        applicationResponse.authReasonCodePresent = true;
+      }
     }
     if (applications.some((item) => item.name == Constants.STRING_SYNC_CAPTURE_NAME)) {
       applicationResponse.capturePresent = true;

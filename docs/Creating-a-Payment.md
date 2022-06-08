@@ -9,6 +9,8 @@ To create a payment, you must first decide which payment method you would like t
 | creditCardWithPayerAuthentication | Processes credit cards with 3DS checks. This requires some extra values on Payment Create which are listed below.    |
 | googlePay                         | Processes the payment using payment network tokenization to make Web payments and mobile payments on Android devices |
 | applePay                          | Processes the payment using payment network tokenization to make Web payments and mobile payments on Apple devices   |
+| eCheck                            | Processes the payment using appropriate check processors.This requires some extra values on Payment Create which are listed below |
+
 
 When creating a payment, the following fields are validated
 
@@ -20,7 +22,10 @@ When creating a payment, the following fields are validated
 | payment.transactions                       | Must be empty                               | Always |
 | payment.amountPlanned                      | Must not be a negative value                | Always |
 | payment.custom.type.key                    | isv_payment_data                            | Always |
-| payment.custom.isv_token                   | Must exist                                  | Always |
+| payment.custom.isv_token                   | Must exist                                  | Except when payment.paymentMethodInfo.method == eCheck |
+| payment.custom.isv_accountNumber           | Must exist                                  | payment.paymentMethodInfo.method == eCheck                            |
+| payment.custom.isv_accountType             | Must exist                                  | payment.paymentMethodInfo.method == eCheck                            |
+| payment.custom.isv_routingNumber           | Must exist                                  | payment.paymentMethodInfo.method == eCheck                            |
 | payment.custom.isv_acceptHeader            | Must exist                                  | payment.paymentMethodInfo.method == creditCardWithPayerAuthentication |
 | payment.custom.isv_userAgentHeader         | Must exist                                  | payment.paymentMethodInfo.method == creditCardWithPayerAuthentication |
 

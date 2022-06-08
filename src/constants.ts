@@ -114,6 +114,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE = 'clientReferenceInformation.code:';
   static readonly PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION = 'CONSUMER_AUTHENTICATION';
   static readonly PAYMENT_GATEWAY_DECISION_SKIP = 'DECISION_SKIP';
+  static readonly PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE = 'CHECK';
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
   static readonly PAYMENT_GATEWAY_JWT_FORMAT = 'JWT';
@@ -140,8 +141,9 @@ export abstract class Constants {
   static readonly API_STATUS_COMPLETED = 'COMPLETED';
   static readonly API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED = 'CUSTOMER_AUTHENTICATION_REQUIRED';
   static readonly API_STATUS_PENDING = 'PENDING';
-  static readonly API_STATUS_PENDING_REVIEW = 'AUTHORIZED_PENDING_REVIEW';
+  static readonly API_STATUS_AUTHORIZED_PENDING_REVIEW = 'AUTHORIZED_PENDING_REVIEW';
   static readonly API_STATUS_PENDING_AUTHENTICATION = 'PENDING_AUTHENTICATION';
+  static readonly API_STATUS_PENDING_REVIEW = 'PENDING_REVIEW';
   static readonly API_STATUS_REVERSED = 'REVERSED';
   static readonly HTTP_STATUS_DECISION_ACCEPT = 'ACCEPT';
   static readonly HTTP_STATUS_DECISION_REJECT = 'REJECT';
@@ -162,6 +164,7 @@ export abstract class Constants {
   static readonly CC_PAYER_AUTHENTICATION = 'creditCardWithPayerAuthentication';
   static readonly CLICK_TO_PAY = 'clickToPay';
   static readonly APPLE_PAY = 'applePay';
+  static readonly ECHECK = 'eCheck';
   static readonly GOOGLE_PAY = 'googlePay';
 
   //Strings
@@ -218,6 +221,8 @@ export abstract class Constants {
   static readonly STRING_SYNC_AUTH_NAME = 'ics_auth';
   static readonly STRING_SYNC_AUTH_REVERSAL_NAME = 'ics_auth_reversal';
   static readonly STRING_SYNC_CAPTURE_NAME = 'ics_bill';
+  static readonly STRING_SYNC_DECISION_NAME = 'ics_decision';
+  static readonly STRING_SYNC_ECHECK_DEBIT_NAME = 'ics_ecp_debit';
   static readonly STRING_SYNC_QUERY = 'submitTimeUtc:[NOW/DAY-1DAY TO NOW/HOUR+1HOUR}';
   static readonly STRING_SYNC_REFUND_NAME = 'ics_credit';
   static readonly STRING_SYNC_SORT = 'submitTimeUtc:desc';
@@ -302,6 +307,8 @@ export abstract class Constants {
   static readonly ISV_USER_AGENT_HEADER = 'isv_userAgentHeader';
   static readonly PAYMENT_CREATE_KEY = 'isv_payment_create_extension';
   static readonly PAYMENT_UPDATE_KEY = 'isv_payment_update_extension';
+  static readonly SEC_CODE_TEL = 'TEL';
+  static readonly SEC_CODE_WEB = 'WEB';
   static readonly SET_BILLING_ADDRESS = 'setBillingAddress';
   static readonly SET_CUSTOM_FIELD = 'setCustomField';
   static readonly SET_CUSTOM_TYPE = 'setCustomType';
@@ -721,6 +728,39 @@ export abstract class Constants {
         required: false,
         type: {
           name: 'Boolean',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_accountNumber',
+        label: {
+          en: 'Account Number for eCheck',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_accountType',
+        label: {
+          en: 'Account Type for eCheck',
+        },
+        required: false,
+        type: {
+          name: 'String',
+        },
+        inputHint: 'SingleLine',
+      },
+      {
+        name: 'isv_routingNumber',
+        label: {
+          en: 'Routing Number for eCheck',
+        },
+        required: false,
+        type: {
+          name: 'String',
         },
         inputHint: 'SingleLine',
       },
