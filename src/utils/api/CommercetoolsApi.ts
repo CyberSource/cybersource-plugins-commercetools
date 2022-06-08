@@ -523,6 +523,7 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
           cardNumber: updatePaymentObj.custom.fields.isv_maskedPan,
           cardExpiryMonth: updatePaymentObj.custom.fields.isv_cardExpiryMonth,
           cardExpiryYear: updatePaymentObj.custom.fields.isv_cardExpiryYear,
+          timeStamp: new Date(Date.now()).toISOString(),
         };
         stringTokenData = JSON.stringify(tokenData);
         if (
@@ -540,7 +541,7 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
           mappedTokens.set(length, stringTokenData);
           tokenResponse = await setCustomType(customerId, mappedTokens, failedTokens);
         } else {
-          if (null != customerInfo) {
+          if (null != customerInfo && Constants.STRING_CUSTOM in customerInfo && Constants.STRING_FIELDS in customerInfo.custom) {
             failedTokens = customerInfo.custom.fields.isv_failedTokens;
           }
           tokenArray = [stringTokenData];
@@ -920,7 +921,7 @@ const setCustomType = async (customerId, fieldsData, failedTokenData) => {
   let customerInfo: any;
   let exceptionData: any;
   try {
-    if (null != customerId && null != fieldsData) {
+    if (null != customerId) {
       const client = getClient();
       if (null != client) {
         const requestBuilder = createRequestBuilder({
