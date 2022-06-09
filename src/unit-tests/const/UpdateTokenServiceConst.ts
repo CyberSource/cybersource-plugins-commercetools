@@ -8,9 +8,26 @@ export const tokens = {
     cardExpiryMonth: updateToken.oldExpiryMonth,
     cardExpiryYear: updateToken.oldExpiryYear,
     paymentToken: updateToken.paymentToken,
-    flag: 'update',
-    oldExpiryMonth: updateToken.oldExpiryMonth,
-    oldExpiryYear: updateToken.oldExpiryYear
+    instrumentIdentifier: updateToken.instrumentIdentifier,
+    addressId: 'OKxBLnRJ'
+  }
+
+  export const newExpiryMonth = updateToken.cardExpiryMonth
+
+  export const newExpiryYear = updateToken.cardExpiryYear
+
+  export const addressData =  {
+    id: 'OKxBLnRJ',
+    firstName: 'shakshi',
+    lastName: 'poddar',
+    streetName: '1295 Charleston Road',
+    additionalStreetInfo: '5th lane',
+    postalCode: '94043',
+    city: 'Mountain View',
+    region: 'CA',
+    country: 'US',
+    phone: '+19876543210',
+    email: 'shakshi.poddar@wipro.com'
   }
 
   export const tokenObject = {

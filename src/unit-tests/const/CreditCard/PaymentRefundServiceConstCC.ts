@@ -1,3 +1,4 @@
+import creditCard from '../../JSON/creditCard.json'
 export const payment = {
     id: '56d9909e-7c0e-4315-b1ef-5788f7b1d33e',
     version: 16,
@@ -62,7 +63,7 @@ export const payment = {
     interfaceInteractions: [],
   };
 
-export const captureId = '6397237528526524203955';
+export const captureId =creditCard.captureId ;
 
 export const captureID = '63972375285265242';
 
@@ -73,8 +74,10 @@ export const updateTransaction = {
   amount: {
     type: 'centPrecision',
     currencyCode: 'USD',
-    centAmount: 5000,
+    centAmount: 100,
     fractionDigits: 2
   },
   state: 'Initial'
 }
+
+export const orderNo = null

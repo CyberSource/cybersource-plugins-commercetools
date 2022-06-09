@@ -494,7 +494,7 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
   return orderResponse;
 };
 
-const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumentIdentifier, updatePaymentObj) => {
+const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumentIdentifier, updatePaymentObj, addressId) => {
   let tokenResponse: any;
   let customerInfo: any;
   let client: any;
@@ -523,6 +523,7 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
           cardNumber: updatePaymentObj.custom.fields.isv_maskedPan,
           cardExpiryMonth: updatePaymentObj.custom.fields.isv_cardExpiryMonth,
           cardExpiryYear: updatePaymentObj.custom.fields.isv_cardExpiryYear,
+          addressId: addressId,
           timeStamp: new Date(Date.now()).toISOString(),
         };
         stringTokenData = JSON.stringify(tokenData);

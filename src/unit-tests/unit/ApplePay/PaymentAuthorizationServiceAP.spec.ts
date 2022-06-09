@@ -8,20 +8,20 @@ import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
 
-/* import { cart, cardTokens, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag } from '../../const/ApplePay/PaymentAuthorizationServiceConstAP';
-import auth from '../../../service/payment/PaymentAuthorizationService'; */
+import { cart, cardTokens, payment, payments, service, dontSaveTokenFlag, payerAuthMandateFlag, orderNo } from '../../const/ApplePay/PaymentAuthorizationServiceConstAP';
+import auth from '../../../service/payment/PaymentAuthorizationService';
 
 let paymentResponse = {
   httpCode: null,
   status: null,
 };
 
-/* test.serial('Authorizing a payment and check http code', async (t) => {
-  const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
+test.serial('Authorizing a payment and check http code', async (t) => {
+  const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.is(paymentResponse.httpCode, 201);
-}); */
+}); 
 
 test.serial('Check status for payment authorization ', async (t) => {
   if (paymentResponse.status == 'AUTHORIZED') {
@@ -33,12 +33,12 @@ test.serial('Check status for payment authorization ', async (t) => {
   }
 });
 
-/* test.serial('Authorizing a payment using invalid token and check http code', async (t) => {
-  const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag);
+test.serial('Authorizing a payment using invalid token and check http code', async (t) => {
+  const result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, 201);
-}); */
+}); 
 
 test.serial('Check status for invalid authorization', async (t) => {
   var i = 0;

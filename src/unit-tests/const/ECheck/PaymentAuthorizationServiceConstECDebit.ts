@@ -1,95 +1,127 @@
-import clickToPay from '../../JSON/clickToPay.json';
-import creditCard from '../../JSON/creditCard.json';
-
-export const payment = {
-  id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
-  version: 2,
-  lastMessageSequenceNumber: 2,
-  createdAt: '2021-11-10T06:15:42.254Z',
-  lastModifiedAt: '2021-11-10T06:15:42.254Z',
-  lastModifiedBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '9f9da50d-abc8-416b-a31d-ea319abf31fc',
-  },
-  createdBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '9f9da50d-abc8-416b-a31d-ea319abf31fc',
-  },
-  amountPlanned: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: 6970,
-    fractionDigits: 2,
-  },
-  paymentMethodInfo: {
-    paymentInterface: "cybersource",
-    method: "clickToPay",
-    name: {
-      "en": "Click to Pay"
-    }
-  },
-  custom: {
-    type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
-    fields: {
-      isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
-      isv_token: clickToPay.isv_token,
-      isv_acceptHeader: '*/*',
-      isv_customerIpAddress: '171.76.13.221',
-      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+/* eslint-disable import/order */
+/* eslint-disable no-var */
+import eCheck from '../../JSON/eCheck.json';
+import creditCard from '../../JSON/creditCard.json'
+export var payment = {
+    "id": "f3215a29-1f08-4775-9006-22b84b55bae5",
+    "version": 2,
+    "lastMessageSequenceNumber": 2,
+    "createdAt": "2022-06-09T07:51:42.330Z",
+    "lastModifiedAt": "2022-06-09T07:51:42.330Z",
+    "lastModifiedBy": {
+      "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
+      "isPlatformClient": false,
+      "customer": {
+        "typeId": "customer",
+        "id": "42c377ec-14f5-4509-8e7f-75738970c8c8"
+      }
     },
-  },
-  paymentStatus: {},
-  transactions: [],
-  interfaceInteractions: [],
-};
-
-export const payments = {
-  id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
-  version: 2,
-  lastMessageSequenceNumber: 2,
-  createdAt: '2021-11-10T06:15:42.254Z',
-  lastModifiedAt: '2021-11-10T06:15:42.254Z',
-  lastModifiedBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '9f9da50d-abc8-416b-a31d-ea319abf31fc',
-  },
-  createdBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '9f9da50d-abc8-416b-a31d-ea319abf31fc',
-  },
-  amountPlanned: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: 6970,
-    fractionDigits: 2,
-  },
-  paymentMethodInfo: {
-    paymentInterface: "cybersource",
-    method: "clickToPay",
-    name: {
-      "en": "Click to Pay"
-    }
-  },
-  custom: {
-    type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
-    fields: {
-      isv_deviceFingerprintId: 'ac692e81-8ed7-4f85-b4c2-931057fb9b24',
-      isv_token: '195403577059284',
-      isv_acceptHeader: '*/*',
-      isv_customerIpAddress: '171.76.13.221',
-      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+    "createdBy": {
+      "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
+      "isPlatformClient": false,
+      "customer": {
+        "typeId": "customer",
+        "id": "42c377ec-14f5-4509-8e7f-75738970c8c8"
+      }
     },
-  },
-  paymentStatus: {},
-  transactions: [],
-  interfaceInteractions: [],
-};
+    "customer": {
+      "typeId": "customer",
+      "id": "42c377ec-14f5-4509-8e7f-75738970c8c8"
+    },
+    "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 1490,
+      "fractionDigits": 2
+    },
+    "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "eCheck",
+      "name": {
+        "en": "eCheck"
+      }
+    },
+    "custom": {
+      "type": {
+        "typeId": "type",
+        "id": "87b9d9db-74a3-45d7-8e60-dde669866808"
+      },
+      "fields": {
+        "isv_deviceFingerprintId": "992569fb-9d45-4e13-87d5-5d0696db459e",
+        "isv_accountNumber": eCheck.accountNumber,
+        "isv_acceptHeader": "*/*",
+        "isv_accountType": "C",
+        "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36",
+        "isv_customerIpAddress": "223.178.233.243",
+        "isv_routingNumber": eCheck.routingNumber
+      }
+    },
+    "paymentStatus": {},
+    "transactions": [],
+    "interfaceInteractions": []
+  }
 
-export const cart = {
+export var paymentGuest = {
+    "id":"b793821e-c364-4166-b47f-da3f181664ed",
+    "version":2,
+    "lastMessageSequenceNumber":2,
+    "createdAt":"2022-06-09T08:56:19.561Z",
+    "lastModifiedAt":"2022-06-09T08:56:19.561Z",
+    "lastModifiedBy":
+    {
+        "clientId":"0GrQ8c2D9t1iSjzJF8E3Ygu3",
+        "isPlatformClient":false,
+        "anonymousId":"137e1f96-4328-4fda-85f5-b039bb640fec"
+    },
+    "createdBy":
+    {
+        "clientId":"0GrQ8c2D9t1iSjzJF8E3Ygu3",
+        "isPlatformClient":false,
+        "anonymousId":"137e1f96-4328-4fda-85f5-b039bb640fec"
+    },
+    "amountPlanned":
+    {
+        "type":"centPrecision",
+        "currencyCode":"USD",
+        "centAmount":2490,
+        "fractionDigits":2
+    },
+    "paymentMethodInfo":
+    {
+        "paymentInterface":"cybersource",
+        "method":"eCheck",
+        "name":
+        {
+            "en":"eCheck"
+        }
+    },
+    "custom":
+    {
+        "type":
+        {
+            "typeId":"type",
+            "id":"87b9d9db-74a3-45d7-8e60-dde669866808"
+        },
+        "fields":
+        {
+            "isv_deviceFingerprintId":"8a031d45-3893-4ba3-9b8f-7f406c3e085f",
+            "isv_accountNumber":eCheck.accountNumber,
+            "isv_acceptHeader":"*/*",
+            "isv_accountType":"C",
+            "isv_userAgentHeader":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36",
+            "isv_customerIpAddress":"223.178.233.243",
+            "isv_routingNumber":eCheck.routingNumber
+        }
+    },
+    "paymentStatus":{},
+    "transactions":[],
+    "interfaceInteractions":[],
+    "anonymousId":"137e1f96-4328-4fda-85f5-b039bb640fec"
+}
+
+
+
+export var cart = {
   "type": "Cart",
   "id": "3d09ed42-1b1b-450a-b670-269437683939",
   "version": 10,
@@ -302,21 +334,18 @@ export const cart = {
   "itemShippingAddresses": [],
   "totalLineItemQuantity": 1
 }
-
-export const service = 'visa';
-
 export const cardTokens = {
-  customerTokenId: creditCard.savedTokenId,
-  paymentInstrumentId: creditCard.savedToken,
+  customerTokenId: creditCard.savedToken,
+  paymentInstrumentId: null,
 };
 
-export const cardTokensObject = {
-  customerTokenId: 'D605360941117CECE053AF598E0A6E',
-  paymentInstrumentId: 'D7688E8C36CCE10FE053A2598D0AC0',
-};
 
-export const orderNo = null;
+
+export const service = 'card';
+
 
 export const dontSaveTokenFlag = false;
 
 export const payerAuthMandateFlag = false
+
+export const orderNo = null;

@@ -6,6 +6,10 @@ dotenv.config();
 import paymentService from '../../utils/PaymentService';
 import {fieldMapperFields, fieldMapperFieldObject,getOMServiceResponsePaymentResponse,getOMServiceResponsePaymentResponseObject,getOMServiceResponseTransactionDetail,visaCardDetailsActionVisaCheckoutData, getCapturedAmountRefundPaymentObj} from '../const/PaymentServiceConst';
 import {getAuthResponsePaymentPendingResponse,getAuthResponsePaymentCompleteResponse,  getAuthResponsePaymentResponse, getAuthResponsePaymentDeclinedResponse,getAuthResponsePaymentResponseObject,getAuthResponseTransactionDetail} from '../const/PaymentServiceConst';
+import {successState, failureState, changeStateTransactionDetail, changeStateFailureTransactionDetail} from '../const/PaymentServiceConst';
+import {payerAuthActionsResponse, payerEnrollActionsUpdatePaymentObj, payerEnrollActionsResponse} from '../const/PaymentServiceConst'
+import {getUpdateTokenActionsActions, failurePaymentResponse, failureResponseTransactionDetail} from '../const/PaymentServiceConst';
+
 
 test.serial('Field mapping for flex keys', async(t)=>{
     const result = await paymentService.fieldMapper(fieldMapperFields);
@@ -96,11 +100,69 @@ test.serial('Get captured amount', async(t)=>{
 })
 
 test.serial('Convert cent to amount ', async(t)=>{
-    const result = paymentService.convertCentToAmount(6970);
+    const result =await paymentService.convertCentToAmount(6970);
     t.is(result, 69.70);
 })
 
 test.serial('Convert amount to cent', async(t)=>{
-    const result = paymentService.convertAmountToCent(69.70);
+    const result =await paymentService.convertAmountToCent(69.70);
     t.is(result, 6970);
 })
+
+test.serial('Get response of change state for success', async(t)=>{
+    const result =await paymentService.changeState(changeStateTransactionDetail, successState);
+    t.is(result.action, 'changeTransactionState');
+    t.is(result.state, 'Success');
+})
+
+test.serial('Get response of change state for failure', async(t)=>{
+    const result =await paymentService.changeState(changeStateFailureTransactionDetail, failureState);
+    t.is(result.action, 'changeTransactionState');
+    t.is(result.state, 'Failure');
+})
+
+test.serial('Get payer auth actions ', async(t)=>{
+    const result = await paymentService.payerAuthActions(payerAuthActionsResponse);
+    t.is(result[0].action, 'addInterfaceInteraction');
+    t.is(result[0].fields.authenticationRequired, true);
+    t.is(result[1].name, 'isv_payerAuthenticationRequired');
+    t.is(result[1].value, true);
+    t.is(result[2].name, 'isv_payerAuthenticationTransactionId');
+    t.is(result[3].name, 'isv_payerAuthenticationAcsUrl');
+    t.is(result[4].name, 'isv_payerAuthenticationPaReq');
+    t.is(result[5].name, 'isv_stepUpUrl');
+    t.is(result[6].name, 'isv_responseJwt');
+})
+
+test.serial('Get payer enroll actions ', async(t)=>{
+    const result = await paymentService.payerEnrollActions(payerEnrollActionsResponse, payerEnrollActionsUpdatePaymentObj);
+    t.is(result.actions[0].action, 'setCustomField');
+    t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
+    t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
+    t.is(result.actions[1].value, 201);
+    t.is(result.actions[2].name, 'isv_payerEnrollStatus');
+    t.is(result.actions[2].value, 'PENDING_AUTHENTICATION');
+    t.is(result.actions[3].name, 'isv_tokenCaptureContextSignature');
+    t.is(result.actions[3].value, null);
+})
+
+test.serial('Get update token actions ', async(t)=>{
+    const result = await paymentService.getUpdateTokenActions(getUpdateTokenActionsActions, null,true);
+    if(result)
+    {
+        t.is(result.actions[0].action, 'setCustomType');
+        t.is(result.actions[0].type.key, 'isv_payments_customer_tokens');
+    }
+    else
+    {
+        t.pass();
+    }
+})
+
+test.serial('Get the failure response ', async(t)=>{
+    const result = await paymentService.failureResponse(failurePaymentResponse, failureResponseTransactionDetail);
+    t.is(result.action, 'addInterfaceInteraction');
+    t.is(result.type.key, 'isv_payment_failure');
+    t.is(result.fields.reasonCode, '201');
+})
+

@@ -52,7 +52,6 @@ export abstract class Constants {
   static readonly FUNC_GET_TRANSACTION_SEARCH_RESPONSE = 'FuncGetTransactionSearchResponse';
   static readonly FUNC_GET_SERVICE_RESPONSE = 'FuncGetOMServiceResponse';
   static readonly FUNC_GET_UPDATE_TOKEN_ACTIONS = 'FuncGetUpdateTokenActions';
-  static readonly FUNC_GET_UPDATE_FAILED_TOKEN_ACTIONS = 'FuncGetUpdateFailedTokenActions';
   static readonly FUNC_GET_VISA_CHECKOUT_DATA = 'FuncGetVisaCheckoutData';
   static readonly FUNC_GOOGLE_PAY_RESPONSE = 'FuncGooglePayResponse';
   static readonly FUNC_KEYS = 'FuncKeys';
@@ -183,6 +182,7 @@ export abstract class Constants {
   static readonly STRING_AMOUNT_PLANNED = 'amountPlanned';
   static readonly STRING_AND = ' AND ';
   static readonly STRING_BODY = 'body';
+  static readonly STRING_BILLING_ADDRESS = 'billingAddress';
   static readonly STRING_CARD = 'card';
   static readonly STRING_CARD_EXPIRY_MONTH = 'cardExpiryMonth';
   static readonly STRING_CARD_EXPIRY_YEAR = 'cardExpiryYear';
