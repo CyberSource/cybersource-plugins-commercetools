@@ -906,48 +906,48 @@ const setCustomerTokenData = async (cardTokens, paymentResponse, authResponse, e
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_INFO, Constants.ERROR_MSG_TOKEN_UPDATE);
       }
     }
-  } else if (
-    Constants.STRING_CUSTOMER in updatePaymentObj &&
-    Constants.STRING_ID in updatePaymentObj.customer &&
-    Constants.HTTP_CODE_TWO_HUNDRED_ONE != paymentResponse.httpCode &&
-    (Constants.CREDIT_CARD == paymentMethod || Constants.CC_PAYER_AUTHENTICATION == paymentMethod) &&
-    (null == updatePaymentObj.custom.fields.isv_savedToken || Constants.STRING_EMPTY == updatePaymentObj.custom.fields.isv_savedToken) &&
-    Constants.ISV_TOKEN_ALIAS in updatePaymentObj.custom.fields &&
-    Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_tokenAlias
-  ) {
-    customerId = updatePaymentObj.customer.id;
-    customerInfo = await commercetoolsApi.getCustomer(customerId);
-    failedToken = {
-      alias: updatePaymentObj.custom.fields.isv_tokenAlias,
-      cardType: updatePaymentObj.custom.fields.isv_cardType,
-      cardName: updatePaymentObj.custom.fields.isv_cardType,
-      cardNumber: updatePaymentObj.custom.fields.isv_maskedPan,
-      cardExpiryMonth: updatePaymentObj.custom.fields.isv_cardExpiryMonth,
-      cardExpiryYear: updatePaymentObj.custom.fields.isv_cardExpiryYear,
-      addressId: addressId,
-      timeStamp: new Date(Date.now()).toISOString(),
-    };
+  } else {
     if (
-      null != customerInfo &&
-      Constants.STRING_CUSTOM in customerInfo &&
-      Constants.STRING_FIELDS in customerInfo.custom &&
-      Constants.ISV_FAILED_TOKENS in customerInfo.custom.fields &&
-      Constants.STRING_EMPTY != customerInfo.custom.fields.isv_failedTokens &&
-      Constants.VAL_ZERO < customerInfo.custom.fields.isv_failedTokens.length
+      Constants.STRING_CUSTOMER in updatePaymentObj &&
+      Constants.STRING_ID in updatePaymentObj.customer &&
+      (Constants.CREDIT_CARD == paymentMethod || Constants.CC_PAYER_AUTHENTICATION == paymentMethod) &&
+      (null == updatePaymentObj.custom.fields.isv_savedToken || Constants.STRING_EMPTY == updatePaymentObj.custom.fields.isv_savedToken) &&
+      Constants.ISV_TOKEN_ALIAS in updatePaymentObj.custom.fields &&
+      Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_tokenAlias
     ) {
-      existingTokens = customerInfo.custom.fields.isv_tokens;
-      existingFailedTokens = customerInfo.custom.fields.isv_failedTokens;
-      existingFailedTokensMap = existingFailedTokens.map((item) => item);
-      failedTokenLength = customerInfo.custom.fields.isv_failedTokens.length;
-      existingFailedTokensMap.set(failedTokenLength, JSON.stringify(failedToken));
-    } else {
-      existingFailedTokensMap = [JSON.stringify(failedToken)];
-    }
-    customerTokenResponse = await commercetoolsApi.setCustomType(updatePaymentObj.customer.id, existingTokens, existingFailedTokensMap);
-    if (null != customerTokenResponse) {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_INFO, Constants.SUCCESS_MSG_CARD_TOKENS_UPDATE);
-    } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_INFO, Constants.ERROR_MSG_TOKEN_UPDATE);
+      customerId = updatePaymentObj.customer.id;
+      customerInfo = await commercetoolsApi.getCustomer(customerId);
+      failedToken = {
+        alias: updatePaymentObj.custom.fields.isv_tokenAlias,
+        cardType: updatePaymentObj.custom.fields.isv_cardType,
+        cardName: updatePaymentObj.custom.fields.isv_cardType,
+        cardNumber: updatePaymentObj.custom.fields.isv_maskedPan,
+        cardExpiryMonth: updatePaymentObj.custom.fields.isv_cardExpiryMonth,
+        cardExpiryYear: updatePaymentObj.custom.fields.isv_cardExpiryYear,
+        addressId: addressId,
+        timeStamp: new Date(Date.now()).toISOString(),
+      };
+      if (null != customerInfo) {
+        if (Constants.STRING_CUSTOM in customerInfo && Constants.STRING_FIELDS in customerInfo.custom) {
+          if (Constants.ISV_FAILED_TOKENS in customerInfo.custom.fields && Constants.STRING_EMPTY != customerInfo.custom.fields.isv_failedTokens && Constants.VAL_ZERO < customerInfo.custom.fields.isv_failedTokens.length) {
+            existingFailedTokens = customerInfo.custom.fields.isv_failedTokens;
+            existingFailedTokensMap = existingFailedTokens.map((item) => item);
+            failedTokenLength = customerInfo.custom.fields.isv_failedTokens.length;
+            existingFailedTokensMap.set(failedTokenLength, JSON.stringify(failedToken));
+          } else {
+            existingFailedTokensMap = [JSON.stringify(failedToken)];
+          }
+          existingTokens = customerInfo.custom.fields.isv_tokens;
+        } else {
+          existingFailedTokensMap = [JSON.stringify(failedToken)];
+        }
+      }
+      customerTokenResponse = await commercetoolsApi.setCustomType(updatePaymentObj.customer.id, existingTokens, existingFailedTokensMap);
+      if (null != customerTokenResponse) {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_INFO, Constants.SUCCESS_MSG_CARD_TOKENS_UPDATE);
+      } else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_INFO, Constants.ERROR_MSG_TOKEN_UPDATE);
+      }
     }
   }
   return authResponse;
@@ -1261,7 +1261,6 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
         if (Constants.ISV_TOKENS in customerObj.custom.fields && Constants.STRING_EMPTY != customerObj.custom.fields.isv_tokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_tokens.length) {
           existingTokens = customerObj.custom.fields.isv_tokens;
         }
-        customerObj.custom.fields.isv_tokenAlias;
         customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokens, existingFailedTokensMap, true);
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.ERROR_MSG_SERVICE_PROCESS);
       }

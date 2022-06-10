@@ -482,7 +482,7 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
         Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
         null != transactionDetail &&
         (Constants.API_STATUS_AUTHORIZED == paymentResponse.status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status || Constants.API_STATUS_PENDING == paymentResponse.status)
-      ){
+      ) {
         setTransaction = setTransactionId(paymentResponse, transactionDetail);
         setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
         response = createResponse(setTransaction, setCustomField, null);
