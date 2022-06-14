@@ -910,6 +910,8 @@ const setCustomerTokenData = async (cardTokens, paymentResponse, authResponse, e
     if (
       Constants.STRING_CUSTOMER in updatePaymentObj &&
       Constants.STRING_ID in updatePaymentObj.customer &&
+      Constants.API_STATUS_PENDING_AUTHENTICATION != paymentResponse.status &&
+      Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED != paymentResponse.status &&
       (Constants.CREDIT_CARD == paymentMethod || Constants.CC_PAYER_AUTHENTICATION == paymentMethod) &&
       (null == updatePaymentObj.custom.fields.isv_savedToken || Constants.STRING_EMPTY == updatePaymentObj.custom.fields.isv_savedToken) &&
       Constants.ISV_TOKEN_ALIAS in updatePaymentObj.custom.fields &&
