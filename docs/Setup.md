@@ -58,4 +58,3 @@ implementations will be different.
   Pay, use the following guide: [Google Pay Setup](GooglePay-Setup.md)
 - For setting up the client-side application to work with Apple
   Pay, use the following guide: [Apple Pay Setup](ApplePay-Setup.md)
-- For setting up the client-side application to work with eCheck, use the following guide: [eCheck Setup](eCheck-Setup.md)

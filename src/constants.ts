@@ -731,39 +731,6 @@ export abstract class Constants {
         },
         inputHint: 'SingleLine',
       },
-      {
-        name: 'isv_accountNumber',
-        label: {
-          en: 'Account Number for eCheck',
-        },
-        required: false,
-        type: {
-          name: 'String',
-        },
-        inputHint: 'SingleLine',
-      },
-      {
-        name: 'isv_accountType',
-        label: {
-          en: 'Account Type for eCheck',
-        },
-        required: false,
-        type: {
-          name: 'String',
-        },
-        inputHint: 'SingleLine',
-      },
-      {
-        name: 'isv_routingNumber',
-        label: {
-          en: 'Routing Number for eCheck',
-        },
-        required: false,
-        type: {
-          name: 'String',
-        },
-        inputHint: 'SingleLine',
-      },
     ],
   };
   static readonly ISV_PAYMENT_CUSTOM_TYPE_CUSTOMER_TOKENS = {
