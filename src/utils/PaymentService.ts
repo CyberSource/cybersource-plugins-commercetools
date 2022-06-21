@@ -484,7 +484,11 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
         (Constants.API_STATUS_AUTHORIZED == paymentResponse.status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status || Constants.API_STATUS_PENDING == paymentResponse.status)
       ) {
         setTransaction = setTransactionId(paymentResponse, transactionDetail);
-        setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
+        if (Constants.CT_TRANSACTION_TYPE_CHARGE == transactionDetail.type && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status) {
+          setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_FAILURE);
+        } else {
+          setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
+        }
         response = createResponse(setTransaction, setCustomField, null);
       } else if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW == paymentResponse.status || Constants.API_STATUS_PENDING_REVIEW == paymentResponse.status) && null != transactionDetail) {
         setTransaction = setTransactionId(paymentResponse, transactionDetail);

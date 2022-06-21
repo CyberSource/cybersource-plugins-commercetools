@@ -657,7 +657,6 @@ const updateDecisionSync = async (decisionUpdateObject) => {
 };
 
 const updateSync = async (syncUpdateObject) => {
-  let updateSyncResponse: any;
   let client: any;
   let requestBuilder: any;
   let channelsRequest: any;
@@ -690,7 +689,7 @@ const updateSync = async (syncUpdateObject) => {
             ],
           }),
         };
-        updateSyncResponse = await client.execute(channelsRequest);
+        await client.execute(channelsRequest);
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
@@ -707,10 +706,6 @@ const updateSync = async (syncUpdateObject) => {
     }
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_ERROR, exceptionData);
   }
-  if (null != updateSyncResponse) {
-    updateSyncResponse = updateSyncResponse.body;
-  }
-  return updateSyncResponse;
 };
 
 const syncVisaCardDetails = async (visaUpdateObject) => {

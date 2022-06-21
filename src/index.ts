@@ -202,6 +202,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
   let updateTransactions: any;
   let exceptionData: any;
   let paymentMethod = Constants.STRING_EMPTY;
+  let transactionLength = Constants.VAL_ZERO;
   let paymentResponse = {
     httpCode: null,
     status: null,
@@ -211,7 +212,8 @@ app.post('/api/extension/payment/update', async (req, res) => {
     if (Constants.STRING_BODY in req && Constants.STRING_RESOURCE in req.body && Constants.STRING_OBJ in req.body.resource) {
       updatePaymentObj = req.body.resource.obj;
       paymentMethod = updatePaymentObj.paymentMethodInfo.method;
-      if (Constants.CC_PAYER_AUTHENTICATION == paymentMethod && Constants.VAL_ZERO == updatePaymentObj.transactions.length) {
+      transactionLength = updatePaymentObj.transactions.length;
+      if (Constants.CC_PAYER_AUTHENTICATION == paymentMethod && Constants.VAL_ZERO == transactionLength) {
         if (null != updatePaymentObj && Constants.STRING_CUSTOM in updatePaymentObj && Constants.STRING_FIELDS in updatePaymentObj.custom && !(Constants.ISV_CARDINAL_REFERENCE_ID in updatePaymentObj.custom.fields)) {
           updateResponse = await paymentHandler.getPayerAuthSetUpResponse(updatePaymentObj);
         } else if (
@@ -236,9 +238,10 @@ app.post('/api/extension/payment/update', async (req, res) => {
           updateResponse = await paymentHandler.getPayerAuthValidateResponse(updatePaymentObj);
         }
       }
-      if (Constants.VAL_ZERO < updatePaymentObj.transactions.length) {
+      if (Constants.VAL_ZERO < transactionLength) {
         updateTransactions = updatePaymentObj.transactions.pop();
         if (
+          Constants.VAL_ONE == transactionLength &&
           null != updateTransactions &&
           Constants.TYPE_ID_TYPE in updateTransactions &&
           (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == updateTransactions.type ||
