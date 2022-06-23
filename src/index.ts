@@ -23,13 +23,30 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'views/css')));
 app.use(express.static(path.join(__dirname, 'views/javascript')));
 app.use(express.static(path.join(__dirname, 'views/images')));
-
+app.all('*', authentication);
 app.listen(port, () => {
   console.log(`Application running on port:${port}`);
 });
 
 app.set('views', path.join(__dirname, 'views/'));
 app.set('view engine', 'ejs');
+
+function authentication(req, res, next) {
+  var authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME);
+    return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER });
+  }
+  const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
+
+  if (process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE == base64Credentials) {
+    next();
+  } else {
+    res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME);
+    return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
+  }
+}
 
 app.get('/orders', async (req, res) => {
   let orderResult: any;
@@ -404,6 +421,7 @@ app.get('/capture', async (req, res) => {
     } else {
       orderErrorMessage = Constants.ERROR_MSG_CANNOT_PROCESS;
       res.redirect('/orders');
+      return;
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -416,6 +434,7 @@ app.get('/capture', async (req, res) => {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_CAPTURE, Constants.LOG_ERROR, exceptionData);
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
+    return;
   }
   res.redirect(`/paymentdetails?id=${paymentId}`);
 });
@@ -471,6 +490,7 @@ app.get('/refund', async (req, res) => {
     } else {
       orderErrorMessage = Constants.ERROR_MSG_CANNOT_PROCESS;
       res.redirect('/orders');
+      return;
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -483,6 +503,7 @@ app.get('/refund', async (req, res) => {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_REFUND, Constants.LOG_ERROR, exceptionData);
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
+    return;
   }
   res.redirect(`/paymentdetails?id=${paymentId}`);
 });
@@ -525,6 +546,7 @@ app.get('/authReversal', async (req, res) => {
     } else {
       orderErrorMessage = Constants.ERROR_MSG_CANNOT_PROCESS;
       res.redirect('/orders');
+      return;
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -537,6 +559,7 @@ app.get('/authReversal', async (req, res) => {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_AUTH_REVERSAL, Constants.LOG_ERROR, exceptionData);
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
+    return;
   }
   res.redirect(`/paymentdetails?id=${req.query.id}`);
 });

@@ -95,6 +95,7 @@ export abstract class Constants {
   static readonly VAL_FIFTY = 50;
   static readonly VAL_FIFTY_NINE = 59;
   static readonly VAL_HUNDRED = 100;
+  static readonly VAL_FOUR_HUNDRED_AND_ONE = 401;
   static readonly VAL_FOUR_SEVENTY_FIVE = 475;
   static readonly VAL_FOUR_EIGHTY = 480;
   static readonly VAL_FOUR_EIGHTY_ONE = 481;
@@ -157,6 +158,7 @@ export abstract class Constants {
   static readonly STRING_EMPTY = '';
   static readonly STRING_HYPHEN = ' - ';
   static readonly STRING_SEMICOLON = ': ';
+  static readonly STRING_EMPTY_SPACE = ' ';
 
   //Payment methods
   static readonly CREDIT_CARD = 'creditCard';
@@ -233,6 +235,7 @@ export abstract class Constants {
   static readonly STRING_UPDATED = 'updated';
   static readonly STRING_VALUE = 'value';
   static readonly STRING_VISA = 'visa';
+  static readonly STRING_WWW_AUTHENTICATE = 'WWW-Authenticate';
 
   static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
   static readonly ERROR_INFORMATION = 'errorInformation';
@@ -365,8 +368,10 @@ export abstract class Constants {
   static readonly ERROR_MSG_FETCH_TRANSACTIONS = 'Unable to fetch transactions details';
   static readonly ERROR_MSG_FLEX_TOKEN_KEYS = 'Failed to generate one time key for Flex token';
   static readonly ERROR_MSG_INVALID_CUSTOMER_INPUT = 'Cannot delete the token due to invalid input';
+  static readonly ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS = 'Invalid Authentication Credentials';
   static readonly ERROR_MSG_INVALID_OPERATION = 'Cannot process the payment due to invalid operation';
   static readonly ERROR_MSG_INVALID_INPUT = 'Cannot process the payment due to invalid input';
+  static readonly ERROR_MSG_MISSING_AUTHORIZATION_HEADER = 'Missing Authorization Header';
   static readonly ERROR_MSG_NO_CARD_DETAILS = 'There are no card details available for the payment';
   static readonly ERROR_MSG_NO_ORDER_DETAILS = 'Unable to retrieve order details, please try again';
   static readonly ERROR_MSG_NO_PAYMENT_METHODS = 'There are no payment method available for the payment';

@@ -8,7 +8,7 @@ const { combine, printf } = format;
 
 const logData = (fileName, methodName, type, message) => {
   const loggingFormat = printf(({ label, methodName, level, message }) => {
-    return `[${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
+    return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
   });
   const logger = winston.createLogger({
     level: type,

@@ -645,22 +645,22 @@ const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResp
             Constants.STRING_CUSTOM in updatePaymentObj &&
             Constants.STRING_FIELDS in updatePaymentObj.custom &&
             Constants.ISV_SALE_ENABLED in updatePaymentObj.custom.fields &&
-            updatePaymentObj.custom.fields.isv_saleEnabled
+            updatePaymentObj.custom.fields.isv_saleEnabled &&
+            Constants.STRING_SYNC_AUTH_NAME == application.name &&
+            undefined != application.reasonCode
           ) {
-            if (application.name == Constants.STRING_SYNC_AUTH_NAME) {
-              if (application.reasonCode != null && Constants.VAL_HUNDRED == application.reasonCode) {
-                authAction.transaction.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
-                authAction.transaction.amount = updatePaymentObj.amountPlanned;
-                authAction.transaction.interactionId = element.id;
-              } else {
-                authAction.transaction.state = Constants.CT_TRANSACTION_STATE_FAILURE;
-                authAction.transaction.amount = updatePaymentObj.amountPlanned;
-                authAction.transaction.interactionId = element.id;
-              }
-              updateActions.actions.push(authAction);
+            if (Constants.VAL_HUNDRED == application.reasonCode) {
+              authAction.transaction.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
+              authAction.transaction.amount = updatePaymentObj.amountPlanned;
+              authAction.transaction.interactionId = element.id;
+            } else {
+              authAction.transaction.state = Constants.CT_TRANSACTION_STATE_FAILURE;
+              authAction.transaction.amount = updatePaymentObj.amountPlanned;
+              authAction.transaction.interactionId = element.id;
             }
+            updateActions.actions.push(authAction);
           }
-          if (application.name == Constants.STRING_SYNC_AUTH_REVERSAL_NAME) {
+          if (Constants.STRING_SYNC_AUTH_REVERSAL_NAME == application.name) {
             if (Constants.APPLICATION_RCODE == application.rCode && Constants.APPLICATION_RFLAG == application.rFlag) {
               authReversalTriggered = true;
               returnAction.transaction.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
@@ -1537,7 +1537,7 @@ const syncHandler = async () => {
                       syncUpdateObject.amountPlanned.centAmount = paymentService.convertAmountToCent(Number(element.orderInformation.amountDetails.totalAmount));
                     }
                     if (applicationResponse.authPresent) {
-                      if (paymentDetails.paymentMethodInfo.method == Constants.ECHECK) {
+                      if (Constants.ECHECK == paymentDetails.paymentMethodInfo.method) {
                         syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_CHARGE;
                       } else {
                         if (applicationResponse.capturePresent && applicationResponse.captureReasonCodePresent) {
@@ -1547,7 +1547,7 @@ const syncHandler = async () => {
                         }
                       }
                       updateSyncResponse = await runSyncAddTransaction(syncUpdateObject, element.applicationInformation.reasonCode, applicationResponse.authPresent, applicationResponse.authReasonCodePresent);
-                      if (null != updateSyncResponse && paymentDetails.paymentMethodInfo.method == Constants.CLICK_TO_PAY) {
+                      if (null != updateSyncResponse && (Constants.CLICK_TO_PAY == paymentDetails.paymentMethodInfo.method || Constants.APPLE_PAY == paymentDetails.paymentMethodInfo.method)) {
                         await updateVisaDetails(paymentDetails.id, updateSyncResponse.version, element.id);
                       }
                     } else if (applicationResponse.capturePresent) {
@@ -1604,27 +1604,27 @@ const getApplicationsPresent = async (applications) => {
     refundPresent: false,
   };
   if (null != applications) {
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_AUTH_NAME) || applications.some((item) => item.name == Constants.STRING_SYNC_ECHECK_DEBIT_NAME)) {
+    if (applications.some((item) => Constants.STRING_SYNC_AUTH_NAME == item.name) || applications.some((item) => Constants.STRING_SYNC_ECHECK_DEBIT_NAME == item.name)) {
       applicationResponse.authPresent = true;
     }
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_AUTH_NAME && item.reasonCode != null && Constants.VAL_HUNDRED == item.reasonCode)) {
+    if (applications.some((item) => Constants.STRING_SYNC_AUTH_NAME == item.name && null != item.reasonCode && Constants.VAL_HUNDRED == item.reasonCode)) {
       applicationResponse.authReasonCodePresent = true;
     }
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_ECHECK_DEBIT_NAME && item.reasonCode == null)) {
-      if (applications.some((nextItem) => nextItem.name == Constants.STRING_SYNC_DECISION_NAME && nextItem.reasonCode == Constants.VAL_FOUR_EIGHTY)) {
+    if (applications.some((item) => Constants.STRING_SYNC_ECHECK_DEBIT_NAME == item.name && null == item.reasonCode)) {
+      if (applications.some((nextItem) => Constants.STRING_SYNC_DECISION_NAME == nextItem.name && Constants.VAL_FOUR_EIGHTY == nextItem.reasonCode)) {
         applicationResponse.authReasonCodePresent = true;
       }
     }
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_CAPTURE_NAME)) {
+    if (applications.some((item) => Constants.STRING_SYNC_CAPTURE_NAME == item.name)) {
       applicationResponse.capturePresent = true;
     }
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_CAPTURE_NAME && item.reasonCode != null && Constants.VAL_HUNDRED == item.reasonCode)) {
+    if (applications.some((item) => Constants.STRING_SYNC_CAPTURE_NAME == item.name && null != item.reasonCode && Constants.VAL_HUNDRED == item.reasonCode)) {
       applicationResponse.captureReasonCodePresent = true;
     }
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_AUTH_REVERSAL_NAME)) {
+    if (applications.some((item) => Constants.STRING_SYNC_AUTH_REVERSAL_NAME == item.name)) {
       applicationResponse.authReversalPresent = true;
     }
-    if (applications.some((item) => item.name == Constants.STRING_SYNC_REFUND_NAME)) {
+    if (applications.some((item) => Constants.STRING_SYNC_REFUND_NAME == item.name)) {
       applicationResponse.refundPresent = true;
     }
   } else {
