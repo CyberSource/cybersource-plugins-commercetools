@@ -1346,14 +1346,7 @@ const reportHandler = async () => {
   let paymentDetails: any;
   let conversionDetailsData: any;
   let exceptionData: any;
-  let transactionDetail: any;
-  let transactionSummaries: any;
-  let applications: any;
-  let applicationResponse: any;
-  let updateSyncResponse: any;
-  let query = Constants.STRING_EMPTY;
   let conversionPresent = false;
-  let captureUpdatedFlag = false;
   var decisionUpdateObject = {
     id: null,
     version: null,
@@ -1364,14 +1357,6 @@ const reportHandler = async () => {
   let decisionSyncResponse = {
     message: Constants.STRING_EMPTY,
     error: Constants.STRING_EMPTY,
-  };
-  let syncUpdateObject = {
-    id: null,
-    version: null,
-    interactionId: null,
-    amountPlanned: null,
-    type: Constants.STRING_EMPTY,
-    state: Constants.STRING_EMPTY,
   };
   try {
     if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_DECISION_SYNC) {
@@ -1389,51 +1374,8 @@ const reportHandler = async () => {
                 decisionUpdateObject.version = paymentDetails.version;
                 decisionUpdateObject.transactionId = latestTransaction.id;
                 if (Constants.HTTP_STATUS_DECISION_ACCEPT == element.newDecision) {
-                  if (Constants.ECHECK != paymentDetails.paymentMethodInfo.method && Constants.CT_TRANSACTION_TYPE_CHARGE == latestTransaction.type) {
-                    query = Constants.PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE + paymentDetails.id + Constants.STRING_AND + Constants.STRING_SYNC_QUERY;
-                    transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, Constants.STRING_SYNC_SORT);
-                    if (null != transactionDetail && Constants.HTTP_CODE_TWO_HUNDRED_ONE == transactionDetail.httpCode) {
-                      transactionSummaries = transactionDetail.data._embedded.transactionSummaries;
-                      for (let transaction of transactionSummaries) {
-                        applications = transaction.applicationInformation.applications;
-                        applicationResponse = await getApplicationsPresent(applications);
-                        if (applicationResponse.authPresent && applicationResponse.authReasonCodePresent && applicationResponse.capturePresent && applicationResponse.captureReasonCodePresent) {
-                          decisionUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
-                          decisionUpdateObject.interactionId = transaction.id;
-                          captureUpdatedFlag = true;
-                          await commercetoolsApi.updateSync(decisionUpdateObject);
-                        } else if (applicationResponse.capturePresent && applicationResponse.captureReasonCodePresent) {
-                          decisionUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
-                          decisionUpdateObject.interactionId = transaction.id;
-                          captureUpdatedFlag = true;
-                          await commercetoolsApi.updateSync(decisionUpdateObject);
-                        } else if (applicationResponse.authPresent && applicationResponse.authReasonCodePresent && !captureUpdatedFlag) {
-                          decisionUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
-                          syncUpdateObject.id = paymentDetails.id;
-                          syncUpdateObject.amountPlanned = paymentDetails.amountPlanned;
-                          syncUpdateObject.interactionId = transaction.id;
-                          syncUpdateObject.version = paymentDetails.version;
-                          syncUpdateObject.type = Constants.CT_TRANSACTION_TYPE_AUTHORIZATION;
-                          syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
-                          updateSyncResponse = await commercetoolsApi.syncAddTransaction(syncUpdateObject);
-                          if (null == updateSyncResponse) {
-                            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REPORT_HANDLER, Constants.LOG_INFO, Constants.ERROR_MSG_ADD_TRANSACTION_DETAILS);
-                          } else {
-                            decisionUpdateObject.version = updateSyncResponse.version;
-                          }
-                          await commercetoolsApi.updateDecisionSync(decisionUpdateObject);
-                        } else {
-                          if (applicationResponse.capturePresent && !applicationResponse.captureReasonCodePresent && !captureUpdatedFlag) {
-                            decisionUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
-                            await commercetoolsApi.updateDecisionSync(decisionUpdateObject);
-                          }
-                        }
-                      }
-                    }
-                  } else {
-                    decisionUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
-                    await commercetoolsApi.updateDecisionSync(decisionUpdateObject);
-                  }
+                  decisionUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
+                  await commercetoolsApi.updateDecisionSync(decisionUpdateObject);
                 }
                 if (Constants.HTTP_STATUS_DECISION_REJECT == element.newDecision) {
                   decisionUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
