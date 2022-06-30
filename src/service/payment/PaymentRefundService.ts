@@ -40,34 +40,20 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
       clientReferenceInformation.partner = clientReferenceInformationpartner;
       requestObj.clientReferenceInformation = clientReferenceInformation;
 
+      var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
+
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ORDER_RECONCILIATION && null != orderNo) {
+        processingInformation.reconciliationId = orderNo;
+      }
+
       if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
-        requestObj.processingInformation = processingInformation;
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
-        requestObj.processingInformation = processingInformation;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
-        requestObj.processingInformation = processingInformation;
       } else if (Constants.ECHECK == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
-        requestObj.processingInformation = processingInformation;
         var paymentInformation = new restApi.Ptsv2paymentsidrefundsPaymentInformation();
         var paymentInformationBank = new restApi.Ptsv2paymentsPaymentInformationBank();
         var paymentInformationBankAccount = new restApi.Ptsv2paymentsPaymentInformationBankAccount();
@@ -80,13 +66,8 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
         paymentInformationPaymentType.name = Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE;
         paymentInformation.paymentType = paymentInformationPaymentType;
         requestObj.paymentInformation = paymentInformation;
-      } else {
-        if (null != orderNo) {
-          var processingInformation = new restApi.Ptsv2paymentsidrefundsProcessingInformation();
-          processingInformation.reconciliationId = orderNo;
-          requestObj.processingInformation = processingInformation;
-        }
-      }
+      } 
+      requestObj.processingInformation = processingInformation;
 
       var orderInformation = new restApi.Ptsv2paymentsidrefundsOrderInformation();
       var orderInformationAmountDetails = new restApi.Ptsv2paymentsidcapturesOrderInformationAmountDetails();

@@ -47,35 +47,21 @@ const captureResponse = async (payment, cart, authId, orderNo) => {
       clientReferenceInformation.partner = clientReferenceInformationpartner;
       requestObj.clientReferenceInformation = clientReferenceInformation;
 
+      var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ORDER_RECONCILIATION && null != orderNo) {
+        processingInformation.reconciliationId = orderNo;
+      }
+
       if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
-        requestObj.processingInformation = processingInformation;
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
-        requestObj.processingInformation = processingInformation;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
-        requestObj.processingInformation = processingInformation;
-      } else {
-        if (null != orderNo) {
-          var processingInformation = new restApi.Ptsv2paymentsidcapturesProcessingInformation();
-          processingInformation.reconciliationId = orderNo;
-          requestObj.processingInformation = processingInformation;
-        }
-      }
+      } 
+      requestObj.processingInformation = processingInformation;
+      
       const totalAmount = paymentService.convertCentToAmount(payment.amountPlanned.centAmount);
 
       var orderInformation = new restApi.Ptsv2paymentsidcapturesOrderInformation();

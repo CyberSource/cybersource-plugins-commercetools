@@ -15,4 +15,8 @@ To reverse a payment:
 - Complete an authorization, ensuring that the state is `Success`
 - Update the payment, adding an INITIAL CANCEL_AUTHORIZATION transaction onto the payment with an amount matching the amount of the authorization being reversed
 
-A successful reversal will change the INITIAL CANCEL_AUTHORIZATION to a SUCCESS CANCEL_AUTHORIZATION transaction, adding the Reversal Request ID onto the transaction as an `interactionId`.
+Cancel Authorization Response Handling
+
+- A successful reversal will change the INITIAL CANCEL_AUTHORIZATION to a SUCCESS CANCEL_AUTHORIZATION transaction, adding the Reversal Request ID onto the transaction as an `interactionId`.
+
+- Incase if the reversal is not successful due to any reason, the plugin will change the INITIAL CANCEL_AUTHORIZATION to FAILURE CANCEL_AUTHORIZATION transaction along with adding the Reverse Request ID onto the transaction as an `interactionId`. One can request a cancel authorization again if its failed

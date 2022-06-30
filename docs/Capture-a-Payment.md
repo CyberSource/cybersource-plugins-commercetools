@@ -15,4 +15,8 @@ To capture a payment:
 - Complete an authorization, ensuring that the state is `Success`
 - Update the payment, adding an INITIAL CHARGE transaction onto the payment with a value to be captured
 
-A successful capture will change the INITIAL CHARGE to a SUCCESS CHARGE transaction, adding the Capture Request ID onto the transaction as an `interactionId`.
+Capture Response Handling
+
+- A successful capture will change the INITIAL CHARGE to a SUCCESS CHARGE transaction, adding the Capture Request ID onto the transaction as an `interactionId`.
+
+- If the settlement is not successful due to any reason, the plugin will change the INITIAL CHARGE to FAILURE CHARGE transaction, adding the Capture Request ID onto the transaction as an `interactionId`. One can request a capture again if its failed.

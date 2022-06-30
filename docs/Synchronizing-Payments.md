@@ -11,7 +11,7 @@ This process is required for a few reasons:
 
 ## Implementation
 
-For using Synchronizing services, they might be enabled from the configuration file. See the [API Extension Setup](API-Extension-Setup.md) for more details.
+For using Synchronizing services, they should be enabled from the configuration file. See the [API Extension Setup](API-Extension-Setup.md) for more details.
 
 > **_NOTE:_** These fields are case sensitive
 
@@ -32,6 +32,8 @@ Alternatively, Cron job can be used to run the sync periodically. Below are the 
 
 ![Synchronizing Decisions](images/Synchronizing-Decisions.svg)
 ### Synchronizing Missing Transactions
+
+**_NOTE:_** On running Run Sync, if you see any payment status in pending, running a decision sync will change the status based on response.
 
 #### Sequence Diagram (Synchronizing Missing Transaction)
 

@@ -16,4 +16,8 @@ To refund a payment:
 - If Sale flag enabled,complete a sale transaction, ensuring that the state for CHARGE is `Success`
 - Update the payment, adding an INITIAL REFUND transaction onto the payment with an amount to be refunded
 
-A successful refund will change the INITIAL REFUND to a SUCCESS REFUND transaction, adding the Credit Request ID onto the transaction as an `interactionId`.
+Refund Response Handling
+
+- A successful refund will change the INITIAL REFUND to a SUCCESS REFUND transaction, adding the Credit Request ID onto the transaction as an `interactionId`.
+
+- Incase if the refund is not successful due to any reason, the plugin will change the INITIAL REFUND to FAILURE REFUND transaction, adding the Refund Request ID onto the transaction as an `interactionId`. One can request a refund again if its failed

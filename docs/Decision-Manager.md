@@ -99,7 +99,8 @@ Fields which are used by Decision Manager are mapped from Commercetools fields a
 
 ### Device fingerprinting
 
-Follow the appropriate Cybersource guide for device fingerprinting and add the session id used for this to the Commercetools payment as a custom field called `isv_deviceFingerprintId`
+Follow the appropriate Cybersource guide for device fingerprinting and add the session id used for this to the Commercetools payment as a custom field called `isv_deviceFingerprintId`. Refer process a payment document for respective payment method to know more.
+
 
 ### Enabling/disabling decision manager for specific payments
 
@@ -124,7 +125,7 @@ To pass additional data to Decision Manager it is possible to customize your Com
 <tr class="odd">
 <td>payment</td>
 <td>isv_customerIpAddress</td>
-<td>billTo_ipAddress</td>
+<td>deviceInformation_ipAddress</td>
 <td><br />
 </td>
 </tbody>
@@ -165,6 +166,10 @@ To support testing Decision Manager responses it is necessary to configure Decis
 - In Decision Manager → Configuration → Extended Settings enable
   Decision Manager for Authorization
   - Also ensure the reply flags are set to DREVIEW and DREJECT
+  - If you need EBC to trigger Authorization Reversal automatically during Reject After Auth cases, make sure that you check the checkbox under Decision Manager->Configuration->Extended Settings to enable it. Otherwise, plugin will automatically trigger Authorization Reversal
+  - When Sale transaction is in review state, before reviewing it navigate to Decision Manager->Configuration->Extended Settings and make sure to select the "Enable Settlement With Selected" for payment processing. And while accepting the order, always make sure that settle checkbox is checked and the amount being settled matches with the total authorization amount, as the plugin will not support the partial settlement
+
+
 - In Decision Manager → Configuration → Profiles create a new profile
   and set it as default
   - Disable the Threshold Rule Generator
@@ -180,6 +185,10 @@ screenshots
 ![](images/966623909.png)
 
 ![](images/966688917.png)
+
+![](images/Enable-Auth-Reverse.png)
+
+![](images/Enable-Settlement.png)
 
 ### Profiles
 

@@ -48,21 +48,18 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
       clientReferenceInformation.partner = clientReferenceInformationpartner;
       requestObj.clientReferenceInformation = clientReferenceInformation;
 
+      var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
+
       if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
-        requestObj.processingInformation = processingInformation;
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
-        requestObj.processingInformation = processingInformation;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
-        requestObj.processingInformation = processingInformation;
       }
-
+      requestObj.processingInformation = processingInformation;
+      
       var orderInformation = new restApi.Ptsv2paymentsidreversalsOrderInformation();
 
       if (null != cart && Constants.VAL_ZERO < cart.count && Constants.STRING_RESULTS in cart) {

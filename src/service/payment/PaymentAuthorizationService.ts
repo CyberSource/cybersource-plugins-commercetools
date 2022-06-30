@@ -58,7 +58,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_SALE_ENABLED in payment.custom.fields && payment.custom.fields.isv_saleEnabled) {
         processingInformation.capture = true;
       }
-      if (null != orderNo) {
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ORDER_RECONCILIATION && null != orderNo) {
         processingInformation.reconciliationId = orderNo;
       }
       if (Constants.STRING_FALSE == process.env.PAYMENT_GATEWAY_DECISION_MANAGER) {
@@ -139,9 +139,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         paymentInformation.fluidData = fluidData;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
         var paymentInformationFluidData = new restApi.Ptsv2paymentsPaymentInformationFluidData();
         paymentInformationFluidData.value = payment.custom.fields.isv_token;
         paymentInformationFluidData.descriptor = Constants.PAYMENT_GATEWAY_APPLE_PAY_DESCRIPTOR;
@@ -154,11 +151,8 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         } else {
           banktransaferOptions.secCode = Constants.SEC_CODE_WEB;
         }
-
         banktransaferOptions.fraudScreeningLevel = Constants.VAL_ONE;
-        if (null != orderNo) {
-          processingInformation.reconciliationId = orderNo;
-        }
+      
         processingInformation.bankTransferOptions = banktransaferOptions;
         var paymentInformationBank = new restApi.Ptsv2paymentsPaymentInformationBank();
         var paymentInformationBankAccount = new restApi.Ptsv2paymentsPaymentInformationBankAccount();
