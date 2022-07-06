@@ -74,5 +74,6 @@ export const payment = {
     state: 'Initial'
   }
 
-
   export const orderNo = null;
+
+  export const orderNumber = '10';

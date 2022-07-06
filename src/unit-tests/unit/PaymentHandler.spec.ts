@@ -13,14 +13,12 @@ import unit from '../JSON/unit.json'
 import paymentHandler from '../../utils/PaymentHandler';
 
 import {updateCardHandlerCustomerId,updateCardHandlerTokens, updateCardHandlerCustomerObj} from '../const/PaymentHandlerConst';
-import {orderManagementHandlerPaymentId,  orderManagementHandlerUpdateTransactions} from '../const/PaymentHandlerConst'
+import {orderManagementHandlerPaymentId,  orderManagementHandlerUpdateTransactions, orderManagementHandlerRefundUpdateTransactions} from '../const/PaymentHandlerConst'
 import {applePaySessionHandlerFields} from '../const/PaymentHandlerConst';
 import { authorizationHandlerAPUpdatePaymentObject,authorizationHandler3DSUpdatePaymentObject,authorizationHandlerCCUpdatePaymentObject, authoriationHandlerGPUpdatePaymentObject,authorizationHandlerVSUpdatePaymentObject, authorizationHandlerUpdateTransactions } from '../const/PaymentHandlerConst';
 import {getPayerAuthEnrollResponseUpdatePaymentObj} from '../const/PaymentHandlerConst';
 import {getPayerAuthReversalHandlerUpdatePaymentObject, getPayerAuthReversalHandlerPaymentResponse, getPayerAuthReversalHandlerUpdateTransactions, getPayerAuthReversalHandlerUpdateActions, getPayerAuthValidateResponseUpdatePaymentObj} from '../const/PaymentHandlerConst'
 import CommercetoolsApi from '../../utils/api/CommercetoolsApi';
-
-
 
 test.serial('Check for report handller ', async (t)=>{
     const result =await paymentHandler.reportHandler();
@@ -57,17 +55,52 @@ test.serial('Get update card handller data', async(t)=>{
 test.serial('Get order management handller for capture ', async(t)=>{
     const orderManagementHandlerUpdatePaymentObj  =await CommercetoolsApi.retrievePayment(unit.paymentId);
     const result = await paymentHandler.orderManagementHandler(orderManagementHandlerPaymentId, orderManagementHandlerUpdatePaymentObj, orderManagementHandlerUpdateTransactions);
-    if(result.actions[1].state == 'Success')
+    if(result.errors[0].code =='InvalidInput')
     {
-        t.is(result.actions[0].action, 'changeTransactionInteractionId');
-        t.is(result.actions[1].action, 'changeTransactionState');
-        t.is(result.actions[1].state, 'Success');
+        t.deepEqual(result.actions, []);
+        t.is(result.errors[0].code, 'InvalidInput');
+        t.is(result.errors[0].message, 'Cannot process the payment due to invalid input');
     }
     else
     {
-        t.is(result.actions[0].action, 'changeTransactionInteractionId');
-        t.is(result.actions[1].action, 'changeTransactionState');
-        t.is(result.actions[1].state, 'Failure');
+        if(result.actions[1].state == 'Success')
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Success');
+        }
+        else
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Failure');
+        }
+    }
+})
+
+test.serial('Get order management handller for refund ', async(t)=>{
+    const orderManagementHandlerUpdatePaymentObj  =await CommercetoolsApi.retrievePayment(unit.paymentId);
+    const result = await paymentHandler.orderManagementHandler(orderManagementHandlerPaymentId, orderManagementHandlerUpdatePaymentObj, orderManagementHandlerRefundUpdateTransactions);
+    if(result.errors[0].code =='InvalidInput')
+    {
+        t.deepEqual(result.actions, []);
+        t.is(result.errors[0].code, 'InvalidInput');
+        t.is(result.errors[0].message, 'Cannot process the payment due to invalid input');
+    }
+    else
+    {
+        if(result.actions[1].state == 'Success')
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Success');
+        }
+        else
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Failure');
+        }
     }
 })
 
@@ -223,5 +256,6 @@ test.serial('get Payer Auth Validate Response', async(t)=>{
         t.is(result.errors[0].code, 'InvalidInput');
     }
 })
+
 
 

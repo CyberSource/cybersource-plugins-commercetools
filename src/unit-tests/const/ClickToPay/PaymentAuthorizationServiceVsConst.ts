@@ -10,12 +10,18 @@ export const payment = {
   lastModifiedBy: {
     clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
     isPlatformClient: false,
-    anonymousId: '9f9da50d-abc8-416b-a31d-ea319abf31fc',
+    customer: {
+      typeId: 'customer',
+      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+    },
   },
   createdBy: {
     clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
     isPlatformClient: false,
-    anonymousId: '9f9da50d-abc8-416b-a31d-ea319abf31fc',
+    customer: {
+      typeId: 'customer',
+      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+    },
   },
   amountPlanned: {
     type: 'centPrecision',
@@ -44,6 +50,55 @@ export const payment = {
   transactions: [],
   interfaceInteractions: [],
 };
+
+export const guestPayment = {
+  "id": "c91a109a-a766-4acf-8340-80b23340cd08",
+  "version": 2,
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2022-06-23T06:20:37.060Z",
+  "lastModifiedAt": "2022-06-23T06:20:37.060Z",
+  "lastModifiedBy": {
+    "clientId": "mSpmJgXkt_CadneUb0otjt98",
+    "isPlatformClient": false,
+    "anonymousId": "b7037191-ed8f-4518-a66a-5b1efda2a2de"
+  },
+  "createdBy": {
+    "clientId": "mSpmJgXkt_CadneUb0otjt98",
+    "isPlatformClient": false,
+    "anonymousId": "b7037191-ed8f-4518-a66a-5b1efda2a2de"
+  },
+  "amountPlanned": {
+    "type": "centPrecision",
+    "currencyCode": "USD",
+    "centAmount": 3500,
+    "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+    "paymentInterface": "cybersource",
+    "method": "clickToPay",
+    "name": {
+      "en": "Click to Pay"
+    }
+  },
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "id": "e2288aa6-6a13-49eb-8f79-f9cc73fd4dd0"
+    },
+    "fields": {
+      "isv_deviceFingerprintId": "e161b9f0-f093-4708-9805-e2639ef586e7",
+      "isv_token": clickToPay.isv_token,
+      "isv_saleEnabled": false,
+      "isv_acceptHeader": "*/*",
+      "isv_customerIpAddress": "122.163.190.43",
+      "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
+    }
+  },
+  "paymentStatus": {},
+  "transactions": [],
+  "interfaceInteractions": [],
+  "anonymousId": "b7037191-ed8f-4518-a66a-5b1efda2a2de"
+}
 
 export const payments = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
@@ -310,6 +365,8 @@ export const cardTokens = {
   paymentInstrumentId: creditCard.savedToken,
 };
 
+export const guestCardTokens = null
+
 export const cardTokensObject = {
   customerTokenId: 'D605360941117CECE053AF598E0A6E',
   paymentInstrumentId: 'D7688E8C36CCE10FE053A2598D0AC0',
@@ -320,3 +377,5 @@ export const orderNo = null;
 export const dontSaveTokenFlag = false;
 
 export const payerAuthMandateFlag = false
+
+export const orderNumber = '10';

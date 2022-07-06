@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import refund from '../../../service/payment/PaymentRefundService';
-import { captureId, captureID, payment, updateTransaction , orderNo} from '../../const/CreditCard/PaymentRefundServiceConstCC'; 
+import { captureId, captureID, payment, updateTransaction , orderNo, orderNumber} from '../../const/CreditCard/PaymentRefundServiceConstCC'; 
 
 let paymentResponse = {
   httpCode: null,
@@ -40,4 +40,15 @@ test.serial('Refunding an invalid payment and check http code', async(t)=>{
 
 test.serial('Check status of an invalid refund', async (t) => {
   t.not(paymentResponseObject.status, 'PENDING');
+});
+
+test.serial('Refunding a payment with reconciliation Id and check http code',async (t)=>{
+  const result:any =await refund.refundResponse(payment, captureId, updateTransaction, orderNumber);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  t.is(paymentResponse.httpCode, 201);
+}) 
+
+test.serial('Check status for payment refund with reconciliation Id', async (t) => {
+t.is(paymentResponse.status, 'PENDING');
 });

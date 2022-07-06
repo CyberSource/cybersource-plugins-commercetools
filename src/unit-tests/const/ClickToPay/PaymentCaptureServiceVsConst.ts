@@ -292,5 +292,7 @@ export const payment = {
 
   export const orderNo = null;
 
+  export const orderNumber = '10';
+
   
   

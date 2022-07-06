@@ -7,7 +7,7 @@ import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { authId, authID, cart, payment, orderNo } from '../../const/ClickToPay/PaymentCaptureServiceVsConst';
+import { authId, authID, cart, payment, orderNo, orderNumber } from '../../const/ClickToPay/PaymentCaptureServiceVsConst';
 import capture from '../../../service/payment/PaymentCaptureService'; 
 
 let paymentResponse = {
@@ -40,4 +40,15 @@ test.serial('Capturing an invalid payment and check http code', async (t) => {
 
 test.serial('Check status for invalid capture ', async (t) => {
   t.not(paymentResponseObject.status, 'PENDING');
+});
+
+test.serial('Capturing a payment with reconciliation Id and check http code', async (t) => {
+  const result: any = await capture.captureResponse(payment, cart, authId, orderNumber);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  t.is(paymentResponse.httpCode, 201);
+}); 
+
+test.serial('Check status for payment capture with reconciliation Id', async (t) => {
+  t.is(paymentResponse.status, 'PENDING');
 });

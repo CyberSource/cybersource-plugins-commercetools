@@ -5,7 +5,7 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
-import { captureId, captureID, payment, updateTransaction, orderNo } from '../../const/GooglePay/PaymentRefundServiceConstGP';
+import { captureId, captureID, payment, updateTransaction, orderNo, orderNumber } from '../../const/GooglePay/PaymentRefundServiceConstGP';
 import refundResponse from '../../../service/payment/PaymentRefundService';
 
 let paymentResponse = {
@@ -38,4 +38,15 @@ test.serial('Refunding an invalid payment and check http code', async(t)=>{
 
 test.serial('Check status of an invalid refund', async (t) => {
   t.not(paymentResponseObject.status, 'PENDING');
+});
+
+test.serial('Refunding a payment with reconciliation Id and check http code', async(t)=>{
+  const result:any = await refundResponse.refundResponse(payment, captureId, updateTransaction, orderNumber);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  t.is(paymentResponse.httpCode, 201);
+}) 
+
+test.serial('Check status of payment refund with with reconciliation Id', async (t) => {
+t.is(paymentResponse.status, 'PENDING');
 });

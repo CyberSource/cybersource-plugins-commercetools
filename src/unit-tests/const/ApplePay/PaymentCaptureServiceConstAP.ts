@@ -63,11 +63,6 @@ export const payment =  {
     anonymousId: '033cd1c3-801d-4d2b-9729-fef0064dd3be'
   }
 
-  
-  
-      
-  
-
 export const cart = {
     "limit": 20,
     "offset": 0,
@@ -304,3 +299,5 @@ export const authId = applePay.authId;
 export const authID = '64311311155868791039'
 
 export const orderNo =  null;
+
+export const orderNumber = '10';

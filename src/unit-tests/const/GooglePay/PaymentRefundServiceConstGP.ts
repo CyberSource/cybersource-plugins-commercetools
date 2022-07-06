@@ -106,3 +106,5 @@ export const  updateTransaction = {
   }
 
   export const orderNo  = null;
+
+  export const orderNumber = '10';

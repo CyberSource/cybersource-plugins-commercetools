@@ -130,7 +130,7 @@ export const cart = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "EUR",
-                    "centAmount": 10000,
+                    "centAmount": 2000,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -140,7 +140,7 @@ export const cart = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "USD",
-                    "centAmount": 100,
+                    "centAmount": 20,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -163,7 +163,7 @@ export const cart = {
               "value": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 100,
+                "centAmount": 20,
                 "fractionDigits": 2
               },
               "country": "US"
@@ -193,7 +193,7 @@ export const cart = {
             "totalPrice": {
               "type": "centPrecision",
               "currencyCode": "USD",
-              "centAmount": 100,
+              "centAmount": 20,
               "fractionDigits": 2
             },
             "taxedPrice": {
@@ -223,7 +223,7 @@ export const cart = {
         "totalPrice": {
           "type": "centPrecision",
           "currencyCode": "USD",
-          "centAmount": 100,
+          "centAmount": 20,
           "fractionDigits": 2
         },
         "taxedPrice": {
@@ -311,3 +311,5 @@ export const authID = googlePay.authId;
 export const authId =  '64008194644864627039'
 
 export const orderNo = null;
+
+export const orderNumber = '10';

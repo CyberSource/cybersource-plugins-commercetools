@@ -302,3 +302,5 @@ export const cart = {
 }
 
 export const orderNo = null
+
+export const orderNumber = '10';

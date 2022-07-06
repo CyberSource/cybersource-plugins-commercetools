@@ -30,6 +30,20 @@ export const tokens = {
     email: 'shakshi.poddar@wipro.com'
   }
 
+  export const invalidAddressData =  {
+    id: 'OKxBLnRJ',
+    firstName: 'shakshi',
+    lastName: 'poddar',
+    streetName: '1295 Charleston Road',
+    additionalStreetInfo: '5th lane',
+    postalCode: '94043',
+    city: 'Mountain View',
+    region: 'California',
+    country: 'US',
+    phone: '+19876543210',
+    email: 'shakshi.poddar@wipro.com'
+  }
+
   export const tokenObject = {
     alias: 'card1',
     value: 'D3CF932491B77AE0E053AF598E0A79',
