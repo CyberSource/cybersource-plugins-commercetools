@@ -1,6 +1,6 @@
 # Tokenization
 
-Commerectools provides the facility of customization of the `customer` resource. A token subscription can be created and saved when you use the CreditCard payment method (if provided).
+Commerectools provides the facility of customization of the `customer` resource. A token subscription can be created and saved when you use the Credit Card payment method (if provided).
 
 The Customer update API extension will channel the request for Customer token creation, updation and deletion request coming from the front-end.
 
@@ -47,13 +47,13 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
     | custom.fields.isv_cardExpiryYear      | Card expiry year                                 | No       | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.expirationYear field containing the card type <br><br> Not required by extension but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                           |
     | custom.fields.isv_addressId           | Id of the address added by customer for the card | Yes      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
     | custom.fields.isv_currencyCode        | Currency code of the store                       | Yes      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint id                   | Yes      | It must be unique for each merchant Id. You can use any string that you are already generating, such as an order number or web session Id. However, do not use the same uppercase and lowercase letters to indicate different session Ids. Replace sessionId with the unique Id generated in the URL given. Include the script "https://h.online-metrix.net/fp/tags.js?org_id={{org Id}}&session_id={{merchant Id}}{{session Id}}". Replace the below data {{org Id}} - To obtain this value, contact your CyberSource representative and specify to them whether it is for testing or production. {{merchant Id}} - Your unique CyberSource merchant Id. {{session Id}} - Value of unique Id generated above |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id                   | Yes      | It must be unique for each merchant Id. You can use any string that you are already generating, such as an order number or web session Id. However, do not use the same uppercase and lowercase letters to indicate different session Ids. Replace sessionId with the unique Id generated in the URL given. Include the script "https://h.online-metrix.net/fp/tags.js?org_id={{org Id}}&session_id={{merchant Id}}{{session Id}}". Replace the below data {{org Id}} - To obtain this value, contact your Cybersource representative and specify to them whether it is for testing or production. {{merchant Id}} - Your unique Cybersource merchant Id. {{session Id}} - Value of unique Id generated above |
 
 5.  Wait for the updated response and verify the custom.fields.isv_tokens field
 
 6.  If token is created successfully, custom.fields.isv_tokens field will contain updated tokens
 
-7.  If there was an error, custom.fields.isv_tokens field either be empty if there were no tokens available or will have the old tokens which were available before adding the new token. Also custom.fields.isv_failedTokens field will have all the failed card records
+7.  If there was an error, custom.fields.isv_tokens field either be empty if there were no tokens available or will have the old tokens which were available before adding the new token. Also custom.fields.isv_failedTokens field will have all the failed card records if there was error while adding the token
 
 ## Update Card Details
 
@@ -87,7 +87,7 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
     | custom.fields.isv_tokens[#].cardNumber           | Card number                        | See notes | Masked Pan of the token to be updated which was returned by Cybersource                                   |
     | custom.fields.isv_tokens[#].cardExpiryMonth      | Card expiry month                  | See notes | Existing expiry month of the token to be updated                                                          |
     | custom.fields.isv_tokens[#].cardExpiryYear       | Card expiry year                   | See notes | Existing expiry of the token to be updated                                                                |
-    | custom.fields.isv_tokens[#].addressId            | Card expiry year                   | See notes | Existing addressId of the token to be updated or the new address id if address needs to be changed        |
+    | custom.fields.isv_tokens[#].addressId            |                    | See notes | Existing addressId of the token to be updated or the new address Id if address needs to be changed        |
     | custom.fields.isv_cardNewExpiryMonth             | Card expiry month                  | See notes | New expiry month value that needs to be updated for the token                                             |
     | custom.fields.isv_cardNewExpiryYear              | Card expiry year                   | See notes | New expiry year value that needs to be updated for the token                                              |
     | custom.fields.isv_tokenAction                    | update                             | Yes       | Case sensitive                                                                                            |
@@ -98,7 +98,7 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
 
 1.  Update the customer by populating the following data
 
-    Note that isv_tokens data is a set of JSON object strings and update the required data for the desired token while the other tokens remain untouched.
+    Note that isv_tokens data is a set of JSON object strings and delete the required data for the desired token while the other tokens remain untouched.
 
     A sample custom fields will look like this:
 
@@ -117,16 +117,16 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
 
     | Property                                         | Value                              | Required  | Notes                                                                                                               |
     | ------------------------------------------------ | ---------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------- |
-    | custom.fields.isv_tokens[#].alias                | Customer token alias               | See notes | Value of the token to be updated which will represent a particular token data in general                            |
-    | custom.fields.isv_tokens[#].value                | Customer token value               | See notes | Customer token of the token to be updated which was returned by Cybersource while creating a token for the customer |
-    | custom.fields.isv_tokens[#].paymentToken         | Customer payment token             | See notes | Payment token of the token to be updated which was returned by Cybersource while creating a token                   |
-    | custom.fields.isv_tokens[#].instrumentIdentifier | Instrument identifier for customer | See notes | Instrument identifier of the token to be updated which was returned by Cybersource while creating a token           |
-    | custom.fields.isv_tokens[#].cardType             | Card type                          | See notes | Card type of the token to be updated returned by Cybersource                                                        |
+    | custom.fields.isv_tokens[#].alias                | Customer token alias               | See notes | Value of the token to be deleted which will represent a particular token data in general                            |
+    | custom.fields.isv_tokens[#].value                | Customer token value               | See notes | Customer token of the token to be deleted which was returned by Cybersource while creating a token for the customer |
+    | custom.fields.isv_tokens[#].paymentToken         | Customer payment token             | See notes | Payment token of the token to be deleted which was returned by Cybersource while creating a token                   |
+    | custom.fields.isv_tokens[#].instrumentIdentifier | Instrument identifier for customer | See notes | Instrument identifier of the token to be deleted which was returned by Cybersource while creating a token           |
+    | custom.fields.isv_tokens[#].cardType             | Card type                          | See notes | Card type of the token to be deleted returned by Cybersource                                                        |
     | custom.fields.isv_tokens[#].cardName             | Card alias                         |           |                                                                                                                     |
-    | custom.fields.isv_tokens[#].cardNumber           | Card number                        | See notes | Masked Pan of the token to be updated which was returned by Cybersource                                             |
-    | custom.fields.isv_tokens[#].cardExpiryMonth      | Card expiry month                  | See notes | Expiry month of the token to be updated                                                                             |
+    | custom.fields.isv_tokens[#].cardNumber           | Card number                        | See notes | Masked Pan of the token to be deleted which was returned by Cybersource                                             |
+    | custom.fields.isv_tokens[#].cardExpiryMonth      | Card expiry month                  | See notes | Expiry month of the token to be deleted                                                                             |
     | custom.fields.isv_tokens[#].cardExpiryYear       | Card expiry year                   | See notes | Expiry expiry year of the token to be updated                                                                       |
-    | custom.fields.isv_tokens[#].addressId            | Card expiry year                   | See notes | Existing addressId of the token to be updated                                                                       |
+    | custom.fields.isv_tokens[#].addressId            |                   | See notes | Existing addressId of the token to be deleted                                                                       |
     | custom.fields.isv_tokenAction                    | delete                             | Yes       | Case sensitive                                                                                                      |
 
-2.  The response will have the updated data by removing the particular token that you intended to delete if the token is deleted sucessfullly. Else the token will still be available in the updated response.
+2.  The response will have the updated data by removing the particular token that you intended to delete if the token is deleted sucessfullly, else the tokens will remain untouched in the updated response.

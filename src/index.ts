@@ -35,7 +35,9 @@ function authentication(req, res, next) {
   var authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME);
+    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin') {
+      res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
+    }
     return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER });
   }
   const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
@@ -43,7 +45,9 @@ function authentication(req, res, next) {
   if (process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE == base64Credentials) {
     next();
   } else {
-    res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME);
+    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin') {
+      res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
+    }
     return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
   }
 }
@@ -594,7 +598,7 @@ app.get('/configurePlugin', async (req, res) => {
       url = Constants.CUSTOMER_CREATE_DESTINATION_URL;
     }
     extension.destination.url = process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL + url;
-    extension.destination.authentication.headerValue = Constants.AUTHENTICATION_SCHEME + process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE;
+    extension.destination.authentication.headerValue = Constants.AUTHENTICATION_SCHEME_BEARER + Constants.STRING_EMPTY_SPACE + process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE;
     scriptResponse = await commercetoolsApi.addExtensions(extension);
     if (null != scriptResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE != parseInt(scriptResponse.statusCode)) {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);

@@ -171,7 +171,8 @@ export abstract class Constants {
   //Strings
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
   static readonly ANONYMOUS_ID = 'anonymousId';
-  static readonly AUTHENTICATION_SCHEME = 'Basic ';
+  static readonly AUTHENTICATION_SCHEME_BASIC = 'Basic';
+  static readonly AUTHENTICATION_SCHEME_BEARER = 'Bearer';
   static readonly CUSTOMER_ID = 'customerId';
   static readonly DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
   static readonly DESC_ORDER = 'desc';

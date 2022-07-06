@@ -2,9 +2,7 @@
 
 ## Visa Click to Pay
 
-If you would like to support Visa Click to Pay, you will need to create a
-Visa Click to Pay API Key and use the Visa Click to Pay Javascript SDK to
-generate a "Visa Click to Pay Order Id" to provide it to Cybersource on a payment
+If you would like to support Visa Click to Pay, you will need to create a Visa Click to Pay API Key and use the Visa Click to Pay Javascript SDK to generate a "Visa Click to Pay Order Id" to provide it to Cybersource on a payment
 request.
 
 ### Visa Click to Pay API Key
@@ -37,4 +35,4 @@ Note that with Visa Checkout you can optionally request shipping address informa
 
 If you configure Visa Click to Pay to collect shipping addresses, then the shipping address will be saved onto the cart on a successful authorization. Otherwise, you will need to manually collect the shipping address information and save it onto the cart before processing a payment.
 
-Once the SDK is configured and you are recieving a Visa Click to Pay order Id, you can continue to the [Authorize a Payment (Visa Click to Pay)](Authorize-a-Payment-Visa-Checkout.md) process.
+Once the SDK is configured and you are receiving a Visa Click to Pay order Id, you can continue to the [Process a Payment (Visa Click to Pay)](Process-a-Payment-ClicktoPay.md) process.

@@ -14,7 +14,7 @@ Unit tests can be executed with the following command
 
 	npm run cov
 
-# Run the Commerectools-Cybersource Plugin
+# Run the Commercetools-Cybersource Plugin
 
 The Plugin  can be run using the following node script, which will build the changes and hosts the plugin in the port added in the .env file:
 

@@ -3,7 +3,6 @@
 - [Commercetools](#Commercetools)
   - [Cybersource Plugin API Key](#CybersourcePLuginAPIKeys)
   - [Frontend API Key](#FrontendAPIKey)
-  - [API Key for Custom data](#APIKeysforCustomData)
 - [Cybersource](#Cybersource)
   - [REST Shared Secret](#RESTSharedSecret)
 
@@ -17,7 +16,7 @@ The API Extension and the Synchronization Service require an API key which will 
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | manage_payments   | This is used for adding and updating transactions during synchronization process                                                                                                                             |
 | manage_orders     | This is used for <ul> <li>Updating the cart with Billing and Shipping addresses while using Visa Click to Pay</li><li>Extracting line item data from the cart to send while using Decision Manager</li></ul> |
-| view_types        | This is used to get the id of the custom payment and payment interface interaction types on API Extension startup                                                                                            |
+| view_types        | This is used to get the Id of the custom payment and payment interface interaction types on API Extension startup                                                                                            |
 | view_customer     | This is used for viewing the customer created and dealing with their custom data                                                                                                                             |
 | manage_customers  | This is used for managing the customer. It is required for creating and updating the customer                                                                                                                |
 | manage_types      | This is used for creating custom types required to process payments and tokens                                                                                                                               |
@@ -31,9 +30,9 @@ To be used for frontend applications in order to create and manage payments and 
 | ----------------------- | ---------------------------------------------------------------------------------------------- |
 | view_published_products | Required to add items into the cart                                                            |
 | view_orders             | Required to view orders                                                                        |
-| view_categories         | Required to view product categoriesorders                                                      |
-| manage_customers        | Required to update or delete saved cards categoriesorders                                      |
-| manage_my_payments      | To allow payments to be created in Commercetools to initiate the payment flow with CyberSource |
+| view_categories         | Required to view product categories                                                       |
+| manage_customers        | Required to update or delete saved cards                                      |
+| manage_my_payments      | To allow payments to be created in Commercetools to initiate the payment flow with Cybersource |
 | manage_my_orders        | Adding Payments to an Order                                                                    |
 | manage_my_profile       | Access to the current customers profile so it can be associated with the Payment and Order     |
 | create_anonymous_token  | (optional) If you are using the key to control the customers session                           |
