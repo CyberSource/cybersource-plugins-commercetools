@@ -1,0 +1,154 @@
+{
+    "key": "isv_payments_payer_authentication_validate_result",
+    "name": {
+      "en": "ISV payment service interaction for result of payer auth validate call"
+    },
+    "resourceTypeIds": [
+      "payment-interface-interaction"
+    ],
+    "fieldDefinitions": [
+      {
+        "name": "authenticationResult",
+        "label": {
+          "en": "Result of authentication call"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "authenticationStatusMessage",
+        "label": {
+          "en": "Description of result of authentication call"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "ucafCollectionIndicator",
+        "label": {
+          "en": "Collection indicator"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "ucafAuthenticationData",
+        "label": {
+          "en": "AAV"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "cavv",
+        "label": {
+          "en": "CAVV"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "cavvAlgorithm",
+        "label": {
+          "en": "CAVV algorithm"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "xid",
+        "label": {
+          "en": "XID"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "specificationVersion",
+        "label": {
+          "en": "Specification Version"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "directoryServerTransactionId",
+        "label": {
+          "en": "Directory server transaction id"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "commerceIndicator",
+        "label": {
+          "en": "Commerce indicator"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "eci",
+        "label": {
+          "en": "Electronic commerce indicator"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "eciRaw",
+        "label": {
+          "en": "Electronic commerce indicator (raw)"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "paresStatus",
+        "label": {
+          "en": "paRes Status"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      }
+    ]
+  }

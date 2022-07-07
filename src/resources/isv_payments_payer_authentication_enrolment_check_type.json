@@ -1,0 +1,154 @@
+{
+    "key": "isv_payments_payer_authentication_enrolment_check",
+    "name": {
+      "en": "ISV payment service interaction for payer authentication enrolment check"
+    },
+    "resourceTypeIds": [
+      "payment-interface-interaction"
+    ],
+    "fieldDefinitions": [
+      {
+        "name": "cardinalReferenceId",
+        "label": {
+          "en": "Reference id used for enrolment check"
+        },
+        "required": true,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "authenticationRequired",
+        "label": {
+          "en": "User needs to authenticate"
+        },
+        "required": true,
+        "type": {
+          "name": "Boolean"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "authorizationAllowed",
+        "label": {
+          "en": "Payment can be authorized"
+        },
+        "required": true,
+        "type": {
+          "name": "Boolean"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "authenticationTransactionId",
+        "label": {
+          "en": "3D Secure authentication transaction id"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "paReq",
+        "label": {
+          "en": "3D Secure paReq value"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "acsUrl",
+        "label": {
+          "en": "3D Secure ACS URL"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "xid",
+        "label": {
+          "en": "3D Secure Transaction id"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "proofXml",
+        "label": {
+          "en": "3D Secure Proof XML"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "specificationVersion",
+        "label": {
+          "en": "3D Secure Specification Version"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "directoryServerTransactionId",
+        "label": {
+          "en": "3D Secure Directory Server Transaction id"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "veresEnrolled",
+        "label": {
+          "en": "3D Secure Enrolment Check Result"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "commerceIndicator",
+        "label": {
+          "en": "3D Secure Commerce Indicator"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "eci",
+        "label": {
+          "en": "3D Secure Electronic Commerce Indicator"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      }
+    ]
+  }

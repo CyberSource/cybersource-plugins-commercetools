@@ -1,0 +1,18 @@
+{
+  "destination": {
+    "type": "HTTP",
+    "url": "",
+    "authentication": {
+      "type": "AuthorizationHeader",
+      "headerValue": ""
+    }
+  },
+  "triggers": [
+    {
+      "resourceTypeId": "customer",
+      "actions": ["Update"]
+    }
+  ],
+  "timeoutInMs": 3000,
+  "key": "isv_customer_update_extension"
+}

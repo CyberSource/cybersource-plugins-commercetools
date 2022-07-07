@@ -9,6 +9,7 @@ import commercetoolsApi from './utils/api/CommercetoolsApi';
 import paymentHandler from './utils/PaymentHandler';
 import paymentService from './utils/PaymentService';
 import { Constants } from './constants';
+import resourceHandler from './utils/config/ResourceHandler';
 
 dotenv.config();
 const app = express();
@@ -585,44 +586,8 @@ app.get('/sync', async (req, res) => {
 });
 
 app.get('/configurePlugin', async (req, res) => {
-  let scriptResponse: any;
-  let url: any;
-  let getCustomType: any;
-  let typeObj: any;
-  for (let extension of Constants.ISV_PAYMENT_EXTENSIONS) {
-    if (Constants.PAYMENT_CREATE_KEY == extension.key) {
-      url = Constants.PAYMENT_CREATE_DESTINATION_URL;
-    } else if (Constants.PAYMENT_UPDATE_KEY == extension.key) {
-      url = Constants.PAYMENT_UPDATE_DESTINATION_URL;
-    } else if (Constants.CUSTOMER_UPDATE_KEY == extension.key) {
-      url = Constants.CUSTOMER_CREATE_DESTINATION_URL;
-    }
-    extension.destination.url = process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL + url;
-    extension.destination.authentication.headerValue = Constants.AUTHENTICATION_SCHEME_BEARER + Constants.STRING_EMPTY_SPACE + process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE;
-    scriptResponse = await commercetoolsApi.addExtensions(extension);
-    if (null != scriptResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE != parseInt(scriptResponse.statusCode)) {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
-    }
-  }
-  for (let customType of Constants.CUSTOM_TYPES) {
-    scriptResponse = await commercetoolsApi.addCustomTypes(customType);
-    if (null != scriptResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE != scriptResponse.statusCode) {
-      if (
-        Constants.HTTP_CODE_FOUR_HUNDRED == scriptResponse.statusCode &&
-        Constants.HTTP_CODE_FOUR_HUNDRED == scriptResponse.body.statusCode &&
-        Constants.STRING_ERRORS in scriptResponse.body &&
-        Constants.STRING_DUPLICATE_FIELD == scriptResponse.body.errors[Constants.VAL_ZERO].code
-      ) {
-        getCustomType = await commercetoolsApi.getCustomType(customType.key);
-        if (null != getCustomType && Constants.HTTP_CODE_TWO_HUNDRED == getCustomType.statusCode) {
-          typeObj = getCustomType.body;
-          paymentHandler.updateCustomField(customType.fieldDefinitions, typeObj.fieldDefinitions, typeObj.id, typeObj.version);
-        }
-      } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + customType.key + Constants.STRING_HYPHEN + scriptResponse.message);
-      }
-    }
-  }
+  await resourceHandler.ensureExtension();
+  await resourceHandler.ensureCustomTypes();
   orderSuccessMessage = Constants.SUCCESS_MSG_SCRIPT_PLUGIN;
   res.redirect('/orders');
 });

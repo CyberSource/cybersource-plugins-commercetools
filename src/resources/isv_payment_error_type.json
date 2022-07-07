@@ -1,0 +1,33 @@
+{
+    "key": "isv_payment_error",
+    "name": {
+      "en": "Created when the payment service throws an unhandled exception"
+    },
+    "resourceTypeIds": [
+      "payment-interface-interaction"
+    ],
+    "fieldDefinitions": [
+      {
+        "name": "reason",
+        "label": {
+          "en": "Reason"
+        },
+        "required": true,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "transactionId",
+        "label": {
+          "en": "Transaction ID"
+        },
+        "required": false,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      }
+    ]
+  }
