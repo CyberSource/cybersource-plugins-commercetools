@@ -42,6 +42,7 @@
     | custom.type.key          | isv_payment_data                            | Yes       | 
     | custom.fields.isv_applePayValidationUrl | Apple Pay validation URL                        | Yes       | Pass the URL obtained from the event’s validationURL property of onvalidatemerchant function. See [Providing Merchant Validation](https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation) for information.              |
     | custom.fields.isv_applePayDisplayName   | Name to be displayed on Apple Pay payment sheet | Yes       |                                                                                   |
+     
 
     b. Verify the custom.fields.isv_applePaySessionData has data from the update response. If the data exists, pass the merchant session object to your Apple Pay session’s completeMerchantValidation method. You can use the merchant session object a single time. It expires five minutes after it is created, see [Providing Merchant Validation](https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation), else throw error to the customer.
 
@@ -53,6 +54,7 @@
     | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | No      | It must be unique for each merchant Id. You can use any string that you are already generating, such as an order number or web session Id. However, do not use the same uppercase and lowercase letters to indicate different session Ids. Replace sessionId with the unique Id generated in the URL given. Include the script "https://h.online-metrix.net/fp/tags.js?org_id={{org Id}}&session_id={{merchant Id}}{{session Id}}". Replace the below data {{org Id}} - To obtain this value, contact your Cybersource representative and specify to them whether it is for testing or production. {{merchant Id}} - Your unique Cybersource merchant Id. {{session Id}} - Value of unique Id generated above |
     | custom.fields.isv_customerIpAddress   | Customer IP address            | Yes      | Populated from client-side libraries                                                                                                                                                                                                                                                                                                   |
     | custom.fields.isv_saleEnabled               | false             | Yes       | Set the value to true if sale is enabled                                                                                                                                                                                                    |
+    | custom.fields.isv_walletType                | Wallet type | No  |   This value is required if walletType is to be passed in authorization. Refer [Cybersource Processing a Payment](https://developer.cybersource.com/api-reference-assets/index.html#payments_payments_process-a-payment) for more information about the wallet type value to be passed. It is supported only for ApplePay, ClicktoPay and GooglePay payment methods|
 
 4.  Add the payment to the cart
 

@@ -336,6 +336,17 @@
         "name": "Boolean"
       },
       "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_walletType",
+      "label": {
+        "en": "Value indicating wallet type"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
     }
   ]
 }

@@ -309,6 +309,7 @@ export abstract class Constants {
   static readonly ISV_TOKEN_VERIFICATION_CONTEXT = 'isv_tokenVerificationContext';
   static readonly ISV_TOKENS = 'isv_tokens';
   static readonly ISV_USER_AGENT_HEADER = 'isv_userAgentHeader';
+  static readonly ISV_WALLET_TYPE = 'isv_walletType';
   static readonly PAYMENT_CREATE_KEY = 'isv_payment_create_extension';
   static readonly PAYMENT_UPDATE_KEY = 'isv_payment_update_extension';
   static readonly SEC_CODE_TEL = 'TEL';

@@ -114,7 +114,7 @@ Fields
 
 Fields
 
-| Name                                 | Type    | Required |
+| Name                                 | Type    | Required | 
 | ------------------------------------ | ------- | -------- |
 | isv_token                            | String  | false    |
 | isv_tokenAlias                       | String  | false    |
@@ -146,7 +146,7 @@ Fields
 | isv_payerEnrollHttpCode              | Number  | false    |
 | isv_saleEnabled                      | Boolean | false    |
 | isv_enabledMoto                      | Boolean | false    |
-
+| isv_walletType                       | String  | false    |
 ### <a name="PayerAuthenticationEnrolmentCheck"></a>Payer authentication enrolment check
 
 | Type                          | Key                                               | Purpose                                                                  |

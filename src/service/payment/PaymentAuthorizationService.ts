@@ -58,6 +58,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_SALE_ENABLED in payment.custom.fields && payment.custom.fields.isv_saleEnabled) {
         processingInformation.capture = true;
       }
+      if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_WALLET_TYPE in payment.custom.fields && Constants.STRING_EMPTY != payment.custom.fields.isv_walletType) {
+        processingInformation.walletType = payment.custom.fields.isv_walletType;
+      }
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ORDER_RECONCILIATION && null != orderNo) {
         processingInformation.reconciliationId = orderNo;
       }
