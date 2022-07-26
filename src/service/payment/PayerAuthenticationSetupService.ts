@@ -57,9 +57,15 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
         tokenInformation.transientToken = jtiToken.jti;
         requestObj.tokenInformation = tokenInformation;
       }
+
+      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_REQUEST +JSON.stringify(requestObj));
+      }
+
       const instance = new restApi.PayerAuthenticationApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
         instance.payerAuthSetup(requestObj, function (error, data, response) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_RESPONSE +JSON.stringify(response));
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
@@ -70,7 +76,7 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
             resolve(paymentResponse);
           } else if (error) {
             if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, error.response.text);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
               paymentResponse.transactionId = errorData.id;
               paymentResponse.status = errorData.status;
@@ -80,7 +86,7 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
               } else {
                 errorData = error;
               }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, errorData);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id,errorData);
             }
             paymentResponse.httpCode = error.status;
             reject(paymentResponse);
@@ -92,7 +98,7 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
         return paymentResponse;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
       return paymentResponse;
     }
   } catch (exception) {
@@ -103,7 +109,7 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, exceptionData);
     return paymentResponse;
   }
 };

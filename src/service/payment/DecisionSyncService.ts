@@ -46,6 +46,7 @@ const conversionDetails = async () => {
     var instance = new restApi.ConversionDetailsApi(configObject, apiClient);
     return await new Promise(function (resolve, reject) {
       instance.getConversionDetail(startTime, endTime, opts, function (error, data, response) {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_INFO, null, Constants.DECISION_SYNC_RESPONSE +JSON.stringify(response));
         if (data) {
           conversionDetailResponse.httpCode = response[Constants.STATUS_CODE];
           conversionDetailResponse.data = data.conversionDetails;
@@ -53,7 +54,7 @@ const conversionDetails = async () => {
           resolve(conversionDetailResponse);
         } else if (error) {
           if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_INFO, error.response.text);
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_ERROR, null, error.response.text);
             errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
             conversionDetailResponse.status = errorData.status;
           } else {
@@ -62,7 +63,7 @@ const conversionDetails = async () => {
             } else {
               errorData = error;
             }
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_INFO, errorData);
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_ERROR, null, errorData);
           }
           conversionDetailResponse.httpCode = error.status;
           reject(conversionDetailResponse);
@@ -81,7 +82,7 @@ const conversionDetails = async () => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_ERROR, null, exceptionData);
     return conversionDetailResponse;
   }
 };

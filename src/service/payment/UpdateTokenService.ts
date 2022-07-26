@@ -58,9 +58,15 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
       var instrumentIdentifier = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentInstrumentIdentifier();
       instrumentIdentifier.id = tokens.instrumentIdentifier;
       requestObj.instrumentIdentifier = instrumentIdentifier;
+
+      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_DEBUG, null, Constants.UPDATE_TOKEN_REQUEST + JSON.stringify(requestObj));
+      }
+
       const instance = new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
         instance.patchCustomersPaymentInstrument(customerTokenId, paymentInstrumentTokenId, requestObj, opts, function (error, data, response) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.UPDATE_TOKEN_RESPONSE + JSON.stringify(response));
           if (data) {
             tokenResponse.httpCode = response[Constants.STATUS_CODE];
             tokenResponse.default = data.default;
@@ -68,14 +74,14 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
             resolve(tokenResponse);
           } else if (error) {
             if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, error.response.text);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, null, error.response.text);
             } else {
               if (typeof error === 'object') {
                 errorData = JSON.stringify(error);
               } else {
                 errorData = error;
               }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, errorData);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, null, errorData);
             }
             tokenResponse.httpCode = error.status;
             reject(tokenResponse);
@@ -87,7 +93,7 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
         return tokenResponse;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);
       return tokenResponse;
     }
   } catch (exception) {
@@ -98,7 +104,7 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
     return tokenResponse;
   }
 };

@@ -40,7 +40,7 @@ const getClient = () => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_COMMERCETOOLS_CONNECT + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CLIENT, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CLIENT, Constants.LOG_ERROR, null, exceptionData);
   }
   return client;
 };
@@ -71,10 +71,10 @@ const retrieveCartByAnonymousId = async (anonymousId) => {
         };
         anonymousIdResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, Constants.LOG_ANONYMOUS_ID + anonymousId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, Constants.ERROR_MSG_CART_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, Constants.LOG_ANONYMOUS_ID + anonymousId, Constants.ERROR_MSG_CART_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -84,7 +84,7 @@ const retrieveCartByAnonymousId = async (anonymousId) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_ERROR, Constants.LOG_ANONYMOUS_ID + anonymousId, exceptionData);
   }
   if (null != anonymousIdResponse) {
     anonymousIdResponse = anonymousIdResponse.body;
@@ -118,10 +118,10 @@ const retrieveCartByCustomerId = async (customerId) => {
         };
         customerIdResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId,Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_INFO, Constants.ERROR_MSG_CART_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_CART_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -131,7 +131,7 @@ const retrieveCartByCustomerId = async (customerId) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_CUSTOMER_ID, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, exceptionData);
   }
   if (null != customerIdResponse) {
     customerIdResponse = customerIdResponse.body;
@@ -160,10 +160,10 @@ const retrieveCartByPaymentId = async (paymentId) => {
         };
         paymentIdResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId,Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId,Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -173,7 +173,7 @@ const retrieveCartByPaymentId = async (paymentId) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_PAYMENT_ID, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentId, exceptionData);
   }
   if (null != paymentIdResponse) {
     paymentIdResponse = paymentIdResponse.body;
@@ -202,10 +202,10 @@ const retrieveOrderByCartId = async (cartId) => {
         };
         paymentIdResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_CART_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_CART_ID, Constants.LOG_INFO, Constants.LOG_CART_ID + cartId,Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_CART_ID, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_CART_ID, Constants.LOG_INFO, Constants.LOG_CART_ID + cartId,Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -215,7 +215,7 @@ const retrieveOrderByCartId = async (cartId) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_CART_ID, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_CART_ID, Constants.LOG_ERROR, Constants.LOG_CART_ID + cartId, exceptionData);
   }
   if (null != paymentIdResponse) {
     paymentIdResponse = paymentIdResponse.body;
@@ -244,10 +244,10 @@ const retrieveOrderByPaymentId = async (paymentId) => {
         };
         paymentIdResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -257,7 +257,7 @@ const retrieveOrderByPaymentId = async (paymentId) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentId, exceptionData);
   }
   if (null != paymentIdResponse) {
     paymentIdResponse = paymentIdResponse.body;
@@ -285,7 +285,7 @@ const retrievePayment = async (paymentId) => {
       };
       paymentResponse = await client.execute(channelsRequest);
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -295,7 +295,7 @@ const retrievePayment = async (paymentId) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_PAYMENT, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_PAYMENT, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentId, exceptionData);
   }
   if (null != paymentResponse) {
     paymentResponse = paymentResponse.body;
@@ -338,10 +338,10 @@ const addTransaction = async (transactionObject) => {
         };
         transactionResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + transactionObject.paymentId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.ERROR_MSG_FETCH_TRANSACTIONS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + transactionObject.paymentId, Constants.ERROR_MSG_FETCH_TRANSACTIONS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -351,7 +351,7 @@ const addTransaction = async (transactionObject) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_ADD_TRANSACTION + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TRANSACTION, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + transactionObject.paymentId, exceptionData);
   }
   if (null != transactionResponse) {
     transactionResponse = transactionResponse.body;
@@ -383,7 +383,7 @@ const getOrders = async () => {
       };
       orderResponse = await client.execute(channelsRequest);
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ORDERS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ORDERS, Constants.LOG_INFO, null, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -393,7 +393,7 @@ const getOrders = async () => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ORDERS, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ORDERS, Constants.LOG_ERROR, null, exceptionData);
   }
   if (null != orderResponse) {
     orderResponse = orderResponse.body;
@@ -470,13 +470,13 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
           };
           orderResponse = await client.execute(channelsRequest);
         } else {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
         }
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_UPDATE_CART);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId, Constants.ERROR_MSG_UPDATE_CART);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_CART);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId, Constants.ERROR_MSG_EMPTY_CART);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -486,7 +486,7 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
     } else {
       exceptionData = Constants.EXCEPTION_MSG_CART_UPDATE + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentId, exceptionData);
   }
   if (null != orderResponse) {
     orderResponse = orderResponse.body;
@@ -549,10 +549,10 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
           tokenResponse = await setCustomType(customerId, tokenArray, failedTokens);
         }
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + updatePaymentObj.customer.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + updatePaymentObj.customer.id, Constants.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -562,7 +562,7 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
     } else {
       exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + updatePaymentObj.customer.id, exceptionData);
   }
   return tokenResponse;
 };
@@ -588,10 +588,10 @@ const getCustomer = async (customerId) => {
         };
         customerResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_INFO, Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -601,7 +601,7 @@ const getCustomer = async (customerId) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CUSTOMER, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, exceptionData);
   }
   if (null != customerResponse) {
     customerResponse = customerResponse.body;
@@ -639,10 +639,10 @@ const updateDecisionSync = async (decisionUpdateObject) => {
         };
         await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + decisionUpdateObject.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + decisionUpdateObject.id, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -652,7 +652,7 @@ const updateDecisionSync = async (decisionUpdateObject) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_DECISION_SYNC + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + decisionUpdateObject.id, exceptionData);
   }
 };
 
@@ -691,10 +691,10 @@ const updateSync = async (syncUpdateObject) => {
         };
         await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + syncUpdateObject.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + syncUpdateObject.id, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -704,7 +704,7 @@ const updateSync = async (syncUpdateObject) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_SYNC_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_SYNC, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + syncUpdateObject.id, exceptionData);
   }
 };
 
@@ -733,10 +733,10 @@ const syncVisaCardDetails = async (visaUpdateObject) => {
         };
         syncVisaCardDetailsResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + visaUpdateObject.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + visaUpdateObject.id, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -746,7 +746,7 @@ const syncVisaCardDetails = async (visaUpdateObject) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_SYNC_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + visaUpdateObject.id, exceptionData);
   }
   if (null != syncVisaCardDetailsResponse) {
     syncVisaCardDetailsResponse = syncVisaCardDetailsResponse.body;
@@ -790,10 +790,10 @@ const syncAddTransaction = async (syncUpdateObject) => {
         };
         syncAddTransactionResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + syncUpdateObject.id ,Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + syncUpdateObject.id, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -803,7 +803,7 @@ const syncAddTransaction = async (syncUpdateObject) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_SYNC_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + syncUpdateObject.id, exceptionData);
   }
   if (null != syncAddTransactionResponse) {
     syncAddTransactionResponse = syncAddTransactionResponse.body;
@@ -829,7 +829,7 @@ const addCustomTypes = async (customType) => {
       };
       customeTypeResponse = await client.execute(channelsRequest);
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, null, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -839,7 +839,7 @@ const addCustomTypes = async (customType) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + customType.key + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, null, exceptionData);
     data = exception;
     if (Constants.HTTP_CODE_FOUR_HUNDRED == data.statusCode && Constants.HTTP_CODE_FOUR_HUNDRED == data.body.statusCode && Constants.STRING_ERRORS in data.body && Constants.STRING_DUPLICATE_FIELD == data.body.errors[Constants.VAL_ZERO].code) {
       customeTypeResponse = data;
@@ -865,7 +865,7 @@ const addExtensions = async (extension) => {
       };
       customeTypeResponse = await client.execute(channelsRequest);
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_EXTENSIONS, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_EXTENSIONS, Constants.LOG_INFO, null, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -875,7 +875,7 @@ const addExtensions = async (extension) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_EXTENSIONS, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_EXTENSIONS, Constants.LOG_ERROR, null, exceptionData);
   }
   return customeTypeResponse;
 };
@@ -896,7 +896,7 @@ const getCustomType = async (key) => {
       };
       customTypeResponse = await client.execute(channelsRequest);
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, null, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
     customTypeResponse = exception;
@@ -907,7 +907,7 @@ const getCustomType = async (key) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + key + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, null,exceptionData);
   }
   return customTypeResponse;
 };
@@ -947,10 +947,10 @@ const setCustomType = async (customerId, fieldsData, failedTokenData) => {
         };
         customResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId,Constants.ERROR_MSG_CREATE_CUSTOM_TYPE);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -960,7 +960,7 @@ const setCustomType = async (customerId, fieldsData, failedTokenData) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, exceptionData);
   }
   if (null != customResponse) {
     customResponse = customResponse.body;
@@ -998,10 +998,10 @@ const addCustomField = async (typeId, version, fieldDefinition) => {
         };
         customResponse = await client.execute(channelsRequest);
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, null, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, Constants.ERROR_MSG_UPDATE_CUSTOM_TYPE);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, null, Constants.ERROR_MSG_UPDATE_CUSTOM_TYPE);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -1011,7 +1011,7 @@ const addCustomField = async (typeId, version, fieldDefinition) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_ERROR, null, exceptionData);
   }
   if (null != customResponse) {
     customResponse = customResponse.body;

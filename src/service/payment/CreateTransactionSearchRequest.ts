@@ -35,23 +35,29 @@ const getTransactionSearchResponse = async (query, sort) => {
       requestObj.limit = Constants.VAL_FIFTY;
       requestObj.offset = Constants.VAL_ZERO;
       requestObj.sort = sort;
+
+      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_DEBUG, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST +JSON.stringify(requestObj));
+      }
+      
       const instance = new restApi.SearchTransactionsApi(configObject, apiClient);
       return await new Promise((resolve, reject) => {
         instance.createSearch(requestObj, function (error, data, response) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_RESPONSE +JSON.stringify(response));
           if (data) {
             searchResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
             searchResponse.data = data;
             resolve(searchResponse);
           } else if (error) {
             if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, error.response.text);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, error.response.text);
             } else {
               if (typeof error === 'object') {
                 errorData = JSON.stringify(error);
               } else {
                 errorData = error;
               }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, errorData);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, errorData);
             }
             searchResponse.httpCode = error.status;
             reject(searchResponse);
@@ -63,7 +69,7 @@ const getTransactionSearchResponse = async (query, sort) => {
         return searchResponse;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, Constants.ERROR_MSG_INVALID_INPUT);
       return searchResponse;
     }
   } catch (exception) {
@@ -74,7 +80,7 @@ const getTransactionSearchResponse = async (query, sort) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
     return searchResponse;
   }
 };

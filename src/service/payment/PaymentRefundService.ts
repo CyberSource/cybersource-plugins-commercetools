@@ -79,9 +79,15 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
       orderInformation.amountDetails = orderInformationAmountDetails;
 
       requestObj.orderInformation = orderInformation;
+
+      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_REQUEST +JSON.stringify(requestObj));
+      }
+
       const instance = new restApi.RefundApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
         instance.refundPayment(requestObj, captureId, function (error, data, response) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_RESPONSE +JSON.stringify(response));
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
@@ -89,7 +95,7 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
             resolve(paymentResponse);
           } else if (error) {
             if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, error.response.text);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
               paymentResponse.transactionId = errorData.id;
               paymentResponse.status = errorData.status;
@@ -99,7 +105,7 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
               } else {
                 errorData = error;
               }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, errorData);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id ,errorData);
             }
             paymentResponse.httpCode = error.status;
             reject(paymentResponse);
@@ -111,7 +117,7 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
         return paymentResponse;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
       return paymentResponse;
     }
   } catch (exception) {
@@ -122,7 +128,7 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, exceptionData);
     return paymentResponse;
   }
 };

@@ -53,11 +53,11 @@ const syncCustomType = async (paymentCustomType) => {
           paymentHandler.updateCustomField(paymentCustomType.fieldDefinitions, typeObj.fieldDefinitions, typeObj.id, typeObj.version);
         }
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse.message);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse.message);
       }
     }
   } catch (err) {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse.message);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse.message);
   }
 };
 

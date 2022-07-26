@@ -401,4 +401,33 @@ export abstract class Constants {
   static readonly PAYMENT_CREATE_DESTINATION_URL = '/api/extension/payment/create';
   static readonly PAYMENT_UPDATE_DESTINATION_URL = '/api/extension/payment/update';
   static readonly CUSTOMER_CREATE_DESTINATION_URL = '/api/extension/customer/update';
+
+   //Debug messages
+   static readonly ADD_TOKEN_REQUEST = 'Add Token Request = ';
+   static readonly ADD_TOKEN_RESPONSE = 'Add Token Response = ';
+   static readonly TRANSACTION_DETAILS_RESPONSE = 'Transaction Details Response = ';
+   static readonly CREATE_TRANSACTION_SEARCH_REQUEST = 'Create Transaction Search Request = ';
+   static readonly CREATE_TRANSACTION_SEARCH_RESPONSE = 'Create Transaction Search Response = ';
+   static readonly DECISION_SYNC_RESPONSE = 'Decision Sync Response = ';
+   static readonly DELETE_TOKEN_RESPONSE = 'Delete Token Response = ';
+   static readonly FLEX_KEYS_REQUEST = 'Flex Keys Request = ';
+   static readonly FLEX_KEYS_RESPONSE = 'Flex Keys Response = ';
+   static readonly PAYER_AUTHENTICATION_SETUP_REQUEST = 'Payer Authentication Setup Request = ';
+   static readonly PAYER_AUTHENTICATION_SETUP_RESPONSE = 'Payer Authentication Setup Response = ';
+   static readonly AUTHORIZATION_REVERSAL_REQUEST = 'Authorization Reversal Request = ';
+   static readonly AUTHORIZATION_REVERSAL_RESPONSE = 'Authorization Reversal Response = ';
+   static readonly PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST = 'Payer Authentication Enrolment Check Request = ';
+   static readonly PAYER_AUTHENTICATION_ENROLMENT_CHECK_RESPONSE = 'Payer Authentication Enrolment Check Response = ';
+   static readonly AUTHORIZATION_REQUEST = 'Authorization Request = ';
+   static readonly AUTHORIZATION_RESPONSE = 'Authorization Response = ';
+   static readonly CAPTURE_REQUEST = 'Capture Request = ';
+   static readonly CAPTURE_RESPONSE = 'Capture Response = ';
+   static readonly REFUND_REQUEST = 'Refund Request = ';
+   static readonly REFUND_RESPONSE = 'Refund Response = ';
+   static readonly UPDATE_TOKEN_REQUEST = 'Update Token Request = ';
+   static readonly UPDATE_TOKEN_RESPONSE = 'Update Token Response = ';
+   static readonly LOG_CUSTOMER_ID = 'CustomerId : ';
+   static readonly LOG_ANONYMOUS_ID = 'AnonymousId : ';
+   static readonly LOG_CART_ID = 'CartId : ';
+   static readonly LOG_PAYMENT_ID = 'PaymentId : ';
 }

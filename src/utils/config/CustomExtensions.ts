@@ -33,10 +33,10 @@ const syncExtensions = async (extension) => {
     extension.destination.authentication.headerValue = Constants.AUTHENTICATION_SCHEME_BEARER + Constants.STRING_EMPTY_SPACE + process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE;
     scriptResponse = await commercetoolsApi.addExtensions(extension);
     if (null != scriptResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE != parseInt(scriptResponse.statusCode)) {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
     }
   } catch (err) {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
   }
 };
 

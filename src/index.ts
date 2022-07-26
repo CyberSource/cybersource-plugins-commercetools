@@ -78,7 +78,7 @@ app.get('/orders', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_ORDERS, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_ORDERS, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.ERROR_MSG_NO_ORDER_DETAILS;
   }
   res.render('orders', {
@@ -144,7 +144,7 @@ app.get('/paymentdetails', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.parse(path.basename(__filename)).name).name, Constants.GET_PAYMENT_DETAILS, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.parse(path.basename(__filename)).name).name, Constants.GET_PAYMENT_DETAILS, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
   }
@@ -189,7 +189,7 @@ app.post('/api/extension/payment/create', async (req, res) => {
               errors: [],
             };
           } else {
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, Constants.ERROR_MSG_FLEX_TOKEN_KEYS);
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_FLEX_TOKEN_KEYS);
             response = paymentService.invalidOperationResponse();
           }
         }
@@ -201,7 +201,7 @@ app.post('/api/extension/payment/create', async (req, res) => {
         response = paymentService.getEmptyResponse();
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_PAYMENT_DATA);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_PAYMENT_DATA);
       response = paymentService.getEmptyResponse();
     }
   } catch (exception) {
@@ -212,7 +212,7 @@ app.post('/api/extension/payment/create', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_ERROR, null, exceptionData);
     response = paymentService.invalidOperationResponse();
   }
   res.send(response);
@@ -288,7 +288,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
         }
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_UPDATE, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_PAYMENT_DATA);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_UPDATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_PAYMENT_DATA);
       updateResponse = paymentService.getEmptyResponse();
     }
   } catch (exception) {
@@ -299,7 +299,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_UPDATE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_UPDATE, Constants.LOG_ERROR, null, exceptionData);
     updateResponse = paymentService.invalidOperationResponse();
   }
   res.send(updateResponse);
@@ -370,7 +370,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CUSTOMER_UPDATE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CUSTOMER_UPDATE, Constants.LOG_ERROR, null, exceptionData);
   }
   if (null == response) {
     customerInfo = await commercetoolsApi.getCustomer(req.body.resource.id);
@@ -436,7 +436,7 @@ app.get('/capture', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_CAPTURE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_CAPTURE, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
     return;
@@ -505,7 +505,7 @@ app.get('/refund', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_REFUND, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_REFUND, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
     return;
@@ -561,7 +561,7 @@ app.get('/authReversal', async (req, res) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_AUTH_REVERSAL, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_AUTH_REVERSAL, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
     return;
