@@ -14,9 +14,10 @@ const logData = (fileName, methodName, type, id, message) => {
     });
   }
   else{
-  loggingFormat = printf(({ label, methodName, level, message }) => {
-    return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
-  });
+    loggingFormat = printf(({ label, methodName, level, message }) => {
+      return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
+    });
+  }
   const logger = winston.createLogger({
     level: type,
     format: combine(loggingFormat),

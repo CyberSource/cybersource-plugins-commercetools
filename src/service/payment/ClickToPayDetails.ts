@@ -45,14 +45,14 @@ const getVisaCheckoutData = async (paymentResponse) => {
               resolve(visaCheckoutData);
             } else if (error) {
               if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response &&  Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-                paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_INFO, error.response.text);
+                paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentResponse.data.clientReferenceInformation.code, error.response.text);
               } else {
                 if (typeof error === 'object') {
                   errorData = JSON.stringify(error);
                 } else {
                   errorData = error;
                 }
-                paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_INFO, errorData);
+                paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentResponse.data.clientReferenceInformation.code, errorData);
               }
               visaCheckoutData.httpCode = error.status;
               reject(visaCheckoutData);
@@ -64,7 +64,7 @@ const getVisaCheckoutData = async (paymentResponse) => {
           return visaCheckoutData;
         });
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentResponse.data.clientReferenceInformation.code, Constants.ERROR_MSG_INVALID_INPUT);
         return visaCheckoutData;
       }
     } else {
@@ -79,7 +79,7 @@ const getVisaCheckoutData = async (paymentResponse) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentResponse.data.clientReferenceInformation.code, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentResponse.data.clientReferenceInformation.code,exceptionData);
     return visaCheckoutData;
   }
 };

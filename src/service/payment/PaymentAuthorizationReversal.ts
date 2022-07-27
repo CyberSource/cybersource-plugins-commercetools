@@ -171,7 +171,7 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
             j++;
           }
         } else {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_CART_LOCALE);
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_CART_LOCALE);
         }
       }
       requestObj.orderInformation = orderInformation;

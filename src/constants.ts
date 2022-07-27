@@ -240,6 +240,7 @@ export abstract class Constants {
 
   static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
   static readonly ERROR_INFORMATION = 'errorInformation';
+  static readonly LOG_DEBUG = 'debug';
   static readonly LOG_ERROR = 'error';
   static readonly LOG_INFO = 'info';
   static readonly TOKEN_INFORMATION = 'tokenInformation';
