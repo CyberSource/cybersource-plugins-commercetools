@@ -833,11 +833,11 @@ const addCustomTypes = async (customType) => {
     }
   } catch (exception) {
     if (typeof exception === 'string') {
-      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + customType.key + Constants.STRING_HYPHEN + exception.toUpperCase();
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_FULLCOLON + customType.key + Constants.STRING_HYPHEN + exception.toUpperCase();
     } else if (exception instanceof Error) {
-      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + customType.key + Constants.STRING_HYPHEN + exception.message;
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_FULLCOLON + customType.key + Constants.STRING_HYPHEN + exception.message;
     } else {
-      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + customType.key + Constants.STRING_HYPHEN + exception;
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_FULLCOLON + customType.key + Constants.STRING_HYPHEN + exception;
     }
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, null, exceptionData);
     data = exception;
@@ -869,9 +869,9 @@ const addExtensions = async (extension) => {
     }
   } catch (exception) {
     if (typeof exception === 'string') {
-      exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + exception.toUpperCase();
+      exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_FULLCOLON + extension.key + Constants.STRING_HYPHEN + exception.toUpperCase();
     } else if (exception instanceof Error) {
-      exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + exception.message;
+      exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_FULLCOLON + extension.key + Constants.STRING_HYPHEN + exception.message;
     } else {
       exceptionData = Constants.EXCEPTION_MSG_ADD_EXTENSION + Constants.STRING_HYPHEN + exception;
     }
@@ -901,11 +901,11 @@ const getCustomType = async (key) => {
   } catch (exception) {
     customTypeResponse = exception;
     if (typeof exception === 'string') {
-      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + key + Constants.STRING_HYPHEN + exception.toUpperCase();
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_FULLCOLON + key + Constants.STRING_HYPHEN + exception.toUpperCase();
     } else if (exception instanceof Error) {
-      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + key + Constants.STRING_HYPHEN + exception.message;
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_FULLCOLON + key + Constants.STRING_HYPHEN + exception.message;
     } else {
-      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_SEMICOLON + key + Constants.STRING_HYPHEN + exception;
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_FULLCOLON + key + Constants.STRING_HYPHEN + exception;
     }
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, null,exceptionData);
   }

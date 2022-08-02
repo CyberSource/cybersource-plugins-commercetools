@@ -19,6 +19,7 @@ const ensureCustomerUpdateExtension = async () => {
 };
 
 const syncExtensions = async (extension) => {
+  let headerValue;
   let scriptResponse: any;
   let url: any;
   try {
@@ -29,11 +30,12 @@ const syncExtensions = async (extension) => {
     } else if (Constants.CUSTOMER_UPDATE_KEY == extension.key) {
       url = Constants.CUSTOMER_CREATE_DESTINATION_URL;
     }
+    headerValue = paymentService.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
     extension.destination.url = process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL + url;
-    extension.destination.authentication.headerValue = Constants.AUTHENTICATION_SCHEME_BEARER + Constants.STRING_EMPTY_SPACE + process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE;
+    extension.destination.authentication.headerValue = Constants.AUTHENTICATION_SCHEME_BEARER + Constants.STRING_EMPTY_SPACE + headerValue;
     scriptResponse = await commercetoolsApi.addExtensions(extension);
     if (null != scriptResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE != parseInt(scriptResponse.statusCode)) {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_SEMICOLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_FULLCOLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
     }
   } catch (err) {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);

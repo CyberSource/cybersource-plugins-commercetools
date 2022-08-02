@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import path from 'path';
 import winston from 'winston';
 import { format } from 'winston';
@@ -733,6 +734,70 @@ const invalidInputResponse = () => {
     ],
   };
 };
+const encryption = (data) => {
+  let key:any;
+  let baseEncodedData:any;
+  let exceptionData:any;
+  let encryption:any
+  let encryptStringData:any;
+  try{
+    if(data){
+      key = process.env.CT_CLIENT_SECRET;
+      const iv = crypto.randomBytes(Constants.VAL_TWELVE);
+      const cipher = crypto.createCipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, key, iv);
+      encryption = cipher.update(data, Constants.UNICODE_ENCODING_SYSTEM, Constants.ENCODING_BASE_SIXTY_FOUR);
+      encryption += cipher.final(Constants.ENCODING_BASE_SIXTY_FOUR);
+      const authTag = cipher.getAuthTag();
+      encryptStringData = iv.toString(Constants.HEX)+Constants.STRING_FULLCOLON+encryption.toString()+Constants.STRING_FULLCOLON+authTag.toString(Constants.HEX);
+      baseEncodedData = (Buffer.from(encryptStringData)).toString(Constants.ENCODING_BASE_SIXTY_FOUR);
+    }
+  }catch(exception){
+    baseEncodedData = null;
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DECRYPTION, Constants.LOG_ERROR, null, exceptionData);
+  }
+  return baseEncodedData;
+};
+
+const decryption = (encodedCredentials) => {
+  let key:any;
+  let data:any;
+  let decryptedData:any;
+  let encryptedData:any;
+  let exceptionData:any;
+  let ivBuff:any;
+  let authTagBuff:any;
+  try{
+    if(encodedCredentials){
+      key = process.env.CT_CLIENT_SECRET;
+      data = (Buffer.from(encodedCredentials, Constants.ENCODING_BASE_SIXTY_FOUR)).toString(Constants.ASCII);
+      ivBuff = Buffer.from(data.split(Constants.STRING_FULLCOLON)[Constants.VAL_ZERO], Constants.HEX);
+      encryptedData = data.split(Constants.STRING_FULLCOLON)[Constants.VAL_ONE];
+      authTagBuff = Buffer.from(data.split(Constants.STRING_FULLCOLON)[Constants.VAL_TWO], Constants.HEX);
+      const decipher = crypto.createDecipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, key, ivBuff);
+      decipher.setAuthTag(authTagBuff);
+      decryptedData = decipher.update(encryptedData, Constants.ENCODING_BASE_SIXTY_FOUR, Constants.UNICODE_ENCODING_SYSTEM);
+      decryptedData += decipher.final(Constants.UNICODE_ENCODING_SYSTEM);
+    }
+  }catch(exception){
+    decryptedData = null;
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DECRYPTION, Constants.LOG_ERROR, null, exceptionData);
+  }
+  return decryptedData;
+};
 
 export default {
   logData,
@@ -753,4 +818,6 @@ export default {
   invalidOperationResponse,
   invalidInputResponse,
   roundOff,
+  encryption,
+  decryption
 };

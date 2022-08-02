@@ -33,23 +33,34 @@ app.set('views', path.join(__dirname, 'views/'));
 app.set('view engine', 'ejs');
 
 function authentication(req, res, next) {
+  let decrypt:any;
   var authHeader = req.headers.authorization;
-
   if (!authHeader) {
     if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin') {
       res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
     }
     return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER });
   }
-  const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
-
-  if (process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE == base64Credentials) {
-    next();
-  } else {
-    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin') {
+  if(req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin'){
+    const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
+    if(base64Credentials == process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE){
+      next();
+    }else{
       res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
+      return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
     }
-    return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
+  }else{
+    if(req.url == '/api/extension/payment/create' || req.url == '/api/extension/payment/update' || req.url == '/api/extension/customer/update'){
+      const encodedCredentials  = authHeader.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
+      decrypt = paymentService.decryption(encodedCredentials);
+      if(null != decrypt && decrypt == process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE){
+        next();
+      }else{
+        return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
+      }
+    }else{
+      next();
+    } 
   }
 }
 

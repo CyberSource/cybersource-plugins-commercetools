@@ -31,8 +31,10 @@ export abstract class Constants {
   static readonly FUNC_CLICK_TO_PAY = 'FuncClickToPayResponse';
   static readonly FUNC_CONVERSION_DETAILS = 'FuncConversionDetails';
   static readonly FUNC_CREATE_RESPONSE = 'FuncCreateResponse';
+  static readonly FUNC_DECRYPTION = 'FuncDecryption';
   static readonly FUNC_DELETE_CARD_HANDLER = 'FuncDeleteCardHandler';
   static readonly FUNC_DELETE_CUSTOMER_TOKEN = 'FuncDeleteCustomerToken';
+  static readonly FUNC_ENCRYPTION = 'FuncEncryption';
   static readonly FUNC_FAILURE_RESPONSE = 'FuncFailureResponse';
   static readonly FUNC_FIELD_MAPPER = 'FuncFieldMapper';
   static readonly FUNC_FIELD_MAPPER_NULL = 'FuncFieldMapperNull';
@@ -90,6 +92,7 @@ export abstract class Constants {
   static readonly VAL_FLOAT_ZERO = 0.0;
   static readonly VAL_ONE = 1;
   static readonly VAL_TWO = 2;
+  static readonly VAL_TWELVE = 12;
   static readonly VAL_TWENTY_THREE = 23;
   static readonly VAL_THIRTY_SIX = 36;
   static readonly VAL_FIFTY = 50;
@@ -156,8 +159,8 @@ export abstract class Constants {
   static readonly REGEX_DOT = '.';
   static readonly REGEX_HYPHEN = '-';
   static readonly STRING_EMPTY = '';
+  static readonly STRING_FULLCOLON = ':';
   static readonly STRING_HYPHEN = ' - ';
-  static readonly STRING_SEMICOLON = ': ';
   static readonly STRING_EMPTY_SPACE = ' ';
 
   //Payment methods
@@ -238,12 +241,17 @@ export abstract class Constants {
   static readonly STRING_VISA = 'visa';
   static readonly STRING_WWW_AUTHENTICATE = 'WWW-Authenticate';
 
+  static readonly ASCII = 'ascii';
   static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
+  static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ERROR_INFORMATION = 'errorInformation';
+  static readonly HEADER_ENCRYPTION_ALGORITHM = 'aes-256-gcm';
+  static readonly HEX = 'hex';
   static readonly LOG_DEBUG = 'debug';
   static readonly LOG_ERROR = 'error';
   static readonly LOG_INFO = 'info';
   static readonly TOKEN_INFORMATION = 'tokenInformation';
+  static readonly UNICODE_ENCODING_SYSTEM = 'utf8'
   static readonly VALIDATION = 'validation';
   static readonly VALIDATION_CALLBACK = 'validationCallback';
   static readonly STRING_DISCOUNTED_PRICE_PER_QUANTITY = 'discountedPricePerQuantity';
