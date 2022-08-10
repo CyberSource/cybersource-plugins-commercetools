@@ -19,9 +19,19 @@ Fields which are used by Decision Manager are mapped from Commercetools fields a
 | cart.lineItem[#] | variant.sku | item_#_productSKU    |  |
 | payment | isv_deviceFingerprintId | deviceInformation_fingerprintSessionId    |  |
 
-### Device fingerprinting
 
-Follow the appropriate Cybersource guide for device fingerprinting and add the session Id used for this to the Commercetools payment as a custom field called `isv_deviceFingerprintId`. Refer process a payment document for respective payment method to know more.
+### <a name="Devicefingerprinting"></a>Device Fingerprinting
+
+Follow the appropriate Cybersource guide for device fingerprinting and add the session Id used for this to the Commercetools payment as a custom field called `isv_deviceFingerprintId`. 
+
+You can use any unique string such as an order number or web session Id or Commercetools payment Id. The string can be combination of uppercase and lowercase letters, digits, and these special characters: hyphen (-) and underscore (_). However, do not use the same uppercase and lowercase letters to indicate different session Ids. 
+
+Replace sessionId with the unique Id generated in the URL "https://h.online-metrix.net/fp/tags.js?org_id={{org Id}}&session_id={{merchant Id}}{{session Id}}" and include the script wherever you want deviceFingerprint Id to be captured.
+
+Replace the below data:
+- {{org Id}} - To obtain this value, contact your Cybersource representative and specify to them whether it is for testing or production. 
+- {{merchant Id}} - Your unique Cybersource merchant Id. 
+- {{session Id}} - Value of unique Id generated above
 
 
 ### Enabling/disabling decision manager for specific payments

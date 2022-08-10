@@ -12,18 +12,11 @@
     - [Payer authentication validate result](#PayerAuthenticationValidation)
     - [Payment error](#PaymentError)
     - [Payment failure](#PaymentFailure)
+- [Creating API Extensions and Customizations](#ApiExtensions)
 
-The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in src/resources folder of the plugin and can be run as a script to load them to Commercetools.
+The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in src/resources folder of the plugin and can be run as an endpoint to load them into Commercetools.
 
 > **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms</li></ul>
-
-Below is the Endpoint to run the script to load these API extension setup and customizations. Before running the script, Cybersource Plugin API Key must be created with the required scope, see Cybersource Plugin API Key in [Key Creation](Key-Creation.md)
-
-| Endpoint                  | Note                                                                                                                                                                                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| {baseUrl}/configurePlugin | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md) to know the values to be passed for the fields required before running the script |
-
-> **_NOTE:_** Any errors occured while running the script or while processing the payments are logged in src/loggers folder of the plugin.
 
 # <a name="APIExtensionSetup"></a>API Extension Setup
 
@@ -38,7 +31,7 @@ actions on a payment resource.
 | type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                         |
 | url                        | {baseUrl}/api/extension/payment/create | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
 | authentication.type        | AuthorizationHeader                    |                                                                                                    |
-| authentication.headerValue | Bearer {credentials}                   | Replace Base 64 encode value of the pair username:password of Commercetools with the {credentials} |
+| authentication.headerValue | Bearer {credentials}                   | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
 | timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                        |
 | actions                    | Create                                 |                                                                                                    |
 | resourceTypeId             | payment                                |                                                                                                    |
@@ -53,7 +46,7 @@ An extension triggered by payment updates is required to process any update acti
 | type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                         |
 | url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
 | authentication.type        | AuthorizationHeader                    |                                                                                                    |
-| authentication.headerValue | Bearer {credentials}                   | Replace Base 64 encode value of the pair username:password of Commercetools with the {credentials} |
+| authentication.headerValue | Bearer {credentials}                   | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
 | timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                        |
 | actions                    | Update                                 |                                                                                                    |
 | resourceTypeId             | payment                                |                                                                                                    |
@@ -68,7 +61,7 @@ An extension triggered by customer update is required to process any update acti
 | type                       | HTTP                                    | The plugin only supports HTTP Destinations                                                         |
 | url                        | {baseUrl}/api/extension/customer/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
 | authentication.type        | AuthorizationHeader                     |                                                                                                    |
-| authentication.headerValue | Bearer {credentials}                    | Replace Base 64 encode value of the pair username:password of Commercetools with the {credentials} |
+| authentication.headerValue | Bearer {credentials}                    | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
 | timeoutInMs                | 3000                                    | You will need Commercetools support to increase the allowable maximum value                        |
 | actions                    | Update                                  |                                                                                                    |
 | resourceTypeId             | customer                                |                                                                                                    |
@@ -220,3 +213,17 @@ Fields
 | ------------- | ------ | -------- |
 | reasonCode    | String | true     |
 | transactionId | String | true     |
+
+# <a name="ApiExtensions"></a>Creating API Extensions and Customizations
+
+Once the environment properties are set and the plugin is deployed successfully, the next step is about setting up the plugin to receive requests from Commercetools.
+
+Below is the Endpoint to create the extensions and the custom fields for the payment and customer resources accordingly to support the Cybersource services. Before running the endpoint, Cybersource Plugin API Key must be created with the required scope, see Cybersource Plugin API Key in [Key Creation](Key-Creation.md)
+
+| Endpoint                  | Note                                                                                                                                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| {baseUrl}/configurePlugin | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md) to know the values to be passed for the fields required before running the script |
+
+Alternatively, navigate to the `{baseUrl}/orders` endpoint and click on **Run Script** button in the UI page. This will invoke the `{baseUrl}/configurePlugin` endpoint to handle the same. Ensure to create the extensions using the plugin endpoint provided in order to avoid authentication overheads later.
+
+> **_NOTE:_** Authentication is required for accessing any endpoint in the plugin, hence ensure to provide the valid values for the same. Refer [Authentication](./Authentication.md) for more information.

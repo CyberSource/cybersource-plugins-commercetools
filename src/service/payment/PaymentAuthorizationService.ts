@@ -338,7 +338,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       return await new Promise(function (resolve, reject) {
         instance.createPayment(requestObj, function (error, data, response) {
           if (Constants.STRING_ENROLL_CHECK == service){
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_RESPONSE +JSON.stringify(requestObj));
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_RESPONSE +JSON.stringify(response));
           }else{
             paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_RESPONSE +JSON.stringify(response));
           }
