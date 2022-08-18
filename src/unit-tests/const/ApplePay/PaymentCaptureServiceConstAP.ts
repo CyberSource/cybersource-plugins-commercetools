@@ -19,7 +19,7 @@ export const payment =  {
     amountPlanned: {
       type: 'centPrecision',
       currencyCode: 'USD',
-      centAmount: 5980,
+      centAmount: 100,
       fractionDigits: 2
     },
     paymentMethodInfo: {
@@ -52,7 +52,7 @@ export const payment =  {
         amount: {
             type: 'centPrecision',
             currencyCode: 'USD',
-            centAmount: 6970,
+            centAmount: 100,
             fractionDigits: 2
         },
         interactionId: '6431033040436397403954',
@@ -62,11 +62,6 @@ export const payment =  {
     interfaceInteractions: [],
     anonymousId: '033cd1c3-801d-4d2b-9729-fef0064dd3be'
   }
-
-  
-  
-      
-  
 
 export const cart = {
     "limit": 20,
@@ -123,7 +118,7 @@ export const cart = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "EUR",
-                    "centAmount": 15845,
+                    "centAmount": 100,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -133,7 +128,7 @@ export const cart = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "USD",
-                    "centAmount": 5980,
+                    "centAmount": 100,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -156,7 +151,7 @@ export const cart = {
               "value": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 5980,
+                "centAmount": 100,
                 "fractionDigits": 2
               },
               "country": "US"
@@ -186,26 +181,26 @@ export const cart = {
             "totalPrice": {
               "type": "centPrecision",
               "currencyCode": "USD",
-              "centAmount": 5980,
+              "centAmount": 100,
               "fractionDigits": 2
             },
             "taxedPrice": {
               "totalNet": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 4983,
+                "centAmount": 49,
                 "fractionDigits": 2
               },
               "totalGross": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 5980,
+                "centAmount": 100,
                 "fractionDigits": 2
               },
               "totalTax": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 997,
+                "centAmount": 99,
                 "fractionDigits": 2
               }
             },
@@ -216,20 +211,20 @@ export const cart = {
         "totalPrice": {
           "type": "centPrecision",
           "currencyCode": "USD",
-          "centAmount": 5980,
+          "centAmount": 100,
           "fractionDigits": 2
         },
         "taxedPrice": {
           "totalNet": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 4983,
+            "centAmount": 49,
             "fractionDigits": 2
           },
           "totalGross": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 5980,
+            "centAmount": 100,
             "fractionDigits": 2
           },
           "taxPortions": [
@@ -238,7 +233,7 @@ export const cart = {
               "amount": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 997,
+                "centAmount": 99,
                 "fractionDigits": 2
               },
               "name": "test-tax-category"
@@ -247,7 +242,7 @@ export const cart = {
           "totalTax": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 997,
+            "centAmount": 99,
             "fractionDigits": 2
           }
         },
@@ -302,3 +297,7 @@ export const cart = {
 export const authId = applePay.authId;
 
 export const authID = '64311311155868791039'
+
+export const orderNo =  null;
+
+export const orderNumber = '10';

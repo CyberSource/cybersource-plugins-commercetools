@@ -22,7 +22,7 @@ export const payment =
     {
         "type":"centPrecision",
         "currencyCode":"USD",
-        "centAmount":6000,
+        "centAmount":100,
         "fractionDigits":2
     },
     "paymentMethodInfo":
@@ -65,7 +65,7 @@ export const payment =
             {
                 "type":"centPrecision",
                 "currencyCode":"USD",
-                "centAmount":5980,
+                "centAmount":100,
                 "fractionDigits":2
             },
             "interactionId":googlePay.authId,
@@ -130,7 +130,7 @@ export const cart = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "EUR",
-                    "centAmount": 15845,
+                    "centAmount": 2000,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -140,7 +140,7 @@ export const cart = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "USD",
-                    "centAmount": 5980,
+                    "centAmount": 20,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -163,7 +163,7 @@ export const cart = {
               "value": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 5980,
+                "centAmount": 20,
                 "fractionDigits": 2
               },
               "country": "US"
@@ -193,26 +193,26 @@ export const cart = {
             "totalPrice": {
               "type": "centPrecision",
               "currencyCode": "USD",
-              "centAmount": 5980,
+              "centAmount": 20,
               "fractionDigits": 2
             },
             "taxedPrice": {
               "totalNet": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 4983,
+                "centAmount": 50,
                 "fractionDigits": 2
               },
               "totalGross": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 5980,
+                "centAmount": 100,
                 "fractionDigits": 2
               },
               "totalTax": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 997,
+                "centAmount": 97,
                 "fractionDigits": 2
               }
             },
@@ -223,20 +223,20 @@ export const cart = {
         "totalPrice": {
           "type": "centPrecision",
           "currencyCode": "USD",
-          "centAmount": 5980,
+          "centAmount": 20,
           "fractionDigits": 2
         },
         "taxedPrice": {
           "totalNet": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 4983,
+            "centAmount": 98,
             "fractionDigits": 2
           },
           "totalGross": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 5980,
+            "centAmount": 100,
             "fractionDigits": 2
           },
           "taxPortions": [
@@ -307,4 +307,9 @@ export const cart = {
     ]
   }
 export const authID = googlePay.authId;
+
 export const authId =  '64008194644864627039'
+
+export const orderNo = null;
+
+export const orderNumber = '10';

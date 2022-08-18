@@ -2,7 +2,7 @@
 
 ## Refund Service Sequence Diagram
 
-![Refund service flow](images/Refund-Flow.svg)
+![Refund service flow](images/Flow-Diagram-Refund-a-Payment.svg)
 
 ## Process
 
@@ -10,9 +10,14 @@ To refund a payment, a Capture must have been completed. When the Payment Update
 
 ## Steps
 
-To reverse a payment:
+To refund a payment:
 
-- Complete an authorization and capture, ensuring that the state for both is `Success`
+- If Sale flag not enabled, complete an authorization and capture, ensuring that the state for both is `Success`
+- If Sale flag enabled, complete a sale transaction, ensuring that the state for CHARGE is `Success`
 - Update the payment, adding an INITIAL REFUND transaction onto the payment with an amount to be refunded
 
-A successful refund will change the INITIAL REFUND to a SUCCESS REFUND transaction, adding the Credit Request ID onto the transaction as an `interactionId`.
+Refund Response Handling
+
+- A successful refund will change the INITIAL REFUND to a SUCCESS REFUND transaction, adding the Credit Request Id onto the transaction as an `interactionId`
+
+- If the refund is not successful due to any reason, the plugin will change the INITIAL REFUND to FAILURE REFUND transaction, adding the Refund Request Id onto the transaction as an `interactionId`. One can request a refund again if it is failed

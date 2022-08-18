@@ -21,7 +21,13 @@ export const payment =  {
       centAmount: clickToPay.centAmount,
       fractionDigits: 2
     },
-    paymentMethodInfo: { paymentInterface: 'cybersource', method: 'visaCheckout' },
+    paymentMethodInfo: {
+      paymentInterface: "cybersource",
+      method: "clickToPay",
+      name: {
+        "en": "Click to Pay"
+      }
+    },
     custom: {
       type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
       fields: {
@@ -70,7 +76,13 @@ export const payment =  {
       centAmount: clickToPay.centAmountValue,
       fractionDigits: 2
     },
-    paymentMethodInfo: { paymentInterface: 'cybersource', method: 'visaCheckout' },
+    paymentMethodInfo: {
+      paymentInterface: "cybersource",
+      method: "clickToPay",
+      name: {
+        "en": "Click to Pay"
+      }
+    },
     custom: {
       type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
       fields: {
@@ -425,3 +437,5 @@ export const payment =  {
   export const  authReversalId = clickToPay.authReversalId
 
   export const authReversalID = '639721595636641210'
+
+  

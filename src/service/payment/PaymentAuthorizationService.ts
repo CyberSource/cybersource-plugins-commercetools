@@ -3,7 +3,7 @@ import path from 'path';
 import paymentService from '../../utils/PaymentService';
 import { Constants } from '../../constants';
 
-const authorizationResponse = async (payment, cart, service, cardTokens, dontSaveTokenFlag) => {
+const authorizationResponse = async (payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo) => {
   let runEnvironment: any;
   let errorData: any;
   let exceptionData: any;
@@ -19,7 +19,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
     httpCode: null,
     transactionId: null,
     status: null,
-    message: null,
     data: null,
   };
   try {
@@ -39,6 +38,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         merchantID: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
         merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
         merchantsecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
+        logConfiguration: {
+          enableLog: false,
+        },
       };
       var clientReferenceInformation = new restApi.Ptsv2paymentsClientReferenceInformation();
       clientReferenceInformation.code = payment.id;
@@ -50,10 +52,20 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       requestObj.clientReferenceInformation = clientReferenceInformation;
 
       var processingInformation = new restApi.Ptsv2paymentsProcessingInformation();
+      if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_ENABLED_MOTO in payment.custom.fields && payment.custom.fields.isv_enabledMoto) {
+        processingInformation.commerceIndicator = Constants.STRING_MOTO;
+      }
+      if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_SALE_ENABLED in payment.custom.fields && payment.custom.fields.isv_saleEnabled) {
+        processingInformation.capture = true;
+      }
+      if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_WALLET_TYPE in payment.custom.fields && Constants.STRING_EMPTY != payment.custom.fields.isv_walletType) {
+        processingInformation.walletType = payment.custom.fields.isv_walletType;
+      }
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ORDER_RECONCILIATION && null != orderNo) {
+        processingInformation.reconciliationId = orderNo;
+      }
       if (Constants.STRING_FALSE == process.env.PAYMENT_GATEWAY_DECISION_MANAGER) {
         actionList.push(Constants.PAYMENT_GATEWAY_DECISION_SKIP);
-      } else {
-        processingInformation.actionList = actionList;
       }
       if (Constants.STRING_ENROLL_CHECK == service) {
         actionList.push(Constants.PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION);
@@ -108,10 +120,20 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           consumerAuthenticationInformation.referenceId = payment.custom.fields.isv_cardinalReferenceId;
           consumerAuthenticationInformation.acsWindowSize = Constants.PAYMENT_GATEWAY_ACS_WINDOW_SIZE;
           consumerAuthenticationInformation.returnUrl = process.env.PAYMENT_GATEWAY_3DS_RETURN_URL;
+          if (
+            payerAuthMandateFlag ||
+            (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_SCA_CHALLENGE &&
+              (null == payment.custom.fields.isv_savedToken || Constants.STRING_EMPTY == payment.custom.fields.isv_savedToken) &&
+              Constants.ISV_TOKEN_ALIAS in payment.custom.fields &&
+              Constants.STRING_EMPTY != payment.custom.fields.isv_tokenAlias &&
+              !dontSaveTokenFlag)
+          ) {
+            consumerAuthenticationInformation.challengeCode = Constants.PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE;
+          }
           requestObj.consumerAuthenticationInformation = consumerAuthenticationInformation;
         }
-      } else if (Constants.VISA_CHECKOUT == payment.paymentMethodInfo.method) {
-        processingInformation.paymentSolution = payment.paymentMethodInfo.method;
+      } else if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
+        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
@@ -125,7 +147,29 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         paymentInformationFluidData.descriptor = Constants.PAYMENT_GATEWAY_APPLE_PAY_DESCRIPTOR;
         paymentInformationFluidData.encoding = Constants.PAYMENT_GATEWAY_APPLE_PAY_ENCODING;
         paymentInformation.fluidData = paymentInformationFluidData;
+      }else if (Constants.ECHECK == payment.paymentMethodInfo.method) {
+        var banktransaferOptions = new restApi.Ptsv2creditsProcessingInformationBankTransferOptions();
+        if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_ENABLED_MOTO in payment.custom.fields && payment.custom.fields.isv_enabledMoto) {
+          banktransaferOptions.secCode = Constants.SEC_CODE_TEL;
+        } else {
+          banktransaferOptions.secCode = Constants.SEC_CODE_WEB;
+        }
+        banktransaferOptions.fraudScreeningLevel = Constants.VAL_ONE;
+      
+        processingInformation.bankTransferOptions = banktransaferOptions;
+        var paymentInformationBank = new restApi.Ptsv2paymentsPaymentInformationBank();
+        var paymentInformationBankAccount = new restApi.Ptsv2paymentsPaymentInformationBankAccount();
+        paymentInformationBankAccount.type = payment.custom.fields.isv_accountType;
+        paymentInformationBankAccount.number = payment.custom.fields.isv_accountNumber;
+        paymentInformationBank.account = paymentInformationBankAccount;
+        paymentInformationBank.routingNumber = payment.custom.fields.isv_routingNumber;
+        paymentInformation.bank = paymentInformationBank;
+        var paymentInformationPaymentType = new restApi.Ptsv2paymentsPaymentInformationPaymentType();
+        paymentInformationPaymentType.name = Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE;
+        paymentInformation.paymentType = paymentInformationPaymentType;
       }
+
+
       requestObj.processingInformation = processingInformation;
       requestObj.paymentInformation = paymentInformation;
 
@@ -281,25 +325,42 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         deviceInformation.userAgentBrowserValue = payment.custom.fields.isv_userAgentHeader;
       }
       requestObj.deviceInformation = deviceInformation;
+
+      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+        if (Constants.STRING_ENROLL_CHECK == service){
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST +JSON.stringify(requestObj));
+         }else{
+           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST +JSON.stringify(requestObj));
+         }
+       }
+
       const instance = new restApi.PaymentsApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
         instance.createPayment(requestObj, function (error, data, response) {
+          if (Constants.STRING_ENROLL_CHECK == service){
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_RESPONSE +JSON.stringify(response));
+          }else{
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_RESPONSE +JSON.stringify(response));
+          }
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
             paymentResponse.status = data.status;
-            paymentResponse.message = data.message;
             paymentResponse.data = data;
             resolve(paymentResponse);
           } else if (error) {
-            if (Constants.STRING_RESPONSE in error && null != error.response && Constants.STRING_TEXT in error.response) {
+            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, errorData);
               paymentResponse.transactionId = errorData.id;
               paymentResponse.status = errorData.status;
-              paymentResponse.message = errorData.message;
             } else {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, error);
+              if (typeof error === 'object') {
+                errorData = JSON.stringify(error);
+              } else {
+                errorData = error;
+              }
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.LOG_PAYMENT_ID + payment.id, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id,errorData);
             }
             paymentResponse.httpCode = error.status;
             reject(paymentResponse);
@@ -311,7 +372,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         return paymentResponse;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
       return paymentResponse;
     }
   } catch (exception) {
@@ -322,7 +383,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id,exceptionData);
     return paymentResponse;
   }
 };

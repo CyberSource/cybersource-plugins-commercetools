@@ -1,12 +1,13 @@
 {
-    "alias": "card2",
-    "value": "D605360941117CECE053AF598E0A6EEC",
+    "alias": "card4111",
+    "value": "E1F3AF75BC388615E053AF598E0A32CB",
     "cardType": "001",
     "cardName": "001",
     "cardNumber": "411111XXXXXX1111",
     "cardExpiryMonth": "12",
-    "cardExpiryYear": "2031",
-    "paymentToken": "D605418402B2E488E053AF598E0A99B5",
-    "oldExpiryMonth": "11",
-    "oldExpiryYear": "2031"
+    "cardExpiryYear": "2029",
+    "paymentToken": "E1F3A344875168D1E053AF598E0A493C",
+    "oldExpiryMonth": "12",
+    "oldExpiryYear": "2022",
+    "instrumentIdentifier": "7010000000121591111"
 }

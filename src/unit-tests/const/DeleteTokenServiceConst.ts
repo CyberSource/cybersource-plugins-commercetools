@@ -9,7 +9,7 @@ export const customerTokenObj = {
   cardNumber: deleteToken.cardNumber,
   cardExpiryMonth: deleteToken.cardExpiryMonth,
   cardExpiryYear: deleteToken.cardExpiryYear,
-  flag: "delete"
+  addressId: 'OKxBLnRJ'
   }
 
   export const customerTokenObject = {

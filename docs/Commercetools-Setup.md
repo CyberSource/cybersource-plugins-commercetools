@@ -4,71 +4,69 @@
   - [Payment Create](#PaymentCreate)
   - [Payment Update](#PaymentUpdate)
   - [Customer Update](#CustomerUpdate)
-- [Resource
-  Customisations](#ResourceCustomisations)
+- [Resource Customizations](#ResourceCustomizations)
   - [Payment Interactions](#PaymentInteractions)
-    - [Customer tokens](#Paymentauthorisationfailed)
-    - [Line item data](#LineItemData)
+    - [Customer tokens](#CustomerTokens)
     - [Payment data](#PaymentData)
     - [Payer authentication enrolment check](#PayerAuthenticationEnrolmentCheck)
     - [Payer authentication validate result](#PayerAuthenticationValidation)
     - [Payment error](#PaymentError)
     - [Payment failure](#PaymentFailure)
+- [Creating API Extensions and Customizations](#ApiExtensions)
 
-The customizations below are required for the API Extension to work
-correctly. JSON versions of these definitions can be found in the
-Installation Guide for Commerectools Cybersource Plugin.
+The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in src/resources folder of the plugin and can be run as an endpoint to load them into Commercetools.
+
+> **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms</li></ul>
 
 # <a name="APIExtensionSetup"></a>API Extension Setup
 
 ## <a name="PaymentCreate"></a>Payment Create
 
 An extension triggered by payment create is required to process any
-actions on a payment.
+actions on a payment resource.
 
-| Property                   | Value                                  | Note                                                                                                  |
-| -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| key                        | isv_payment_create_extension           |                                                                                                       |
-| type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                            |
-| url                        | {baseUrl}/api/extension/payment/create | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production       |
-| authentication.type        | AuthorizationHeader                    |                                                                                                       |
-| authentication.headerValue | Basic {credentials}                    | Replace Base 64 encode value of the pair (username: password) of Commercetools with the {credentials} |
-| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                           |
-| actions                    | Create                                 |                                                                                                       |
-| resourceTypeId             | payment                                |                                                                                                       |
+| Property                   | Value                                  | Note                                                                                               |
+| -------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| key                        | isv_payment_create_extension           |                                                                                                    |
+| type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                         |
+| url                        | {baseUrl}/api/extension/payment/create | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
+| authentication.type        | AuthorizationHeader                    |                                                                                                    |
+| authentication.headerValue | Bearer {credentials}                   | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
+| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                        |
+| actions                    | Create                                 |                                                                                                    |
+| resourceTypeId             | payment                                |                                                                                                    |
 
 ## <a name="PaymentUpdate"></a>Payment Update
 
-An extension triggered by payment updates is required to process
-authorizations
+An extension triggered by payment updates is required to process any update actions on a payment resource
 
-| Property                   | Value                                  | Note                                                                                                  |
-| -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| key                        | isv_payment_update_extension           |                                                                                                       |
-| type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                            |
-| url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production       |
-| authentication.type        | AuthorizationHeader                    |                                                                                                       |
-| authentication.headerValue | Basic {credentials}                    | Replace Base 64 encode value of the pair (username: password) of Commercetools with the {credentials} |
-| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                           |
-| actions                    | Update                                 |                                                                                                       |
-| resourceTypeId             | payment                                |                                                                                                       |
+| Property                   | Value                                  | Note                                                                                               |
+| -------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| key                        | isv_payment_update_extension           |                                                                                                    |
+| type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                         |
+| url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
+| authentication.type        | AuthorizationHeader                    |                                                                                                    |
+| authentication.headerValue | Bearer {credentials}                   | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
+| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                        |
+| actions                    | Update                                 |                                                                                                    |
+| resourceTypeId             | payment                                |                                                                                                    |
 
 ## <a name="CustomerUpdate"></a>Customer Update
 
-An extension triggered by customer update is required to process any action on customer token.
+An extension triggered by customer update is required to process any update actions on customer resource.
 
-| Property                   | Value                                  | Note                                                                                                  |
-| -------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| key                        | isv_customer_update_extension          |                                                                                                       |
-| type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                            |
-| url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production       |
-| authentication.type        | AuthorizationHeader                    |                                                                                                       |
-| authentication.headerValue | Basic {credentials}                    | Replace Base 64 encode value of the pair (username: password) of Commercetools with the {credentials} |
-| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                           |
-| actions                    | Update                                 |                                                                                                       |
-| resourceTypeId             | customer                               |                                                                                                       |
+| Property                   | Value                                   | Note                                                                                               |
+| -------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| key                        | isv_customer_update_extension           |                                                                                                    |
+| type                       | HTTP                                    | The plugin only supports HTTP Destinations                                                         |
+| url                        | {baseUrl}/api/extension/customer/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
+| authentication.type        | AuthorizationHeader                     |                                                                                                    |
+| authentication.headerValue | Bearer {credentials}                    | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
+| timeoutInMs                | 3000                                    | You will need Commercetools support to increase the allowable maximum value                        |
+| actions                    | Update                                  |                                                                                                    |
+| resourceTypeId             | customer                                |                                                                                                    |
 
-# <a name="ResourceCustomizations"></a>Resource Customisations
+# <a name="ResourceCustomizations"></a>Resource Customizations
 
 ## <a name="PaymentInteractions"></a>Payment Interactions
 
@@ -80,22 +78,26 @@ An extension triggered by customer update is required to process any action on c
 
 Fields
 
-| Name       | Type   | Required |
-| ---------- | ------ | -------- |
-| isv_tokens | String | false    |
-
-### <a name="LineItemData"></a>Line Item Data
-
-| Type    | Key                         | Purpose                                                   |
-| ------- | --------------------------- | --------------------------------------------------------- |
-| payment | isv_payments_line_item_data | Custom data type for Cybersource custom line item fields. |
-
-Fields
-
-| Name            | Type | Required |
-| --------------- | ---- | -------- |
-| isv_productCode | Enum | false    |
-| isv_productRisk | Enum | false    |
+| Name                             | Type           | Required |
+| -------------------------------- | -------------- | -------- |
+| isv_tokens                       | Set of Strings | false    |
+| isv_token                        | String         | false    |
+| isv_tokenAlias                   | String         | false    |
+| isv_savedToken                   | String         | false    |
+| isv_tokenVerificationContext     | String         | false    |
+| isv_tokenCaptureContextSignature | String         | false    |
+| isv_cardType                     | String         | false    |
+| isv_maskedPan                    | String         | false    |
+| isv_cardExpiryMonth              | String         | false    |
+| isv_cardExpiryYear               | String         | false    |
+| isv_addressId                    | String         | false    |
+| isv_currencyCode                 | String         | false    |
+| isv_deviceFingerprintId          | String         | false    |
+| isv_cardNewExpiryMonth           | String         | false    |
+| isv_cardNewExpiryYear            | String         | false    |
+| isv_tokenAction                  | String         | false    |
+| isv_tokenUpdated                 | Boolean        | false    |
+| isv_failedTokens                 | Set of Strings | false    |
 
 ### <a name="PaymentData"></a>Payment Data
 
@@ -105,7 +107,7 @@ Fields
 
 Fields
 
-| Name                                 | Type    | Required |
+| Name                                 | Type    | Required | 
 | ------------------------------------ | ------- | -------- |
 | isv_token                            | String  | false    |
 | isv_tokenAlias                       | String  | false    |
@@ -127,7 +129,6 @@ Fields
 | isv_deviceFingerprintId              | String  | false    |
 | isv_customerIpAddress                | String  | false    |
 | isv_cardinalReferenceId              | String  | false    |
-| isv_tokenCaptureContextSignature     | String  | false    |
 | isv_deviceDataCollectionUrl          | String  | false    |
 | isv_stepUpUrl                        | String  | false    |
 | isv_applePayValidationUrl            | String  | false    |
@@ -136,7 +137,9 @@ Fields
 | isv_payerEnrollTransactionId         | String  | false    |
 | isv_payerEnrollStatus                | String  | false    |
 | isv_payerEnrollHttpCode              | Number  | false    |
-
+| isv_saleEnabled                      | Boolean | false    |
+| isv_enabledMoto                      | Boolean | false    |
+| isv_walletType                       | String  | false    |
 ### <a name="PayerAuthenticationEnrolmentCheck"></a>Payer authentication enrolment check
 
 | Type                          | Key                                               | Purpose                                                                  |
@@ -145,19 +148,21 @@ Fields
 
 Fields
 
-| Name                         | Type    | Required | Source                          | Notes                                                                                                                                                                                             |
-| ---------------------------- | ------- | -------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| cardinalReferenceId          | String  | true     | Payer Authentication setup call | Reference id of payer authentication setup is sent for enrolment check                                                                                                                            |
-| authenticationRequired       | Boolean | true     | Enrolment check response        | Indicates that the authentication window needs to be displayed. Set to true when the Cybersource Authorization httpCode is 201 and status is 'PENDING_AUTHENTICATION'                             |
-| authorizationAllowed         | Boolean | true     | Enrolment check response        | Indicates that an attempt to authorize the payment may be made. Set to true when the Cybersource httpCode is 201 and status is 'PENDING_AUTHENTICATION' for enrolment check                       |
-| authenticationTransactionId  | String  | false    | Enrolment check response        | Value passed in Cardinal continue call to link back to Cybersource. Also passed back to Cybersource to validate authentication <br><br> Should always be present unless enrolment check times out |
-| paReq                        | String  | false    | Enrolment check response        | Passed to Authentication validation call when the Cybersource httpCode is 201 and status is 'PENDING_AUTHENTICATION' for enrolment check                                                          |
-| acsUrl                       | String  | false    | Enrolment check response        | Passed to Authentication validation call when the Cybersource httpCode is 201 and status is 'PENDING_AUTHENTICATION' for enrolment check                                                          |
-| xid                          | String  | false    | Enrolment check response        | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
-| proofXml                     | String  | false    | Enrolment check response        | Stored to verify enrolment check was made in case payment is challenged. 3D Secure 1.x only                                                                                                       |
-| specificationVersion         | String  | false    | enrolment check response        | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
-| directoryServerTransactionId | String  | false    | Enrolment check response        | Stored to verify enrolment check was made in case payment is challenged. 3D Secure 2.x only                                                                                                       |
-| veresEnrolled                | String  | false    | Enrolment check response        | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
+| Name                         | Type    | Required | Source                                                   | Notes                                                                                                                                                                                             |
+| ---------------------------- | ------- | -------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| cardinalReferenceId          | String  | true     | Payer Authentication setup call                          | Reference Id of payer authentication setup is sent for enrolment check                                                                                                                            |
+| authenticationRequired       | Boolean | true     | Enrolment check response                                 | Indicates that the authentication window needs to be displayed. Set to true when the Cybersource Authorization httpCode is 201 and status is 'PENDING_AUTHENTICATION'                             |
+| authorizationAllowed         | Boolean | true     | Enrolment check response                                 | Indicates that an attempt to authorize the payment may be made. Set to true when the Cybersource httpCode is 201 and status is 'PENDING_AUTHENTICATION' for enrolment check                       |
+| authenticationTransactionId  | String  | false    | Enrolment check response                                 | Value passed in Cardinal continue call to link back to Cybersource. Also passed back to Cybersource to validate authentication <br><br> Should always be present unless enrolment check times out |
+| paReq                        | String  | false    | Enrolment check response                                 | Passed to Authentication validation call when the Cybersource httpCode is 201 and status is 'PENDING_AUTHENTICATION' for enrolment check                                                          |
+| acsUrl                       | String  | false    | Enrolment check response                                 | Passed to Authentication validation call when the Cybersource httpCode is 201 and status is 'PENDING_AUTHENTICATION' for enrolment check                                                          |
+| xid                          | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
+| proofXml                     | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged. 3D Secure 1.x only                                                                                                       |
+| specificationVersion         | String  | false    | enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
+| directoryServerTransactionId | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged. 3D Secure 2.x only                                                                                                       |
+| veresEnrolled                | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
+| commerceIndicator            | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
+| eci                          | String  | false    | Payer auth validation result or enrolment check response | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 
 ### <a name="PayerAuthenticationValidation"></a>Payer authentication validation
 
@@ -180,6 +185,8 @@ Fields
 | eci                          | String | false    | Payer auth validation result or enrolment check response |
 | eciRaw                       | String | false    | Payer auth validation result or enrolment check response |
 | paresStatus                  | String | false    | Payer auth validation result or enrolment check response |
+| ucafCollectionIndicator      | String | false    | Payer auth validation result or enrolment check response |
+| ucafAuthenticationData       | String | false    | Payer auth validation result or enrolment check response |
 
 ### <a name="PaymentError"></a>Payment Error
 
@@ -206,3 +213,17 @@ Fields
 | ------------- | ------ | -------- |
 | reasonCode    | String | true     |
 | transactionId | String | true     |
+
+# <a name="ApiExtensions"></a>Creating API Extensions and Customizations
+
+Once the environment properties are set and the plugin is deployed successfully, the next step is about setting up the plugin to receive requests from Commercetools.
+
+Below is the Endpoint to create the extensions and the custom fields for the payment and customer resources accordingly to support the Cybersource services. Before running the endpoint, Cybersource Plugin API Key must be created with the required scope, see Cybersource Plugin API Key in [Key Creation](Key-Creation.md)
+
+| Endpoint                  | Note                                                                                                                                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| {baseUrl}/configurePlugin | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md) to know the values to be passed for the fields required before running the script |
+
+Alternatively, navigate to the `{baseUrl}/orders` endpoint and click on **Run Script** button in the UI page. This will invoke the `{baseUrl}/configurePlugin` endpoint to handle the same. Ensure to create the extensions using the plugin endpoint provided in order to avoid authentication overheads later.
+
+> **_NOTE:_** Authentication is required for accessing any endpoint in the plugin, hence ensure to provide the valid values for the same. Refer [Authentication](./Authentication.md) for more information.

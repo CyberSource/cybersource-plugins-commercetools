@@ -12,15 +12,13 @@ import unit from '../JSON/unit.json'
 
 import paymentHandler from '../../utils/PaymentHandler';
 
-import {updateCardHandlerCustomerId,updateCardHandlerTokens} from '../const/PaymentHandlerConst';
-import {orderManagementHandlerPaymentId,  orderManagementHandlerUpdateTransactions} from '../const/PaymentHandlerConst'
-import {deleteCardHandlerUpdateCustomerObj, deleteCardHandlerCutsomerId} from '../const/PaymentHandlerConst';
+import {updateCardHandlerCustomerId,updateCardHandlerTokens, updateCardHandlerCustomerObj} from '../const/PaymentHandlerConst';
+import {orderManagementHandlerPaymentId,  orderManagementHandlerUpdateTransactions, orderManagementHandlerRefundUpdateTransactions} from '../const/PaymentHandlerConst'
 import {applePaySessionHandlerFields} from '../const/PaymentHandlerConst';
 import { authorizationHandlerAPUpdatePaymentObject,authorizationHandler3DSUpdatePaymentObject,authorizationHandlerCCUpdatePaymentObject, authoriationHandlerGPUpdatePaymentObject,authorizationHandlerVSUpdatePaymentObject, authorizationHandlerUpdateTransactions } from '../const/PaymentHandlerConst';
 import {getPayerAuthEnrollResponseUpdatePaymentObj} from '../const/PaymentHandlerConst';
+import {getPayerAuthReversalHandlerUpdatePaymentObject, getPayerAuthReversalHandlerPaymentResponse, getPayerAuthReversalHandlerUpdateTransactions, getPayerAuthReversalHandlerUpdateActions, getPayerAuthValidateResponseUpdatePaymentObj} from '../const/PaymentHandlerConst'
 import CommercetoolsApi from '../../utils/api/CommercetoolsApi';
-
-
 
 test.serial('Check for report handller ', async (t)=>{
     const result =await paymentHandler.reportHandler();
@@ -42,24 +40,70 @@ test.serial('Check for report handller ', async (t)=>{
 })
 
 test.serial('Get update card handller data', async(t)=>{
-    const result = await paymentHandler.updateCardHandler(updateCardHandlerTokens, updateCardHandlerCustomerId);
-    t.is(result.actions[0].action, "setCustomType");
+    const result = await paymentHandler.updateCardHandler(updateCardHandlerTokens, updateCardHandlerCustomerId, updateCardHandlerCustomerObj);
+    if(result)
+    {
+        t.is(result.actions[0].action, "setCustomType");
+    }
+    else
+    {
+        t.pass();
+    }
+    
 })
 
 test.serial('Get order management handller for capture ', async(t)=>{
     const orderManagementHandlerUpdatePaymentObj  =await CommercetoolsApi.retrievePayment(unit.paymentId);
     const result = await paymentHandler.orderManagementHandler(orderManagementHandlerPaymentId, orderManagementHandlerUpdatePaymentObj, orderManagementHandlerUpdateTransactions);
-    
-    t.is(result.actions[0].action, 'changeTransactionInteractionId');
-    t.is(result.actions[1].action, 'changeTransactionState');
-    t.is(result.actions[1].state, 'Success');
+    if(result.errors[0].code =='InvalidInput')
+    {
+        t.deepEqual(result.actions, []);
+        t.is(result.errors[0].code, 'InvalidInput');
+        t.is(result.errors[0].message, 'Cannot process the payment due to invalid input');
+    }
+    else
+    {
+        if(result.actions[1].state == 'Success')
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Success');
+        }
+        else
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Failure');
+        }
+    }
 })
 
-test.serial('Get delete card handler data ', async (t)=>{
-    const result =await paymentHandler.deleteCardHandler(deleteCardHandlerUpdateCustomerObj, deleteCardHandlerCutsomerId);
-    t.is(result.actions[0].action, "setCustomType");
-    t.is(result.actions[0].type.key, "isv_payments_customer_tokens");
+test.serial('Get order management handller for refund ', async(t)=>{
+    const orderManagementHandlerUpdatePaymentObj  =await CommercetoolsApi.retrievePayment(unit.paymentId);
+    const result = await paymentHandler.orderManagementHandler(orderManagementHandlerPaymentId, orderManagementHandlerUpdatePaymentObj, orderManagementHandlerRefundUpdateTransactions);
+    if(result.errors[0].code =='InvalidInput')
+    {
+        t.deepEqual(result.actions, []);
+        t.is(result.errors[0].code, 'InvalidInput');
+        t.is(result.errors[0].message, 'Cannot process the payment due to invalid input');
+    }
+    else
+    {
+        if(result.actions[1].state == 'Success')
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Success');
+        }
+        else
+        {
+            t.is(result.actions[0].action, 'changeTransactionInteractionId');
+            t.is(result.actions[1].action, 'changeTransactionState');
+            t.is(result.actions[1].state, 'Failure');
+        }
+    }
 })
+
 
 test.serial('Get apple Pay Session Handler response ', async(t)=>{
     const result = await paymentHandler.applePaySessionHandler(applePaySessionHandlerFields);
@@ -186,9 +230,32 @@ test.serial('Get Payer Auth Enroll Response', async(t)=>{
         t.is(result.actions[0].action, 'setCustomField');
         t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
         t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
-        t.is(result.actions[1].value, 201);
         t.is(result.actions[2].name, 'isv_payerEnrollStatus');
-        t.is(result.actions[2].value, 'AUTHORIZED');
     }
 })
+
+test.serial('Get Payer AuthReversal Handler', async(t)=>{
+    const result  = await paymentHandler.getPayerAuthReversalHandler(getPayerAuthReversalHandlerUpdatePaymentObject, getPayerAuthReversalHandlerPaymentResponse, getPayerAuthReversalHandlerUpdateTransactions, getPayerAuthReversalHandlerUpdateActions);
+    t.is(result.actions[0].action, 'changeTransactionInteractionId');
+    t.is(result.actions[1].action, 'changeTransactionState');
+    t.is(result.actions[1].state, 'Success');
+})
+
+test.serial('get Payer Auth Validate Response', async(t)=>{
+    const result = await paymentHandler.getPayerAuthValidateResponse(getPayerAuthValidateResponseUpdatePaymentObj);
+    if(result.actions.length>0)
+    {
+        t.is(result.actions[0].action, 'setCustomField');
+        t.is(result.actions[0].name,  'isv_payerEnrollTransactionId');
+        t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
+        t.is(result.actions[2].name, 'isv_payerEnrollStatus');
+    }
+    else
+    {
+        t.deepEqual(result.actions, []);
+        t.is(result.errors[0].code, 'InvalidInput');
+    }
+})
+
+
 

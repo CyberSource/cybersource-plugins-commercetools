@@ -19,7 +19,6 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
     httpCode: null,
     transactionId: null,
     status: null,
-    message: null,
   };
   try {
     if (null != authReversalId && null != payment) {
@@ -36,6 +35,9 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
         merchantID: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
         merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
         merchantsecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
+        logConfiguration: {
+          enableLog: false,
+        },
       };
       var clientReferenceInformation = new restApi.Ptsv2paymentsidreversalsClientReferenceInformation();
       clientReferenceInformation.code = payment.id;
@@ -46,21 +48,18 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
       clientReferenceInformation.partner = clientReferenceInformationpartner;
       requestObj.clientReferenceInformation = clientReferenceInformation;
 
-      if (Constants.VISA_CHECKOUT == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
-        processingInformation.paymentSolution = payment.paymentMethodInfo.method;
-        processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
-        requestObj.processingInformation = processingInformation;
-      } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
-        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
-        requestObj.processingInformation = processingInformation;
-      } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
-        var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
-        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
-        requestObj.processingInformation = processingInformation;
-      }
+      var processingInformation = new restApi.Ptsv2paymentsidreversalsProcessingInformation();
 
+      if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
+        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
+        processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
+      } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
+        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
+      } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {
+        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
+      }
+      requestObj.processingInformation = processingInformation;
+      
       var orderInformation = new restApi.Ptsv2paymentsidreversalsOrderInformation();
 
       if (null != cart && Constants.VAL_ZERO < cart.count && Constants.STRING_RESULTS in cart) {
@@ -172,7 +171,7 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
             j++;
           }
         } else {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_CART_LOCALE);
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_CART_LOCALE);
         }
       }
       requestObj.orderInformation = orderInformation;
@@ -184,24 +183,32 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
       orderInformationAmountDetails.currency = payment.amountPlanned.currencyCode;
       orderInformation.amountDetails = orderInformationAmountDetails;
 
+      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REVERSAL_REQUEST +JSON.stringify(requestObj));
+      }
+
       var instance = new restApi.ReversalApi(configObject, apiClient);
       return await new Promise((resolve, reject) => {
         instance.authReversal(authReversalId, requestObj, function (error, data, response) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REVERSAL_RESPONSE+JSON.stringify(response));
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
             paymentResponse.transactionId = data.id;
             paymentResponse.status = data.status;
-            paymentResponse.message = data.message;
             resolve(paymentResponse);
           } else if (error) {
-            if (Constants.STRING_RESPONSE in error && null != error.response && Constants.STRING_TEXT in error.response) {
+            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, errorData);
               paymentResponse.transactionId = errorData.id;
               paymentResponse.status = errorData.status;
-              paymentResponse.message = errorData.message;
             } else {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, error);
+              if (typeof error === 'object') {
+                errorData = JSON.stringify(error);
+              } else {
+                errorData = error;
+              }
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, errorData);
             }
             paymentResponse.httpCode = error.status;
             reject(paymentResponse);
@@ -213,7 +220,7 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
         return paymentResponse;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
       return paymentResponse;
     }
   } catch (exception) {
@@ -224,7 +231,7 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, exceptionData);
     return paymentResponse;
   }
 };

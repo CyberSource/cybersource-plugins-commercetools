@@ -1,0 +1,33 @@
+{
+    "key": "isv_payment_failure",
+    "name": {
+      "en": "Interaction for a payment that been rejected or has failed in payment service"
+    },
+    "resourceTypeIds": [
+      "payment-interface-interaction"
+    ],
+    "fieldDefinitions": [
+      {
+        "name": "reasonCode",
+        "label": {
+          "en": "Reason Code"
+        },
+        "required": true,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      },
+      {
+        "name": "transactionId",
+        "label": {
+          "en": "Transaction ID"
+        },
+        "required": true,
+        "type": {
+          "name": "String"
+        },
+        "inputHint": "SingleLine"
+      }
+    ]
+  }

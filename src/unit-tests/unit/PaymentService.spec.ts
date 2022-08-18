@@ -9,7 +9,7 @@ import {getAuthResponsePaymentPendingResponse,getAuthResponsePaymentCompleteResp
 import {successState, failureState, changeStateTransactionDetail, changeStateFailureTransactionDetail} from '../const/PaymentServiceConst';
 import {payerAuthActionsResponse, payerEnrollActionsUpdatePaymentObj, payerEnrollActionsResponse} from '../const/PaymentServiceConst'
 import {getUpdateTokenActionsActions, failurePaymentResponse, failureResponseTransactionDetail} from '../const/PaymentServiceConst';
-import {deleteTokenResponse, deleteTokenCustomerObj} from '../const/PaymentServiceConst'
+
 
 test.serial('Field mapping for flex keys', async(t)=>{
     const result = await paymentService.fieldMapper(fieldMapperFields);
@@ -147,9 +147,16 @@ test.serial('Get payer enroll actions ', async(t)=>{
 })
 
 test.serial('Get update token actions ', async(t)=>{
-    const result = await paymentService.getUpdateTokenActions(getUpdateTokenActionsActions);
-    t.is(result.actions[0].action, 'setCustomType');
-    t.is(result.actions[0].type.key, 'isv_payments_customer_tokens');
+    const result = await paymentService.getUpdateTokenActions(getUpdateTokenActionsActions, null,true);
+    if(result)
+    {
+        t.is(result.actions[0].action, 'setCustomType');
+        t.is(result.actions[0].type.key, 'isv_payments_customer_tokens');
+    }
+    else
+    {
+        t.pass();
+    }
 })
 
 test.serial('Get the failure response ', async(t)=>{
@@ -159,8 +166,3 @@ test.serial('Get the failure response ', async(t)=>{
     t.is(result.fields.reasonCode, '201');
 })
 
-test.serial('Get delete token response ', async(t)=>{
-    const result = await paymentService.deleteToken(deleteTokenResponse, deleteTokenCustomerObj);
-    t.not(result, null);
-
-})

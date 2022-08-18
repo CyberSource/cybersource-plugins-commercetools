@@ -17,7 +17,13 @@ export const payment = {
       centAmount: 6970,
       fractionDigits: 2
     },
-    paymentMethodInfo: { paymentInterface: 'cybersource', method: 'visaCheckout' },
+    paymentMethodInfo: {
+      paymentInterface: "cybersource",
+      method: "clickToPay",
+      name: {
+        "en": "Click to Pay"
+      }
+    },
     custom: {
       type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
       fields: {
@@ -62,8 +68,12 @@ export const payment = {
     amount: {
       type: 'centPrecision',
       currencyCode: 'USD',
-      centAmount: 6970,
+      centAmount: 100,
       fractionDigits: 2
     },
     state: 'Initial'
   }
+
+  export const orderNo = null;
+
+  export const orderNumber = '10';

@@ -18,10 +18,16 @@ export const payment = {
     amountPlanned: {
       type: 'centPrecision',
       currencyCode: 'USD',
-      centAmount: 6970,
+      centAmount: 100,
       fractionDigits: 2
     },
-    paymentMethodInfo: { paymentInterface: 'cybersource', method: 'visaCheckout' },
+    "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "clickToPay",
+      "name": {
+        "en": "Click to Pay"
+      }
+    },
     custom: {
       type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
       fields: {
@@ -103,7 +109,7 @@ export const payment = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "EUR",
-                    "centAmount": 15845,
+                    "centAmount": 10000,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -113,7 +119,7 @@ export const payment = {
                   "value": {
                     "type": "centPrecision",
                     "currencyCode": "USD",
-                    "centAmount": 5980,
+                    "centAmount": 100,
                     "fractionDigits": 2
                   },
                   "country": "US"
@@ -136,7 +142,7 @@ export const payment = {
               "value": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 5980,
+                "centAmount": 100,
                 "fractionDigits": 2
               },
               "country": "US"
@@ -166,26 +172,26 @@ export const payment = {
             "totalPrice": {
               "type": "centPrecision",
               "currencyCode": "USD",
-              "centAmount": 5980,
+              "centAmount": 100,
               "fractionDigits": 2
             },
             "taxedPrice": {
               "totalNet": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 4983,
+                "centAmount": 49,
                 "fractionDigits": 2
               },
               "totalGross": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 5980,
+                "centAmount": 100,
                 "fractionDigits": 2
               },
               "totalTax": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 997,
+                "centAmount": 99,
                 "fractionDigits": 2
               }
             },
@@ -196,20 +202,20 @@ export const payment = {
         "totalPrice": {
           "type": "centPrecision",
           "currencyCode": "USD",
-          "centAmount": 5980,
+          "centAmount": 100,
           "fractionDigits": 2
         },
         "taxedPrice": {
           "totalNet": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 4983,
+            "centAmount": 49,
             "fractionDigits": 2
           },
           "totalGross": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 5980,
+            "centAmount": 100,
             "fractionDigits": 2
           },
           "taxPortions": [
@@ -218,7 +224,7 @@ export const payment = {
               "amount": {
                 "type": "centPrecision",
                 "currencyCode": "USD",
-                "centAmount": 997,
+                "centAmount": 99,
                 "fractionDigits": 2
               },
               "name": "test-tax-category"
@@ -227,7 +233,7 @@ export const payment = {
           "totalTax": {
             "type": "centPrecision",
             "currencyCode": "USD",
-            "centAmount": 997,
+            "centAmount": 99,
             "fractionDigits": 2
           }
         },
@@ -283,6 +289,10 @@ export const payment = {
   export const authId = clickToPay.authId;
 
   export const authID = '63972485384166953039';
+
+  export const orderNo = null;
+
+  export const orderNumber = '10';
 
   
   

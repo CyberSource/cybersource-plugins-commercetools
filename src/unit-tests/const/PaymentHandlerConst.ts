@@ -5,7 +5,7 @@ import creditCard from '../JSON/creditCard.json';
 import cpay from '../JSON/clickToPay.json';
 import unit from '../JSON/unit.json';
 import updateToken from '../JSON/updateToken.json';
-import deleteToken from '../JSON/deleteToken.json';
+
 
 
   export const updateCardHandlerTokens  = {
@@ -17,15 +17,336 @@ import deleteToken from '../JSON/deleteToken.json';
     cardExpiryMonth: updateToken.cardExpiryMonth,
     cardExpiryYear: updateToken.cardExpiryYear,
     paymentToken: updateToken.paymentToken,
-    flag: 'update',
-    oldExpiryMonth: updateToken.oldExpiryMonth,
-    oldExpiryYear: updateToken.oldExpiryYear
+    instrumentIdentifier: updateToken.instrumentIdentifier,
+    addressId: "gMgqUiw_"
+  }
+  
+  export const updateCardHandlerCustomerId = unit.customerId;
+
+  export const updateCardHandlerCustomerObj ={
+    "id": "dc510eec-fc6f-48c3-a82a-098cf946f8e6",
+    "version": 533,
+    "lastMessageSequenceNumber": 23,
+    "createdAt": "2022-05-25T08:44:21.150Z",
+    "lastModifiedAt": "2022-06-06T10:53:21.569Z",
+    "lastModifiedBy": {
+      "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
+      "isPlatformClient": false,
+      "customer": {
+        "typeId": "customer",
+        "id": "dc510eec-fc6f-48c3-a82a-098cf946f8e6"
+      }
+    },
+    "createdBy": {
+      "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
+      "isPlatformClient": false,
+      "customer": {
+        "typeId": "customer",
+        "id": "2167e970-b3af-40b7-97f2-e29f2ea27fd3"
+      }
+    },
+    "email": "sp54@gmail.com",
+    "firstName": "shakshi",
+    "lastName": "p",
+    "password": "****C8c=",
+    "addresses": [
+      {
+        "id": "OKxBLnRJ",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "T3B6sKY0",
+        "firstName": "John",
+        "lastName": "Doe",
+        "streetName": "1295 Charleston Road",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "1234567890",
+        "email": "john.doe@wipro.com"
+      },
+      {
+        "id": "YibACEQy",
+        "firstName": "John",
+        "lastName": "Doe",
+        "streetName": "1295 Charleston Road",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "1234567890",
+        "email": "john.doe@wipro.com"
+      },
+      {
+        "id": "GSSbzroG",
+        "firstName": "cccccccccc",
+        "lastName": "ddddddddddddd",
+        "streetName": "6th lane",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "9876543210",
+        "email": "shakshi@wipro.com"
+      },
+      {
+        "id": "YZ1YBUgk",
+        "firstName": "John",
+        "lastName": "Doeeeee",
+        "streetName": "1295 Charleston Road",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "1234567890",
+        "email": "john.doe@wipro.com"
+      },
+      {
+        "id": "fl7zvZpV",
+        "country": "US"
+      },
+      {
+        "id": "moF4Gsp5",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "1EFWu0fD",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "-nvm4elr",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "z-uYYpuU",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "DCuyWDtO",
+        "firstName": "Shakshi",
+        "lastName": "Poddar",
+        "streetName": "ABC Tech 1295 Chariston Road 5th Lane Mountain View",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "8808906634",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "-2cxb12M",
+        "firstName": "Shakshi",
+        "lastName": "Poddar",
+        "streetName": "ABC Tech 1295 Chariston Road 5th Lane Mountain View",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "8808906634",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "wobmsm0R",
+        "firstName": "Shakshi",
+        "lastName": "Poddar",
+        "streetName": "ABC Tech 1295 Chariston Road 5th Lane Mountain View",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "8808906634",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "Ukrm2gw_",
+        "firstName": "Shakshi",
+        "lastName": "Poddar",
+        "streetName": "ABC Tech 1295 Chariston Road 5th Lane Mountain View",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "8808906634",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "xYBgkf8i",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "rj44OsF_",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "8-KGRSU5",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "qwwu3z3L",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "UB3Tz9sn",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "oFxMxbTn",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "LnJXyyKz",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      },
+      {
+        "id": "gMgqUiw_",
+        "firstName": "shakshi",
+        "lastName": "poddar",
+        "streetName": "1295 Charleston Road",
+        "additionalStreetInfo": "5th lane",
+        "postalCode": "94043",
+        "city": "Mountain View",
+        "region": "CA",
+        "country": "US",
+        "phone": "+19876543210",
+        "email": "shakshi.poddar@wipro.com"
+      }
+    ],
+    "shippingAddressIds": [],
+    "billingAddressIds": [],
+    "isEmailVerified": false,
+    "custom": {
+      "type": {
+        "typeId": "type",
+        "id": "ab1407b1-321e-4952-8d5d-3cd60b491b2d"
+      },
+      "fields": {
+        "isv_cardNewExpiryYear": "2030",
+        "isv_tokenAction": "update",
+        "isv_tokenUpdated": false,
+        "isv_cardNewExpiryMonth": "12",
+        "isv_tokens": [
+          "{\"alias\":\"1111card\",\"value\":\"DFD30371B90D8BE8E053AF598E0A30E8\",\"cardType\":\"001\",\"cardName\":\"001\",\"cardNumber\":\"411111XXXXXX1111\",\"cardExpiryMonth\":\"12\",\"cardExpiryYear\":\"2031\",\"paymentToken\":\"DFD30B1B1300A4DFE053AF598E0A076C\",\"instrumentIdentifier\":\"7010000000121591111\",\"addressId\":\"gMgqUiw_\"}"
+        ]
+      }
+    },
+    "stores": [],
+    "authenticationMode": "Password"
   }
 
-  export const updateCardHandlerCustomerId = unit.customerId;
   
   export const orderManagementHandlerPaymentId = unit.paymentId;
 
+  
   export const orderManagementHandlerUpdateTransactions = {
     id: '8d3dab83-6024-4c50-ba0e-c387a89762be',
     timestamp: '2022-01-11T06:37:11.153Z',
@@ -39,19 +360,19 @@ import deleteToken from '../JSON/deleteToken.json';
     state: 'Initial'
   }
 
-export const deleteCardHandlerUpdateCustomerObj = {
-    alias: deleteToken.alias,
-    value: deleteToken.value,
-    cardType: deleteToken.cardType,
-    cardName: deleteToken.cardName,
-    cardNumber: deleteToken.cardNumber,
-    cardExpiryMonth: deleteToken.cardExpiryMonth,
-    cardExpiryYear: deleteToken.cardExpiryYear,
-    flag: 'delete'
+  export const orderManagementHandlerRefundUpdateTransactions = {
+    "id": "6c0edcd0-c02b-4993-a08a-200124b6072a",
+    "timestamp": "2022-07-05T10:45:45.338Z",
+    "type": "Refund",
+    "amount": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 100,
+      "fractionDigits": 2
+    },
+    "state": "Initial"
   }
-
-  export const deleteCardHandlerCutsomerId = unit.customerId
-
+  
   export const applePaySessionHandlerFields = 
   {
     isv_deviceFingerprintId: '2cd0221d-e31e-42d3-9d6b-aaeedd0eb62c',
@@ -417,4 +738,277 @@ export const getPayerAuthEnrollResponseUpdatePaymentObj =
   "transactions": [],
   "interfaceInteractions": []
 }
+
+export const getPayerAuthReversalHandlerUpdatePaymentObject = 
+{
+  id: 'ab23fdf8-bda0-4783-b7c0-8d3f26eacaae',
+  version: 21,
+  lastMessageSequenceNumber: 2,
+  createdAt: '2022-04-29T07:19:23.822Z',
+  lastModifiedAt: '2022-04-29T07:19:46.399Z',
+  lastModifiedBy: {
+    clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
+    isPlatformClient: false,
+    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' }
+  },
+  createdBy: {
+    clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
+    isPlatformClient: false,
+    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' }
+  },
+  customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 1490,
+    fractionDigits: 2
+  },
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'creditCardWithPayerAuthentication',
+    name: { en: 'Credit Card Payer Authentication' }
+  },
+  custom: {
+    type: { typeId: 'type', id: '87b9d9db-74a3-45d7-8e60-dde669866808' },
+    fields: {
+      isv_requestJwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkOTUzZmQ4Ni1iNGJiLTQzM2ItODZjMi1jYWU1YWZhMzkyOTQiLCJpYXQiOjE2NTEyMTY3NzgsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY1MTIyMDM3OCwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiJmOTNkOWY5Ni1iNjA5LTQ5OTgtOWU5Yy0xODViNTQ1Y2I3OTYifQ.ulJDRAULe-3KxIeeEqoeEirxSRLXQmLTW_P0jI7M8lI',
+      isv_deviceFingerprintId: '88dd8d3d-e169-4f10-b0d5-ca3db778c955',
+      isv_payerEnrollTransactionId: '6512167849836129104953',
+      isv_cardExpiryYear: '2026',
+      isv_token: 'eyJraWQiOiIwOHJOcG9kM0M4c3pjUDRacUI4Vm03eGtsS2hldUdOYSIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAyNiIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTY1MTIxNzY3NSwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTY1MTIxNjc3NSwianRpIjoiMUUwMVY5OTQwRFkxUU1QRUdRTUpSR0Y3RFpKMFpTNENQU0FIQ0U2OTlWNEI0NjA3SUVDWTYyNkI5NTBCMThEMiIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDI2In0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.JbMSKx9LJaVWt55auuSjJeDz-I7nu-1DExukgZ-cmuWIIdgR48amDLipfE9Wd2YPp_sf2dEfhNJVwd-PdMJeZThYjtd42cAPd2LUmZHCsowPa_szqEieXaUGhgTd-4PrDTyp073hUPYYIKyGlZDcPMvpxPAWzlqNnzTNmQNlK62dWOsUith5mTNqpVCtNx8GRCnXuTh_P9ewmWwYUkBJrmxKs9v6suTU4BQUyv1NoiZeJddoUzJkk45VQa5rEBe0av18k4-Utk9zSqjF-34mHk7UPiuiD9JyHrlrgFklHyi0iJ8naxWhddveqBCH0YJepkPZjjfHHGb0ucJkJyQc3w',
+      isv_payerEnrollHttpCode: 201,
+      isv_maskedPan: '411111XXXXXX1111',
+      isv_cardExpiryMonth: '01',
+      isv_payerAuthenticationRequired: false,
+      isv_deviceDataCollectionUrl: 'https://centinelapistag.cardinalcommerce.com/V1/Cruise/Collect',
+      isv_cardinalReferenceId: 'f93d9f96-b609-4998-9e9c-185b545cb796',
+      isv_acceptHeader: '*/*',
+      isv_cardType: '001',
+      isv_payerEnrollStatus: 'AUTHORIZED_RISK_DECLINED',
+      isv_customerIpAddress: '106.202.152.23',
+      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+      isv_tokenVerificationContext: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJTbWJxeFNPQzVVZmwyOGozMTVRb3JCQUFFQ0NwK0U2emU2NW1GZlBxWmFucVZQMlhHeTNzblM1b1ZDUStMSk1CczIyTmdiSzc3WHhCUVdlL2JBQXFGcjBkWE53czBmU01DNDhtTlY4dHV2dlowcVgyOXVxZi8xRXdLeUR4RjhMS2pOVWwiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJucTNYN2pjcWNTVmdZZEJ3azVBT0c1bHI1ODZQT01vakdCZmFjUGx3Y2JjSTBPanhFQXFkSUpBMl9Cdi1VOVVZZmlFNlZONFNJMmtKclNBVnktOWpjVzROOWx0dTVfc3hoV3JmLWJmS3d6a0VUV2wyY0hKdmNNZWE1Z18xcTYyVU9ybDVCS2paNmNYZ1JOXzJvbDNuRnBtcmt5dUtJanJGbzY5OGN6WnNHUC1nc3k0X2tkeGJqMm5TVG55STNNamlkVW51VXlVZ3l5VlBweGJfTXJxQnhublYyTXVQN2ZUMHoyOTM5OFN3S3d2UHZsWmhoUUVlZEpxOHVPUkVJSmhFMDZvVlYwdVRxeDdWYlNhMkluN1RmcElWVzBGVmF0SnJ5YVFlYktoUzgwWFFpeVFDUlJCZXZxVm11WEhqVGtrWmp3eTUxQWJjNEZiWE5TRS05Y1JnVXciLCJraWQiOiIwOHJOcG9kM0M4c3pjUDRacUI4Vm03eGtsS2hldUdOYSJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NTEyMTc2NjMsImlhdCI6MTY1MTIxNjc2MywianRpIjoiVTZ5S2ZMZHhERTBjRXJIRCJ9.19aNcAu3ozFlYdGbO_IOL5i5oteb7wx_yiVUNsvjpkY'
+    }
+  },
+  paymentStatus: {},
+  transactions: [],
+  interfaceInteractions: []
+}
+
+export const getPayerAuthReversalHandlerPaymentResponse = 
+{
+  httpCode: 201,
+  status: 'AUTHORIZED_RISK_DECLINED',
+  transactionId: '6512167849836129104953'
+}
+
+export const getPayerAuthReversalHandlerUpdateTransactions = 
+{
+  id: 'dfc2cd16-4648-4881-97d0-b1c75c67f6dd',
+  timestamp: '2022-04-29T07:19:47.979Z',
+  type: 'Authorization',
+  amount: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 1490,
+    fractionDigits: 2
+  },
+  state: 'Initial'
+}
+
+export const getPayerAuthReversalHandlerUpdateActions = 
+{
+  actions: [
+    {
+      action: 'changeTransactionInteractionId',
+      interactionId: '6512167849836129104953',
+      transactionId: 'dfc2cd16-4648-4881-97d0-b1c75c67f6dd'
+    },
+    {
+      action: 'changeTransactionState',
+      state: 'Success',
+      transactionId: 'dfc2cd16-4648-4881-97d0-b1c75c67f6dd'
+    }
+  ],
+  errors: []
+}
+
+export const getPayerAuthValidateResponseUpdatePaymentObj = 
+{
+  "id": "4c91a542-b2fb-4bbc-b63f-5ed47ed67ec3",
+  "version": 27,
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2022-04-29T10:36:56.575Z",
+  "lastModifiedAt": "2022-04-29T10:37:36.570Z",
+  "lastModifiedBy": {
+    "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
+    "isPlatformClient": false,
+    "customer": {
+      "typeId": "customer",
+      "id": "88c278f9-82d9-427c-96df-f98a4f23e543"
+    }
+  },
+  "createdBy": {
+    "clientId": "0GrQ8c2D9t1iSjzJF8E3Ygu3",
+    "isPlatformClient": false,
+    "customer": {
+      "typeId": "customer",
+      "id": "88c278f9-82d9-427c-96df-f98a4f23e543"
+    }
+  },
+  "customer": {
+    "typeId": "customer",
+    "id": "88c278f9-82d9-427c-96df-f98a4f23e543"
+  },
+  "amountPlanned": {
+    "type": "centPrecision",
+    "currencyCode": "USD",
+    "centAmount": 2490,
+    "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+    "paymentInterface": "cybersource",
+    "method": "creditCardWithPayerAuthentication",
+    "name": {
+      "en": "Credit Card Payer Authentication"
+    }
+  },
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "id": "87b9d9db-74a3-45d7-8e60-dde669866808"
+    },
+    "fields": {
+      "isv_requestJwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNGVjMTgxZC1jMTNkLTQ4M2ItYTk5Ny1iM2M5NTM4N2M0OTEiLCJpYXQiOjE2NTEyMjg2NDksImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY1MTIzMjI0OSwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiIwOWUzMDkyZS04MjllLTQxNjYtYTMxYi1kODZmYmQ0MjYzN2EifQ.I89pAlGI8B8SAoh4ENJDxAC-eb5lEs8m0KLDq8bij9k",
+      "isv_deviceFingerprintId": "e7744f08-b910-4b18-b08d-083502b21898",
+      "isv_payerEnrollTransactionId": "6512286557606123804951",
+      "isv_cardExpiryYear": "2025",
+      "isv_token": creditCard.isv_token,
+      "isv_payerEnrollHttpCode": 201,
+      "isv_payerAuthenticationPaReq": "eyJtZXNzYWdlVHlwZSI6IkNSZXEiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiJmOTMzMWZmOS1jYzQ4LTQ3YTMtODU2Mi0yOTM4ZTM3ODI0ZTMiLCJhY3NUcmFuc0lEIjoiNjZhYWJkMWUtN2NjOS00NTFhLThjOTYtNzQ3NmM2Mjc2ZTFhIiwiY2hhbGxlbmdlV2luZG93U2l6ZSI6IjAxIn0",
+      "isv_stepUpUrl": "https://centinelapistag.cardinalcommerce.com/V2/Cruise/StepUp",
+      "isv_maskedPan": "400000XXXXXX1091",
+      "isv_payerAuthenticationTransactionId": "8G2TD6BEkp9pQ8i2pfO0",
+      "isv_payerAuthenticationRequired": true,
+      "isv_deviceDataCollectionUrl": "https://centinelapistag.cardinalcommerce.com/V1/Cruise/Collect",
+      "isv_cardinalReferenceId": "09e3092e-829e-4166-a31b-d86fbd42637a",
+      "isv_acceptHeader": "*/*",
+      "isv_cardType": "001",
+      "isv_payerEnrollStatus": "PENDING_AUTHENTICATION",
+      "isv_customerIpAddress": "106.202.152.23",
+      "isv_cardExpiryMonth": "01",
+      "isv_payerAuthenticationAcsUrl": "https://0merchantacsstag.cardinalcommerce.com/MerchantACSWeb/creq.jsp",
+      "isv_responseJwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NWJhOGJjZS0wMmY4LTQ0ZTAtOTQwMC00NGY1NThjZWRmZTciLCJpYXQiOjE2NTEyMjg2NTYsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY1MTIzMjI1NiwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUGF5bG9hZCI6eyJBQ1NVcmwiOiJodHRwczovLzBtZXJjaGFudGFjc3N0YWcuY2FyZGluYWxjb21tZXJjZS5jb20vTWVyY2hhbnRBQ1NXZWIvY3JlcS5qc3AiLCJQYXlsb2FkIjoiZXlKdFpYTnpZV2RsVkhsd1pTSTZJa05TWlhFaUxDSnRaWE56WVdkbFZtVnljMmx2YmlJNklqSXVNUzR3SWl3aWRHaHlaV1ZFVTFObGNuWmxjbFJ5WVc1elNVUWlPaUptT1RNek1XWm1PUzFqWXpRNExUUTNZVE10T0RVMk1pMHlPVE00WlRNM09ESTBaVE1pTENKaFkzTlVjbUZ1YzBsRUlqb2lOalpoWVdKa01XVXROMk5qT1MwME5URmhMVGhqT1RZdE56UTNObU0yTWpjMlpURmhJaXdpWTJoaGJHeGxibWRsVjJsdVpHOTNVMmw2WlNJNklqQXhJbjAiLCJUcmFuc2FjdGlvbklkIjoiOEcyVEQ2QkVrcDlwUThpMnBmTzAifSwiT2JqZWN0aWZ5UGF5bG9hZCI6dHJ1ZSwiUmV0dXJuVXJsIjoiaHR0cHM6Ly95b3V0aGZ1bC1maWVsZC02NDgxMy5wa3RyaW90Lm5ldC9wYXllckF1dGhSZXR1cm5VcmwifQ.XW0pqIhX1DRUmWxfgM_oMHAArrwaqghtpECX3ERFhZU",
+      "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
+      "isv_tokenVerificationContext": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJsZG9pcldMNk1oeGxwRXE0VHBERHZoQUFFS0JsU2g4SFI3NFkvOHpmWFpkeDM4VFdWLzMxMHpOQWZzUklwbXFoR3hra1prUS9odEhlWVI5ZDJUS3BmemtnUXJSb042MGN2R09HdTUxcEtoNlJodi9HSTVKUFZhRmFoSmFmdCtuRXAzbGQiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJoTFlnYTM1NElJLVRUNjhLdVROOVVYVWtzeVloMlIxQzRlTFlEWlp4a2tXUF9zM3phQjZ0NEVMa3NHclV0VUR3cnV3S09QMzNKM3Q5ZHU2N1ZBTjI3V0JpU1REaUthdzJzZWhWczlFRTdzSlpleFo4VHNzN1hDcG53ZlhyNnBxTzBla3liNU1TZ0lCU0JKLW41OWNjMmdlZjJ4c0tlZFlCei1QVHFTX2dfS3U1RGR0TE5rSTBENDdsbzhTYWlReGRjaFZYWkV4MGNheWdfUDl2WTBYeUNFRDJYZkFtQnpwVE5PdEQ0NFdrbUpNTDJ3amRGbHhNTGJOUTZ6MnVzZzRvTVpSbXVocy1yc0tHajV6RU5kXzJtQUZXbUp1ZHZqMWM4NVNNTEJ4cDF1OHpwSU5KVV9NRHo2UEFUbjZBTnI2SUdXR0NOUXZfWHExcTJKRmF4LUEzdXciLCJraWQiOiIwOEt2VHZOcTZSVkxSN1VadXlpZDRTa1NqQ2d5MUxLUyJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NTEyMjk1MTYsImlhdCI6MTY1MTIyODYxNiwianRpIjoiRHlxVGViRUM2VXlZQjN1VyJ9.ExAWSu7NXZvRf9kHSE2jU3L7KW40Uuz3BmKZI9GSvZ8"
+    }
+  },
+  "paymentStatus": {},
+  "transactions": [],
+  "interfaceInteractions": [
+    {
+      "type": {
+        "typeId": "type",
+        "id": "0fe48d4b-5696-4b68-9725-c6d9b94a32cd"
+      },
+      "fields": {
+        "specificationVersion": "2.1.0",
+        "authorizationAllowed": true,
+        "cardinalReferenceId": "09e3092e-829e-4166-a31b-d86fbd42637a",
+        "acsUrl": "https://0merchantacsstag.cardinalcommerce.com/MerchantACSWeb/creq.jsp",
+        "veresEnrolled": "Y",
+        "authenticationRequired": true,
+        "directoryServerTransactionId": "8285ab73-81c2-4d25-b298-075a40f60a4e",
+        "paReq": "eyJtZXNzYWdlVHlwZSI6IkNSZXEiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiJmOTMzMWZmOS1jYzQ4LTQ3YTMtODU2Mi0yOTM4ZTM3ODI0ZTMiLCJhY3NUcmFuc0lEIjoiNjZhYWJkMWUtN2NjOS00NTFhLThjOTYtNzQ3NmM2Mjc2ZTFhIiwiY2hhbGxlbmdlV2luZG93U2l6ZSI6IjAxIn0",
+        "authenticationTransactionId": "8G2TD6BEkp9pQ8i2pfO0"
+      }
+    }
+  ]
+}
+
+export const getPayerAuthValidateResponseUpdatePaymentObjGuest = {
+  "id": "95b4f7da-de4e-48c6-9928-940a30d0505a",
+  "version": 28,
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2022-06-22T07:21:42.964Z",
+  "lastModifiedAt": "2022-06-22T07:22:09.603Z",
+  "lastModifiedBy": {
+    "clientId": "mSpmJgXkt_CadneUb0otjt98",
+    "isPlatformClient": false,
+    "anonymousId": "710d994b-76e3-4873-b4c0-f584f60480a9"
+  },
+  "createdBy": {
+    "clientId": "mSpmJgXkt_CadneUb0otjt98",
+    "isPlatformClient": false,
+    "anonymousId": "710d994b-76e3-4873-b4c0-f584f60480a9"
+  },
+  "amountPlanned": {
+    "type": "centPrecision",
+    "currencyCode": "USD",
+    "centAmount": 3500,
+    "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+    "paymentInterface": "cybersource",
+    "method": "creditCardWithPayerAuthentication",
+    "name": {
+      "en": "Credit Card Payer Authentication"
+    }
+  },
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "id": "e2288aa6-6a13-49eb-8f79-f9cc73fd4dd0"
+    },
+    "fields": {
+      "isv_requestJwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNGE3NTQyNS1lMmUzLTQyM2MtOGQxZS0yNWIyZWRjMGQ5Y2MiLCJpYXQiOjE2NTU4ODI1MjAsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY1NTg4NjEyMCwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiJmNTZmODU1Ni1iMWRiLTQ2ZjktODlhMy1lN2Q1NmUyYmQ0YjYifQ.TEkyVIFKKmevRbuODVQOIbyQUozEjKPiUSstgCruVjI",
+      "isv_deviceFingerprintId": "a125d543-6b9f-4c07-a8de-90a5e6a8728b",
+      "isv_payerEnrollTransactionId": "6558825283576087403955",
+      "isv_cardExpiryYear": "2025",
+      "isv_token": creditCard.isv_token,
+      "isv_saleEnabled": true,
+      "isv_payerEnrollHttpCode": 201,
+      "isv_payerAuthenticationPaReq": "eNpVUctuwjAQvPsrEOo5dpxHAS2WQhAqUqG0UIF6M47VhJIEnIRHv752SErr08561p6ZhVWspBwvpaiUZDCTRcE/ZSeJht3NemS/OAHnu3D0vNylpzAhXQaL4E0eGZykKpI8Y7ZFLAq4hUg/oUTMs5IBF8fRdM5cv09tH3ADEaRSTcfMcW2XUpeS2wF8ayPIeCrZOTmofF9GgGuIQORVVqor67ma2gIEldqzuCwPxQDj8/lsietWK8krJaQl8hSwISDAd1WLylSFNntJIraeROHsvff9up7E/Gseribz43bzMearYAjYMBBEvJSMEkqJT2mHPA4oHZAe4LqPgKdGDXtwPMvYaCCCg/kouCHHM1d/O9pRpZTMRGupRQjk5ZBnUnN0rr+19nBXHj6ZdEWp8/J83yFO38Rb43o80dlQj9j1fFIHhc0MbpaHmz3r6t/+fwBpTqmG",
+      "isv_stepUpUrl": "https://centinelapistag.cardinalcommerce.com/V2/Cruise/StepUp",
+      "isv_maskedPan": "400000XXXXXX1091",
+      "isv_payerAuthenticationTransactionId": "XWB1O3AaajCBLSjmvCi0",
+      "isv_payerAuthenticationRequired": true,
+      "isv_deviceDataCollectionUrl": "https://centinelapistag.cardinalcommerce.com/V1/Cruise/Collect",
+      "isv_cardinalReferenceId": "f56f8556-b1db-46f9-89a3-e7d56e2bd4b6",
+      "isv_acceptHeader": "*/*",
+      "isv_cardType": "001",
+      "isv_payerEnrollStatus": "PENDING_AUTHENTICATION",
+      "isv_customerIpAddress": "27.57.79.95",
+      "isv_cardExpiryMonth": "01",
+      "isv_payerAuthenticationAcsUrl": "https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "isv_responseJwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4M2ViODljYy1lOGUzLTQ2OTktOTZkNS04MjkyZWYxZTFiMjAiLCJpYXQiOjE2NTU4ODI1MjgsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY1NTg4NjEyOCwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUGF5bG9hZCI6eyJBQ1NVcmwiOiJodHRwczovL21lcmNoYW50YWNzc3RhZy5jYXJkaW5hbGNvbW1lcmNlLmNvbS9NZXJjaGFudEFDU1dlYi9wYXJlcS5qc3A_dmFhPWImZ29sZD1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEiLCJQYXlsb2FkIjoiZU5wVlVjdHV3akFRdlBzckVPbzVkcHhIQVMyV1FoQXFVcUcwVUlGNk00N1ZoSklFbklSSHY3NTJTRXJyMDg1NjFwNlpoVldzcEJ3dnBhaVVaRENUUmNFL1pTZUpodDNOZW1TL09BSG51M0Qwdk55bHB6QWhYUWFMNEUwZUdaeWtLcEk4WTdaRkxBcTRoVWcvb1VUTXM1SUJGOGZSZE01Y3YwOXRIM0FERWFSU1RjZk1jVzJYVXBlUzJ3RjhheVBJZUNyWk9UbW9mRjlHZ0d1SVFPUlZWcW9yNjdtYTJnSUVsZHF6dUN3UHhRRGo4L2xzaWV0V0s4a3JKYVFsOGhTd0lTREFkMVdMeWxTRk5udEpJcmFlUk9Ic3ZmZjl1cDdFL0dzZXJpYno0M2J6TWVhcllBallNQkJFdkpTTUVrcUpUMm1IUEE0b0haQWU0THFQZ0tkR0RYdHdQTXZZYUNDQ2cva291Q0hITTFkL085cFJwWlRNUkd1cFJRams1WkJuVW5OMHJyKzE5bkJYSGo2WmRFV3A4L0o4M3lGTzM4UmI0M284MGRsUWo5ajFmRklIaGMwTWJwYUhtejNyNnQvK2Z3QnBUcW1HIiwiVHJhbnNhY3Rpb25JZCI6IlhXQjFPM0FhYWpDQkxTam12Q2kwIn0sIk9iamVjdGlmeVBheWxvYWQiOnRydWUsIlJldHVyblVybCI6Imh0dHBzOi8veW91dGhmdWwtZmllbGQtNjQ4MTMucGt0cmlvdC5uZXQvcGF5ZXJBdXRoUmV0dXJuVXJsIn0.QTWLjBmbj3FG7N3_UNEYzKMbwjCYJfNH0_LGf2Sow2g",
+      "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36",
+      "isv_tokenVerificationContext": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiIrMkVaeGlWNkZ4cUZWenVDZzBKWUZCQUFFS1E1SmYrcHpybnlSYUE4QXQvTm1nck1QcnRIUkdlbHZvNzkzWngrczhIaHVvaDBTMVNRL1NPbHprU0hmUGpGcGdhVHhTMU9ERVRNWG4reVdnUjJMTVVadDdURmpmQndEdXZoQnhEVXpEd1MiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJoWkVmYzZyam5xd1lCdzJwM01HbkJ5cWJySEJTeUxjSzhDVS0tdHFWU3dRek1JeWNSMDhWNEcxeUVMNFhtVTdlcjR0bWhpSVE0b0l4U1VnazlDc1k0THN0M3k4aHR2RmQwTGw1eHVNTW1NZDVvT1I0OEdDX3Z3SC0wdVR5elhxenh6Q2VURVZsWjZqUlZhNnU0UkZpcmRDaUlTdkRwLXloV2x3UmlDWk14RVRuTVAxTmJVbDFxeHdNaDcxXzdIbDFBX1dRbk9lYnA5ZExKenBMS2lPRmJTVDFld3pvQ1F5SS1pRkh1T2pmX2ZLaVlvYnk5ODMzLXZmZktEV2EwTnU0UFdnUGJrNHlRSUdEb2h4NTRNbTZVVnJZTGNfZ05rSjlDbkZFNWROVG9ZZzBjbUpzN2N1YzRGN1VMTl9FWjB5aWpndFRjLVFaNHVZZXdmekxoN21BV3ciLCJraWQiOiIwOEJVSExPRnB2VWp0SXFFTXQ5azVNNXhaWmZmdU1GeCJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NTU4ODM0MDIsImlhdCI6MTY1NTg4MjUwMiwianRpIjoicFhTNzl5bzJEVDBYbG9JcCJ9.o8_jbhDS3m6ihE5UWLVb7g3DnfgYVBrTh5AeCdZajY4"
+    }
+  },
+  "paymentStatus": {},
+  "transactions": [],
+  "interfaceInteractions": [
+    {
+      "type": {
+        "typeId": "type",
+        "id": "1de581f8-37fe-490b-b377-e32985d1b48f"
+      },
+      "fields": {
+        "specificationVersion": "1.0.2",
+        "authorizationAllowed": true,
+        "cardinalReferenceId": "f56f8556-b1db-46f9-89a3-e7d56e2bd4b6",
+        "acsUrl": "https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "veresEnrolled": "Y",
+        "authenticationRequired": true,
+        "paReq": "eNpVUctuwjAQvPsrEOo5dpxHAS2WQhAqUqG0UIF6M47VhJIEnIRHv752SErr08561p6ZhVWspBwvpaiUZDCTRcE/ZSeJht3NemS/OAHnu3D0vNylpzAhXQaL4E0eGZykKpI8Y7ZFLAq4hUg/oUTMs5IBF8fRdM5cv09tH3ADEaRSTcfMcW2XUpeS2wF8ayPIeCrZOTmofF9GgGuIQORVVqor67ma2gIEldqzuCwPxQDj8/lsietWK8krJaQl8hSwISDAd1WLylSFNntJIraeROHsvff9up7E/Gseribz43bzMearYAjYMBBEvJSMEkqJT2mHPA4oHZAe4LqPgKdGDXtwPMvYaCCCg/kouCHHM1d/O9pRpZTMRGupRQjk5ZBnUnN0rr+19nBXHj6ZdEWp8/J83yFO38Rb43o80dlQj9j1fFIHhc0MbpaHmz3r6t/+fwBpTqmG",
+        "authenticationTransactionId": "XWB1O3AaajCBLSjmvCi0",
+        "xid": "WFdCMU8zQWFhakNCTFNqbXZDaTA=",
+        "proofXml": "<AuthProof><Time>2022 Jun 22 07:22:08</Time><DSUrl>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/vereq.jsp?acqid=CYBS</DSUrl><VEReqProof><Message id=\"XWB1O3AaajCBLSjmvCi0\"><VEReq><version>1.0.2</version><pan>XXXXXXXXXXXX1091</pan><Merchant><acqBIN>469216</acqBIN><merID>341422420000000</merID><password></password></Merchant><Browser><deviceCategory>0</deviceCategory><accept>*/*</accept><userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36</userAgent></Browser></VEReq></Message></VEReqProof><VEResProof><Message id=\"XWB1O3AaajCBLSjmvCi0\"><VERes><version>1.0.2</version><CH><enrolled>Y</enrolled><acctID>5663039</acctID></CH><url>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&amp;gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</url><protocol>ThreeDSecure</protocol></VERes></Message></VEResProof></AuthProof>"
+      }
+    }
+  ],
+  "anonymousId": "710d994b-76e3-4873-b4c0-f584f60480a9"
+}
+
 

@@ -1,11 +1,15 @@
 {
-    "alias": "deleting",
-    "value": "D605360941117CECE053AF598E0A6EEC",
+    "alias": "0010",
+    "value": "DFD30371B90D8BE8E053AF598E0A30E8",
+    "paymentToken": "E0EDC5A6B7A12C87E053AF598E0A9BFB",
+    "instrumentIdentifier": "7010000000019410010",
     "cardType": "001",
     "cardName": "001",
-    "cardNumber": "411111XXXXXX1111",
-    "cardExpiryMonth": "06",
-    "cardExpiryYear": "2026",
-    "paymentToken": "D7923004A7FA0950E053AF598E0A3B5D",
-    "instrumentIdentifier": "7010000000121591111"
+    "cardNumber": "400000XXXX0010",
+    "cardExpiryMonth": "01",
+    "cardExpiryYear": "2025",
+    "addressId": "Ukrm2gw_",
+    "timeStamp": "2022-06-08T10:12:00.436Z"
 }
+    
+    

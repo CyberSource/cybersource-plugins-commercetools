@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import path from 'path';
 import winston from 'winston';
 import { format } from 'winston';
@@ -6,10 +7,18 @@ import { Constants } from '../constants';
 
 const { combine, printf } = format;
 
-const logData = (fileName, methodName, type, message) => {
-  const loggingFormat = printf(({ label, methodName, level, message }) => {
-    return `[${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
-  });
+const logData = (fileName, methodName, type, id, message) => {
+  let loggingFormat;
+  if(null != id && Constants.STRING_EMPTY != id){
+    loggingFormat = printf(({ label, methodName, level, message }) => {
+      return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}] [${id}] : ${message}`;
+    });
+  }
+  else{
+    loggingFormat = printf(({ label, methodName, level, message }) => {
+      return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
+    });
+  }
   const logger = winston.createLogger({
     level: type,
     format: combine(loggingFormat),
@@ -46,7 +55,7 @@ const fieldMapper = (fields) => {
         });
       });
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FIELD_MAPPER, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_CUSTOM_FIELDS);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FIELD_MAPPER, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_CUSTOM_FIELDS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -56,7 +65,37 @@ const fieldMapper = (fields) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FIELD_MAPPER, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FIELD_MAPPER, Constants.LOG_ERROR, null, exceptionData);
+  }
+  return actions;
+};
+
+const fieldMapperNull = (fields) => {
+  let actions = [] as any;
+  let keys: any;
+  let exceptionData: any;
+  try {
+    keys = Object.keys(fields);
+    if (null != keys) {
+      keys.forEach((key, index) => {
+        actions.push({
+          action: Constants.SET_CUSTOM_FIELD,
+          name: key,
+          value: null,
+        });
+      });
+    } else {
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FIELD_MAPPER_NULL, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_CUSTOM_FIELDS);
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FIELD_MAPPER_NULL, Constants.LOG_ERROR, null, exceptionData);
   }
   return actions;
 };
@@ -73,7 +112,7 @@ function setTransactionId(paymentResponse, transactionDetail) {
       transactionIdData.interactionId = paymentResponse.transactionId;
       transactionIdData.transactionId = transactionDetail.id;
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_TRANSACTION_ID, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_TRANSACTION_ID, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -83,7 +122,7 @@ function setTransactionId(paymentResponse, transactionDetail) {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_TRANSACTION_ID, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_TRANSACTION_ID, Constants.LOG_ERROR, null, exceptionData);
   }
   return transactionIdData;
 }
@@ -100,7 +139,7 @@ function changeState(transactionDetail, state) {
       changeStateData.state = state;
       changeStateData.transactionId = transactionDetail.id;
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CHANGE_STATE, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CHANGE_STATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -110,7 +149,7 @@ function changeState(transactionDetail, state) {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CHANGE_STATE, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CHANGE_STATE, Constants.LOG_ERROR, null, exceptionData);
   }
   return changeStateData;
 }
@@ -132,7 +171,7 @@ const failureResponse = (paymentResponse, transactionDetail) => {
       failureResponseData.fields.reasonCode = `${paymentResponse.httpCode}`;
       failureResponseData.fields.transactionId = transactionDetail.id;
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FAILURE_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FAILURE_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -142,7 +181,7 @@ const failureResponse = (paymentResponse, transactionDetail) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FAILURE_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_FAILURE_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
   }
   return failureResponseData;
 };
@@ -187,7 +226,7 @@ const visaCardDetailsAction = (visaCheckoutData) => {
         });
       }
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_VISA_CARD_DETAILS_ACTION, Constants.LOG_INFO, Constants.ERROR_MSG_CLICK_TO_PAY_DATA);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_VISA_CARD_DETAILS_ACTION, Constants.LOG_INFO, null, Constants.ERROR_MSG_CLICK_TO_PAY_DATA);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -197,7 +236,7 @@ const visaCardDetailsAction = (visaCheckoutData) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_VISA_CARD_DETAILS_ACTION, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_VISA_CARD_DETAILS_ACTION, Constants.LOG_ERROR, null, exceptionData);
   }
   return actions;
 };
@@ -257,7 +296,7 @@ const payerAuthActions = (response) => {
         },
       ];
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_ACTIONS, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_ACTIONS, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -267,7 +306,7 @@ const payerAuthActions = (response) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_ACTIONS, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_ACTIONS, Constants.LOG_ERROR, null, exceptionData);
   }
   return action;
 };
@@ -275,7 +314,14 @@ const payerAuthActions = (response) => {
 const payerEnrollActions = (response, updatePaymentObj) => {
   let action: any;
   let exceptionData: any;
+  let consumerErrorData: any;
   let isv_payerAuthenticationTransactionId = null;
+  let isv_cardinalReferenceId = null;
+  let isv_deviceDataCollectionUrl = null;
+  let isv_requestJwt = null;
+  let isv_responseJwt = null;
+  let isv_stepUpUrl = null;
+  let isv_payerAuthenticationPaReq = null;
   let isv_payerAuthenticationRequired = false;
   try {
     if (null != response) {
@@ -327,15 +373,51 @@ const payerEnrollActions = (response, updatePaymentObj) => {
           value: null,
         });
       }
-      if (Constants.API_STATUS_PENDING_AUTHENTICATION != response.status) {
+      isv_payerAuthenticationRequired = Constants.API_STATUS_PENDING_AUTHENTICATION == response.status ? true : updatePaymentObj.custom.fields.isv_payerAuthenticationRequired ? true : false;
+      action.actions.push({
+        action: Constants.SET_CUSTOM_FIELD,
+        name: Constants.ISV_PAYER_AUTHENTICATION_REQUIRED,
+        value: isv_payerAuthenticationRequired,
+      });
+      if (
+        response.httpCode == Constants.HTTP_CODE_TWO_HUNDRED_ONE &&
+        response.data.hasOwnProperty(Constants.ERROR_INFORMATION) &&
+        Constants.VAL_ZERO < Object.keys(response.data.errorInformation).length &&
+        response.data.errorInformation.hasOwnProperty(Constants.STRING_REASON) &&
+        Constants.VAL_ZERO < Object.keys(response.data.errorInformation.reason).length &&
+        Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED == response.data.errorInformation.reason
+      ) {
         action.actions.push({
           action: Constants.SET_CUSTOM_FIELD,
-          name: Constants.ISV_PAYER_AUTHENTICATION_REQUIRED,
-          value: isv_payerAuthenticationRequired,
+          name: Constants.ISV_PAYER_AUTHENTICATION_ENROLL_STATUS,
+          value: response.data.errorInformation.reason,
         });
+        if (updatePaymentObj.custom.fields.isv_payerAuthenticationRequired) {
+          consumerErrorData = fieldMapperNull({
+            isv_payerAuthenticationTransactionId,
+            isv_cardinalReferenceId,
+            isv_deviceDataCollectionUrl,
+            isv_requestJwt,
+            isv_responseJwt,
+            isv_stepUpUrl,
+            isv_payerAuthenticationPaReq,
+          });
+          consumerErrorData.forEach((i) => {
+            action.actions.push(i);
+          });
+        } else {
+          consumerErrorData = fieldMapperNull({
+            isv_cardinalReferenceId,
+            isv_deviceDataCollectionUrl,
+            isv_requestJwt,
+          });
+          consumerErrorData.forEach((i) => {
+            action.actions.push(i);
+          });
+        }
       }
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_ENROLL_ACTIONS, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_ENROLL_ACTIONS, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -345,14 +427,14 @@ const payerEnrollActions = (response, updatePaymentObj) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_ENROLL_ACTIONS, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_ENROLL_ACTIONS, Constants.LOG_ERROR, null, exceptionData);
   }
   return action;
 };
 
-const getUpdateTokenActions = (actions) => {
+const getUpdateTokenActions = (actions, existingFailedTokensMap, errorFlag) => {
   let returnResponse: any;
-  if (null != actions) {
+  if (errorFlag) {
     returnResponse = {
       actions: [
         {
@@ -363,6 +445,26 @@ const getUpdateTokenActions = (actions) => {
           },
           fields: {
             isv_tokens: actions,
+            isv_tokenUpdated: false,
+            isv_failedTokens: existingFailedTokensMap,
+          },
+        },
+      ],
+      errors: [],
+    };
+  } else {
+    returnResponse = {
+      actions: [
+        {
+          action: Constants.SET_CUSTOM_TYPE,
+          type: {
+            key: Constants.ISV_PAYMENTS_CUSTOMER_TOKENS,
+            typeId: Constants.TYPE_ID_TYPE,
+          },
+          fields: {
+            isv_tokens: actions,
+            isv_tokenUpdated: true,
+            isv_failedTokens: existingFailedTokensMap,
           },
         },
       ],
@@ -385,11 +487,19 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
   let isv_deviceDataCollectionUrl = Constants.STRING_EMPTY;
   try {
     if (null != paymentResponse) {
-      if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && null != transactionDetail && (Constants.API_STATUS_AUTHORIZED == paymentResponse.status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status)) {
+      if (
+        Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+        null != transactionDetail &&
+        (Constants.API_STATUS_AUTHORIZED == paymentResponse.status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status || Constants.API_STATUS_PENDING == paymentResponse.status)
+      ) {
         setTransaction = setTransactionId(paymentResponse, transactionDetail);
-        setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
+        if (Constants.CT_TRANSACTION_TYPE_CHARGE == transactionDetail.type && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status) {
+          setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_FAILURE);
+        } else {
+          setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
+        }
         response = createResponse(setTransaction, setCustomField, null);
-      } else if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.API_STATUS_PENDING_REVIEW == paymentResponse.status && null != transactionDetail) {
+      } else if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW == paymentResponse.status || Constants.API_STATUS_PENDING_REVIEW == paymentResponse.status) && null != transactionDetail) {
         setTransaction = setTransactionId(paymentResponse, transactionDetail);
         setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_PENDING);
         response = createResponse(setTransaction, setCustomField, null);
@@ -406,7 +516,14 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
           actions: actions,
           errors: [],
         };
-      } else if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.API_STATUS_PENDING_AUTHENTICATION == paymentResponse.status) {
+      } else if (
+        Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+        Constants.API_STATUS_PENDING_AUTHENTICATION == paymentResponse.status &&
+        paymentResponse.hasOwnProperty(Constants.STRING_DATA) &&
+        Constants.VAL_ZERO < Object.keys(paymentResponse.data).length &&
+        paymentResponse.data.hasOwnProperty(Constants.STRING_CONSUMER_AUTHENTICATION) &&
+        Constants.VAL_ZERO < Object.keys(paymentResponse.data.consumerAuthenticationInformation).length
+      ) {
         payerAuthenticationData = {
           isv_payerAuthenticationPaReq: paymentResponse.data.consumerAuthenticationInformation.pareq,
           isv_payerAuthenticationTransactionId: paymentResponse.data.consumerAuthenticationInformation.authenticationTransactionId,
@@ -439,7 +556,7 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
         }
       }
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_AUTH_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_INPUT);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_AUTH_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -449,7 +566,7 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_AUTH_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_AUTH_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
   }
   return response;
 };
@@ -474,7 +591,7 @@ function createResponse(setTransaction, setCustomField, paymentFailure) {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CREATE_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CREATE_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
   }
   returnResponse = {
     actions: actions,
@@ -501,7 +618,7 @@ const getOMServiceResponse = (paymentResponse, transactionDetail) => {
       setTransaction = setTransactionId(paymentResponse, transactionDetail);
       response = createResponse(setTransaction, setCustomField, paymentFailure);
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_SERVICE_RESPONSE, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_OPERATION);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_SERVICE_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_OPERATION);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -511,7 +628,7 @@ const getOMServiceResponse = (paymentResponse, transactionDetail) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_SERVICE_RESPONSE, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_SERVICE_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
   }
   return response;
 };
@@ -544,7 +661,7 @@ const getCapturedAmount = (refundPaymentObj) => {
         pendingCaptureAmount = convertCentToAmount(pendingCaptureAmount);
       }
     } else {
-      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CAPTURED_AMOUNT, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_OPERATION);
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CAPTURED_AMOUNT, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_OPERATION);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -554,38 +671,9 @@ const getCapturedAmount = (refundPaymentObj) => {
     } else {
       exceptionData = exception;
     }
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CAPTURED_AMOUNT, Constants.LOG_ERROR, exceptionData);
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CAPTURED_AMOUNT, Constants.LOG_ERROR, null, exceptionData);
   }
   return pendingCaptureAmount;
-};
-
-const deleteToken = async (tokenResponse, customerObj) => {
-  let isvTokensObj = new Array();
-  let parsedToken: any;
-  if (null != tokenResponse && null != customerObj && null != tokenResponse.httpCode) {
-    if (Constants.HTTP_CODE_TWO_HUNDRED_FOUR == tokenResponse.httpCode) {
-      customerObj.custom.fields.isv_tokens.forEach((element) => {
-        parsedToken = JSON.parse(element);
-        if (tokenResponse.deletedToken != parsedToken.paymentToken) {
-          isvTokensObj.push(element);
-        }
-      });
-    } else {
-      customerObj.custom.fields.isv_tokens.forEach((element) => {
-        parsedToken = JSON.parse(element);
-        if (Constants.STRING_FLAG in parsedToken) {
-          if (Constants.STRING_DELETE == parsedToken.flag) {
-            delete parsedToken.flag;
-          }
-        }
-        isvTokensObj.push(element);
-      });
-    }
-  } else {
-    isvTokensObj = customerObj.custom.fields.isv_tokens;
-    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DELETE_TOKEN, Constants.LOG_INFO, Constants.ERROR_MSG_INVALID_CUSTOMER_INPUT);
-  }
-  return isvTokensObj;
 };
 
 const convertCentToAmount = (num) => {
@@ -646,6 +734,70 @@ const invalidInputResponse = () => {
     ],
   };
 };
+const encryption = (data) => {
+  let key:any;
+  let baseEncodedData:any;
+  let exceptionData:any;
+  let encryption:any
+  let encryptStringData:any;
+  try{
+    if(data){
+      key = process.env.CT_CLIENT_SECRET;
+      const iv = crypto.randomBytes(Constants.VAL_TWELVE);
+      const cipher = crypto.createCipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, key, iv);
+      encryption = cipher.update(data, Constants.UNICODE_ENCODING_SYSTEM, Constants.ENCODING_BASE_SIXTY_FOUR);
+      encryption += cipher.final(Constants.ENCODING_BASE_SIXTY_FOUR);
+      const authTag = cipher.getAuthTag();
+      encryptStringData = iv.toString(Constants.HEX)+Constants.STRING_FULLCOLON+encryption.toString()+Constants.STRING_FULLCOLON+authTag.toString(Constants.HEX);
+      baseEncodedData = (Buffer.from(encryptStringData)).toString(Constants.ENCODING_BASE_SIXTY_FOUR);
+    }
+  }catch(exception){
+    baseEncodedData = null;
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DECRYPTION, Constants.LOG_ERROR, null, exceptionData);
+  }
+  return baseEncodedData;
+};
+
+const decryption = (encodedCredentials) => {
+  let key:any;
+  let data:any;
+  let decryptedData:any;
+  let encryptedData:any;
+  let exceptionData:any;
+  let ivBuff:any;
+  let authTagBuff:any;
+  try{
+    if(encodedCredentials){
+      key = process.env.CT_CLIENT_SECRET;
+      data = (Buffer.from(encodedCredentials, Constants.ENCODING_BASE_SIXTY_FOUR)).toString(Constants.ASCII);
+      ivBuff = Buffer.from(data.split(Constants.STRING_FULLCOLON)[Constants.VAL_ZERO], Constants.HEX);
+      encryptedData = data.split(Constants.STRING_FULLCOLON)[Constants.VAL_ONE];
+      authTagBuff = Buffer.from(data.split(Constants.STRING_FULLCOLON)[Constants.VAL_TWO], Constants.HEX);
+      const decipher = crypto.createDecipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, key, ivBuff);
+      decipher.setAuthTag(authTagBuff);
+      decryptedData = decipher.update(encryptedData, Constants.ENCODING_BASE_SIXTY_FOUR, Constants.UNICODE_ENCODING_SYSTEM);
+      decryptedData += decipher.final(Constants.UNICODE_ENCODING_SYSTEM);
+    }
+  }catch(exception){
+    decryptedData = null;
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DECRYPTION, Constants.LOG_ERROR, null, exceptionData);
+  }
+  return decryptedData;
+};
 
 export default {
   logData,
@@ -659,7 +811,6 @@ export default {
   getAuthResponse,
   getOMServiceResponse,
   getCapturedAmount,
-  deleteToken,
   convertCentToAmount,
   convertAmountToCent,
   getSubstring,
@@ -667,4 +818,6 @@ export default {
   invalidOperationResponse,
   invalidInputResponse,
   roundOff,
+  encryption,
+  decryption
 };

@@ -1,0 +1,18 @@
+{
+  "destination": {
+    "type": "HTTP",
+    "url": "",
+    "authentication": {
+      "type": "AuthorizationHeader",
+      "headerValue": ""
+    }
+  },
+  "triggers": [
+    {
+      "resourceTypeId": "payment",
+      "actions": ["Create"]
+    }
+  ],
+  "timeoutInMs": 10000,
+  "key": "isv_payment_create_extension"
+}
