@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import moment from 'moment';
 import path from 'path';
+import serverless from 'serverless-http';
 
 import flexKeys from './service/payment/FlexKeys';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
@@ -602,3 +603,5 @@ app.get('/configurePlugin', async (req, res) => {
   orderSuccessMessage = Constants.SUCCESS_MSG_SCRIPT_PLUGIN;
   res.redirect('/orders');
 });
+
+exports.handler = serverless(app);

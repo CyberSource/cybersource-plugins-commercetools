@@ -4,11 +4,11 @@
   - [Environment Properties](#EnvironmentProperties)
 - [Deployment](#Deployment)
 
-
 # <a name="Configuration"></a>Configuration
 
 There are a number of configuration variables that need to be defined before running the plugin. These can be set as environment variables inside the .env file present in the root directory of the plugin.
 
+For multiple environments you should use unique values per environment.
 
 ## <a name="EnvironmentProperties"></a>Environment Properties
 
@@ -29,7 +29,6 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 | PAYMENT_GATEWAY_TARGET_ORIGIN              | Base URL where your frontend will be accessible                                       |                                                                                                                        |
 | PAYMENT_GATEWAY_VERIFICATION_KEY           | Used to check Flex tokens for tampering                                               | Use <b>Openssl -rand64 32</b> to generate verification key                                                             |
 | PAYMENT_GATEWAY_3DS_RETURN_URL             | URL that the issuing bank will redirect to the customer for payer Authentication      | Used only if payment.paymentMethodInfo.method == creditCardWithPayerAuthentication                                     |
-| PAYMENT_GATEWAY_ENABLE_DEBUG             | Boolean value - true or false      | Flag for enabling or disabling logging of requests that is send to Cybersource. Case sensitive                                |
 | PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID      | Your Apple Pay merchant Id                                                            | Provided by Apple                                                                                                      |
 | PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH | Path where the Apple Pay certificate is stored                                        | Used only if payment.paymentMethodInfo.method == applePay                                                              |
 | PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH         | Path where the Apple Pay key is stored                                                | Used only if payment.paymentMethodInfo.method == applePay                                                              |
@@ -38,6 +37,8 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 | PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME     | Numeric value between 1-24                                                            | Provide the number of hours that saved card attempts are counted (Max of 24 hours). By default this value is set to 1, applicable only if rate limiter is enabled                           |
 | PAYMENT_GATEWAY_DECISION_SYNC              | Boolean value - true or false                                                         | Flag for enabling or disabling Decision sync. Case sensitive                                                         |
 | PAYMENT_GATEWAY_RUN_SYNC                   | Boolean value - true or false                                                         | Flag for enabling or disabling Run sync. Case sensitive                                                              |
+| AWS_ACCESS_KEY_ID                          | AWS Access Key ID                                                            | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials)                                    |
+| AWS_SECRET_KEY                            | AWS Secret Key                                                           | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials)                                    |
 | CT_PROJECT_KEY                             | Project key for your Commercetools project                                            | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
 | CT_CLIENT_ID                               | Client Id of your Commercetools Payment API key                                       | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
 | CT_CLIENT_SECRET                           | Client secret of your Commercetools Payment API key                                   | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
@@ -47,8 +48,6 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 # <a name="Deployment"></a>Deployment
 
 The Commercetools - Cybersource plugin is a typescript project which is built using cybersource-rest-client npm package and other several node packages.
-
-> **_NOTE:_** You can view the loggers in src/loggers folder of the plugin if there are any information or errors found while processing the payments or configuring the plugin.
 
 ## Example deployment steps
 
@@ -68,9 +67,3 @@ The steps involved in deploying the Commercetools - Cybersource plugin in develo
 > **_NOTE:_** It is necessary to build the entire plugin. Whenever there is a change and that need to be reflected, run the following script for building the application
 
     npm run build
-
-### Run Unit Tests
-
-Unit tests can be executed with the following command
-
-	npm run cov
