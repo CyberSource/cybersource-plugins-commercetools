@@ -1566,7 +1566,7 @@ const getApplicationsPresent = async (applications) => {
     if (applications.some((item) => Constants.STRING_SYNC_AUTH_REVERSAL_NAME == item.name)) {
       applicationResponse.authReversalPresent = true;
     }
-    if (applications.some((item) => Constants.STRING_SYNC_REFUND_NAME == item.name)) {
+    if (applications.some((item) => (Constants.STRING_SYNC_REFUND_NAME == item.name || Constants.STRING_SYNC_ECHECK_CREDIT_NAME == item.name))) {
       applicationResponse.refundPresent = true;
     }
   } else {

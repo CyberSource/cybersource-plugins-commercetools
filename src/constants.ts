@@ -228,6 +228,7 @@ export abstract class Constants {
   static readonly STRING_SYNC_AUTH_REVERSAL_NAME = 'ics_auth_reversal';
   static readonly STRING_SYNC_CAPTURE_NAME = 'ics_bill';
   static readonly STRING_SYNC_DECISION_NAME = 'ics_decision';
+  static readonly STRING_SYNC_ECHECK_CREDIT_NAME = 'ics_ecp_credit';
   static readonly STRING_SYNC_ECHECK_DEBIT_NAME = 'ics_ecp_debit';
   static readonly STRING_SYNC_QUERY = 'submitTimeUtc:[NOW/DAY-1DAY TO NOW/HOUR+1HOUR}';
   static readonly STRING_SYNC_REFUND_NAME = 'ics_credit';
