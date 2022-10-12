@@ -4,6 +4,10 @@
 
 The following section contains steps to get started with an generic integration between Commercetools and Cybersource using the typescript plugin.
 
+## Plugin Upgradation
+
+If you are using old version of plugin, replace your module with this source code to use latest version.
+
 ## Prerequisites
 
 - An installation of node JS is required before running the application.
@@ -38,11 +42,9 @@ The details of the specific customizations listed above is documented here: [Com
 
 Configuration of the Plugin allows you to set the properties required for access to both Commercetools and Cybersource. This includes properties such as the Commercetools project key and the Cybersource merchant Id. For more information about what properties need to be set and how they can be configure, see [API Extension Setup](API-Extension-Setup.md) for more details.
 
-After application setup is done, for further deployment of Plugin on AWS Lambda, see [AWS-Serverless-Deployment\#AWSDeploymentSteps](AWS-Serverless-Deployment.md#AWSDeploymentSteps)
-
 ## 4. Front-end Setup
 
-The bulk of the integration work when using the Commerectools-Cybersource plugin
+The bulk of the integration work when using the Commercetools-Cybersource plugin
 is within the user-interface. This is because
 Commercetools does not come with a user-interface and therefore all
 implementations will be different.
@@ -53,4 +55,4 @@ implementations will be different.
   Pay, use the following guide: [Google Pay Setup](GooglePay-Setup.md)
 - For setting up the client-side application to work with Apple
   Pay, use the following guide: [Apple Pay Setup](ApplePay-Setup.md)
-- For setting up the client-side application to work with eCheck, use the following guide: [eCheck Setup](eCheck-Setup.md)
+

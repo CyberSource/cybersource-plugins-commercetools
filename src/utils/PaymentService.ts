@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import path from 'path';
 import winston from 'winston';
+import WinstonCloudwatch from 'winston-cloudwatch';
 import { format } from 'winston';
 import 'winston-daily-rotate-file';
 import { Constants } from '../constants';
@@ -9,6 +10,7 @@ const { combine, printf } = format;
 
 const logData = (fileName, methodName, type, id, message) => {
   let loggingFormat;
+  let logger;
   if(null != id && Constants.STRING_EMPTY != id){
     loggingFormat = printf(({ label, methodName, level, message }) => {
       return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}] [${id}] : ${message}`;
@@ -19,19 +21,40 @@ const logData = (fileName, methodName, type, id, message) => {
       return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
     });
   }
-  const logger = winston.createLogger({
-    level: type,
-    format: combine(loggingFormat),
-    transports: [
-      new winston.transports.DailyRotateFile({
-        filename: 'src/loggers/application-%DATE%.log',
-        datePattern: 'YYYY-MM-DD',
-        zippedArchive: true,
-        maxSize: '20m',
-        maxFiles: '14d',
-      }),
-    ],
-  });
+  if(process.env.PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS == Constants.STRING_TRUE){
+    logger = winston.createLogger({
+      level: type,
+      format: combine(loggingFormat),
+      transports: [
+        new WinstonCloudwatch({
+          awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID_VALUE,
+          awsSecretKey: process.env.AWS_SECRET_KEY_VALUE,
+          logGroupName: Constants.STRING_MY_APPLICATION,
+          logStreamName: function () {
+            let date = new Date().toISOString().split('T')[Constants.VAL_ZERO]
+            return Constants.STRING_MY_REQUESTS + date
+          },
+          awsRegion: process.env.AWS_REGION_NAME,
+          jsonMessage: true
+        })
+      ],
+    });
+  }
+  else{
+    logger = winston.createLogger({
+      level: type,
+      format: combine(loggingFormat),
+      transports: [
+        new winston.transports.DailyRotateFile({
+          filename: 'src/loggers/application-%DATE%.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+        }),
+      ],
+    });
+  }
   logger.log({
     label: fileName,
     methodName: methodName,
@@ -39,6 +62,7 @@ const logData = (fileName, methodName, type, id, message) => {
     message: message,
   });
 };
+
 
 const fieldMapper = (fields) => {
   let actions = [] as any;

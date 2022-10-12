@@ -604,4 +604,7 @@ app.get('/configurePlugin', async (req, res) => {
   res.redirect('/orders');
 });
 
-exports.handler = serverless(app);
+if(process.env.PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS == Constants.STRING_TRUE)
+{
+   exports.handler = serverless(app);
+}

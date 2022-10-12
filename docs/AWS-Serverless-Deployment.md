@@ -8,10 +8,11 @@ AWS Lambda is a serverless, event-driven compute service that lets you run virtu
 
 ## Pre-Requisites
 
-Here is a list of everything you need to have before proceeding with deployment:
+Here is a list of pre-requisites that you need to have before proceeding with deployment:
 
 - NodeJS and NPM
 - Active AWS account
+- Active AWS subscription
 - AWS credentials
 
 ## <a name="AWSSecurityCredentials"></a>AWS Security Credentials
@@ -30,12 +31,12 @@ To connect the application to AWS account, you need to generate AWS Security Cre
 
 ## <a name="ServerlessFrameworkServices"></a>Serverless Framework Services
 
-The Serverless Framework is a command-line tool that uses easy and approachable YAML syntax to deploy your code. A service is configured via a `serverless.yml` file where you define your functions, the events that trigger them, and the AWS resources to deploy.
+The Serverless Framework is a command-line tool that uses easy and approachable YAML syntax to deploy your code. A service is configured via `serverless.yml` file where you define your functions, the events that trigger them, and the AWS resources to deploy. Each service configuration is managed in the serverless.yml file.
 
-Each service configuration is managed in the serverless.yml file. The main responsibilities of this file are:
+The main responsibilities of this file are:
 
 - Declare a serverless service
-- Define the cloud provider where the service will be deployed 
+- Define the cloud provider where the service will be deployed
 - Define one or more functions
 - Define the events that trigger each function (e.g. HTTP requests)
 - Define a set of AWS resources to create
@@ -49,11 +50,11 @@ Specify the event along with the path which will trigger the handler function.
     functions:
     HandlerFunction:
         handler: build/main/index.handler
-        events: 
-        - httpApi: 
+        events:
+        - httpApi:
             path: /
             method: ANY
-        - httpApi: 
+        - httpApi:
             path: /{proxy+}
             method: ANY
 
@@ -77,60 +78,51 @@ In order to get logs in AWS Cloudwatch, you need to provide following permission
 ## Loggers in AWS Cloudwatch
 
 You can see all your logs in AWS Cloudwatch, for that you need to perform below steps.
-- Provide your AWS Access Key ID and Secret Key in .env file. (Refer [API-Extension-Setup](API-Extension-Setup.md))
-- 'Winston' npm package is used for loggers but in order to get loggers in AWS cloudwatch, you also need to use 'winston-cloudwatch'
-- You need to configure your transports with below details to send loggers to AWS Cloudwatch in `/src/utils/PaymentHandler.ts`
 
-      new WinstonCloudwatch({
-            awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            awsSecretKey: process.env.AWS_SECRET_KEY,
-            logGroupName: <Log_Group_Name>,
-            logStreamName: <Log_StreamName>
-            awsRegion: <AWS_Region>,
-            jsonMessage: true
-         })
-- Change the filename from `src/loggers/application-%DATE%.log` to `/tmp/application-%DATE%.log` from the transports of winston logger in `/src/utils/PaymentHandler.ts`.
+- Provide your AWS Access Key ID ,Secret Key and AWS Region Name in .env file. (Refer [API-Extension-Setup](API-Extension-Setup.md))
+- Pass the value as `true` for the ENV variable `PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md))
 
 ## <a name="AWSDeploymentSteps"></a>Steps to Deploy Plugin on AWS Lambda
 
-1. Navigate to the root directory and run the following command to include the npm dependencies
+1.  Navigate to the root directory and run the following command to include the npm dependencies
 
          npm install
 
-> **_NOTE:_** This is not necessary if the dependencies are already availabe in <b>node_modules</b> repository
+> **_NOTE:_** This is not necessary if the dependencies are already available in <b>node_modules</b> repository
 
-2. Populate AWS security credentials (Refer [AWS Security Credentials](#AWSSecurityCredentials)) and run the following command
+2.  Populate AWS security credentials (Refer [AWS Security Credentials](#AWSSecurityCredentials)) and run the following command
 
          serverless config credentials --provider aws --key <your_aws_access_key_id> --secret <your_aws_access_key_secret>
 
-3. Remove .gitignore file and and run the following command
+3.  Remove .gitignore file and and run the following command
 
          Serverless create -t aws-nodejs
 
-4. Above command will add one file in the root directory i.e. serverless.yml. Populate the required values in this file. (Refer [Serverless Framework Services](#ServerlessFrameworkServices))
+4.  Above command will add one file in the root directory i.e. serverless.yml . Populate the required values in this file. (Refer [Serverless Framework Services](#ServerlessFrameworkServices))
 
-5. Populate the .env file with the required data by referring to the values from [API-Extension-Setup](API-Extension-Setup.md)
-
-6. To deploy a service, run the below command in the same directory as serverless.yml i.e. root directory
+5.  To deploy a service, run the below command in the same directory as serverless.yml i.e. root directory
 
          npm run deploy
 
-## Custom Domain Name for Lambda     
+6.  Once the deployment is done, to set/modify the ENV variables you have to login to your AWS account.
+- Navigate to the lambda and click on the lambda function that has been created after successful deployment.
+- Navigate to Configuration -> Environment variables and click on Add environment variable.
+- Enter key and value for your ENV variable and click on save. (Refer [API-Extension-Setup](API-Extension-Setup.md))
+
+## Custom Domain Name for Lambda
 
 With Serverless, it's easier than ever to deploy production-ready API endpoints. However, using AWS API Gateway results in odd hostnames for your endpoints. Further, these hostnames will change if you remove and redeploy your service. To map a custom domain name to your endpoints, Refer [Serverless-Api-Gateway-Domain](https://www.serverless.com/blog/serverless-api-gateway-domain/)
 
 You need to have custom domain for your application since your application will be hosted on that URL and that URL will be used to create API extensions.
 
-
-
 ## Troubleshoot
 
-1. While deploying the application, if deployment is failed with error messsage "Cannot read file due to EMFILE: too many open files" then this error you may have received because your system has certain limit to open files and when that limit is reached this error is thrown. After sometime, try to deploy your application again after closing open files.
+1.  While deploying the application, if deployment is failed with error messsage "Cannot read file due to EMFILE: too many open files" then this error you may have received because your system has certain limit to open files and when that limit is reached this error is thrown. After sometime, try to deploy your application again after closing opened files.
 
-2. While configuring serverless with your AWS security credentials, sometimes you may get error message as ' The term 'serverless' is not recognized as the name of a cmdlet, function, script file, or operable program' so another way for configuration is to open the credentials file. This file is usually found at ~/.aws/credentials. You may need to show hidden files in your file browser.
+2.  While configuring serverless with your AWS security credentials, sometimes you may get error message as ' The term 'serverless' is not recognized as the name of a cmdlet, function, script file, or operable program' so another way for configuration is to open the credentials file. This file is usually found at ~/.aws/credentials . You may need to show hidden files in your file browser.
 
-   Your file may be empty or may not even exist. If it doesn’t exist create an empty file. In that file you can now paste your credentials in this format. 
+    Your file may be empty or may not even exist. If it doesn’t exist create an empty file. In that file you can paste your credentials in this format.
 
-         [default]
-         aws_access_key_id=${Your access key ID}
-         aws_secret_access_key=${Your secret access key}
+          [default]
+          aws_access_key_id=${Your access key ID}
+          aws_secret_access_key=${Your secret access key}

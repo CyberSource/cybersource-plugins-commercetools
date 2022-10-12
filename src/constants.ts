@@ -212,6 +212,8 @@ export abstract class Constants {
   static readonly STRING_HOURS = 'hours';
   static readonly STRING_ID = 'id';
   static readonly STRING_MOTO = 'MOTO';
+  static readonly STRING_MY_APPLICATION = 'my-application';
+  static readonly STRING_MY_REQUESTS = 'my-requests-';
   static readonly STRING_OBJ = 'obj';
   static readonly STRING_ORDER_NUMBER = 'orderNumber';
   static readonly STRING_PAYMENT_TOKEN = 'paymentToken';
