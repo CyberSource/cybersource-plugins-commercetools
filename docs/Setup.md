@@ -49,10 +49,8 @@ is within the user-interface. This is because
 Commercetools does not come with a user-interface and therefore all
 implementations will be different.
 
-- For setting up the client-side application to work with Visa
-  Click to Pay, use the following guide: [Visa Click to Pay Setup](Visa-ClicktoPay-Setup.md)
-- For setting up the client-side application to work with Google
-  Pay, use the following guide: [Google Pay Setup](GooglePay-Setup.md)
-- For setting up the client-side application to work with Apple
-  Pay, use the following guide: [Apple Pay Setup](ApplePay-Setup.md)
+- For setting up the client-side application to work with Visa Click to Pay, use the following guide: [Visa Click to Pay Setup](Visa-ClicktoPay-Setup.md)
+- For setting up the client-side application to work with Google Pay, use the following guide: [Google Pay Setup](GooglePay-Setup.md)
+- For setting up the client-side application to work with Apple Pay, use the following guide: [Apple Pay Setup](ApplePay-Setup.md)
+- For setting up the client-side application to work with eCheck, use the following guide: [eCheck Setup](eCheck-Setup.md)
 
