@@ -4,11 +4,11 @@
   - [Environment Properties](#EnvironmentProperties)
 - [Deployment](#Deployment)
 
-
 # <a name="Configuration"></a>Configuration
 
 There are a number of configuration variables that need to be defined before running the plugin. These can be set as environment variables inside the .env file present in the root directory of the plugin.
 
+For multiple environments you should use unique values per environment.
 
 ## <a name="EnvironmentProperties"></a>Environment Properties
 
@@ -38,6 +38,10 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 | PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME     | Numeric value between 1-24                                                            | Provide the number of hours that saved card attempts are counted (Max of 24 hours). By default this value is set to 1, applicable only if rate limiter is enabled                           |
 | PAYMENT_GATEWAY_DECISION_SYNC              | Boolean value - true or false                                                         | Flag for enabling or disabling Decision sync. Case sensitive                                                         |
 | PAYMENT_GATEWAY_RUN_SYNC                   | Boolean value - true or false                                                         | Flag for enabling or disabling Run sync. Case sensitive                                                              |
+| AWS_ACCESS_KEY_ID_VALUE                          | AWS Access Key ID                                                            | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials). Required when deploying on AWS lambda                                    |
+| AWS_SECRET_KEY_VALUE                            | AWS Secret Key                                                           | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials). Required when deploying on AWS lambda                                   |
+| AWS_REGION_NAME                           | AWS Region Name                                                          | Provided by AWS. Required when deploying on AWS lambda                                    |
+| PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS             | Boolean value - true or false                                                         | Set the value to true to get AWS Cloudwatch logs. Case sensitive.                                                         |
 | CT_PROJECT_KEY                             | Project key for your Commercetools project                                            | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
 | CT_CLIENT_ID                               | Client Id of your Commercetools Payment API key                                       | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
 | CT_CLIENT_SECRET                           | Client secret of your Commercetools Payment API key                                   | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
@@ -49,6 +53,8 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 The Commercetools - Cybersource plugin is a typescript project which is built using cybersource-rest-client npm package and other several node packages.
 
 > **_NOTE:_** You can view the loggers in src/loggers folder of the plugin if there are any information or errors found while processing the payments or configuring the plugin.
+
+If you want serverless deployment of the plugin on AWS Lambda, refer [AWS-Serverless-Deployment\#AWSDeploymentSteps](AWS-Serverless-Deployment.md#AWSDeploymentSteps)
 
 ## Example deployment steps
 
