@@ -36,7 +36,32 @@ actions on a payment resource.
 | actions                    | Create                                 |                                                                                                    |
 | resourceTypeId             | payment                                |                                                                                                    |
 
-## <a name="PaymentUpdate"></a>Payment Update
+| Name                             | Type           | Required |
+| -------------------------------- | -------------- | -------- |
+| isv_tokens                       | Set of Strings | false    |
+| isv_token                        | String         | false    |
+| isv_tokenAlias                   | String         | false    |
+| isv_savedToken                   | String         | false    |
+| isv_tokenVerificationContext     | String         | false    |
+| isv_tokenCaptureContextSignature | String         | false    |
+| isv_cardType                     | String         | false    |
+| isv_maskedPan                    | String         | false    |
+| isv_cardExpiryMonth              | String         | false    |
+| isv_cardExpiryYear               | String         | false    |
+| isv_addressId                    | String         | false    |
+| isv_currencyCode                 | String         | false    |
+| isv_deviceFingerprintId          | String         | false    |
+| isv_cardNewExpiryMonth           | String         | false    |
+| isv_cardNewExpiryYear            | String         | false    |
+| isv_tokenAction                  | String         | false    |
+| isv_tokenUpdated                 | Boolean        | false    |
+| isv_failedTokens                 | Set of Strings | false    |
+
+### <a name="PaymentData"></a>Payment Data
+
+| Type    | Key              | Purpose                                                                                            |
+| ------- | ---------------- | -------------------------------------------------------------------------------------------------- |
+| payment | isv_payment_data | Custom Cybersource payment data such as tokens, card details used to trigger Cybersource services. |
 
 An extension triggered by payment updates is required to process any update actions on a payment resource
 
@@ -140,6 +165,9 @@ Fields
 | isv_saleEnabled                      | Boolean | false    |
 | isv_enabledMoto                      | Boolean | false    |
 | isv_walletType                       | String  | false    |
+| isv_accountNumber                    | String  | false    |
+| isv_accountType                      | String  | false    |
+| isv_routingNumber                    | String  | false    |
 ### <a name="PayerAuthenticationEnrolmentCheck"></a>Payer authentication enrolment check
 
 | Type                          | Key                                               | Purpose                                                                  |

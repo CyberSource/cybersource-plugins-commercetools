@@ -9,6 +9,7 @@
 - [Process a Payment With Click to pay](Process-a-Payment-ClicktoPay.md)
 - [Process a Payment With Google Pay](Process-a-Payment-GooglePay.md)
 - [Process a Payment With Apple Pay](Process-a-Payment-ApplePay.md)
+- [Process a Payment With eCheck](Process-a-Payment-eCheck.md)
 - [Process a Payment For MOTO](Process-a-Payment-MOTO.md)
 - [Reverse a Payment](Reverse-a-Payment.md)
 - [Capture a Payment](Capture-a-Payment.md)

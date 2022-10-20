@@ -1,4 +1,3 @@
-
 import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();

@@ -56,5 +56,5 @@ When Cybersource returns an unsuccessful response code, the relevant transaction
 
 ## <a name="APIExtensionerrors"></a>API Extension errors
 
-When there is an error in the API Extension itself, the payment will be updated to contain a new interfaceInteraction of type 'cybersource_payment_failure', containing a message from the exception
+When there is an error in the API Extension itself, the payment will be updated to contain a new interfaceInteraction of type 'isv_payment_failure', containing a message from the exception
 that was thrown.
