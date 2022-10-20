@@ -9,6 +9,7 @@ To create a payment, you must first decide which payment method you would like t
 | creditCardWithPayerAuthentication | Processes credit cards with 3DS checks. This requires some extra values on Payment Create which are listed below    |
 | googlePay                         | Processes the payment using payment network tokenization to make Web payments and mobile payments on Android devices using Google Pay |
 | applePay                          | Processes the payment using payment network tokenization to make Web payments and mobile payments on Apple devices using Apple Pay   |
+| eCheck                            | Processes the payment using appropriate check processors.This requires some extra values on Payment Create which are listed below |
 
 
 
