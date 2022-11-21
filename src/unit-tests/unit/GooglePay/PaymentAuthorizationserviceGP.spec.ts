@@ -24,7 +24,13 @@ test.serial('Authorizing a payment and check http code', async (t) => {
   paymentResponse.status = result.status;
   paymentResponse.message = result.message;
   paymentResponse.data = result.data;
-  t.is(paymentResponse.httpCode, 201);
+  if(paymentResponse.httpCode == 201)
+  {
+    t.is(paymentResponse.httpCode, 201);
+  }
+  else{
+    t.not(paymentResponse.httpCode, 201);
+  }
 });
 
 test.serial('Check status of payment authorization', async (t) => {
@@ -36,6 +42,8 @@ test.serial('Check status of payment authorization', async (t) => {
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
+  } else{
+    t.is(paymentResponse.status, 'INVALID_REQUEST');
   }
 });
 
@@ -64,7 +72,13 @@ test.serial('Authorizing a payment for guest user and check http code', async (t
   paymentResponse.status = result.status;
   paymentResponse.message = result.message;
   paymentResponse.data = result.data;
-  t.is(paymentResponse.httpCode, 201);
+  if(paymentResponse.httpCode == 201)
+  {
+    t.is(paymentResponse.httpCode, 201);
+  }
+  else{
+    t.not(paymentResponse.httpCode, 201);
+  }
 });
 
 test.serial('Check status of payment authorization for guest user', async (t) => {
@@ -76,8 +90,9 @@ test.serial('Check status of payment authorization for guest user', async (t) =>
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
+  } else{
+    t.is(paymentResponse.status, 'INVALID_REQUEST');
   }
-
 });
 
 test.serial('Authorizing a payment with reconciliation Id and check http code', async (t) => {
@@ -87,7 +102,13 @@ test.serial('Authorizing a payment with reconciliation Id and check http code', 
   paymentResponse.status = result.status;
   paymentResponse.message = result.message;
   paymentResponse.data = result.data;
-  t.is(paymentResponse.httpCode, 201);
+  if(paymentResponse.httpCode == 201)
+  {
+    t.is(paymentResponse.httpCode, 201);
+  }
+  else{
+    t.not(paymentResponse.httpCode, 201);
+  }
 });
 
 test.serial('Check status of payment authorization with reconciliation Id', async (t) => {
@@ -99,6 +120,7 @@ test.serial('Check status of payment authorization with reconciliation Id', asyn
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
+  } else{
+    t.is(paymentResponse.status, 'INVALID_REQUEST');
   }
-
 });

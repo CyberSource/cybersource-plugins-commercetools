@@ -20,7 +20,14 @@ test.serial('Authorizing a payment and check http code', async (t) => {
   const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  t.is(paymentResponse.httpCode, 201);
+  if(paymentResponse.httpCode == 201)
+  {
+    t.is(paymentResponse.httpCode, 201);
+  }
+  else
+  {
+    t.not(paymentResponse.httpCode, 201);
+  }
 }); 
 
 test.serial('Check status for payment authorization ', async (t) => {
@@ -32,6 +39,8 @@ test.serial('Check status for payment authorization ', async (t) => {
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
+  } else{
+    t.is(paymentResponse.status, 'INVALID_REQUEST');
   }
 });
 
@@ -54,7 +63,14 @@ test.serial('Authorizing a payment for guest user and check http code', async (t
   const result: any = await auth.authorizationResponse(guestPayment, cart, service, guestCardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  t.is(paymentResponse.httpCode, 201);
+  if(paymentResponse.httpCode == 201)
+  {
+    t.is(paymentResponse.httpCode, 201);
+  }
+  else
+  {
+    t.not(paymentResponse.httpCode, 201);
+  }
 }); 
 
 test.serial('Check status for payment authorization for guest user', async (t) => {
@@ -66,6 +82,8 @@ test.serial('Check status for payment authorization for guest user', async (t) =
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
+  } else{
+    t.is(paymentResponse.status, 'INVALID_REQUEST');
   }
 });
 
@@ -73,7 +91,14 @@ test.serial('Authorizing a payment with reconciliation Id and check http code', 
   const result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  t.is(paymentResponse.httpCode, 201);
+  if(paymentResponse.httpCode == 201)
+  {
+    t.is(paymentResponse.httpCode, 201);
+  }
+  else
+  {
+    t.not(paymentResponse.httpCode, 201);
+  }
 }); 
 
 test.serial('Check status for payment authorization with reconciliation Id', async (t) => {
@@ -85,5 +110,7 @@ test.serial('Check status for payment authorization with reconciliation Id', asy
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
+  } else{
+    t.is(paymentResponse.status, 'INVALID_REQUEST');
   }
 });

@@ -49,8 +49,7 @@ test.serial('Get update card handller data', async(t)=>{
     {
         t.pass();
     }
-    
-})
+ })
 
 test.serial('Get order management handller for capture ', async(t)=>{
     const orderManagementHandlerUpdatePaymentObj  =await CommercetoolsApi.retrievePayment(unit.paymentId);
@@ -121,7 +120,6 @@ test.serial('get authorization handller for google pay', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
     }
 })
 
@@ -149,8 +147,8 @@ test.serial('get authorization handller for credit card', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
-    }})
+    }
+})
 
 test.serial('get authorization handller for payer auth', async(t)=>{
     const result = await paymentHandler.authorizationHandler(authorizationHandler3DSUpdatePaymentObject, authorizationHandlerUpdateTransactions);
@@ -162,7 +160,6 @@ test.serial('get authorization handller for payer auth', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
     }
 })
 
@@ -176,9 +173,8 @@ test.serial('get authorization handller for apple pay', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
     }
-   })
+})
 
 test.serial('get payer auth set up response ', async(t)=>{
     const result = await paymentHandler.getPayerAuthSetUpResponse(authorizationHandler3DSUpdatePaymentObject);
