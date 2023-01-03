@@ -184,7 +184,7 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
       orderInformation.amountDetails = orderInformationAmountDetails;
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REVERSAL_REQUEST +JSON.stringify(requestObj));
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REVERSAL_REQUEST +JSON.stringify(requestObj));
       }
 
       var instance = new restApi.ReversalApi(configObject, apiClient);

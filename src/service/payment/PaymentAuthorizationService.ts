@@ -328,9 +328,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
         if (Constants.STRING_ENROLL_CHECK == service){
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST +JSON.stringify(requestObj));
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST +JSON.stringify(requestObj));
          }else{
-           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST +JSON.stringify(requestObj));
+           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST +JSON.stringify(requestObj));
          }
        }
 

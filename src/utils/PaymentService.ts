@@ -27,14 +27,14 @@ const logData = (fileName, methodName, type, id, message) => {
       format: combine(loggingFormat),
       transports: [
         new WinstonCloudwatch({
-          awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID_VALUE,
-          awsSecretKey: process.env.AWS_SECRET_KEY_VALUE,
+          awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
           logGroupName: Constants.STRING_MY_APPLICATION,
           logStreamName: function () {
             let date = new Date().toISOString().split('T')[Constants.VAL_ZERO]
             return Constants.STRING_MY_REQUESTS + date
           },
-          awsRegion: process.env.AWS_REGION_NAME,
+          awsRegion: process.env.AWS_REGION,
           jsonMessage: true
         })
       ],
@@ -55,12 +55,23 @@ const logData = (fileName, methodName, type, id, message) => {
       ],
     });
   }
-  logger.log({
-    label: fileName,
-    methodName: methodName,
-    level: type,
-    message: message,
-  });
+  if(null != id && Constants.STRING_EMPTY != id){
+    logger.log({
+      label: fileName,
+      methodName: methodName,
+      level: type,
+      id: id,
+      message: message,
+    });
+  }
+  else{
+    logger.log({
+     label: fileName,
+     methodName: methodName,
+     level: type,
+     message: message,
+    });
+  }
 };
 
 

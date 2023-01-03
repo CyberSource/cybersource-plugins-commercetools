@@ -108,6 +108,8 @@ You can see all your logs in AWS Cloudwatch, for that you need to perform below 
 - Navigate to the lambda and click on the lambda function that has been created after successful deployment.
 - Navigate to Configuration -> Environment variables and click on Add environment variable.
 - Enter key and value for your ENV variable and click on save. (Refer [API-Extension-Setup](API-Extension-Setup.md))
+   
+    **_NOTE:_** AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_REGION can't be modified since they are AWS reserved keywords. 
 
 ## Custom Domain Name for Lambda
 

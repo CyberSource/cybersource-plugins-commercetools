@@ -37,7 +37,7 @@ const getTransactionSearchResponse = async (query, sort) => {
       requestObj.sort = sort;
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_DEBUG, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST +JSON.stringify(requestObj));
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST +JSON.stringify(requestObj));
       }
       
       const instance = new restApi.SearchTransactionsApi(configObject, apiClient);

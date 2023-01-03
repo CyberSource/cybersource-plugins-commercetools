@@ -81,7 +81,7 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
       requestObj.orderInformation = orderInformation;
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_REQUEST + JSON.stringify(requestObj));
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_REQUEST + JSON.stringify(requestObj));
       }
 
       const instance = new restApi.RefundApi(configObject, apiClient);

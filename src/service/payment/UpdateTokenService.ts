@@ -60,7 +60,7 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
       requestObj.instrumentIdentifier = instrumentIdentifier;
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_DEBUG, null, Constants.UPDATE_TOKEN_REQUEST + JSON.stringify(requestObj));
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.UPDATE_TOKEN_REQUEST + JSON.stringify(requestObj));
       }
 
       const instance = new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);

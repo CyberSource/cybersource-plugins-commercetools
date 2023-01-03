@@ -37,7 +37,7 @@ const keys = async () => {
     requestObj.targetOrigin = process.env.PAYMENT_GATEWAY_TARGET_ORIGIN;
 
     if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_DEBUG, null, Constants.FLEX_KEYS_REQUEST + JSON.stringify(requestObj));
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, null, Constants.FLEX_KEYS_REQUEST + JSON.stringify(requestObj));
     }
 
     const instance = new restApi.KeyGenerationApi(configObject, apiClient);

@@ -2,6 +2,7 @@ import path from 'path';
 import axios from 'axios';
 import fs from 'fs';
 import https from 'https';
+import {stringify} from 'flatted';
 
 import paymentAuthorization from './../service/payment/PaymentAuthorizationService';
 import paymentService from './../utils/PaymentService';
@@ -181,7 +182,7 @@ const getCreditCardResponse = async (updatePaymentObj, customerInfo, cartObj, up
     authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
     if (null != authResponse) {
       if (Constants.APPLE_PAY == updatePaymentObj.paymentMethodInfo.method) {
-        cardDetails = await clickToPay.getVisaCheckoutData(paymentResponse);
+        cardDetails = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj.id);
         if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.HTTP_CODE_TWO_HUNDRED == cardDetails.httpCode && cardDetails.hasOwnProperty(Constants.CARD_FIELD_GROUP) && Constants.VAL_ZERO < Object.keys(cardDetails.cardFieldGroup).length) {
           actions = paymentService.visaCardDetailsAction(cardDetails);
           if (null != actions && Constants.VAL_ZERO < actions.length) {
@@ -520,7 +521,7 @@ const clickToPayResponse = async (updatePaymentObj, cartObj, updateTransactions,
   if (null != paymentResponse && null != paymentResponse.httpCode) {
     authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
     if (null != authResponse) {
-      visaCheckoutData = await clickToPay.getVisaCheckoutData(paymentResponse);
+      visaCheckoutData = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj.id);
       if (
         Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
         Constants.HTTP_CODE_TWO_HUNDRED == visaCheckoutData.httpCode &&
@@ -698,12 +699,42 @@ const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResp
   return updateActions;
 };
 
+const getCertificatesData = async (url) => {
+  let certificateResponse = {
+    status : Constants.VAL_ZERO,
+    data : null,
+  }
+  if(null != url){
+      return new Promise(async (resolve, reject) => {
+        axios.get(url)
+          .then(function (response) {
+            if(response.data){
+              certificateResponse.data = response.data;
+              certificateResponse.status = response.status;
+              resolve(certificateResponse);
+            }
+            else{
+              certificateResponse.status = response.status
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CERTIFICATES_DATA, Constants.LOG_ERROR, null, stringify(response));
+              reject(stringify(certificateResponse));
+            }  
+        })
+        .catch(function (exception) {
+         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CERTIFICATES_DATA, Constants.LOG_ERROR, null, exception);
+         reject(exception);
+       });
+      })
+    }
+}
+
 const applePaySessionHandler = async (fields) => {
   let serviceResponse: any;
   let exceptionData: any;
   let httpsAgent: any;
   let cert: any;
   let key: any;
+  let certData: any;
+  let keyData: any;
   let body: any;
   let domainName: any;
   let applePaySession: any;
@@ -713,11 +744,28 @@ const applePaySessionHandler = async (fields) => {
       if (Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH) {
         cert = process.env.PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH;
         key = process.env.PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH;
+        if(process.env.PAYMENT_GATEWAY_ENABLE_SERVERLESS_DEPLOYMENT == Constants.STRING_TRUE){
+          certData = await getCertificatesData(cert);
+          keyData = await getCertificatesData(key);
+          if(Constants.HTTP_CODE_TWO_HUNDRED == certData.status && null != certData.data && Constants.HTTP_CODE_TWO_HUNDRED == keyData.status && null != keyData.data){
+            httpsAgent = new https.Agent({
+            rejectUnauthorized: false,
+            cert: certData.data,
+            key: keyData.data,
+           });
+         }
+         else{
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_APPLE_PAY_SESSION_HANDLER, Constants.LOG_ERROR, null, Constants.ERROR_MSG_ACCESSING_CERTIFICATES);
+          errorFlag = true
+         } 
+      }
+      else{
         httpsAgent = new https.Agent({
           rejectUnauthorized: false,
           cert: fs.readFileSync(cert),
           key: fs.readFileSync(key),
         });
+      }
         domainName = process.env.PAYMENT_GATEWAY_TARGET_ORIGIN;
         domainName = domainName.replace(Constants.DOMAIN_REGEX, Constants.STRING_EMPTY);
         body = {
@@ -1595,7 +1643,7 @@ const updateVisaDetails = async (paymentId, paymentVersion, transactionId) => {
   };
   if (null != paymentId && null != paymentVersion && null != transactionId) {
     visaObject.transactionId = transactionId;
-    visaCheckoutData = await clickToPay.getVisaCheckoutData(visaObject);
+    visaCheckoutData = await clickToPay.getVisaCheckoutData(visaObject, paymentId);
     if (null != visaCheckoutData) {
       cartDetails = await getCartDetailsByPaymentId(paymentId);
       if (null != cartDetails && Constants.STRING_CART_STATE == cartDetails.cartState) {

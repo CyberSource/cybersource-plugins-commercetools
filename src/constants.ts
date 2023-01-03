@@ -42,6 +42,7 @@ export abstract class Constants {
   static readonly FUNC_GET_AUTH_RESPONSE = 'FuncGetAuthResponse';
   static readonly FUNC_GET_CAPTURED_AMOUNT = 'FuncGetCapturedAmount';
   static readonly FUNC_GET_CARD_TOKENS = 'FuncGetCardTokens';
+  static readonly FUNC_GET_CERTIFICATES_DATA = 'FuncGetCertificatesData';
   static readonly FUNC_GET_CREDIT_CARD_RESPONSE = 'FuncGetCreditCardResponse';
   static readonly FUNC_GET_CART_DETAILS_BY_PAYMENT_ID = 'FuncGetCartDetailsByPaymentId';
   static readonly FUNC_GET_CLIENT = 'FuncGetClient';
@@ -363,6 +364,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
   static readonly ERROR_MSG_APPLICATION_DETAILS = 'Unable to fetch transaction application details';
   static readonly ERROR_MSG_APPLE_PAY_CERTIFICATES = 'Please provide certificates paths for Apple Pay in configuration file';
+  static readonly ERROR_MSG_ACCESSING_CERTIFICATES = 'An error occured while accessing ApplePay Certificates';
   static readonly ERROR_MSG_EMPTY_PAYMENT_DATA = 'There was an error while fetching payment details';
   static readonly ERROR_MSG_EMPTY_TRANSACTION_DETAILS = 'There was an error while fetching transaction details, please try again';
   static readonly ERROR_MSG_ENABLE_SYNC = 'Please enable Run sync';
