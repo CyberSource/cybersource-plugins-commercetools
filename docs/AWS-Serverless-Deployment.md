@@ -15,7 +15,7 @@ Here is a list of pre-requisites that you need to have before proceeding with de
 - Active AWS subscription
 - AWS credentials
 
-## <a name="AWSSecurityCredentials"></a>AWS Security Credentials
+## AWS Security Credentials
 
 To connect the application to AWS account, you need to generate AWS Security Credentials. Follow below steps to generate security credentials
 
@@ -29,23 +29,12 @@ To connect the application to AWS account, you need to generate AWS Security Cre
 
 3. The downloaded file contains `AWSAccessKeyId` and `AWSSecretKey`, use these credentials whenever required.
 
-## <a name="ServerlessFrameworkServices"></a>Serverless Framework Services
+## Serverless Framework Services
 
-The Serverless Framework is a command-line tool that uses easy and approachable YAML syntax to deploy your code. A service is configured via `serverless.yml` file where you define your functions, the events that trigger them, and the AWS resources to deploy. Each service configuration is managed in the serverless.yml file.
-
-The main responsibilities of this file are:
-
-- Declare a serverless service
-- Define the cloud provider where the service will be deployed
-- Define one or more functions
-- Define the events that trigger each function (e.g. HTTP requests)
-- Define a set of AWS resources to create
-- Allow events listed in the events section to automatically create the resources required for the event upon deployment
-- Allow flexible configuration using variables
-
-Any service configuration will be done in `serverless.yml` file. You can see the name of the service, here you can provide your service name. The function inside the functions definition, it should point to `build/main/index.handler` since in index file we are wrapping our API for serverless use.
+The Serverless Framework is a command-line tool that uses easy and approachable YAML syntax to deploy your code. A service is configured via `serverless.yml` file where you define your functions, the events that trigger them, and the AWS resources to deploy. Each service configuration is managed in the serverless.yml file. You can see the name of the service and here you can provide your service name as per your convenience. The function inside the functions definition, it should point to `build/main/index.handler` since in index file we are wrapping our API for serverless use.
 
 Specify the event along with the path which will trigger the handler function.
+The serverless.yml file should looks like as follows:
 
     functions:
     HandlerFunction:
@@ -73,16 +62,17 @@ In order to get logs in AWS Cloudwatch, you need to provide following permission
           Resource:
               - arn:aws:logs:*:*:*
 
+Inside provider, you need to provide timeout for your API gateway as 20 second 
+ 
+      timeout: 20
+
 > **_NOTE:_** Make sure to have correct indentation for each line in `serverless.yml` file. (Refer [Serverless.yml Reference](https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml))
 
 ## Loggers in AWS Cloudwatch
 
-You can see all your logs in AWS Cloudwatch, for that you need to perform below steps.
+You can see all your logs in AWS Cloudwatch, for that you need to pass the value as `true` for the ENV variable `PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md))
 
-- Provide your AWS Access Key ID ,Secret Key and AWS Region Name in .env file. (Refer [API-Extension-Setup](API-Extension-Setup.md))
-- Pass the value as `true` for the ENV variable `PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md))
-
-## <a name="AWSDeploymentSteps"></a>Steps to Deploy Plugin on AWS Lambda
+## Steps to Deploy Plugin on AWS Lambda
 
 1.  Navigate to the root directory and run the following command to include the npm dependencies
 
@@ -90,7 +80,7 @@ You can see all your logs in AWS Cloudwatch, for that you need to perform below 
 
 > **_NOTE:_** This is not necessary if the dependencies are already available in <b>node_modules</b> repository
 
-2.  Populate AWS security credentials (Refer [AWS Security Credentials](#AWSSecurityCredentials)) and run the following command
+2.  Populate AWS security credentials (Refer [AWS Security Credentials](#aws-security-credentials)) and run the following command
 
          serverless config credentials --provider aws --key <your_aws_access_key_id> --secret <your_aws_access_key_secret>
 
@@ -98,7 +88,7 @@ You can see all your logs in AWS Cloudwatch, for that you need to perform below 
 
          Serverless create -t aws-nodejs
 
-4.  Above command will add one file in the root directory i.e. serverless.yml . Populate the required values in this file. (Refer [Serverless Framework Services](#ServerlessFrameworkServices))
+4.  Above command will add one file in the root directory i.e. serverless.yml . Populate the required values in this file. (Refer [Serverless Framework Services](#serverless-framework-services))
 
 5.  To deploy a service, run the below command in the same directory as serverless.yml i.e. root directory
 
@@ -109,13 +99,11 @@ You can see all your logs in AWS Cloudwatch, for that you need to perform below 
 - Navigate to Configuration -> Environment variables and click on Add environment variable.
 - Enter key and value for your ENV variable and click on save. (Refer [API-Extension-Setup](API-Extension-Setup.md))
    
-    **_NOTE:_** AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_REGION can't be modified since they are AWS reserved keywords. 
+    **_NOTE:_** AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_REGION can't be modified since they are AWS reserved keywords.
+    
+    The execution role which will be created while deploying to AWS lambda will provide the credentials to lambda function which can be used to run and invoke other web services. Therefore, you don't need to provide AWS credentials in .env file.
 
-## Custom Domain Name for Lambda
-
-With Serverless, it's easier than ever to deploy production-ready API endpoints. However, using AWS API Gateway results in odd hostnames for your endpoints. Further, these hostnames will change if you remove and redeploy your service. To map a custom domain name to your endpoints, Refer [Serverless-Api-Gateway-Domain](https://www.serverless.com/blog/serverless-api-gateway-domain/)
-
-You need to have custom domain for your application since your application will be hosted on that URL and that URL will be used to create API extensions.
+ **_NOTE:_** If You need to have custom domain for your application since your application will be hosted on that URL and that URL will be used to create API extensions, refer  [Serverless-Api-Gateway-Domain](https://www.serverless.com/blog/serverless-api-gateway-domain/) for more information
 
 ## Troubleshoot
 

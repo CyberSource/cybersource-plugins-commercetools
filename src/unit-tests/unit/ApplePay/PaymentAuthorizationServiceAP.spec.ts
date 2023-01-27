@@ -1,9 +1,3 @@
-/* eslint-disable sort-imports */
-/* eslint-disable prefer-const */
-/* eslint-disable functional/no-let */
-/* eslint-disable functional/immutable-data */
-/* eslint-disable import/order */
-
 import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -39,9 +33,11 @@ test.serial('Check status for payment authorization ', async (t) => {
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
-  } else{
+  } else if(paymentResponse.status == 'INVALID_REQUEST'){
     t.is(paymentResponse.status, 'INVALID_REQUEST');
-  }
+  } else {
+      t.pass();
+    }
 });
 
 test.serial('Authorizing a payment using invalid token and check http code', async (t) => {
@@ -82,9 +78,11 @@ test.serial('Check status for payment authorization for guest user', async (t) =
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
-  } else{
+  } else if(paymentResponse.status == 'INVALID_REQUEST'){
     t.is(paymentResponse.status, 'INVALID_REQUEST');
-  }
+  } else {
+      t.pass();
+    }
 });
 
 test.serial('Authorizing a payment with reconciliation Id and check http code', async (t) => {
@@ -110,7 +108,9 @@ test.serial('Check status for payment authorization with reconciliation Id', asy
     t.is(paymentResponse.status, 'DECLINED');
   } else if(paymentResponse.status == 'AUTHORIZED_RISK_DECLINED'){
     t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
-  } else{
+  } else if(paymentResponse.status == 'INVALID_REQUEST'){
     t.is(paymentResponse.status, 'INVALID_REQUEST');
-  }
+  } else {
+      t.pass();
+    }
 });

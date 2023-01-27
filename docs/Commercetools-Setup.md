@@ -1,26 +1,26 @@
 # Commercetools Setup
 
-- [API Extension Setup](#APIExtensionSetup)
-  - [Payment Create](#PaymentCreate)
-  - [Payment Update](#PaymentUpdate)
-  - [Customer Update](#CustomerUpdate)
-- [Resource Customizations](#ResourceCustomizations)
-  - [Payment Interactions](#PaymentInteractions)
-    - [Customer tokens](#CustomerTokens)
-    - [Payment data](#PaymentData)
-    - [Payer authentication enrolment check](#PayerAuthenticationEnrolmentCheck)
-    - [Payer authentication validate result](#PayerAuthenticationValidation)
-    - [Payment error](#PaymentError)
-    - [Payment failure](#PaymentFailure)
-- [Creating API Extensions and Customizations](#ApiExtensions)
+- [API Extension Setup](#api-extension-setup)
+  - [Payment Create](#payment-create)
+  - [Payment Update](#payment-update)
+  - [Customer Update](#customer-update)
+- [Resource Customizations](#resource-customizations)
+  - [Payment Interactions](#payment-interactions)
+    - [Customer tokens](#customer-tokens)
+    - [Payment data](#payment-data)
+    - [Payer authentication enrolment check](#payer-authentication-enrolment-check)
+    - [Payer authentication validate result](#payer-authentication-validate-result)
+    - [Payment error](#payment-error)
+    - [Payment failure](#payment-failure)
+- [Creating API Extensions and Customizations](#creating-api-extensions-and-customizations)
 
 The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in src/resources folder of the plugin and can be run as an endpoint to load them into Commercetools.
 
 > **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms</li></ul>
 
-# <a name="APIExtensionSetup"></a>API Extension Setup
+# API Extension Setup
 
-## <a name="PaymentCreate"></a>Payment Create
+## Payment Create
 
 An extension triggered by payment create is required to process any
 actions on a payment resource.
@@ -36,7 +36,7 @@ actions on a payment resource.
 | actions                    | Create                                 |                                                                                                    |
 | resourceTypeId             | payment                                |                                                                                                    |
 
-## <a name="PaymentUpdate"></a>Payment Update
+## Payment Update
 
 An extension triggered by payment updates is required to process any update actions on a payment resource
 
@@ -51,7 +51,7 @@ An extension triggered by payment updates is required to process any update acti
 | actions                    | Update                                 |                                                                                                    |
 | resourceTypeId             | payment                                |                                                                                                    |
 
-## <a name="CustomerUpdate"></a>Customer Update
+## Customer Update
 
 An extension triggered by customer update is required to process any update actions on customer resource.
 
@@ -62,15 +62,15 @@ An extension triggered by customer update is required to process any update acti
 | url                        | {baseUrl}/api/extension/customer/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
 | authentication.type        | AuthorizationHeader                     |                                                                                                    |
 | authentication.headerValue | Bearer {credentials}                    | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
-| timeoutInMs                | 3000                                    | You will need Commercetools support to increase the allowable maximum value                        |
+| timeoutInMs                | 4000                                    | You will need Commercetools support to increase the allowable maximum value                        |
 | actions                    | Update                                  |                                                                                                    |
 | resourceTypeId             | customer                                |                                                                                                    |
 
-# <a name="ResourceCustomizations"></a>Resource Customizations
+# Resource Customizations
 
-## <a name="PaymentInteractions"></a>Payment Interactions
+## Payment Interactions
 
-### <a name="CustomerTokens"></a>Customer Tokens
+### Customer Tokens
 
 | Type     | Key                          | Purpose                                              |
 | -------- | ---------------------------- | ---------------------------------------------------- |
@@ -99,7 +99,7 @@ Fields
 | isv_tokenUpdated                 | Boolean        | false    |
 | isv_failedTokens                 | Set of Strings | false    |
 
-### <a name="PaymentData"></a>Payment Data
+### Payment Data
 
 | Type    | Key              | Purpose                                                                                            |
 | ------- | ---------------- | -------------------------------------------------------------------------------------------------- |
@@ -143,7 +143,7 @@ Fields
 | isv_accountNumber                    | String  | false    |
 | isv_accountType                      | String  | false    |
 | isv_routingNumber                    | String  | false    |
-### <a name="PayerAuthenticationEnrolmentCheck"></a>Payer authentication enrolment check
+### Payer authentication enrolment check
 
 | Type                          | Key                                               | Purpose                                                                  |
 | ----------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
@@ -167,7 +167,7 @@ Fields
 | commerceIndicator            | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 | eci                          | String  | false    | Payer auth validation result or enrolment check response | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 
-### <a name="PayerAuthenticationValidation"></a>Payer authentication validation
+### Payer authentication validate result
 
 | Type                          | Key                                               | Purpose                                                                                                                                                                                                                      |
 | ----------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -191,7 +191,7 @@ Fields
 | ucafCollectionIndicator      | String | false    | Payer auth validation result or enrolment check response |
 | ucafAuthenticationData       | String | false    | Payer auth validation result or enrolment check response |
 
-### <a name="PaymentError"></a>Payment Error
+### Payment Error
 
 | Type                          | Key               | Purpose                                                                     |
 | ----------------------------- | ----------------- | --------------------------------------------------------------------------- |
@@ -204,7 +204,7 @@ Fields
 | reason        | String | true     |
 | transactionId | String | false    |
 
-### <a name="PaymentFailure"></a>Payment Failure
+### Payment Failure
 
 | Type                          | Key                 | Purpose                                                                  |
 | ----------------------------- | ------------------- | ------------------------------------------------------------------------ |
@@ -217,7 +217,7 @@ Fields
 | reasonCode    | String | true     |
 | transactionId | String | true     |
 
-# <a name="ApiExtensions"></a>Creating API Extensions and Customizations
+# Creating API Extensions and Customizations
 
 Once the environment properties are set and the plugin is deployed successfully, the next step is about setting up the plugin to receive requests from Commercetools.
 

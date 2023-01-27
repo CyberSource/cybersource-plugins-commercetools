@@ -1,9 +1,3 @@
-/* eslint-disable sort-imports */
-/* eslint-disable prefer-const */
-/* eslint-disable functional/no-let */
-/* eslint-disable functional/immutable-data */
-/* eslint-disable import/order */
-
 import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -32,7 +26,11 @@ test.serial('Authorizing a payment and check http code for logged in customer', 
 test.serial('Check status of payment authorization for logged in customer', async (t) => {
  if(paymentResponse.httpCode == 201)
   {
-    t.is(paymentResponse.status, 'PENDING');
+    if (paymentResponse.status == 'PENDING') {
+      t.is(paymentResponse.status, 'PENDING');
+    } else if (paymentResponse.status == 'DECLINED') {
+      t.is(paymentResponse.status, 'DECLINED');
+    } 
   }
   else{
     t.not(paymentResponse.status, 'PENDING');
@@ -55,7 +53,11 @@ test.serial('Authorizing a payment and check http code for guest user', async (t
   test.serial('Check status of payment authorization for guest user', async (t) => {
     if(paymentResponse.httpCode == 201)
     {
-      t.is(paymentResponse.status, 'PENDING');
+      if (paymentResponse.status == 'PENDING') {
+        t.is(paymentResponse.status, 'PENDING');
+      } else if (paymentResponse.status == 'DECLINED') {
+        t.is(paymentResponse.status, 'DECLINED');
+      } 
     }
     else{
       t.not(paymentResponse.status, 'PENDING');

@@ -1,16 +1,16 @@
 # API Extension Setup
 
-- [Configuration](#Configuration)
-  - [Environment Properties](#EnvironmentProperties)
-- [Deployment](#Deployment)
+- [Configuration](#configuration)
+  - [Environment Properties](#environment-properties)
+- [Deployment](#deployment)
 
-# <a name="Configuration"></a>Configuration
+# Configuration
 
 There are a number of configuration variables that need to be defined before running the plugin. These can be set as environment variables inside the .env file present in the root directory of the plugin.
 
 For multiple environments you should use unique values per environment.
 
-## <a name="EnvironmentProperties"></a>Environment Properties
+## Environment Properties
 
 Variables that begin with 'CT' prefix are Commercetools project specific properties.
 
@@ -38,9 +38,9 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 | PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME     | Numeric value between 1-24                                                            | Provide the number of hours that saved card attempts are counted (Max of 24 hours). By default this value is set to 1, applicable only if rate limiter is enabled                           |
 | PAYMENT_GATEWAY_DECISION_SYNC              | Boolean value - true or false                                                         | Flag for enabling or disabling Decision sync. Case sensitive                                                         |
 | PAYMENT_GATEWAY_RUN_SYNC                   | Boolean value - true or false                                                         | Flag for enabling or disabling Run sync. Case sensitive                                                              |
-| AWS_ACCESS_KEY_ID                          | AWS Access Key ID                                                            | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials). Required when deploying on AWS                                     |
-| AWS_SECRET_ACCESS_KEY                            | AWS Secret Key                                                           | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials). Required when deploying on AWS                                   |
-| AWS_REGION                           | AWS Region Name                                                          | Provided by AWS. Required when deploying on AWS                                    |
+| AWS_ACCESS_KEY_ID                          | AWS Access Key ID                                                            | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials). Required when running Docker container in AWS                                     |
+| AWS_SECRET_ACCESS_KEY                            | AWS Secret Key                                                           | Provided by AWS in [AWS-Serverless-Deployment\#AWSSecurityCredentials](AWS-Serverless-Deployment.md#AWSSecurityCredentials). Required when running Docker container in AWS                                   |
+| AWS_REGION                           | AWS Region Name                                                          | Provided by AWS. Required when running Docker container in AWS                                    |
 | PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS             | Boolean value - true or false                                                         | Set the value to true to get AWS Cloudwatch logs. Case sensitive.                                                         |
 | PAYMENT_GATEWAY_ENABLE_SERVERLESS_DEPLOYMENT | Boolean value - true or false | Set the value to true when the plugin is hosted using any serverless deployments.
 | CT_PROJECT_KEY                             | Project key for your Commercetools project                                            | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
@@ -49,7 +49,7 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 | CT_AUTH_HOST                               | Commercetools auth server URL                                                         | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
 | CT_API_HOST                                | Commercetools API server URL                                                          | Created in <a href="Key-Creation.md">Key Creation</a>                                                                  |
 
-# <a name="Deployment"></a>Deployment
+# Deployment
 
 The Commercetools - Cybersource plugin is a typescript project which is built using cybersource-rest-client npm package and other several node packages.
 

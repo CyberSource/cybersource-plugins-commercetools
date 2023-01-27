@@ -15,14 +15,14 @@ To deploy Docker containers on ECS, you must meet the following requirements:
 
 ## Creation of AWS Security Credentials
  
-  To generate AWS Security Credentials, Refer [AWS-Security-Credentials](AWS-Serverless-Deployment.md#a-name"awssecuritycredentials"aaws-security-credentials)
+  To generate AWS Security Credentials, Refer [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials)
 
 
 
 
 ## Run an application on ECS
 
-If you have created AWS Security Credentials by referring [AWS-Security-Credentials](AWS-Serverless-Deployment.md#a-name"awssecuritycredentials"aaws-security-credentials), then by default it will have all the permissions to run Compose application since it is a root user. 
+If you have created AWS Security Credentials by referring [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials), then by default it will have all the permissions to run Compose application since it is a root user. 
 If you are using IAM user, ensure that the user has all the required permissions. Refer [docker-ecs-integration](https://docs.docker.com/cloud/ecs-integration/#run-an-application-on-ecs) to check the list of permissions to be granted.
 
 ### Configure AWS CLI
@@ -166,10 +166,13 @@ DNS name will available in AWS console under respective LoadBalancer details in 
 
 ## Loggers in AWS Cloudwatch
 
-To generate loggers in AWS cloudwatch service, Refer [Loggers-in-AWS-Cloudwatch](AWS-Serverless-Deployment.md#loggers-in-aws-cloudwatch)
+You can see all your logs in AWS Cloudwatch, for that you need to perform below steps.
+
+- Provide your AWS Access Key ID ,Secret Key and AWS Region Name in .env file. (Refer [API-Extension-Setup](API-Extension-Setup.md))
+- Pass the value as `true` for the ENV variable `PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md))
 
 ## Troubleshoot
- - When using `docker compose up` command, if you get the following error "`pulling from host <accountId>.dkr.ecr.<region>.amazonaws.com failed with status code [manifests latest]: 403 Forbidden`", it means that authentication is expired. Refer [Authenticate-to-default-registry](#step2authenticate-to-your-default-registry) to authenticate again.
+ - When using `docker compose up` command, if you get the following error "`pulling from host <accountId>.dkr.ecr.<region>.amazonaws.com failed with status code [manifests latest]: 403 Forbidden`", it means that authentication is expired. Refer [Authenticate-to-default-registry](#step-2-authenticate-the-docker-cli-to-your-default-registry) to authenticate again.
 
  - It's better to use `PowerShell` if any of the above commands are not working or not retrieving the data in cmd terminal.
 

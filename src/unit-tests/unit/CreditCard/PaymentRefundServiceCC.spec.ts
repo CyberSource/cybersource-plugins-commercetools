@@ -1,8 +1,3 @@
-/* eslint-disable sort-imports */
-/* eslint-disable functional/immutable-data */
-/* eslint-disable functional/no-let */
-/* eslint-disable prefer-const */
-/* eslint-disable import/order */
 import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();

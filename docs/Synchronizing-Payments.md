@@ -2,7 +2,7 @@
 
 ## Overview
 
-Synchronizing payments uses the [Cybersource Transaction Search API](https://developer.cybersource.com/api/developer-guides/dita-txn-search-details-rest-api-dev-guide-102718/txn-search-intro.html) and the [Conversion Detail API](https://developer.cybersource.com/api/developer-guides/dita-reporting-rest-api-dev-guide-102718/reporting_api/reporting-ondemand-detail-download.html) to search for transactions that contain a possible Commercetools Payment Id, and then compares the transaction against the Commercetools payment. if found creating or updating transactions on the Commercetools payment if required.
+Synchronizing payments uses the [Cybersource Transaction Search API](https://developer.cybersource.com/docs/cybs/en-us/txn-search/developer/all/rest/txn-search/txn-search-intro.html) and the [Conversion Detail API](https://developer.cybersource.com/docs/cybs/en-us/reporting/developer/all/rest/reporting/reporting_api/reporting-ondemand-detail-download.html) to search for transactions that contain a possible Commercetools Payment Id, and then compares the transaction against the Commercetools payment. if found creating or updating transactions on the Commercetools payment if required.
 
 This process is required for a few reasons:
 

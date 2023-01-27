@@ -29,7 +29,7 @@ For the Commercetools Plugin to support MOTO transaction, follow the steps menti
 
         Skip this step when using a saved token for a Credit Card payment method and proceed to step 3
 
-    a. Create a Commercetools payment (https://docs.commercetools.com/http-api-projects-payments) and populate the following
+    a. Create a Commercetools payment (https://docs.commercetools.com/api/projects/payments) and populate the following
 
     | Property                           | Value                               | Required  | Notes                                                                                                                                                                                                                                                                                                              |
     | ---------------------------------- | ----------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -46,7 +46,7 @@ For the Commercetools Plugin to support MOTO transaction, follow the steps menti
 
     c. Use the Flex Microform 0.11 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Flex Microform JS to tokenize a credit card
 
-3.  For saved token of a Credit Card payment method, create a Commercetools payment (https://docs.commercetools.com/http-api-projects-payments) and populate the following
+3.  For saved token of a Credit Card payment method, create a Commercetools payment (https://docs.commercetools.com/api/projects/payments) and populate the following
 
     | Property                              | Value                               | Required  | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
     | ------------------------------------- | ----------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,12 +62,12 @@ For the Commercetools Plugin to support MOTO transaction, follow the steps menti
     | custom.fields.isv_cardType            | Credit card type                    | No        | custom.fields.isv_tokens's "cardType" value from Customer object. <br>Not required by plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
     | custom.fields.isv_cardExpiryMonth     | Card expiry month                   | No        | custom.fields.isv_tokens's "cardExpiryMonth" value from Customer object <br>Not required by plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
     | custom.fields.isv_cardExpiryYear      | Card expiry year                    | No        | custom.fields.isv_tokens's "cardExpiryYear" value from Customer object <br>Not required by plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#a-namedevicefingerprintingadevice-fingerprinting) to generate this value |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_saleEnabled         | false                               | No        | Set the value to true if sale has to be performed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
     Also see [Decision Manager](Decision-Manager.md) for additional fields to be populated if you are using Decision Manager
 
-4.  For Visa Click to Pay, Google Pay, Apple Pay and eCheck create a Commercetools payment (https://docs.commercetools.com/http-api-projects-payments) and populate the required fields mentioned in the respective documents
+4.  For Visa Click to Pay, Google Pay, Apple Pay and eCheck create a Commercetools payment (https://docs.commercetools.com/api/projects/payments) and populate the required fields mentioned in the respective documents
 
     - [Process a Payment With Click to Pay](Process-a-Payment-ClicktoPay.md)
     - [Process a Payment With Google Pay](Process-a-Payment-GooglePay.md)
@@ -83,7 +83,7 @@ For the Commercetools Plugin to support MOTO transaction, follow the steps menti
 
 5.  Add the payment to the cart
 
-6.  Update the Commercetools payment (<https://docs.commercetools.com/http-api-projects-payments>) with the fields mentioned in the step 5 of [Process a Payment Without Payer Authentication](Process-a-Payment-Without-Payer-Authentication.md) along with the below data
+6.  Update the Commercetools payment (<https://docs.commercetools.com/api/projects/payments>) with the fields mentioned in the step 5 of [Process a Payment Without Payer Authentication](Process-a-Payment-Without-Payer-Authentication.md) along with the below data
 
     | Property                      | Value                            | Required | Notes                                                                                                   |
     | ----------------------------- | -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
@@ -114,7 +114,7 @@ For the Commercetools Plugin to support MOTO transaction, follow the steps menti
 
     b. If the state of the transaction is updated to **Pending** which is due to Fraud Check, create an order in Commercetools and display the order confirmation page
 
-    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#Errorhandling) for handling errors or failures
+    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#error-handling) for handling errors or failures
 
 ## Stored values
 

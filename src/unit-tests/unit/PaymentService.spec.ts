@@ -1,5 +1,3 @@
-/* eslint-disable sort-imports */
-/* eslint-disable import/order */
 import test from  'ava';
 import dotenv from 'dotenv';
 dotenv.config();

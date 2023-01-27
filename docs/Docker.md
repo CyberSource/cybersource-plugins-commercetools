@@ -21,7 +21,7 @@ Before using it, make sure to install Docker Desktop in the respective system.
 
      docker run -e <env variables> -p <hostport>:<containerport> -d <imagename>
      
-     Example: docker run -e CT_PROJECT_KEY=xxx -e CT_CLIENT_ID=xxx -p 3505:3505 sample
+     Example: docker run -e CT_PROJECT_KEY=xxx -e CT_CLIENT_ID=xxx -p 3505:3505 -d sample
 
     
   - `env variables` are the key value pairs present in env file, Refer
@@ -32,7 +32,7 @@ Before using it, make sure to install Docker Desktop in the respective system.
   **_Note_**: If you build the image along with env variables settings, then no need to specify the env variables while running docker image
 
 ## Running the Docker image in AWS
- To run the docker image in AWS, refer the following guide [Docker-Container-in-AWS](Docker-Container-in-AWS)
+ To run the docker image in AWS, refer the following guide [Docker-Container-in-AWS](Docker-Container-in-AWS.md)
 
 
        

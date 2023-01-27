@@ -33,7 +33,7 @@ After authentication is complete, authorization of the payment can then be tri
 
         Skip this step when using a saved token and proceed to step 3
 
-    a. Create a Commercetools payment (https://docs.commercetools.com/http-api-projects-payments) and populate the following
+    a. Create a Commercetools payment (https://docs.commercetools.com/api/projects/payments) and populate the following
 
     | Property                           | Value                               | Required  | Notes                                                                                                                                                               |
     | ---------------------------------- | ----------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -51,7 +51,7 @@ After authentication is complete, authorization of the payment can then be tri
 
     c. Use the Flex Microform 0.11 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Flex Microform JS to tokenize a credit card
 
-3.  For saved token, create a Commercetools payment (https://docs.commercetools.com/http-api-projects-payments) and populate the following
+3.  For saved token, create a Commercetools payment (https://docs.commercetools.com/api/projects/payments) and populate the following
 
     | Property                           | Value                               | Required  | Notes                                                                                                                                                               |
     | ---------------------------------- | ----------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -68,7 +68,7 @@ After authentication is complete, authorization of the payment can then be tri
 
 4.  Add the payment to the cart
 
-5.  Update the Commercetools payment (<https://docs.commercetools.com/http-api-projects-payments>) and populate the following
+5.  Update the Commercetools payment (<https://docs.commercetools.com/api/projects/payments>) and populate the following
 
     a. Also see [Decision Manager](Decision-Manager.md) for additional fields to populate if you are using Decision Manager
 
@@ -84,7 +84,7 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_cardType            | Credit card type               | No        | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.type field containing the card type <br><br> Not required by the plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
     | custom.fields.isv_cardExpiryMonth     | Card expiry month              | No        | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.expirationMonth field containing the card type <br><br> Not required by the plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                          |
     | custom.fields.isv_cardExpiryYear      | Card expiry year               | No        | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a data.expirationYear field containing the card type <br><br> Not required by the plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#a-namedevicefingerprintingadevice-fingerprinting) to generate this value |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_saleEnabled         | false                         | Yes       | Set the value to true if sale is enabled                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 
@@ -96,7 +96,7 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_cardType            | Credit card type               | No       | custom.fields.isv_tokens's "cardType" value from Customer object <br>Not required by the plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
     | custom.fields.isv_cardExpiryMonth     | Card expiry month              | No       | custom.fields.isv_tokens's "cardExpiryMonth" value from Customer object <br>Not required by the plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
     | custom.fields.isv_cardExpiryYear      | Card expiry year               | No       | custom.fields.isv_tokens's "cardExpiryYear" value from Customer object <br>Not required by the plugin but can be used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | Yes      | Refer [Device Fingerprinting](./Decision-Manager.md#a-namedevicefingerprintingadevice-fingerprinting) to generate this value |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | Yes      | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     
     
 
@@ -173,7 +173,7 @@ After authentication is complete, authorization of the payment can then be tri
 
     b. If the state of the transaction is updated to **Pending** which is due to Fraud, display the order confirmation page
 
-    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#Errorhandling) for handling errors or failures
+    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#error-handling) for handling errors or failures
 
 ## Stored values
 

@@ -1,7 +1,3 @@
-/* eslint-disable functional/immutable-data */
-/* eslint-disable no-var */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable import/order */
 import test from 'ava';
 import dotenv from 'dotenv';
 

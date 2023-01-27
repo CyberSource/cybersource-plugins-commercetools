@@ -109,4 +109,4 @@ export const paymentResponses =  {
     }
 }
 
-    
+export const paymentId = 'c134385b-0753-423a-a3ff-20fec1ab088d'

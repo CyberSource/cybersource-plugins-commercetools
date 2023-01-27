@@ -1,5 +1,3 @@
-/* eslint-disable functional/immutable-data */
-/* eslint-disable no-var */
 import test from 'ava';
 import dotenv from 'dotenv';
 
