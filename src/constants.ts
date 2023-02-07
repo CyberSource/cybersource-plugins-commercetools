@@ -122,7 +122,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
   static readonly PAYMENT_GATEWAY_JWT_FORMAT = 'JWT';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'YBBY8SIG';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'J88PJQQT';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
