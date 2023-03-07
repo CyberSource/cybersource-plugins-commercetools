@@ -104,8 +104,8 @@ const authorizationHandler = async (updatePaymentObj, updateTransactions) => {
             Constants.ISV_TOKEN_VERIFICATION_CONTEXT in updatePaymentObj.custom.fields &&
             null != updatePaymentObj.custom.fields.isv_tokenVerificationContext &&
             Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_tokenVerificationContext) ||
-          (paymentMethod != Constants.CREDIT_CARD &&
-            paymentMethod != Constants.CC_PAYER_AUTHENTICATION &&
+          (Constants.CREDIT_CARD != paymentMethod   &&
+            Constants.CC_PAYER_AUTHENTICATION != paymentMethod  &&
             Constants.ISV_TOKEN_VERIFICATION_CONTEXT in updatePaymentObj.custom.fields &&
             null != updatePaymentObj.custom.fields.isv_tokenVerificationContext &&
             Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_tokenVerificationContext)
@@ -411,7 +411,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj) => {
         if (null != paymentResponse && null != paymentResponse.httpCode) {
           authResponse = paymentService.payerEnrollActions(paymentResponse, updatePaymentObj);
           if (null != authResponse) {
-            if (paymentResponse.httpCode == Constants.HTTP_CODE_TWO_HUNDRED_ONE && !paymentResponse.data.hasOwnProperty(Constants.ERROR_INFORMATION)) {
+            if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && !paymentResponse.data.hasOwnProperty(Constants.ERROR_INFORMATION)) {
               authResponse.actions.push({
                 action: Constants.ADD_INTERFACE_INTERACTION,
                 type: {
@@ -432,7 +432,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj) => {
               });
             }
             if (
-              paymentResponse.httpCode == Constants.HTTP_CODE_TWO_HUNDRED_ONE &&
+              Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
               paymentResponse.data.hasOwnProperty(Constants.ERROR_INFORMATION) &&
               Constants.VAL_ZERO < Object.keys(paymentResponse.data.errorInformation).length &&
               paymentResponse.data.errorInformation.hasOwnProperty(Constants.STRING_REASON) &&
@@ -749,7 +749,7 @@ const applePaySessionHandler = async (fields) => {
           keyData = await getCertificatesData(key);
           if(Constants.HTTP_CODE_TWO_HUNDRED == certData.status && null != certData.data && Constants.HTTP_CODE_TWO_HUNDRED == keyData.status && null != keyData.data){
             httpsAgent = new https.Agent({
-            rejectUnauthorized: false,
+            rejectUnauthorized: true,
             cert: certData.data,
             key: keyData.data,
            });
@@ -761,7 +761,7 @@ const applePaySessionHandler = async (fields) => {
       }
       else{
         httpsAgent = new https.Agent({
-          rejectUnauthorized: false,
+          rejectUnauthorized: true,
           cert: fs.readFileSync(cert),
           key: fs.readFileSync(key),
         });
@@ -1716,7 +1716,7 @@ const runSyncAddTransaction = async (syncUpdateObject, reasonCode, authPresent, 
         for (let element of transactionSummaries) {
           applications = element.applicationInformation.applications;
           for (let application of applications) {
-            if (application.name == Constants.STRING_SYNC_AUTH_REVERSAL_NAME) {
+            if (Constants.STRING_SYNC_AUTH_REVERSAL_NAME == application.name) {
               if (Constants.VAL_THIRTY_SIX == element.clientReferenceInformation.code.length) {
                 paymentDetails = await commercetoolsApi.retrievePayment(element.clientReferenceInformation.code);
                 if (null != paymentDetails && Constants.STRING_TRANSACTIONS in paymentDetails) {

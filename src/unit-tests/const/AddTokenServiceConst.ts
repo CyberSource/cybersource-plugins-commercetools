@@ -27,7 +27,6 @@ export const addTokenResponseCustomerObj = {
     "email": "spshakshi54@gmail.com",
     "firstName": "shakshi",
     "lastName": "p",
-    "password": "****jsI=",
     "addresses": [
       {
         "id": "Gu_fd8_a",
@@ -99,7 +98,6 @@ export const addInvalidTokenResponseCustomerObj = {
     "email": "spshakshi54@gmail.com",
     "firstName": "shakshi",
     "lastName": "p",
-    "password": "****jsI=",
     "addresses": [
       {
         "id": "Gu_fd8_a",

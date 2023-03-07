@@ -736,7 +736,6 @@ export const deleteTokenCustomerObj =
   "email": "sp@gmail.com",
   "firstName": "Shakshi ",
   "lastName": "Poddar",
-  "password": "****9nM=",
   "addresses": [],
   "shippingAddressIds": [],
   "billingAddressIds": [],

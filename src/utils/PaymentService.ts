@@ -21,7 +21,7 @@ const logData = (fileName, methodName, type, id, message) => {
       return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
     });
   }
-  if(process.env.PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS == Constants.STRING_TRUE){
+  if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS){
     logger = winston.createLogger({
       level: type,
       format: combine(loggingFormat),

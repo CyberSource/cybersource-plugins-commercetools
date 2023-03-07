@@ -48,7 +48,6 @@ import updateToken from '../JSON/updateToken.json';
     "email": "sp54@gmail.com",
     "firstName": "shakshi",
     "lastName": "p",
-    "password": "****C8c=",
     "addresses": [
       {
         "id": "OKxBLnRJ",
