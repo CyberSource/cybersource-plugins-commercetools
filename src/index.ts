@@ -93,7 +93,6 @@ app.get('/orders', async (req, res) => {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_ORDERS, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.ERROR_MSG_NO_ORDER_DETAILS;
   }
-  res.setHeader("Content-Security-Policy", `script-src ${process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL}`);
   res.render('orders', {
     count: orderCount,
     orderList: orderResult,
@@ -167,7 +166,6 @@ app.get('/paymentdetails', async (req, res) => {
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
   }
-  res.setHeader("Content-Security-Policy", `script-src ${process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL}`);
   res.render('paymentdetails', {
     id: convertedPaymentId,
     payments: paymentDetails,
