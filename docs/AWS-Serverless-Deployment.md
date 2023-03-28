@@ -116,3 +116,5 @@ You can see all your logs in AWS Cloudwatch, for that you need to pass the value
           [default]
           aws_access_key_id=${Your access key ID}
           aws_secret_access_key=${Your secret access key}
+
+3. If you are getting "Internal server error" while running sync service, increase the timeout of your API gateway to 30 seconds in serverless.yml file or in General Configuration of Lambda Function of AWS Console to avoid such error.

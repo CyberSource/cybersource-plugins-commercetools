@@ -854,5 +854,5 @@ export default {
   invalidInputResponse,
   roundOff,
   encryption,
-  decryption
+  decryption,
 };

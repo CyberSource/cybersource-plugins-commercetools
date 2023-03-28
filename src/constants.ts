@@ -53,6 +53,7 @@ export abstract class Constants {
   static readonly FUNC_GET_PAYER_AUTH_SETUP_RESPONSE = 'FuncGetPayerAuthSetUpResponse';
   static readonly FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE = 'FuncGetPayerAuthValidateResponse';
   static readonly FUNC_GET_TRANSACTION_SEARCH_RESPONSE = 'FuncGetTransactionSearchResponse';
+  static readonly FUNC_GET_TRANSACTION_SUMMARIES = 'FuncGetTransactionSummaries';
   static readonly FUNC_GET_SERVICE_RESPONSE = 'FuncGetOMServiceResponse';
   static readonly FUNC_GET_UPDATE_TOKEN_ACTIONS = 'FuncGetUpdateTokenActions';
   static readonly FUNC_GET_VISA_CHECKOUT_DATA = 'FuncGetVisaCheckoutData';
@@ -93,6 +94,7 @@ export abstract class Constants {
   static readonly VAL_FLOAT_ZERO = 0.0;
   static readonly VAL_ONE = 1;
   static readonly VAL_TWO = 2;
+  static readonly VAL_THREE = 3;
   static readonly VAL_TWELVE = 12;
   static readonly VAL_TWENTY_THREE = 23;
   static readonly VAL_THIRTY_SIX = 36;
@@ -359,12 +361,13 @@ export abstract class Constants {
   static readonly EXCEPTION_MSG_PAYER_AUTH = 'An exception occurred while authenticating the payment';
   static readonly EXCEPTION_MSG_SERVICE_PROCESS = 'An exception occurred while processing your payment';
   static readonly EXCEPTION_MSG_SYNC_DETAILS = 'An exception occurred while fetching sync conversion details';
+  static readonly EXCEPTION_MSG_TRANSACTION_SEARCH = 'An exception occurred while retrieving the transaction details';
 
   //Error messges
   static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
   static readonly ERROR_MSG_APPLICATION_DETAILS = 'Unable to fetch transaction application details';
   static readonly ERROR_MSG_APPLE_PAY_CERTIFICATES = 'Please provide certificates paths for Apple Pay in configuration file';
-  static readonly ERROR_MSG_ACCESSING_CERTIFICATES = 'An error occured while accessing ApplePay Certificates';
+  static readonly ERROR_MSG_ACCESSING_CERTIFICATES = 'An error occurred while accessing ApplePay Certificates';
   static readonly ERROR_MSG_EMPTY_PAYMENT_DATA = 'There was an error while fetching payment details';
   static readonly ERROR_MSG_EMPTY_TRANSACTION_DETAILS = 'There was an error while fetching transaction details, please try again';
   static readonly ERROR_MSG_ENABLE_SYNC = 'Please enable Run sync';
@@ -410,6 +413,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_UPDATE_CART = 'Unable to update the cart';
   static readonly ERROR_MSG_UPDATE_CUSTOM_TYPE = 'There was an error updating custom type';
   static readonly ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA = 'Unable to update click to pay card details';
+  static readonly ERROR_MSG_RETRY_TRANSACTION_SEARCH = 'Missing transaction details';
 
   //script data
   static readonly PAYMENT_CREATE_DESTINATION_URL = '/api/extension/payment/create';
