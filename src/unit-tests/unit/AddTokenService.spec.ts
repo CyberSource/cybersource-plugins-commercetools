@@ -1,4 +1,3 @@
-/* eslint-disable sort-imports */
 import test from 'ava';
 
 import dotenv from 'dotenv';
@@ -35,7 +34,5 @@ test.serial("Get response of add token and check status", async(t)=>{
     {
         t.not(paymentResponse.status, 'AUTHORIZED')
     }
-   
-
 })
 

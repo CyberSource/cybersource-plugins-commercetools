@@ -1,6 +1,3 @@
-/* eslint-disable sort-imports */
-/* eslint-disable functional/immutable-data */
-/* eslint-disable import/order */
 import test from 'ava';
 import dotenv from  'dotenv';
 
@@ -21,14 +18,11 @@ test.serial('Check http code for Payer auth set up with invalid token ', async(t
 })
   
   test.serial('Check status for payer auth set up with invalid token' , async (t)=>{
-    
-    t.not(paymentResponseObject.status, 'COMPLETED');
-
-  })
+   t.not(paymentResponseObject.status, 'COMPLETED');
+ })
 
   test.serial('Check http code for Payer auth set up with saved token ', async(t)=>{
-    
-      const result:any = await setupService.payerAuthSetupResponse(paymentSavedTokens, cardTokensObjects);
+    const result:any = await setupService.payerAuthSetupResponse(paymentSavedTokens, cardTokensObjects);
       paymentResponseObject.httpCode = result.httpCode;
       paymentResponseObject.status = result.status;
       if(paymentResponseObject.httpCode == 201)
@@ -50,22 +44,18 @@ test.serial('Check status for payer auth set up with saved token' , async (t)=>{
   {
     t.not(paymentResponseObject.status, 'COMPLETED');
   }
-
 })
 
   
 test.serial('Check http code for Payer auth set up with invalid customer', async(t)=>{
-    
-  const result:any = await setupService.payerAuthSetupResponse(paymentSavedTokens, cardTokensInvalidCustomerObjects);
+ const result:any = await setupService.payerAuthSetupResponse(paymentSavedTokens, cardTokensInvalidCustomerObjects);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, 201);
 })
 
 test.serial('Check status for payer auth set up with invalid customer' , async (t)=>{
-
 t.not(paymentResponseObject.status, 'COMPLETED');
-
 })
 
 

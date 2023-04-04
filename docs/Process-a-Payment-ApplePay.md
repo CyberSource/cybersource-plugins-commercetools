@@ -10,7 +10,7 @@
 
     a. Ensure your cart locale is set
 
-2.  Create a Commercetools payment (<https://docs.commercetools.com/http-api-projects-payments>) and
+2.  Create a Commercetools payment (<https://docs.commercetools.com/api/projects/payments>) and
     populate the following
 
     | Property                              | Value                               | Required  | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -22,14 +22,14 @@
     | paymentMethodInfo.method              | applePay                            | Yes       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
     | custom.type.key                       | isv_payment_data                    | Yes       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
     | custom.fields.isv_token               | Apple Pay payment data              | Yes       | Obtain the base64encode value for payment token field on a successful payment authorized event for apple Pay                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | No        | Refer [Device Fingerprinting](./Decision-Manager.md#a-namedevicefingerprintingadevice-fingerprinting) to generate this value |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | No        | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_customerIpAddress   | Customer IP address                 | Yes       | Populated from client-side libraries                                                                                          |
 3.  You can optionally obtain the session data for <b>Web integration</b> to pass the merchant session object to your Apple Pay session’s completeMerchantValidation method by creating a payment with the following
 
     Note that you can skip this step for Native App integration
 
     a. Create a Commercetools payment
-        (https://docs.commercetools.com/http-api-projects-payments) and
+        (https://docs.commercetools.com/api/projects/payments) and
         populate the following
 
     | Property                                | Value                                           | Required  | Notes                                                                                                                                                                                                                                                                          |
@@ -46,12 +46,12 @@
 
     b. Verify the custom.fields.isv_applePaySessionData has data from the update response. If the data exists, pass the merchant session object to your Apple Pay session’s completeMerchantValidation method. You can use the merchant session object a single time. It expires five minutes after it is created, see [Providing Merchant Validation](https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation), else throw error to the customer.
 
-    c. Update the Commercetools payment (<https://docs.commercetools.com/http-api-projects-payments>) and populate the following
+    c. Update the Commercetools payment (<https://docs.commercetools.com/api/projects/payments>) and populate the following
 
     | Property                              | Value                          | Required | Notes                                                                                                                                                                                                                                                                                                                                  |
     | ------------------------------------- | ------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
     | custom.fields.isv_token               | Apple Pay payment data         | Yes      | Obtain the base64encode value of payment token field on a successful payment processing event for apple Pay                                                                                                                                                                                                                  |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | No      | Refer [Device Fingerprinting](./Decision-Manager.md#a-namedevicefingerprintingadevice-fingerprinting) to generate this value |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | No      | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_customerIpAddress   | Customer IP address            | Yes      | Populated from client-side libraries                                                                                                                                                                                                                                                                                                   |
     | custom.fields.isv_saleEnabled               | false             | Yes       | Set the value to true if sale is enabled                                                                                                                                                                                                    |
     | custom.fields.isv_walletType                | Wallet type | No  |   This value is required if walletType is to be passed in authorization. Refer [Cybersource Processing a Payment](https://developer.cybersource.com/api-reference-assets/index.html#payments_payments_process-a-payment) for more information about the wallet type value to be passed. It is supported only for ApplePay, ClicktoPay and GooglePay payment methods|
@@ -85,4 +85,4 @@
 
     b. If the state of the transaction is updated to **Pending** which is due to Fraud Check, display the order confirmation page 
 
-    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#Errorhandling) for handling errors or failures
+    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#error-handling) for handling errors or failures

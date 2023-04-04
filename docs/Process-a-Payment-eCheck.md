@@ -17,7 +17,7 @@ Make sure the checkout page is setup to collect all the required information fro
 2. Enter the account number, account type and routing number
 
 3.  Create a Commercetools payment
-    (https://docs.commercetools.com/http-api-projects-payments) and
+    (https://docs.commercetools.com/api/projects/payments) and
     populate the following
 
     | Property                              | Value                               | Required  | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -50,4 +50,4 @@ Make sure the checkout page is setup to collect all the required information fro
 
     b. If the state of the transaction is updated to **Pending** which is due to Fraud Check, display the order confirmation page
 
-    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#Errorhandling) for handling errors or failures
+    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#error-handling) for handling errors or failures

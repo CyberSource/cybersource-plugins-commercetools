@@ -16,9 +16,9 @@ const keys = async () => {
   const format = Constants.PAYMENT_GATEWAY_JWT_FORMAT;
   try {
     const apiClient = new restApi.ApiClient();
-    if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.TEST_ENVIRONMENT) {
+    if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
       runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-    } else if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.LIVE_ENVIRONMENT) {
+    } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
       runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
     }
     const configObject = {
@@ -37,7 +37,7 @@ const keys = async () => {
     requestObj.targetOrigin = process.env.PAYMENT_GATEWAY_TARGET_ORIGIN;
 
     if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_DEBUG, null, Constants.FLEX_KEYS_REQUEST + JSON.stringify(requestObj));
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, null, Constants.FLEX_KEYS_REQUEST + JSON.stringify(requestObj));
     }
 
     const instance = new restApi.KeyGenerationApi(configObject, apiClient);

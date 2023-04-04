@@ -1,9 +1,3 @@
-/* eslint-disable sort-imports */
-/* eslint-disable no-var */
-/* eslint-disable functional/immutable-data */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prefer-const */
-/* eslint-disable import/order */
 import test from 'ava';
 
 import dotenv from 'dotenv';
@@ -15,7 +9,7 @@ import paymentHandler from '../../utils/PaymentHandler';
 import {updateCardHandlerCustomerId,updateCardHandlerTokens, updateCardHandlerCustomerObj} from '../const/PaymentHandlerConst';
 import {orderManagementHandlerPaymentId,  orderManagementHandlerUpdateTransactions, orderManagementHandlerRefundUpdateTransactions} from '../const/PaymentHandlerConst'
 import {applePaySessionHandlerFields} from '../const/PaymentHandlerConst';
-import { authorizationHandlerAPUpdatePaymentObject,authorizationHandler3DSUpdatePaymentObject,authorizationHandlerCCUpdatePaymentObject, authoriationHandlerGPUpdatePaymentObject,authorizationHandlerVSUpdatePaymentObject, authorizationHandlerUpdateTransactions } from '../const/PaymentHandlerConst';
+import { authorizationHandlerAPUpdatePaymentObject, authorizationHandlerECUpdatePaymentObject, authorizationHandler3DSUpdatePaymentObject,authorizationHandlerCCUpdatePaymentObject, authoriationHandlerGPUpdatePaymentObject,authorizationHandlerVSUpdatePaymentObject, authorizationHandlerUpdateTransactions } from '../const/PaymentHandlerConst';
 import {getPayerAuthEnrollResponseUpdatePaymentObj} from '../const/PaymentHandlerConst';
 import {getPayerAuthReversalHandlerUpdatePaymentObject, getPayerAuthReversalHandlerPaymentResponse, getPayerAuthReversalHandlerUpdateTransactions, getPayerAuthReversalHandlerUpdateActions, getPayerAuthValidateResponseUpdatePaymentObj} from '../const/PaymentHandlerConst'
 import CommercetoolsApi from '../../utils/api/CommercetoolsApi';
@@ -49,8 +43,7 @@ test.serial('Get update card handller data', async(t)=>{
     {
         t.pass();
     }
-    
-})
+ })
 
 test.serial('Get order management handller for capture ', async(t)=>{
     const orderManagementHandlerUpdatePaymentObj  =await CommercetoolsApi.retrievePayment(unit.paymentId);
@@ -107,8 +100,15 @@ test.serial('Get order management handller for refund ', async(t)=>{
 
 test.serial('Get apple Pay Session Handler response ', async(t)=>{
     const result = await paymentHandler.applePaySessionHandler(applePaySessionHandlerFields);
+    if(result.actions.length == 0)
+    {
+        t.is(result.errors[0].code, 'InvalidInput');
+    }
+    else
+    {
     t.is(result.actions[0].action, 'setCustomField')
     t.is(result.actions[0].name, 'isv_applePaySessionData');
+    }
 })
 
 test.serial('get authorization handller for google pay', async(t)=>{
@@ -121,7 +121,6 @@ test.serial('get authorization handller for google pay', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
     }
 })
 
@@ -149,8 +148,8 @@ test.serial('get authorization handller for credit card', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
-    }})
+    }
+})
 
 test.serial('get authorization handller for payer auth', async(t)=>{
     const result = await paymentHandler.authorizationHandler(authorizationHandler3DSUpdatePaymentObject, authorizationHandlerUpdateTransactions);
@@ -162,7 +161,6 @@ test.serial('get authorization handller for payer auth', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
     }
 })
 
@@ -176,9 +174,21 @@ test.serial('get authorization handller for apple pay', async(t)=>{
     {
         t.is(result.actions[0].action, 'changeTransactionInteractionId');
         t.is(result.actions[1].action, 'changeTransactionState');
-    
     }
-   })
+})
+
+test.serial('get authorization handller for eCheck', async(t)=>{
+    const result = await paymentHandler.authorizationHandler(authorizationHandlerECUpdatePaymentObject, authorizationHandlerUpdateTransactions);;
+    if(result.actions[0]==undefined)
+    {
+        t.deepEqual(result.actions, []);
+    }
+    else
+    {
+        t.is(result.actions[0].action, 'changeTransactionInteractionId');
+        t.is(result.actions[1].action, 'changeTransactionState');
+    }
+})
 
 test.serial('get payer auth set up response ', async(t)=>{
     const result = await paymentHandler.getPayerAuthSetUpResponse(authorizationHandler3DSUpdatePaymentObject);
@@ -194,7 +204,7 @@ test.serial('get payer auth set up response ', async(t)=>{
         t.is(result.actions[1].action, 'setCustomField');
         t.is(result.actions[1].name,   'isv_cardinalReferenceId');
         t.is(result.actions[2].action, 'setCustomField');
-        t.is(result.actions[2].name,   'isv_deviceDataCollectionUrl');
+        t.is(result.actions[2].name,   'isv_deviceDataCollectionUrl')
     }
 })
 

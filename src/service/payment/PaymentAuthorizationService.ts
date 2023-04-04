@@ -27,9 +27,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       locale = selectedLocale[Constants.VAL_ZERO];
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.CreatePaymentRequest();
-      if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.TEST_ENVIRONMENT) {
+      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.LIVE_ENVIRONMENT) {
+      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
       }
       const configObject = {
@@ -328,9 +328,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
         if (Constants.STRING_ENROLL_CHECK == service){
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST +JSON.stringify(requestObj));
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST +JSON.stringify(requestObj));
          }else{
-           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST +JSON.stringify(requestObj));
+           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST +JSON.stringify(requestObj));
          }
        }
 

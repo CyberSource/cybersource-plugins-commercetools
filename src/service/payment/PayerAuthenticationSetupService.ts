@@ -21,9 +21,9 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
     if (null != payment) {
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.PayerAuthSetupRequest();
-      if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.TEST_ENVIRONMENT) {
+      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.LIVE_ENVIRONMENT) {
+      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
       }
       const configObject = {
@@ -59,7 +59,7 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
       }
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_REQUEST +JSON.stringify(requestObj));
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_REQUEST +JSON.stringify(requestObj));
       }
 
       const instance = new restApi.PayerAuthenticationApi(configObject, apiClient);

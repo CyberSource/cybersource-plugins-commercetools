@@ -48,7 +48,6 @@ import updateToken from '../JSON/updateToken.json';
     "email": "sp54@gmail.com",
     "firstName": "shakshi",
     "lastName": "p",
-    "password": "****C8c=",
     "addresses": [
       {
         "id": "OKxBLnRJ",
@@ -491,7 +490,7 @@ import updateToken from '../JSON/updateToken.json';
         },
         paymentMethodInfo: {
           paymentInterface: 'cybersource',
-          method: 'visaCheckout',
+          method: "clickToPay",
           name: { en: 'Click to Pay' }
         },
         custom: {
@@ -671,6 +670,57 @@ import updateToken from '../JSON/updateToken.json';
         interfaceInteractions: [],
         anonymousId: '033cd1c3-801d-4d2b-9729-fef0064dd3be'
       }
+
+export const authorizationHandlerECUpdatePaymentObject = {
+  "id": "d48e2fbc-8ae8-4f5c-9050-aae5bf0d5fea",
+  "version": 2,
+  "versionModifiedAt": "2023-01-06T09:47:40.393Z",
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2023-01-06T09:47:40.393Z",
+  "lastModifiedAt": "2023-01-06T09:47:40.393Z",
+  "lastModifiedBy": {
+    "clientId": "JHv0zxYXhIeJh_YAAJJpsegK",
+    "isPlatformClient": false,
+    "anonymousId": "e2738776-3238-4d9a-933f-6e41e6c0e941"
+  },
+  "createdBy": {
+    "clientId": "JHv0zxYXhIeJh_YAAJJpsegK",
+    "isPlatformClient": false,
+    "anonymousId": "e2738776-3238-4d9a-933f-6e41e6c0e941"
+  },
+  "amountPlanned": {
+    "type": "centPrecision",
+    "currencyCode": "USD",
+    "centAmount": 6970,
+    "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+    "paymentInterface": "cybersource",
+    "method": "eCheck",
+    "name": {
+      "en": "eCheck"
+    }
+  },
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "id": "230048d9-6594-41a9-854b-77e25ca5610d"
+    },
+    "fields": {
+      "isv_deviceFingerprintId": "e11dac2a-7f5c-4c3a-ac68-828e888d5b49",
+      "isv_accountNumber": "4100",
+      "isv_acceptHeader": "*/*",
+      "isv_accountType": "C",
+      "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+      "isv_customerIpAddress": "49.37.169.255",
+      "isv_routingNumber": "121042882"
+    }
+  },
+  "paymentStatus": {},
+  "transactions": [],
+  "interfaceInteractions": [],
+  "anonymousId": "e2738776-3238-4d9a-933f-6e41e6c0e941"
+}
 
 export const getPayerAuthEnrollResponseUpdatePaymentObj =
 {

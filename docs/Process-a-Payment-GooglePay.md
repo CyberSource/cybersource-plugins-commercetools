@@ -11,7 +11,7 @@
     a. Ensure your cart locale is set
 
 2.  Create a Commercetools payment
-    (https://docs.commercetools.com/http-api-projects-payments) and
+    (https://docs.commercetools.com/api/projects/payments) and
     populate the following
 
     | Property                              | Value                               | Required  | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -23,7 +23,7 @@
     | amountPlanned                         | Amount to be processed                | Yes       | Should match cart gross total, unless split payments are being used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
     | custom.type.key                    | isv_payment_data                    | Yes       |                                                                                                                                                                     |
     | custom.fields.isv_token               | Google Pay payment data             | Yes       | Obtain the base64 encoded value of 'token' field from google Pay paymentData                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#a-namedevicefingerprintingadevice-fingerprinting) to generate this value |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_customerIpAddress | Customer IP address | Yes | Populated from client-side libraries |
     | custom.fields.isv_saleEnabled               | false             | Yes       | Set the value to true if sale is enabled           |
     | custom.fields.isv_walletType                | Wallet type | No  |   This value is required if walletType is to be passed in authorization. Refer [Cybersource Processing a Payment](https://developer.cybersource.com/api-reference-assets/index.html#payments_payments_process-a-payment) for more information about the wallet type value to be passed. It is supported only for ApplePay, ClicktoPay and GooglePay payment methods|  
@@ -58,4 +58,4 @@
 
     b. If the state of the transaction is updated to **Pending** which is due to Fraud Check, display the order confirmation page 
 
-    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#Errorhandling) for handling errors or failures
+    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#error-handling) for handling errors or failures

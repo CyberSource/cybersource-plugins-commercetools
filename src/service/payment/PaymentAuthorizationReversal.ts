@@ -24,9 +24,9 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
     if (null != authReversalId && null != payment) {
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.AuthReversalRequest();
-      if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.TEST_ENVIRONMENT) {
+      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.LIVE_ENVIRONMENT) {
+      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
       }
       const configObject = {
@@ -184,7 +184,7 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
       orderInformation.amountDetails = orderInformationAmountDetails;
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REVERSAL_REQUEST +JSON.stringify(requestObj));
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTH_REVERSAL_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REVERSAL_REQUEST +JSON.stringify(requestObj));
       }
 
       var instance = new restApi.ReversalApi(configObject, apiClient);

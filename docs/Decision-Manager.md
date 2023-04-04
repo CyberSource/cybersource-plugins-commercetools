@@ -20,7 +20,7 @@ Fields which are used by Decision Manager are mapped from Commercetools fields a
 | payment | isv_deviceFingerprintId | deviceInformation_fingerprintSessionId    |  |
 
 
-### <a name="Devicefingerprinting"></a>Device Fingerprinting
+### Device Fingerprinting
 
 Follow the appropriate Cybersource guide for device fingerprinting and add the session Id used for this to the Commercetools payment as a custom field called `isv_deviceFingerprintId`. 
 
@@ -52,7 +52,7 @@ To pass additional data to Decision Manager it is possible to customize your Com
 
 #### Payment
 
-The following is an example of field definitions for the customer IP address and a single merchant defined field. They would need to be added to the base field definitions and any other payment customizations you may already have
+The following is an example of field definitions for the customer IP address. They would need to be added to the base field definitions and any other payment customizations you may already have
 
     {
       "fieldDefinitions": [

@@ -2,6 +2,7 @@ import path from 'path';
 import axios from 'axios';
 import fs from 'fs';
 import https from 'https';
+import { stringify } from 'flatted';
 
 import paymentAuthorization from './../service/payment/PaymentAuthorizationService';
 import paymentService from './../utils/PaymentService';
@@ -89,7 +90,7 @@ const authorizationHandler = async (updatePaymentObj, updateTransactions) => {
             break;
           }
           default: {
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_HANDLER, Constants.LOG_INFO, updatePaymentObj.id,Constants.ERROR_MSG_NO_PAYMENT_METHODS);
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_HANDLER, Constants.LOG_INFO, updatePaymentObj.id, Constants.ERROR_MSG_NO_PAYMENT_METHODS);
             errorFlag = true;
             break;
           }
@@ -103,8 +104,8 @@ const authorizationHandler = async (updatePaymentObj, updateTransactions) => {
             Constants.ISV_TOKEN_VERIFICATION_CONTEXT in updatePaymentObj.custom.fields &&
             null != updatePaymentObj.custom.fields.isv_tokenVerificationContext &&
             Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_tokenVerificationContext) ||
-          (paymentMethod != Constants.CREDIT_CARD &&
-            paymentMethod != Constants.CC_PAYER_AUTHENTICATION &&
+          (Constants.CREDIT_CARD != paymentMethod &&
+            Constants.CC_PAYER_AUTHENTICATION != paymentMethod &&
             Constants.ISV_TOKEN_VERIFICATION_CONTEXT in updatePaymentObj.custom.fields &&
             null != updatePaymentObj.custom.fields.isv_tokenVerificationContext &&
             Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_tokenVerificationContext)
@@ -181,7 +182,7 @@ const getCreditCardResponse = async (updatePaymentObj, customerInfo, cartObj, up
     authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
     if (null != authResponse) {
       if (Constants.APPLE_PAY == updatePaymentObj.paymentMethodInfo.method) {
-        cardDetails = await clickToPay.getVisaCheckoutData(paymentResponse);
+        cardDetails = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj.id);
         if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.HTTP_CODE_TWO_HUNDRED == cardDetails.httpCode && cardDetails.hasOwnProperty(Constants.CARD_FIELD_GROUP) && Constants.VAL_ZERO < Object.keys(cardDetails.cardFieldGroup).length) {
           actions = paymentService.visaCardDetailsAction(cardDetails);
           if (null != actions && Constants.VAL_ZERO < actions.length) {
@@ -241,7 +242,7 @@ const getPayerAuthSetUpResponse = async (updatePaymentObj) => {
         errorFlag = true;
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id,Constants.ERROR_MSG_NO_CARD_DETAILS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_NO_CARD_DETAILS);
       errorFlag = true;
     }
   } catch (exception) {
@@ -252,7 +253,7 @@ const getPayerAuthSetUpResponse = async (updatePaymentObj) => {
     } else {
       exceptionData = Constants.EXCEPTION_MSG_PAYER_AUTH + Constants.STRING_HYPHEN + exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id,exceptionData);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, exceptionData);
     errorFlag = true;
   }
   if (errorFlag) {
@@ -410,7 +411,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj) => {
         if (null != paymentResponse && null != paymentResponse.httpCode) {
           authResponse = paymentService.payerEnrollActions(paymentResponse, updatePaymentObj);
           if (null != authResponse) {
-            if (paymentResponse.httpCode == Constants.HTTP_CODE_TWO_HUNDRED_ONE && !paymentResponse.data.hasOwnProperty(Constants.ERROR_INFORMATION)) {
+            if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && !paymentResponse.data.hasOwnProperty(Constants.ERROR_INFORMATION)) {
               authResponse.actions.push({
                 action: Constants.ADD_INTERFACE_INTERACTION,
                 type: {
@@ -431,7 +432,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj) => {
               });
             }
             if (
-              paymentResponse.httpCode == Constants.HTTP_CODE_TWO_HUNDRED_ONE &&
+              Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
               paymentResponse.data.hasOwnProperty(Constants.ERROR_INFORMATION) &&
               Constants.VAL_ZERO < Object.keys(paymentResponse.data.errorInformation).length &&
               paymentResponse.data.errorInformation.hasOwnProperty(Constants.STRING_REASON) &&
@@ -498,7 +499,7 @@ const getPayerAuthReversalHandler = async (updatePaymentObj, paymentResponse, up
     }
     updateActions = await checkAuthReversalTriggered(updatePaymentObj, cartObj, paymentResponse, updateActions);
   } else {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_REVERSAL_HANDLER, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id,Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PAYER_AUTH_REVERSAL_HANDLER, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
   }
   return updateActions;
 };
@@ -520,7 +521,7 @@ const clickToPayResponse = async (updatePaymentObj, cartObj, updateTransactions,
   if (null != paymentResponse && null != paymentResponse.httpCode) {
     authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
     if (null != authResponse) {
-      visaCheckoutData = await clickToPay.getVisaCheckoutData(paymentResponse);
+      visaCheckoutData = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj.id);
       if (
         Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
         Constants.HTTP_CODE_TWO_HUNDRED == visaCheckoutData.httpCode &&
@@ -538,14 +539,14 @@ const clickToPayResponse = async (updatePaymentObj, cartObj, updateTransactions,
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS);
         }
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id,Constants.ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA);
       }
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id,Constants.ERROR_MSG_SERVICE_PROCESS);
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
       returnResponse.errorFlag = true;
     }
   } else {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id,Constants.ERROR_MSG_SERVICE_PROCESS);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
     returnResponse.errorFlag = true;
   }
   returnResponse.paymentResponse = paymentResponse;
@@ -586,12 +587,57 @@ const googlePayResponse = async (updatePaymentObj, cartObj, updateTransactions, 
       }
     }
   } else {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GOOGLE_PAY_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id,Constants.ERROR_MSG_SERVICE_PROCESS);
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GOOGLE_PAY_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
     returnResponse.errorFlag = true;
   }
   returnResponse.paymentResponse = paymentResponse;
   returnResponse.authResponse = authResponse;
   return returnResponse;
+};
+
+const getTransactionSummaries = async (updatePaymentObj) => {
+  let query = Constants.STRING_EMPTY;
+  let transactionDetail: any;
+  let exceptionData: any;
+  let transactionSummaryObject = {
+    summaries: null,
+    historyPresent: false
+  };
+  let errorData: any;
+  try {
+    query = Constants.PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE + updatePaymentObj.id + Constants.STRING_AND + Constants.STRING_SYNC_QUERY;
+    return await new Promise(async function (resolve, reject) {
+      await setTimeout(async () => {
+        transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, Constants.STRING_SYNC_SORT);
+        if (null != transactionDetail && Constants.HTTP_CODE_TWO_HUNDRED_ONE == transactionDetail.httpCode && transactionDetail?.data?._embedded?.transactionSummaries && Constants.VAL_ONE < transactionDetail.data.totalCount) {
+          transactionSummaryObject.summaries = transactionDetail.data._embedded.transactionSummaries;
+          transactionSummaryObject.historyPresent = true;
+          resolve(transactionSummaryObject);
+        } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SUMMARIES, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_RETRY_TRANSACTION_SEARCH);
+          reject(transactionSummaryObject);
+        }
+      }, 1500);
+    }).catch((error) => {
+      if (typeof error === 'object') {
+        errorData = JSON.stringify(error);
+      } else {
+        errorData = error;
+      }
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SUMMARIES, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_RETRY_TRANSACTION_SEARCH + errorData);
+      return transactionSummaryObject;
+    });
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_TRANSACTION_SEARCH + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_TRANSACTION_SEARCH + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_TRANSACTION_SEARCH + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SUMMARIES, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, exceptionData);
+  }
+  return transactionSummaryObject;
 };
 
 const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResponse, updateActions) => {
@@ -600,7 +646,6 @@ const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResp
   let applications: any;
   let authReversalResponse: any;
   let exceptionData: any;
-  let query = Constants.STRING_EMPTY;
   let authReversalTriggered = false;
   let returnAction = {
     action: Constants.ADD_TRANSACTION,
@@ -633,10 +678,16 @@ const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResp
     },
   };
   try {
-    query = Constants.PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE + updatePaymentObj.id + Constants.STRING_AND + Constants.STRING_SYNC_QUERY;
-    transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, Constants.STRING_SYNC_SORT);
-    if (null != transactionDetail && Constants.HTTP_CODE_TWO_HUNDRED_ONE == transactionDetail.httpCode) {
-      transactionSummaries = transactionDetail.data._embedded.transactionSummaries;
+    for (let i = Constants.VAL_ZERO; i < Constants.VAL_THREE; i++) {
+      transactionDetail = await getTransactionSummaries(updatePaymentObj);
+      if (null != transactionDetail) {
+        transactionSummaries = transactionDetail.summaries;
+        if (true == transactionDetail.historyPresent) {
+          break;
+        }
+      }
+    }
+    if (null != transactionSummaries) {
       transactionSummaries.forEach((element) => {
         applications = element.applicationInformation.applications;
         applications.forEach((application) => {
@@ -673,6 +724,7 @@ const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResp
           }
         });
       });
+
     }
     if (!authReversalTriggered) {
       authReversalResponse = await paymentAuthReversal.authReversalResponse(updatePaymentObj, cartObj, paymentResponse.transactionId);
@@ -698,12 +750,42 @@ const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResp
   return updateActions;
 };
 
+const getCertificatesData = async (url) => {
+  let certificateResponse = {
+    status: Constants.VAL_ZERO,
+    data: null,
+  }
+  if (null != url) {
+    return new Promise(async (resolve, reject) => {
+      axios.get(url)
+        .then(function (response) {
+          if (response.data) {
+            certificateResponse.data = response.data;
+            certificateResponse.status = response.status;
+            resolve(certificateResponse);
+          }
+          else {
+            certificateResponse.status = response.status
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CERTIFICATES_DATA, Constants.LOG_ERROR, null, stringify(response));
+            reject(stringify(certificateResponse));
+          }
+        })
+        .catch(function (exception) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CERTIFICATES_DATA, Constants.LOG_ERROR, null, exception);
+          reject(exception);
+        });
+    })
+  }
+}
+
 const applePaySessionHandler = async (fields) => {
   let serviceResponse: any;
   let exceptionData: any;
   let httpsAgent: any;
   let cert: any;
   let key: any;
+  let certData: any;
+  let keyData: any;
   let body: any;
   let domainName: any;
   let applePaySession: any;
@@ -713,11 +795,28 @@ const applePaySessionHandler = async (fields) => {
       if (Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH) {
         cert = process.env.PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH;
         key = process.env.PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH;
-        httpsAgent = new https.Agent({
-          rejectUnauthorized: false,
-          cert: fs.readFileSync(cert),
-          key: fs.readFileSync(key),
-        });
+        if (process.env.PAYMENT_GATEWAY_ENABLE_SERVERLESS_DEPLOYMENT == Constants.STRING_TRUE) {
+          certData = await getCertificatesData(cert);
+          keyData = await getCertificatesData(key);
+          if (Constants.HTTP_CODE_TWO_HUNDRED == certData.status && null != certData.data && Constants.HTTP_CODE_TWO_HUNDRED == keyData.status && null != keyData.data) {
+            httpsAgent = new https.Agent({
+              rejectUnauthorized: true,
+              cert: certData.data,
+              key: keyData.data,
+            });
+          }
+          else {
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_APPLE_PAY_SESSION_HANDLER, Constants.LOG_ERROR, null, Constants.ERROR_MSG_ACCESSING_CERTIFICATES);
+            errorFlag = true
+          }
+        }
+        else {
+          httpsAgent = new https.Agent({
+            rejectUnauthorized: true,
+            cert: fs.readFileSync(cert),
+            key: fs.readFileSync(key),
+          });
+        }
         domainName = process.env.PAYMENT_GATEWAY_TARGET_ORIGIN;
         domainName = domainName.replace(Constants.DOMAIN_REGEX, Constants.STRING_EMPTY);
         body = {
@@ -1595,7 +1694,7 @@ const updateVisaDetails = async (paymentId, paymentVersion, transactionId) => {
   };
   if (null != paymentId && null != paymentVersion && null != transactionId) {
     visaObject.transactionId = transactionId;
-    visaCheckoutData = await clickToPay.getVisaCheckoutData(visaObject);
+    visaCheckoutData = await clickToPay.getVisaCheckoutData(visaObject, paymentId);
     if (null != visaCheckoutData) {
       cartDetails = await getCartDetailsByPaymentId(paymentId);
       if (null != cartDetails && Constants.STRING_CART_STATE == cartDetails.cartState) {
@@ -1668,7 +1767,7 @@ const runSyncAddTransaction = async (syncUpdateObject, reasonCode, authPresent, 
         for (let element of transactionSummaries) {
           applications = element.applicationInformation.applications;
           for (let application of applications) {
-            if (application.name == Constants.STRING_SYNC_AUTH_REVERSAL_NAME) {
+            if (Constants.STRING_SYNC_AUTH_REVERSAL_NAME == application.name) {
               if (Constants.VAL_THIRTY_SIX == element.clientReferenceInformation.code.length) {
                 paymentDetails = await commercetoolsApi.retrievePayment(element.clientReferenceInformation.code);
                 if (null != paymentDetails && Constants.STRING_TRANSACTIONS in paymentDetails) {

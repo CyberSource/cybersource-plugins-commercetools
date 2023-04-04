@@ -1,6 +1,6 @@
 {
   "name": "commercertools-extension",
-  "version": "22.2.0",
+  "version": "23.1.0",
   "description": "Payment Services Commercetools Extension",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -11,6 +11,7 @@
     "clean": "rimraf build:*",
     "tsc": "tsc",
     "start": "npm run build && node build/main/index.js",
+    "deploy": "npm run build && serverless deploy",
     "deploy": "npm run build && serverless deploy",
     "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 src/**/*.ejs src/**/*.css src/**/*.js src/**/*.png build/main",
     "build:main": "tsc -p tsconfig.json",
@@ -63,7 +64,9 @@
     "rimraf": "^3.0.2",
     "serverless": "^3.21.0",
     "serverless-http": "^3.0.1",
-    "winston-cloudwatch": "^6.0.1"
+    "winston-cloudwatch": "^6.0.1",
+    "flatted": "^3.2.7",
+    "aws-sdk": "2.1264.0"
 
   },
   "devDependencies": {

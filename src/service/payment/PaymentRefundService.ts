@@ -16,9 +16,9 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
     if (null != captureId && null != payment && null != updateTransactions) {
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.RefundPaymentRequest();
-      if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.TEST_ENVIRONMENT) {
+      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() == Constants.LIVE_ENVIRONMENT) {
+      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
       }
       const configObject = {
@@ -81,7 +81,7 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
       requestObj.orderInformation = orderInformation;
 
       if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_DEBUG, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_REQUEST + JSON.stringify(requestObj));
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_REQUEST + JSON.stringify(requestObj));
       }
 
       const instance = new restApi.RefundApi(configObject, apiClient);

@@ -1,5 +1,3 @@
-/* eslint-disable no-var */
-/* eslint-disable import/order */
 import test from 'ava';
 
 import key from '../../service/payment/FlexKeys';

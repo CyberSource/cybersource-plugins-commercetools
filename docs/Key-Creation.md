@@ -1,14 +1,14 @@
 # Key Creation
 
 - [Commercetools](#Commercetools)
-  - [Cybersource Plugin API Key](#CybersourcePLuginAPIKeys)
-  - [Frontend API Key](#FrontendAPIKey)
-- [Cybersource](#Cybersource)
-  - [REST Shared Secret](#RESTSharedSecret)
+  - [Cybersource Plugin API Keys](#cybersource-plugin-api-keys)
+  - [Frontend API Key](#frontend-api-key)
+- [Cybersource](#cybersource)
+  - [REST Shared Secret](#rest-shared-secret)
 
-# <a name="Commercetools"></a>Commercetools
+# Commercetools
 
-## <a name="CybersourcePLuginAPIKeys"></a>Cybersource Plugin API Keys
+## Cybersource Plugin API Keys
 
 The API Extension and the Synchronization Service require an API key which will be used throughout the payments process. The scopes required for this API key are:
 
@@ -22,7 +22,7 @@ The API Extension and the Synchronization Service require an API key which will 
 | manage_types      | This is used for creating custom types required to process payments and tokens                                                                                                                               |
 | manage_extensions | This is used for extending payment create, update and customer update APIs                                                                                                                                   |
 
-## <a name="FrontendAPIKey"></a>Frontend API Key
+## Frontend API Key
 
 To be used for frontend applications in order to create and manage payments and carts for customers. The scopes for the API key used here should be limited to the 'My' Commercetools APIs to limit access a client-side application has to the data in Commercetools.
 
@@ -37,8 +37,8 @@ To be used for frontend applications in order to create and manage payments and 
 | manage_my_profile       | Access to the current customers profile so it can be associated with the Payment and Order     |
 | create_anonymous_token  | (optional) If you are using the key to control the customers session                           |
 
-# <a name="Cybersource"></a>Cybersource
+# Cybersource
 
-## <a name="RESTSharedSecret"></a>REST Shared Secret
+## REST Shared Secret
 
 Flex token generation uses a shared secret to generate one-time keys to be used when encrypting the user's credit card details on the client side and HTTP Signature authentication for Cybersource REST API services. Set up a secret as per [this guide](https://developer.cybersource.com/library/documentation/dev_guides/REST_API/Getting_Started/Getting_Started_REST_API.pdf)<span> </span>and store the values safely. These should be provided in the API Extension's .env file as described in the [API Extension Setup](API-Extension-Setup.md) page.
