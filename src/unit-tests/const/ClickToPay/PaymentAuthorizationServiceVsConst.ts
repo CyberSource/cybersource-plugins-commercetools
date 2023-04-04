@@ -1,6 +1,5 @@
 import clickToPay from '../../JSON/clickToPay.json';
 import creditCard from '../../JSON/creditCard.json';
-
 export const payment = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
   version: 2,

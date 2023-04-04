@@ -73,6 +73,7 @@ For the Commercetools Plugin to support MOTO transaction, follow the steps menti
     - [Process a Payment With Google Pay](Process-a-Payment-GooglePay.md)
     - [Process a Payment With Apple Pay](Process-a-Payment-ApplePay.md)
     - [Process a Payment With eCheck](./Process-a-Payment-eCheck.md)
+    - [Process a Payment With eCheck](./Process-a-Payment-eCheck.md)
 
 
     and add the following properties

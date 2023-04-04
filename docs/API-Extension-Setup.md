@@ -9,6 +9,7 @@
 There are a number of configuration variables that need to be defined before running the plugin. These can be set as environment variables inside the .env file present in the root directory of the plugin.
 
 For multiple environments you should use unique values per environment.
+For multiple environments you should use unique values per environment.
 
 ## Environment Properties
 
@@ -54,6 +55,8 @@ Variables that begin with 'CT' prefix are Commercetools project specific propert
 The Commercetools - Cybersource plugin is a typescript project which is built using cybersource-rest-client npm package and other several node packages.
 
 > **_NOTE:_** You can view the loggers in src/loggers folder of the plugin if there are any information or errors found while processing the payments or configuring the plugin.
+
+If you want serverless deployment of the plugin on AWS Lambda, refer [AWS-Serverless-Deployment\#AWSDeploymentSteps](AWS-Serverless-Deployment.md#AWSDeploymentSteps)
 
 If you want serverless deployment of the plugin on AWS Lambda, refer [AWS-Serverless-Deployment\#AWSDeploymentSteps](AWS-Serverless-Deployment.md#AWSDeploymentSteps)
 
