@@ -99,7 +99,7 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
       }
       requestObj.deviceInformation = deviceInformation;
 
-      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TOKEN_RESPONSE, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ADD_TOKEN_REQUEST + JSON.stringify(requestObj));
       }
 

@@ -3,7 +3,7 @@ import path from 'path';
 import { Constants } from '../../constants';
 import paymentService from '../../utils/PaymentService';
 
-const getTransactionSearchResponse = async (query, sort) => {
+const getTransactionSearchResponse = async (query, sort, midCredentials) => {
   let runEnvironment: any;
   let errorData: any;
   let exceptionData: any;
@@ -12,7 +12,7 @@ const getTransactionSearchResponse = async (query, sort) => {
     data: null,
   };
   try {
-    if (null != query && null != sort) {
+    if (null != query && null != sort && null != midCredentials) {
       if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
@@ -21,9 +21,9 @@ const getTransactionSearchResponse = async (query, sort) => {
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
         runEnvironment: runEnvironment,
-        merchantID: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
-        merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
-        merchantsecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
+        merchantID: midCredentials.merchantId,
+        merchantKeyId: midCredentials.merchantKeyId,
+        merchantsecretKey: midCredentials.merchantSecretKey,
         logConfiguration: {
           enableLog: false,
         },
@@ -36,14 +36,14 @@ const getTransactionSearchResponse = async (query, sort) => {
       requestObj.offset = Constants.VAL_ZERO;
       requestObj.sort = sort;
 
-      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST +JSON.stringify(requestObj));
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST + JSON.stringify(requestObj));
       }
-      
+
       const instance = new restApi.SearchTransactionsApi(configObject, apiClient);
       return await new Promise((resolve, reject) => {
         instance.createSearch(requestObj, function (error, data, response) {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_RESPONSE +JSON.stringify(response));
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_RESPONSE + JSON.stringify(response));
           if (data) {
             searchResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
             searchResponse.data = data;
@@ -79,6 +79,9 @@ const getTransactionSearchResponse = async (query, sort) => {
       exceptionData = exception.message;
     } else {
       exceptionData = exception;
+    }
+    if (Constants.EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED == exceptionData || Constants.EXCEPTION_MERCHANT_KEY_ID_REQUIRED == exceptionData) {
+      exceptionData = Constants.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET + midCredentials.merchantId;
     }
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
     return searchResponse;

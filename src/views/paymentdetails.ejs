@@ -286,8 +286,14 @@
       'Success' == element.state) { authPresent = true; } if('Charge' == element.type && 'Success' == element.state){ capturePresent = true; } if('Refund' == element.type && 'Success' == element.state){ refundPresent = true; } if('CancelAuthorization' == element.type &&
       'Success' == element.state){ authReversalPresent = true; } }) } %>
       <div class="div-padding" id="buttonsDiv">
-        <% if(authPresent && !capturePresent && !authReversalPresent && !refundPresent){ %>
-        <a class="button" id="capture" href="/capture?id=<%=id%>" role="button" onclick="showDiv()">Capture </a>
+        <% if(authPresent && !authReversalPresent && (!refundPresent || (refundPresent && authorizedAmount)) && ((capturePresent && authorizedAmount) || (!capturePresent && authorizedAmount))){ %>
+          <div class="div-padding">You can capture amount <%= authorizedAmount%></div>
+          <form action="/capture" class="div-padding" id="partialCaptureForm">
+            <input type="hidden" name="captureId" id="captureId" value="<%=id%>" />
+            Capture amount: <input type="text" name="captureAmount" id="captureAmount" size="6" value="" autocomplete="off" oninput="validateAmount(this)" required />
+            <button type="submit" id="captureButton" class="button" onclick="validate()">Capture</button>
+          </form>
+        <% } if(authPresent && !capturePresent && !authReversalPresent && !refundPresent){ %>
         <a class="button" id="auth" href="/authreversal?id=<%=id%>" role="button" onclick="showDiv()">Reverse </a>
         <% } if(capturePresent && !authReversalPresent &&((refundPresent && captureAmount) || (!refundPresent && captureAmount))){ %>
         <div class="div-padding">You can refund amount <%= captureAmount%></div>

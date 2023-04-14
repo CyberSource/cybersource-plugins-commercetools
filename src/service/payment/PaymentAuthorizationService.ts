@@ -2,6 +2,7 @@ import restApi from 'cybersource-rest-client';
 import path from 'path';
 import paymentService from '../../utils/PaymentService';
 import { Constants } from '../../constants';
+import multiMid from '../../utils/config/MultiMid';
 
 const authorizationResponse = async (payment, cart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo) => {
   let runEnvironment: any;
@@ -21,6 +22,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
     status: null,
     data: null,
   };
+  let midCredentials: any;
   try {
     if (null != payment && null != cart && null != service && Constants.STRING_LOCALE in cart && null != cart.locale) {
       selectedLocale = cart.locale.split(Constants.REGEX_HYPHEN);
@@ -32,12 +34,13 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
         runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
       }
+      midCredentials = await multiMid.getMidCredentials(payment);
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
         runEnvironment: runEnvironment,
-        merchantID: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
-        merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
-        merchantsecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
+        merchantID: midCredentials.merchantId,
+        merchantKeyId: midCredentials.merchantKeyId,
+        merchantsecretKey: midCredentials.merchantSecretKey,
         logConfiguration: {
           enableLog: false,
         },
@@ -45,12 +48,10 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       var clientReferenceInformation = new restApi.Ptsv2paymentsClientReferenceInformation();
       clientReferenceInformation.code = payment.id;
       requestObj.clientReferenceInformation = clientReferenceInformation;
-
       var clientReferenceInformationpartner = new restApi.Ptsv2paymentsClientReferenceInformationPartner();
       clientReferenceInformationpartner.solutionId = Constants.PAYMENT_GATEWAY_PARTNER_SOLUTION_ID;
       clientReferenceInformation.partner = clientReferenceInformationpartner;
       requestObj.clientReferenceInformation = clientReferenceInformation;
-
       var processingInformation = new restApi.Ptsv2paymentsProcessingInformation();
       if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_ENABLED_MOTO in payment.custom.fields && payment.custom.fields.isv_enabledMoto) {
         processingInformation.commerceIndicator = Constants.STRING_MOTO;
@@ -147,7 +148,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         paymentInformationFluidData.descriptor = Constants.PAYMENT_GATEWAY_APPLE_PAY_DESCRIPTOR;
         paymentInformationFluidData.encoding = Constants.PAYMENT_GATEWAY_APPLE_PAY_ENCODING;
         paymentInformation.fluidData = paymentInformationFluidData;
-      }else if (Constants.ECHECK == payment.paymentMethodInfo.method) {
+      } else if (Constants.ECHECK == payment.paymentMethodInfo.method) {
         var banktransaferOptions = new restApi.Ptsv2creditsProcessingInformationBankTransferOptions();
         if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_ENABLED_MOTO in payment.custom.fields && payment.custom.fields.isv_enabledMoto) {
           banktransaferOptions.secCode = Constants.SEC_CODE_TEL;
@@ -155,7 +156,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           banktransaferOptions.secCode = Constants.SEC_CODE_WEB;
         }
         banktransaferOptions.fraudScreeningLevel = Constants.VAL_ONE;
-      
         processingInformation.bankTransferOptions = banktransaferOptions;
         var paymentInformationBank = new restApi.Ptsv2paymentsPaymentInformationBank();
         var paymentInformationBankAccount = new restApi.Ptsv2paymentsPaymentInformationBankAccount();
@@ -168,19 +168,14 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         paymentInformationPaymentType.name = Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE;
         paymentInformation.paymentType = paymentInformationPaymentType;
       }
-
-
       requestObj.processingInformation = processingInformation;
       requestObj.paymentInformation = paymentInformation;
-
       totalAmount = paymentService.convertCentToAmount(payment.amountPlanned.centAmount);
-
       var orderInformation = new restApi.Ptsv2paymentsOrderInformation();
       var orderInformationAmountDetails = new restApi.Ptsv2paymentsOrderInformationAmountDetails();
       orderInformationAmountDetails.totalAmount = totalAmount;
       orderInformationAmountDetails.currency = payment.amountPlanned.currencyCode;
       orderInformation.amountDetails = orderInformationAmountDetails;
-
       var orderInformationBillTo = new restApi.Ptsv2paymentsOrderInformationBillTo();
       orderInformationBillTo.firstName = cart.billingAddress.firstName;
       orderInformationBillTo.lastName = cart.billingAddress.lastName;
@@ -193,7 +188,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       orderInformationBillTo.phoneNumber = cart.billingAddress.phone;
       orderInformation.billTo = orderInformationBillTo;
       requestObj.orderInformation = orderInformation;
-
       var orderInformationShipTo = new restApi.Ptsv2paymentsOrderInformationShipTo();
       orderInformationShipTo.firstName = cart.shippingAddress.firstName;
       orderInformationShipTo.lastName = cart.shippingAddress.lastName;
@@ -206,7 +200,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       orderInformationShipTo.phoneNumber = cart.shippingAddress.phone;
       orderInformation.shipTo = orderInformationShipTo;
       requestObj.orderInformation = orderInformation;
-
       orderInformation.lineItems = [];
       cart.lineItems.forEach((lineItem) => {
         if (Constants.STRING_DISCOUNTED_PRICE_PER_QUANTITY in lineItem && Constants.VAL_ZERO == lineItem.discountedPricePerQuantity.length) {
@@ -325,22 +318,20 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         deviceInformation.userAgentBrowserValue = payment.custom.fields.isv_userAgentHeader;
       }
       requestObj.deviceInformation = deviceInformation;
-
-      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
-        if (Constants.STRING_ENROLL_CHECK == service){
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST +JSON.stringify(requestObj));
-         }else{
-           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST +JSON.stringify(requestObj));
-         }
-       }
-
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
+        if (Constants.STRING_ENROLL_CHECK == service) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_REQUEST + JSON.stringify(requestObj));
+        } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST + JSON.stringify(requestObj));
+        }
+      }
       const instance = new restApi.PaymentsApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
         instance.createPayment(requestObj, function (error, data, response) {
-          if (Constants.STRING_ENROLL_CHECK == service){
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_RESPONSE +JSON.stringify(response));
-          }else{
-            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_RESPONSE +JSON.stringify(response));
+          if (Constants.STRING_ENROLL_CHECK == service) {
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_RESPONSE + JSON.stringify(response));
+          } else {
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_RESPONSE + JSON.stringify(response));
           }
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];
@@ -360,7 +351,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
               } else {
                 errorData = error;
               }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.LOG_PAYMENT_ID + payment.id, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id,errorData);
+              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.LOG_PAYMENT_ID + payment.id, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, errorData);
             }
             paymentResponse.httpCode = error.status;
             reject(paymentResponse);
@@ -383,7 +374,10 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
     } else {
       exceptionData = exception;
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id,exceptionData);
+    if (Constants.EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED == exceptionData || Constants.EXCEPTION_MERCHANT_KEY_ID_REQUIRED == exceptionData) {
+      exceptionData = Constants.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET + midCredentials.merchantId;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, exceptionData);
     return paymentResponse;
   }
 };

@@ -380,6 +380,17 @@
         "name": "String"
       },
       "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_merchantId",
+      "label": {
+        "en": "Merchant Id used for the transaction"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
     }
   ]
 }

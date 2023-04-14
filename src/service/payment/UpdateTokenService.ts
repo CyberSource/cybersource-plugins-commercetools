@@ -35,12 +35,10 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
           enableLog: false,
         },
       };
-
       var card = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentCard();
       card.expirationMonth = newExpiryMonth;
       card.expirationYear = newExpiryYear;
       requestObj.card = card;
-
       var opts = [];
       if (null != addressData) {
         var billTo = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo();
@@ -58,11 +56,9 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
       var instrumentIdentifier = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentInstrumentIdentifier();
       instrumentIdentifier.id = tokens.instrumentIdentifier;
       requestObj.instrumentIdentifier = instrumentIdentifier;
-
-      if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG){
+      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.UPDATE_TOKEN_REQUEST + JSON.stringify(requestObj));
       }
-
       const instance = new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
         instance.patchCustomersPaymentInstrument(customerTokenId, paymentInstrumentTokenId, requestObj, opts, function (error, data, response) {
