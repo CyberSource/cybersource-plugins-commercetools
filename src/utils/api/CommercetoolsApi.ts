@@ -13,6 +13,7 @@ const getClient = () => {
   let authMiddleware: any;
   let exceptionData: any;
   try {
+    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
     projectKey = process.env.CT_PROJECT_KEY;
     authMiddleware = createAuthMiddlewareForClientCredentialsFlow({
       host: process.env.CT_AUTH_HOST,

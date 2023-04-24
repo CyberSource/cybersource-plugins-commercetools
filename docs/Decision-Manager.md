@@ -36,7 +36,7 @@ Replace the below data:
 
 ### Enabling/disabling decision manager for specific payments
 
-The Cybersource Plugin has environment variable for decision manager as PAYMENT_GATEWAY_DECISION_MANAGER, you can set the values to true or false to enable or disable decision manager
+The Cybersource Plugin has environment variable for decision manager as PAYMENT_GATEWAY_DECISION_MANAGER, you can set the values to true or false to enable or disable decision manager. If set to true, PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID variable must be configured with comma separated values of different merchant Ids in which decision manager has to be executed.
 
 > **_NOTE:_** This field is case sensitive
 

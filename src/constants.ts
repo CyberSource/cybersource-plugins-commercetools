@@ -78,6 +78,7 @@ export abstract class Constants {
   static readonly FUNC_SET_CUSTOMER_TOKENS = 'FuncSetCustomerTokens';
   static readonly FUNC_SET_CUSTOM_TYPE = 'FuncSetCustomType';
   static readonly FUNC_SET_TRANSACTION_ID = 'FuncSetTransactionId';
+  static readonly FUNC_SETUP_RESOURCES = 'FuncSetupResources';
   static readonly FUNC_SYNC_HANDLER = 'FuncSyncHandler';
   static readonly FUNC_UPDATE_CART_BY_PAYMENT_ID = 'FuncUpdateCartByPaymentId';
   static readonly FUNC_UPDATE_CARD_HANDLER = 'FuncUpdateCardHandler';
@@ -95,7 +96,7 @@ export abstract class Constants {
   static readonly FUNC_RUN_SYNC_UPDATE_CAPTURE_AMOUNT = 'FuncRunSyncUpdateCaptureAmount';
   static readonly FUNC_SET_CUSTOM_TYPE_DATA = 'FuncSetCustomTypeData';
   static readonly FUNC_UPDATE_AVAILABLE_AMOUNT = 'FuncUpdateAvailableAmount';
-  static readonly FUNC_ADD_REFUND_ACTION = 'FuncAddRefundAction'
+  static readonly FUNC_ADD_REFUND_ACTION = 'FuncAddRefundAction';
 
   //Numbers
   static readonly VAL_NEGATIVE_ONE = -1;
@@ -133,7 +134,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
   static readonly PAYMENT_GATEWAY_JWT_FORMAT = 'JWT';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'J88PJQQT';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'MQNETIGU';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
@@ -202,6 +203,7 @@ export abstract class Constants {
   static readonly REFUND_AMOUNT = 'refundAmount';
   static readonly SHIPPING_AND_HANDLING = 'shipping_and_handling';
   static readonly SHIPPING_INFO = 'shippingInfo';
+  static readonly SHIPPING_MODE_MULTIPLE = 'Multiple';
   static readonly STRING_AMOUNT_PLANNED = 'amountPlanned';
   static readonly STRING_AND = ' AND ';
   static readonly STRING_BODY = 'body';
@@ -211,6 +213,8 @@ export abstract class Constants {
   static readonly STRING_CARD_EXPIRY_YEAR = 'cardExpiryYear';
   static readonly STRING_CART_STATE = 'Active';
   static readonly STATUS_CODE = 'statusCode';
+  static readonly STRING_CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
+  static readonly STRING_CONTENT_SECURITY_POLICY_VALUE = "script-src 'self'";
   static readonly STRING_CONSUMER_AUTHENTICATION = 'consumerAuthenticationInformation';
   static readonly STRING_CUSTOM = 'custom';
   static readonly STRING_CUSTOMER = 'customer';
@@ -260,6 +264,7 @@ export abstract class Constants {
   static readonly STRING_VALUE = 'value';
   static readonly STRING_VISA = 'visa';
   static readonly STRING_WWW_AUTHENTICATE = 'WWW-Authenticate';
+  static readonly STRING_DEFAULT = 'default';
 
   static readonly ASCII = 'ascii';
   static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
@@ -272,7 +277,7 @@ export abstract class Constants {
   static readonly LOG_INFO = 'info';
   static readonly LOG_WARN = 'warn';
   static readonly TOKEN_INFORMATION = 'tokenInformation';
-  static readonly UNICODE_ENCODING_SYSTEM = 'utf8'
+  static readonly UNICODE_ENCODING_SYSTEM = 'utf8';
   static readonly VALIDATION = 'validation';
   static readonly VALIDATION_CALLBACK = 'validationCallback';
   static readonly STRING_DISCOUNTED_PRICE_PER_QUANTITY = 'discountedPricePerQuantity';
@@ -312,7 +317,7 @@ export abstract class Constants {
   static readonly ISV_APPLE_PAY_DISPLAY_NAME = 'isv_applePayDisplayName';
   static readonly ISV_APPLE_PAY_VALIDATION_URL = 'isv_applePayValidationUrl';
   static readonly ISV_ACS_URL = 'isv_payerAuthenticationAcsUrl';
-  static readonly ISV_AVAILABLE_CAPTURE_AMOUNT = 'isv_availableCaptureAmount'
+  static readonly ISV_AVAILABLE_CAPTURE_AMOUNT = 'isv_availableCaptureAmount';
   static readonly ISV_CARDINAL_REFERENCE_ID = 'isv_cardinalReferenceId';
   static readonly ISV_CAPTURE_CONTEXT_SIGNATURE = 'isv_tokenCaptureContextSignature';
   static readonly ISV_CARD_EXPIRY_MONTH = 'isv_cardExpiryMonth';
@@ -370,7 +375,7 @@ export abstract class Constants {
   //Exception messages
   static readonly EXCEPTION_MSG_ADD_EXTENSION = 'An exception occurred while adding extension to Commercetools';
   static readonly EXCEPTION_MSG_ADD_TRANSACTION = 'An exception occurred while adding transaction to the payment';
-  static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception ocurred while retrieving multi-mid details'
+  static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception ocurred while retrieving multi-mid details';
   static readonly EXCEPTION_MSG_AUTHORIZING_PAYMENT = 'An exception occurred while authorizing the payment';
   static readonly EXCEPTION_MSG_CART_UPDATE = 'An exception occurred while updating the cart';
   static readonly EXCEPTION_MSG_CART_DETAILS = 'An exception occurred while fetching cart details';
@@ -382,11 +387,12 @@ export abstract class Constants {
   static readonly EXCEPTION_MSG_ENV_VARIABLE_NOT_SET = 'Please configure the mid credentials in env file for';
   static readonly EXCEPTION_MSG_FETCH_PAYMENT_DETAILS = 'An exception occurred while fetching payment details';
   static readonly EXCEPTION_MSG_FETCH_ORDER_DETAILS = 'An exception occurred while fetching order details';
-  static readonly EXCEPTION_MSG_GET_MID_CREDENTIALS = 'An exception occurred while retrieving mid credentials'
+  static readonly EXCEPTION_MSG_GET_MID_CREDENTIALS = 'An exception occurred while retrieving mid credentials';
   static readonly EXCEPTION_MERCHANT_KEY_ID_REQUIRED = 'MerchantKeyId is Mandatory';
   static readonly EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED = 'MerchantseceretKey is Mandatory';
   static readonly EXCEPTION_MSG_PAYER_AUTH = 'An exception occurred while authenticating the payment';
   static readonly EXCEPTION_MSG_SERVICE_PROCESS = 'An exception occurred while processing your payment';
+  static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception occured while creating the extensions and custom fields = ';
   static readonly EXCEPTION_MSG_SYNC_DETAILS = 'An exception occurred while fetching sync conversion details';
   static readonly EXCEPTION_MSG_TRANSACTION_SEARCH = 'An exception occurred while retrieving the transaction details';
 
@@ -439,6 +445,8 @@ export abstract class Constants {
   static readonly ERROR_MSG_REVERSAL_FAILURE = 'Cannot process authorization reversal as there are no transaction id available';
   static readonly ERROR_MSG_REVERSAL_SERVICE = 'Error in triggering authorization reversal service';
   static readonly ERROR_MSG_SERVICE_PROCESS = 'Unable to process your request';
+  static readonly ERROR_MSG_SETUP_RESOURCES = 'Failed to create extensions and custom fields, please provide all the required data in env file';
+  static readonly ERROR_MSG_SHIPPING_DETAILS_NOT_FOUND = 'Unable to fetech the shipping details for the payment : ';
   static readonly ERROR_MSG_SYNC_PAYMENT_DETAILS = 'An error occurred while trying to sync the payments details';
   static readonly ERROR_MSG_TOKEN_UPDATE = 'Failed to update card tokens';
   static readonly ERROR_MSG_UPDATE_CART = 'Unable to update the cart';

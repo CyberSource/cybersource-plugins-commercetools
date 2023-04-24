@@ -36,9 +36,9 @@ const getVisaCheckoutData = async (paymentResponse, payment) => {
           },
         };
         const apiClient = new restApi.ApiClient();
-        const instance = new restApi.TransactionDetailsApi(configObject, apiClient);
+        const transactionDetailsApiInstance = new restApi.TransactionDetailsApi(configObject, apiClient);
         return await new Promise((resolve, reject) => {
-          instance.getTransaction(id, function (error, data, response) {
+          transactionDetailsApiInstance.getTransaction(id, function (error, data, response) {
             paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_VISA_CHECKOUT_DATA, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.TRANSACTION_DETAILS_RESPONSE + JSON.stringify(response));
             if (data) {
               visaCheckoutData.httpCode = response[Constants.STRING_RESPONSE_STATUS];

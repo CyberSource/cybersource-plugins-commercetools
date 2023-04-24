@@ -103,9 +103,9 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TOKEN_RESPONSE, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ADD_TOKEN_REQUEST + JSON.stringify(requestObj));
       }
 
-      const instance = new restApi.PaymentsApi(configObject, apiClient);
+      const paymentsApiInstance = new restApi.PaymentsApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.createPayment(requestObj, function (error, data, response) {
+        paymentsApiInstance.createPayment(requestObj, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_TOKEN_RESPONSE, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ADD_TOKEN_RESPONSE + JSON.stringify(response));
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];

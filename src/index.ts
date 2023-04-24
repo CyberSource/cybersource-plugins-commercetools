@@ -93,6 +93,7 @@ app.get('/orders', async (req, res) => {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_ORDERS, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.ERROR_MSG_NO_ORDER_DETAILS;
   }
+  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
   res.render('orders', {
     count: orderCount,
     orderList: orderResult,
@@ -112,8 +113,7 @@ app.get('/paymentdetails', async (req, res) => {
   let cartData: any;
   let exceptionData: any;
   let refundTransaction: any;
-  let selectedLocale: any;
-  let locale: any;
+  let cartLocale: any;
   let authReversalFlag = false;
   let convertedPaymentId = Constants.STRING_EMPTY;
   let pendingCaptureAmount = Constants.VAL_FLOAT_ZERO;
@@ -124,14 +124,13 @@ app.get('/paymentdetails', async (req, res) => {
   try {
     if (Constants.STRING_ID in req.query) {
       requestId = req.query.id;
-      if (null != requestId && typeof requestId == 'string') {
+      if (null != requestId && typeof requestId === 'string') {
         paymentId = requestId;
         convertedPaymentId = paymentId.replace(/\s+/g, Constants.STRING_EMPTY);
         cartDetails = await commercetoolsApi.retrieveCartByPaymentId(convertedPaymentId);
         cartData = cartDetails.results[Constants.VAL_ZERO];
         if (null != cartData && Constants.STRING_LOCALE in cartData && null != cartData.locale) {
-          selectedLocale = cartData.locale.split(Constants.REGEX_HYPHEN);
-          locale = selectedLocale[Constants.VAL_ZERO];
+          cartLocale = cartData.locale;
         }
         paymentDetails = await commercetoolsApi.retrievePayment(convertedPaymentId);
         if (null != paymentDetails) {
@@ -168,6 +167,7 @@ app.get('/paymentdetails', async (req, res) => {
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
   }
+  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
   res.render('paymentdetails', {
     id: convertedPaymentId,
     payments: paymentDetails,
@@ -176,7 +176,7 @@ app.get('/paymentdetails', async (req, res) => {
     authorizedAmount: pendingAuthorizedAmount,
     amountConversion: paymentService.convertCentToAmount,
     roundOff: paymentService.roundOff,
-    locale: locale,
+    locale: cartLocale,
     errorMessage: errorMessage,
     successMessage: successMessage,
     refundErrorMessage: refundErrorMessage,
@@ -194,7 +194,7 @@ app.post('/api/extension/payment/create', async (req, res) => {
   try {
     if (Constants.STRING_BODY in req && Constants.STRING_RESOURCE in req.body && Constants.STRING_OBJ in req.body.resource) {
       requestObj = req.body.resource.obj;
-      if (null != requestObj && typeof requestObj == 'object') {
+      if (null != requestObj && typeof requestObj === 'object') {
         paymentObj = requestObj;
         paymentMethod = paymentObj.paymentMethodInfo.method;
         if (paymentMethod == Constants.CREDIT_CARD || paymentMethod == Constants.CC_PAYER_AUTHENTICATION) {
@@ -263,7 +263,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
   try {
     if (Constants.STRING_BODY in req && Constants.STRING_RESOURCE in req.body && Constants.STRING_OBJ in req.body.resource) {
       requestObj = req.body.resource;
-      if (null != requestObj && typeof requestObj == 'object') {
+      if (null != requestObj && typeof requestObj === 'object') {
         updatePaymentObj = requestObj.obj;
         updatePaymentId = requestObj.id;
         paymentMethod = updatePaymentObj.paymentMethodInfo.method;
@@ -294,7 +294,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
           }
         }
         if (Constants.VAL_ZERO < transactionLength) {
-          updateTransactions = updatePaymentObj.transactions.pop();
+          updateTransactions = updatePaymentObj.transactions[transactionLength - Constants.VAL_ONE];
           if (
             Constants.VAL_ONE == transactionLength &&
             null != updateTransactions &&
@@ -365,7 +365,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
       Constants.STRING_EMPTY == req.body.resource.obj.custom.fields.isv_tokenCaptureContextSignature
     ) {
       requestObj = req.body.resource;
-      if (null != requestObj && typeof requestObj == 'object') {
+      if (null != requestObj && typeof requestObj === 'object') {
         paymentObj = requestObj.obj;
         microFormKeys = await flexKeys.keys(paymentObj);
         if (null != microFormKeys) {
@@ -386,9 +386,9 @@ app.post('/api/extension/customer/update', async (req, res) => {
       Constants.STRING_EMPTY != req.body.resource.obj.custom.fields.isv_addressId
     ) {
       requestObj = req.body.resource;
-      if (null != requestObj && typeof requestObj == 'object') {
+      if (null != requestObj && typeof requestObj === 'object') {
         customerObj = requestObj;
-        customerAddress = customerObj.obj.addresses
+        customerAddress = customerObj.obj.addresses;
         response = await paymentHandler.addCardHandler(customerObj.id, customerAddress, customerObj.obj);
       }
     } else if (
@@ -403,7 +403,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
       Constants.VAL_ZERO < req.body.resource.obj.custom.fields.isv_tokens.length
     ) {
       requestObj = req.body.resource;
-      if (null != requestObj && typeof requestObj == 'object') {
+      if (null != requestObj && typeof requestObj === 'object') {
         customerObj = requestObj;
         customFields = customerObj.obj.custom.fields;
         tokensToUpdate = JSON.parse(customFields.isv_tokens[Constants.VAL_ZERO]);
@@ -428,7 +428,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
   }
   if (null == response) {
     requestObj = req.body.resource;
-    if (null != requestObj && typeof requestObj == 'object') {
+    if (null != requestObj && typeof requestObj === 'object') {
       customerObj = requestObj;
       customerInfo = await commercetoolsApi.getCustomer(customerObj.id);
       if (
@@ -457,13 +457,14 @@ app.get('/capture', async (req, res) => {
   let latestTransaction: any;
   let exceptionData: any;
   let pendingAuthorizedAmount: number;
+  let transactionLength = Constants.VAL_ZERO;
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
     if (Constants.STRING_QUERY in req && Constants.CAPTURE_ID in req.query && null != req.query.captureId && Constants.CAPTURE_AMOUNT in req.query) {
       requestId = req.query.captureId;
       requestAmount = Number(req.query.captureAmount);
-      if (null != requestId && typeof requestId == 'string' && null != requestAmount && typeof requestAmount == 'number') {
+      if (null != requestId && typeof requestId === 'string' && null != requestAmount && typeof requestAmount === 'number') {
         paymentId = requestId;
         captureAmount = requestAmount;
         capturePaymentObj = await commercetoolsApi.retrievePayment(paymentId);
@@ -485,8 +486,9 @@ app.get('/capture', async (req, res) => {
               state: Constants.CT_TRANSACTION_STATE_INITIAL,
             };
             addTransaction = await commercetoolsApi.addTransaction(transactionObject);
-            if (null != addTransaction && Constants.STRING_TRANSACTIONS in addTransaction) {
-              latestTransaction = addTransaction.transactions.pop();
+            if (null != addTransaction && Constants.STRING_TRANSACTIONS in addTransaction && Constants.VAL_ZERO < addTransaction.transactions.length) {
+              transactionLength = addTransaction.transactions.length;
+              latestTransaction = addTransaction.transactions[transactionLength - Constants.VAL_ONE];
               if (null != latestTransaction && Constants.CT_TRANSACTION_TYPE_CHARGE == latestTransaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS == latestTransaction.state) {
                 successMessage = Constants.SUCCESS_MSG_CAPTURE_SERVICE;
               } else {
@@ -523,7 +525,7 @@ app.get('/capture', async (req, res) => {
     return;
   }
   res.redirect(`/paymentdetails?id=${paymentId}`);
-})
+});
 
 app.get('/refund', async (req, res) => {
   let paymentId: any;
@@ -536,13 +538,14 @@ app.get('/refund', async (req, res) => {
   let requestId: any;
   let requestAmount: any;
   let pendingCaptureAmount: number;
+  let transactionLength = Constants.VAL_ZERO;
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
     if (Constants.STRING_QUERY in req && Constants.REFUND_ID in req.query && null != req.query.refundId && Constants.REFUND_AMOUNT in req.query) {
       requestId = req.query.refundId;
       requestAmount = Number(req.query.refundAmount);
-      if (null != requestId && typeof requestId == 'string' && null != requestAmount && typeof requestAmount == 'number') {
+      if (null != requestId && typeof requestId === 'string' && null != requestAmount && typeof requestAmount === 'number') {
         paymentId = requestId;
         refundAmount = requestAmount;
         refundPaymentObj = await commercetoolsApi.retrievePayment(paymentId);
@@ -564,8 +567,9 @@ app.get('/refund', async (req, res) => {
               state: Constants.CT_TRANSACTION_STATE_INITIAL,
             };
             addTransaction = await commercetoolsApi.addTransaction(transactionObject);
-            if (null != addTransaction && Constants.STRING_TRANSACTIONS in addTransaction) {
-              latestTransaction = addTransaction.transactions.pop();
+            if (null != addTransaction && Constants.STRING_TRANSACTIONS in addTransaction && Constants.VAL_ZERO < addTransaction.transactions.length) {
+              transactionLength = addTransaction.transactions.length;
+              latestTransaction = addTransaction.transactions[transactionLength - Constants.VAL_ONE];
               if (null != latestTransaction && Constants.CT_TRANSACTION_TYPE_REFUND == latestTransaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS == latestTransaction.state) {
                 successMessage = Constants.SUCCESS_MSG_REFUND_SERVICE;
               } else {
@@ -612,12 +616,13 @@ app.get('/authReversal', async (req, res) => {
   let transactionObject: any;
   let latestTransaction: any;
   let exceptionData: any;
+  let transactionLength = Constants.VAL_ZERO;
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
     if (Constants.STRING_QUERY in req && Constants.STRING_ID in req.query && null != req.query.id) {
       requestId = req.query.id;
-      if (null != requestId && typeof requestId == 'string') {
+      if (null != requestId && typeof requestId === 'string') {
         paymentId = requestId;
         authReversalObj = await commercetoolsApi.retrievePayment(paymentId);
         if (null != authReversalObj) {
@@ -629,8 +634,9 @@ app.get('/authReversal', async (req, res) => {
             state: Constants.CT_TRANSACTION_STATE_INITIAL,
           };
           addTransaction = await commercetoolsApi.addTransaction(transactionObject);
-          if (null != addTransaction && Constants.STRING_TRANSACTIONS in addTransaction) {
-            latestTransaction = addTransaction.transactions.pop();
+          if (null != addTransaction && Constants.STRING_TRANSACTIONS in addTransaction && Constants.VAL_ZERO < addTransaction.transactions.length) {
+            transactionLength = addTransaction.transactions.length;
+            latestTransaction = addTransaction.transactions[transactionLength - Constants.VAL_ONE];
             if (null != latestTransaction && Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION == latestTransaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS == latestTransaction.state) {
               successMessage = Constants.SUCCESS_MSG_REVERSAL_SERVICE;
             } else {

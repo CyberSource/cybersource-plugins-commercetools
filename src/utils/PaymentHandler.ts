@@ -163,53 +163,67 @@ const getCreditCardResponse = async (updatePaymentObj, customerInfo, cartObj, up
   let cardRateCount: any;
   let dontSaveTokenFlag = false;
   let payerAuthMandateFlag = false;
+  let exceptionData: any;
   let returnResponse = {
     paymentResponse: null,
     authResponse: null,
     errorFlag: false,
   };
-  if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER && null != customerInfo) {
-    cardRate = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME ? process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME : Constants.DEFAULT_PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
-    cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
-    startTime = new Date();
-    startTime.setHours(startTime.getHours() - cardRate);
-    limiterResponse = await rateLimiterAddToken(customerInfo, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
-    if (null != limiterResponse && limiterResponse >= parseInt(cardRateCount)) {
-      dontSaveTokenFlag = true;
+  try {
+    if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER && null != customerInfo) {
+      cardRate = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME ? process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME : Constants.DEFAULT_PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
+      cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
+      startTime = new Date();
+      startTime.setHours(startTime.getHours() - cardRate);
+      limiterResponse = await rateLimiterAddToken(customerInfo, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
+      if (null != limiterResponse && limiterResponse >= parseInt(cardRateCount)) {
+        dontSaveTokenFlag = true;
+      }
     }
-  }
-  paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_CARD, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
-  if (null != updatePaymentObj && null != paymentResponse && null != paymentResponse.httpCode) {
-    authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
-    if (null != authResponse) {
-      if (Constants.APPLE_PAY == updatePaymentObj.paymentMethodInfo.method) {
-        cardDetails = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj);
-        if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.HTTP_CODE_TWO_HUNDRED == cardDetails.httpCode && cardDetails.hasOwnProperty(Constants.CARD_FIELD_GROUP) && Constants.VAL_ZERO < Object.keys(cardDetails.cardFieldGroup).length) {
-          actions = paymentService.visaCardDetailsAction(cardDetails);
-          if (null != actions && Constants.VAL_ZERO < actions.length) {
-            actions.forEach((i) => {
-              authResponse.actions.push(i);
+    paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_CARD, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
+    if (null != updatePaymentObj && null != paymentResponse && null != paymentResponse.httpCode) {
+      authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
+      if (null != authResponse) {
+        if (Constants.APPLE_PAY == updatePaymentObj.paymentMethodInfo.method) {
+          cardDetails = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj.id);
+          if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.HTTP_CODE_TWO_HUNDRED == cardDetails.httpCode && cardDetails.hasOwnProperty(Constants.CARD_FIELD_GROUP) && Constants.VAL_ZERO < Object.keys(cardDetails.cardFieldGroup).length) {
+            actions = paymentService.visaCardDetailsAction(cardDetails);
+            if (null != actions && Constants.VAL_ZERO < actions.length) {
+              actions.forEach((i) => {
+                authResponse.actions.push(i);
+              });
+            }
+          }
+          if (Constants.ISV_PAYMENT_APPLE_PAY_SESSION_DATA in updatePaymentObj.custom.fields && Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_applePaySessionData) {
+            authResponse.actions.push({
+              action: Constants.SET_CUSTOM_FIELD,
+              name: Constants.ISV_PAYMENT_APPLE_PAY_SESSION_DATA,
+              value: null,
             });
           }
         }
-        if (Constants.ISV_PAYMENT_APPLE_PAY_SESSION_DATA in updatePaymentObj.custom.fields && Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_applePaySessionData) {
-          authResponse.actions.push({
-            action: Constants.SET_CUSTOM_FIELD,
-            name: Constants.ISV_PAYMENT_APPLE_PAY_SESSION_DATA,
-            value: null,
-          });
-        }
+      } else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CREDIT_CARD_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
+        returnResponse.errorFlag = true;
       }
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CREDIT_CARD_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
       returnResponse.errorFlag = true;
     }
-  } else {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CREDIT_CARD_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
+    returnResponse.paymentResponse = paymentResponse;
+    returnResponse.authResponse = authResponse;
+  }
+  catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_CREDIT_CARD_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, exceptionData);
     returnResponse.errorFlag = true;
   }
-  returnResponse.paymentResponse = paymentResponse;
-  returnResponse.authResponse = authResponse;
   return returnResponse;
 };
 
@@ -513,45 +527,59 @@ const clickToPayResponse = async (updatePaymentObj, cartObj, updateTransactions,
   let actions: any;
   let dontSaveTokenFlag = false;
   let payerAuthMandateFlag = false;
+  let exceptionData: any;
   let returnResponse = {
     paymentResponse: null,
     authResponse: null,
     errorFlag: false,
   };
-  paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_VISA, customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
-  if (null != paymentResponse && null != paymentResponse.httpCode) {
-    authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
-    if (null != authResponse) {
-      visaCheckoutData = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj);
-      if (
-        Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
-        Constants.HTTP_CODE_TWO_HUNDRED == visaCheckoutData.httpCode &&
-        visaCheckoutData.hasOwnProperty(Constants.CARD_FIELD_GROUP) &&
-        Constants.VAL_ZERO < Object.keys(visaCheckoutData.cardFieldGroup).length
-      ) {
-        actions = paymentService.visaCardDetailsAction(visaCheckoutData);
-        if (null != actions && Constants.VAL_ZERO < actions.length) {
-          actions.forEach((i) => {
-            authResponse.actions.push(i);
-          });
-        }
-        cartUpdate = await commercetoolsApi.updateCartByPaymentId(cartObj.id, updatePaymentObj.id, cartObj.version, visaCheckoutData);
-        if (null != cartUpdate) {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS);
+  try {
+    paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_VISA, customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
+    if (null != paymentResponse && null != paymentResponse.httpCode) {
+      authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
+      if (null != authResponse) {
+        visaCheckoutData = await clickToPay.getVisaCheckoutData(paymentResponse, updatePaymentObj);
+        if (
+          Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
+          Constants.HTTP_CODE_TWO_HUNDRED == visaCheckoutData.httpCode &&
+          visaCheckoutData.hasOwnProperty(Constants.CARD_FIELD_GROUP) &&
+          Constants.VAL_ZERO < Object.keys(visaCheckoutData.cardFieldGroup).length
+        ) {
+          actions = paymentService.visaCardDetailsAction(visaCheckoutData);
+          if (null != actions && Constants.VAL_ZERO < actions.length) {
+            actions.forEach((i) => {
+              authResponse.actions.push(i);
+            });
+          }
+          cartUpdate = await commercetoolsApi.updateCartByPaymentId(cartObj.id, updatePaymentObj.id, cartObj.version, visaCheckoutData);
+          if (null != cartUpdate) {
+            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS);
+          }
+        } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA);
         }
       } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
+        returnResponse.errorFlag = true;
       }
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
       returnResponse.errorFlag = true;
     }
-  } else {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
+    returnResponse.paymentResponse = paymentResponse;
+    returnResponse.authResponse = authResponse;
+  }
+  catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CLICK_TO_PAY, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, exceptionData);
     returnResponse.errorFlag = true;
   }
-  returnResponse.paymentResponse = paymentResponse;
-  returnResponse.authResponse = authResponse;
   return returnResponse;
 };
 
@@ -561,6 +589,7 @@ const googlePayResponse = async (updatePaymentObj, cartObj, updateTransactions, 
   let actions: any;
   let dontSaveTokenFlag = false;
   let payerAuthMandateFlag = false;
+  let exceptionData: any;
   let cardDetails = {
     cardFieldGroup: null,
   };
@@ -569,30 +598,43 @@ const googlePayResponse = async (updatePaymentObj, cartObj, updateTransactions, 
     authResponse: null,
     errorFlag: false,
   };
-  paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_GOOGLE, customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
-  if (null != paymentResponse && null != paymentResponse.httpCode) {
-    authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
-    if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
-      if (null != paymentResponse.data.paymentInformation.tokenizedCard && null != paymentResponse.data.paymentInformation.tokenizedCard.expirationMonth) {
-        cardDetails.cardFieldGroup = paymentResponse.data.paymentInformation.tokenizedCard;
-      } else {
-        cardDetails.cardFieldGroup = paymentResponse.data.paymentInformation.card;
-      }
-      if (null != cardDetails.cardFieldGroup) {
-        actions = paymentService.visaCardDetailsAction(cardDetails);
-        if (null != actions && Constants.VAL_ZERO < actions.length) {
-          actions.forEach((i) => {
-            authResponse.actions.push(i);
-          });
+  try {
+    paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_GOOGLE, customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
+    if (null != paymentResponse && null != paymentResponse.httpCode) {
+      authResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
+      if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
+        if (null != paymentResponse.data.paymentInformation.tokenizedCard && null != paymentResponse.data.paymentInformation.tokenizedCard.expirationMonth) {
+          cardDetails.cardFieldGroup = paymentResponse.data.paymentInformation.tokenizedCard;
+        } else {
+          cardDetails.cardFieldGroup = paymentResponse.data.paymentInformation.card;
+        }
+        if (null != cardDetails.cardFieldGroup) {
+          actions = paymentService.visaCardDetailsAction(cardDetails);
+          if (null != actions && Constants.VAL_ZERO < actions.length) {
+            actions.forEach((i) => {
+              authResponse.actions.push(i);
+            });
+          }
         }
       }
+    } else {
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GOOGLE_PAY_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
+      returnResponse.errorFlag = true;
     }
-  } else {
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GOOGLE_PAY_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, Constants.ERROR_MSG_SERVICE_PROCESS);
+    returnResponse.paymentResponse = paymentResponse;
+    returnResponse.authResponse = authResponse;
+  }
+  catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GOOGLE_PAY_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + updatePaymentObj.id, exceptionData);
     returnResponse.errorFlag = true;
   }
-  returnResponse.paymentResponse = paymentResponse;
-  returnResponse.authResponse = authResponse;
   return returnResponse;
 };
 
@@ -1656,8 +1698,8 @@ const reportHandler = async () => {
               for (let element of conversionDetailsData) {
                 if (Constants.VAL_THIRTY_SIX == element.merchantReferenceNumber.length) {
                   paymentDetails = await commercetoolsApi.retrievePayment(element.merchantReferenceNumber);
-                  if (null != paymentDetails) {
-                    latestTransaction = paymentDetails.transactions.pop();
+                  if (null != paymentDetails && paymentDetails?.transactions && Constants.VAL_ZERO < paymentDetails.transactions.length) {
+                    latestTransaction = paymentDetails.transactions[paymentDetails.transactions.length - Constants.VAL_ONE]
                     if ((Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == latestTransaction.type || Constants.CT_TRANSACTION_TYPE_CHARGE == latestTransaction.type) && Constants.CT_TRANSACTION_STATE_PENDING == latestTransaction.state) {
                       conversionPresent = true;
                       decisionUpdateObject.id = paymentDetails.id;

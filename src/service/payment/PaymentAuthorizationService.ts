@@ -8,8 +8,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
   let runEnvironment: any;
   let errorData: any;
   let exceptionData: any;
-  let selectedLocale: any;
-  let locale: any;
+  let cartLocale: any;
   let actionList = new Array();
   let j = Constants.VAL_ZERO;
   let totalAmount = Constants.VAL_FLOAT_ZERO;
@@ -25,8 +24,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
   let midCredentials: any;
   try {
     if (null != payment && null != cart && null != service && Constants.STRING_LOCALE in cart && null != cart.locale) {
-      selectedLocale = cart.locale.split(Constants.REGEX_HYPHEN);
-      locale = selectedLocale[Constants.VAL_ZERO];
+      cartLocale = cart.locale;
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.CreatePaymentRequest();
       if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
@@ -187,19 +185,6 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       orderInformationBillTo.email = cart.billingAddress.email;
       orderInformationBillTo.phoneNumber = cart.billingAddress.phone;
       orderInformation.billTo = orderInformationBillTo;
-      requestObj.orderInformation = orderInformation;
-      var orderInformationShipTo = new restApi.Ptsv2paymentsOrderInformationShipTo();
-      orderInformationShipTo.firstName = cart.shippingAddress.firstName;
-      orderInformationShipTo.lastName = cart.shippingAddress.lastName;
-      orderInformationShipTo.address1 = cart.shippingAddress.streetName;
-      orderInformationShipTo.locality = cart.shippingAddress.city;
-      orderInformationShipTo.administrativeArea = cart.shippingAddress.region;
-      orderInformationShipTo.postalCode = cart.shippingAddress.postalCode;
-      orderInformationShipTo.country = cart.shippingAddress.country;
-      orderInformationShipTo.email = cart.shippingAddress.email;
-      orderInformationShipTo.phoneNumber = cart.shippingAddress.phone;
-      orderInformation.shipTo = orderInformationShipTo;
-      requestObj.orderInformation = orderInformation;
       orderInformation.lineItems = [];
       cart.lineItems.forEach((lineItem) => {
         if (Constants.STRING_DISCOUNTED_PRICE_PER_QUANTITY in lineItem && Constants.VAL_ZERO == lineItem.discountedPricePerQuantity.length) {
@@ -209,10 +194,10 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           } else {
             unitPrice = paymentService.convertCentToAmount(lineItem.price.value.centAmount);
           }
-          orderInformationLineItems.productName = lineItem.name[locale];
+          orderInformationLineItems.productName = lineItem.name[cartLocale];
           orderInformationLineItems.quantity = lineItem.quantity;
           orderInformationLineItems.productSku = lineItem.variant.sku;
-          orderInformationLineItems.productCode = lineItem.productId;
+          orderInformationLineItems.productCode = Constants.STRING_DEFAULT;
           orderInformationLineItems.unitPrice = unitPrice;
           if (Constants.STRING_TAX_RATE in lineItem && null != lineItem.taxRate && true === lineItem.taxRate.includedInPrice) {
             orderInformationLineItems.taxRate = lineItem.taxRate.amount;
@@ -223,10 +208,10 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           lineItem.discountedPricePerQuantity.forEach((item) => {
             var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
             unitPrice = paymentService.convertCentToAmount(item.discountedPrice.value.centAmount);
-            orderInformationLineItems.productName = lineItem.name[locale];
+            orderInformationLineItems.productName = lineItem.name[cartLocale];
             orderInformationLineItems.quantity = item.quantity;
             orderInformationLineItems.productSku = lineItem.variant.sku;
-            orderInformationLineItems.productCode = lineItem.productId;
+            orderInformationLineItems.productCode = Constants.STRING_DEFAULT;
             orderInformationLineItems.unitPrice = unitPrice;
             item.discountedPrice.includedDiscounts.forEach((discount) => {
               discountPrice = discountPrice + paymentService.convertCentToAmount(discount.discountedAmount.centAmount) * item.quantity;
@@ -246,10 +231,10 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           if (Constants.STRING_DISCOUNTED_PRICE_PER_QUANTITY in customLineItem && Constants.VAL_ZERO == customLineItem.discountedPricePerQuantity.length) {
             var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
             unitPrice = paymentService.convertCentToAmount(customLineItem.money.centAmount);
-            orderInformationLineItems.productName = customLineItem.name[locale];
+            orderInformationLineItems.productName = customLineItem.name[cartLocale];
             orderInformationLineItems.quantity = customLineItem.quantity;
             orderInformationLineItems.productSku = customLineItem.slug;
-            orderInformationLineItems.productCode = customLineItem.id;
+            orderInformationLineItems.productCode = Constants.STRING_DEFAULT;
             orderInformationLineItems.unitPrice = unitPrice;
             if (Constants.STRING_TAX_RATE in customLineItem && null != customLineItem.taxRate && true === customLineItem.taxRate.includedInPrice) {
               orderInformationLineItems.taxRate = customLineItem.taxRate.amount;
@@ -260,10 +245,10 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
             customLineItem.discountedPricePerQuantity.forEach((customItem) => {
               var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
               unitPrice = paymentService.convertCentToAmount(customItem.discountedPrice.value.centAmount);
-              orderInformationLineItems.productName = customLineItem.name[locale];
+              orderInformationLineItems.productName = customLineItem.name[cartLocale];
               orderInformationLineItems.quantity = customItem.quantity;
               orderInformationLineItems.productSku = customLineItem.slug;
-              orderInformationLineItems.productCode = customLineItem.id;
+              orderInformationLineItems.productCode = Constants.STRING_DEFAULT;
               orderInformationLineItems.unitPrice = unitPrice;
               customItem.discountedPrice.includedDiscounts.forEach((discount) => {
                 discountPrice = discountPrice + paymentService.convertCentToAmount(discount.discountedAmount.centAmount) * customItem.quantity;
@@ -279,7 +264,54 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           }
         });
       }
-      if (Constants.SHIPPING_INFO in cart) {
+      if (cart?.shippingMode && Constants.SHIPPING_MODE_MULTIPLE == cart.shippingMode && cart?.shipping && Constants.VAL_ZERO < cart.shipping.length) {
+        var orderInformationShipTo = new restApi.Ptsv2paymentsOrderInformationShipTo();
+        orderInformationShipTo.firstName = cart.shipping[Constants.VAL_ZERO].shippingAddress.firstName;
+        orderInformationShipTo.lastName = cart.shipping[Constants.VAL_ZERO].shippingAddress.lastName;
+        orderInformationShipTo.address1 = cart.shipping[Constants.VAL_ZERO].shippingAddress.streetName;
+        orderInformationShipTo.locality = cart.shipping[Constants.VAL_ZERO].shippingAddress.city;
+        orderInformationShipTo.administrativeArea = cart.shipping[Constants.VAL_ZERO].shippingAddress.region;
+        orderInformationShipTo.postalCode = cart.shipping[Constants.VAL_ZERO].shippingAddress.postalCode;
+        orderInformationShipTo.country = cart.shipping[Constants.VAL_ZERO].shippingAddress.country;
+        orderInformationShipTo.email = cart.shipping[Constants.VAL_ZERO].shippingAddress.email;
+        orderInformationShipTo.phoneNumber = cart.shipping[Constants.VAL_ZERO].shippingAddress.phone;
+        orderInformation.shipTo = orderInformationShipTo;
+        cart.shipping.forEach((shippingDetail) => {
+          var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
+          orderInformationLineItems.productName = shippingDetail.shippingInfo.shippingMethodName;
+          orderInformationLineItems.quantity = Constants.VAL_ONE;
+          orderInformationLineItems.productSku = Constants.SHIPPING_AND_HANDLING;
+          orderInformationLineItems.productCode = Constants.SHIPPING_AND_HANDLING;
+          if (Constants.STRING_DISCOUNTED_PRICE in shippingDetail.shippingInfo) {
+            shippingCost = paymentService.convertCentToAmount(shippingDetail.shippingInfo.discountedPrice.value.centAmount);
+            if (Constants.STRING_INCLUDED_DISCOUNTS in shippingDetail.shippingInfo.discountedPrice) {
+              shippingDetail.shippingInfo.discountedPrice.includedDiscounts.forEach((discount) => {
+                discountPrice += paymentService.convertCentToAmount(discount.discountedAmount.centAmount);
+              });
+              orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice);
+            }
+          } else {
+            shippingCost = paymentService.convertCentToAmount(shippingDetail.shippingInfo.price.centAmount);
+          }
+          orderInformationLineItems.unitPrice = shippingCost;
+          if (Constants.STRING_TAX_RATE in shippingDetail.shippingInfo && null != shippingDetail.shippingInfo.taxRate && true === shippingDetail.shippingInfo.taxRate.includedInPrice) {
+            orderInformationLineItems.taxRate = shippingDetail.shippingInfo.taxRate.amount;
+          }
+          orderInformation.lineItems[j] = orderInformationLineItems;
+          j++;
+        });
+      } else if (cart?.shippingInfo) {
+        var orderInformationShipTo = new restApi.Ptsv2paymentsOrderInformationShipTo();
+        orderInformationShipTo.firstName = cart.shippingAddress.firstName;
+        orderInformationShipTo.lastName = cart.shippingAddress.lastName;
+        orderInformationShipTo.address1 = cart.shippingAddress.streetName;
+        orderInformationShipTo.locality = cart.shippingAddress.city;
+        orderInformationShipTo.administrativeArea = cart.shippingAddress.region;
+        orderInformationShipTo.postalCode = cart.shippingAddress.postalCode;
+        orderInformationShipTo.country = cart.shippingAddress.country;
+        orderInformationShipTo.email = cart.shippingAddress.email;
+        orderInformationShipTo.phoneNumber = cart.shippingAddress.phone;
+        orderInformation.shipTo = orderInformationShipTo;
         var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
         orderInformationLineItems.productName = cart.shippingInfo.shippingMethodName;
         orderInformationLineItems.quantity = Constants.VAL_ONE;
@@ -325,9 +357,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.AUTHORIZATION_REQUEST + JSON.stringify(requestObj));
         }
       }
-      const instance = new restApi.PaymentsApi(configObject, apiClient);
+      const paymentsApiInstance = new restApi.PaymentsApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.createPayment(requestObj, function (error, data, response) {
+        paymentsApiInstance.createPayment(requestObj, function (error, data, response) {
           if (Constants.STRING_ENROLL_CHECK == service) {
             paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_ENROLMENT_CHECK_RESPONSE + JSON.stringify(response));
           } else {
@@ -340,7 +372,14 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
             paymentResponse.data = data;
             resolve(paymentResponse);
           } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+            if (
+              error.hasOwnProperty(Constants.STRING_RESPONSE) &&
+              null != error.response &&
+              Constants.VAL_ZERO < Object.keys(error.response).length &&
+              error.response.hasOwnProperty(Constants.STRING_TEXT) &&
+              null != error.response.text &&
+              Constants.VAL_ZERO < Object.keys(error.response.text).length
+            ) {
               paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
               paymentResponse.transactionId = errorData.id;

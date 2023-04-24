@@ -35,7 +35,6 @@ const keys = async (paymentObj) => {
           enableLog: false,
         },
       };
-      // eslint-disable-next-line no-var
       var requestObj = new restApi.GeneratePublicKeyRequest();
       requestObj.encryptionType = Constants.PAYMENT_GATEWAY_ENCRYPTION_TYPE;
       requestObj.targetOrigin = process.env.PAYMENT_GATEWAY_TARGET_ORIGIN;
@@ -43,9 +42,9 @@ const keys = async (paymentObj) => {
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.FLEX_KEYS_REQUEST + JSON.stringify(requestObj));
       }
-      const instance = new restApi.KeyGenerationApi(configObject, apiClient);
+      const keyGenerationApiInstance = new restApi.KeyGenerationApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.generatePublicKey(format, requestObj, function (error, data, response) {
+        keyGenerationApiInstance.generatePublicKey(format, requestObj, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.FLEX_KEYS_RESPONSE + JSON.stringify(response));
           if (data) {
             isv_tokenCaptureContextSignature = data.keyId;

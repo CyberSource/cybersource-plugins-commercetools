@@ -32,9 +32,9 @@ const deleteCustomerToken = async (customerTokenObj) => {
         },
       };
       const apiClient = new restApi.ApiClient();
-      var instance = new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);
+      var customerPaymentInstrumentApiInstance = new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.deleteCustomerPaymentInstrument(customerTokenId, paymentInstrumentTokenId, opts, function (error, data, response) {
+        customerPaymentInstrumentApiInstance.deleteCustomerPaymentInstrument(customerTokenId, paymentInstrumentTokenId, opts, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DELETE_CUSTOMER_TOKEN, Constants.LOG_INFO, null, Constants.DELETE_TOKEN_RESPONSE + JSON.stringify(response));
           if (Constants.HTTP_CODE_TWO_HUNDRED_FOUR == response.status) {
             customerTokenDeleteResponse.httpCode = response.status;

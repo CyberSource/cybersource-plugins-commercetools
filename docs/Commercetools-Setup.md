@@ -143,6 +143,7 @@ Fields
 | isv_accountNumber                    | String  | false    |
 | isv_accountType                      | String  | false    |
 | isv_routingNumber                    | String  | false    |
+| isv_merchantId                       | String  | false    |
 
 ### Payer authentication enrolment check
 
@@ -228,8 +229,28 @@ Below is the Endpoint to create the extensions and the custom fields for the pay
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | {baseUrl}/configurePlugin | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md) to know the values to be passed for the fields required before running the script |
 
-Alternatively, navigate to the `{baseUrl}/orders` endpoint and click on **Run Script** button in the UI page. This will invoke the `{baseUrl}/configurePlugin` endpoint to handle the same. Ensure to create the extensions using the plugin endpoint provided in order to avoid authentication overheads later.
+You can navigate to the `{baseUrl}/orders` endpoint and click on **Run Script** button in the UI page. This will invoke the `{baseUrl}/configurePlugin` endpoint to handle the same. Ensure to create the extensions using the plugin endpoint provided in order to avoid authentication overheads later.
+
+Alternatively, you can create extensions and custom fields also by executing the following script command.
+
+      npm run setup-resources
+
+Following env variables are mandatory for the script to execute successfully:
+
+- PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL
+- PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE
+- CT_PROJECT_KEY
+- CT_CLIENT_ID
+- CT_CLIENT_SECRET
+- CT_AUTH_HOST
+- CT_API_HOST
+
+Refer [API Estension Setup](./API-Extension-Setup.md) to know more about the value to be populated to each of the variable.
+
+<b>Ensure to create the extensions using any one of the above approaches only in order to avoid authentication overheads later.</b>
+
+> **_NOTE:_** For all kind of deployments including local, AWS and for Docker image, the extension creation and customization using the npm command `npm run setup-resources` will be possible only if the system supports `npm`
 
 > **_NOTE:_** Authentication is required for accessing any endpoint in the plugin, hence ensure to provide the valid values for the same. Refer [Authentication](./Authentication.md) for more information.
 
-> **_NOTE:_** An example  of custom field creation and setting data to the created custom field can be found in [Example-Custom-Field](./Example-Custom-Field.md)
+An example  of custom field creation and setting data to the created custom field can be found in [Example-Custom-Field](./Example-Custom-Field.md)

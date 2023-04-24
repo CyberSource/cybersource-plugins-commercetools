@@ -63,9 +63,9 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_REQUEST + JSON.stringify(requestObj));
       }
-      const instance = new restApi.PayerAuthenticationApi(configObject, apiClient);
+      const payerAuthenticationApiInstance = new restApi.PayerAuthenticationApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.payerAuthSetup(requestObj, function (error, data, response) {
+        payerAuthenticationApiInstance.payerAuthSetup(requestObj, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_RESPONSE + JSON.stringify(response));
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];

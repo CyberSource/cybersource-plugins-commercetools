@@ -77,9 +77,9 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_REQUEST + JSON.stringify(requestObj));
       }
-      const instance = new restApi.RefundApi(configObject, apiClient);
+      const refundApiInstance = new restApi.RefundApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.refundPayment(requestObj, captureId, function (error, data, response) {
+        refundApiInstance.refundPayment(requestObj, captureId, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_REFUND_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.REFUND_RESPONSE + JSON.stringify(response));
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];

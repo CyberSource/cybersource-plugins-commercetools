@@ -64,9 +64,9 @@ const captureResponse = async (payment, updateTransactions, authId, orderNo) => 
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CAPTURE_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.CAPTURE_REQUEST + JSON.stringify(requestObj));
       }
-      const instance = new restApi.CaptureApi(configObject, apiClient);
+      const captureApiInstance = new restApi.CaptureApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.capturePayment(requestObj, authId, function (error, data, response) {
+        captureApiInstance.capturePayment(requestObj, authId, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CAPTURE_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.CAPTURE_RESPONSE + JSON.stringify(response));
           if (data) {
             paymentResponse.httpCode = response[Constants.STATUS_CODE];

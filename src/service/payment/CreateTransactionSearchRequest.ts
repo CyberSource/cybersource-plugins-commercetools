@@ -40,9 +40,9 @@ const getTransactionSearchResponse = async (query, sort, midCredentials) => {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST + JSON.stringify(requestObj));
       }
 
-      const instance = new restApi.SearchTransactionsApi(configObject, apiClient);
+      const searchTransactionsApiInstance = new restApi.SearchTransactionsApi(configObject, apiClient);
       return await new Promise((resolve, reject) => {
-        instance.createSearch(requestObj, function (error, data, response) {
+        searchTransactionsApiInstance.createSearch(requestObj, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_RESPONSE + JSON.stringify(response));
           if (data) {
             searchResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];

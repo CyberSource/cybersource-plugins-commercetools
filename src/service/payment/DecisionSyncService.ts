@@ -41,9 +41,9 @@ const conversionDetails = async (midCredentials) => {
       if (null != organizationId) {
         opts.push(organizationId);
       }
-      var instance = new restApi.ConversionDetailsApi(configObject, apiClient);
+      var conversionDetailsApiInstance = new restApi.ConversionDetailsApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        instance.getConversionDetail(startTime, endTime, opts, function (error, data, response) {
+        conversionDetailsApiInstance.getConversionDetail(startTime, endTime, opts, function (error, data, response) {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_INFO, null, Constants.DECISION_SYNC_RESPONSE + JSON.stringify(response));
           if (data) {
             conversionDetailResponse.httpCode = response[Constants.STATUS_CODE];

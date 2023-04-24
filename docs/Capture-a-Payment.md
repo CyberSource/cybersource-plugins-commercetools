@@ -6,7 +6,7 @@
 
 ## Process
 
-To capture a payment, an Authorization must have been completed. When the Payment Update API plugin receives a payment that contains an INITIAL CHARGE transaction, it will attempt to capture the requested amount on the transaction using the `interactionId` of the existing SUCCESS AUTHORIZATION transaction on the payment.
+To capture a payment, an Authorization must have been completed. When the Payment Update API plugin receives a payment that contains an INITIAL CHARGE transaction, it will attempt to capture the requested amount on the transaction using the `interactionId` of the existing SUCCESS AUTHORIZATION transaction on the payment.You can perform multiple captures but the total of all previous successful captures and the current capture must be not more than the amount authorized.
 
 ## Steps
 

@@ -10,6 +10,8 @@
 
     a. Ensure your cart locale is set
 
+    > **_NOTE:_** : If the cart has multiple shipping methods, the  shipping address of the first available shipping method applied to the cart will be used to process the payment
+
 2.  Create a Commercetools payment (<https://docs.commercetools.com/api/projects/payments>) and
     populate the following
 
@@ -24,6 +26,7 @@
     | custom.fields.isv_token               | Apple Pay payment data              | Yes       | Obtain the base64encode value for payment token field on a successful payment authorized event for apple Pay                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
     | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | No        | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_customerIpAddress   | Customer IP address                 | Yes       | Populated from client-side libraries                                                                                          |
+    | custom.fields.isv_merchantId   | Merchant Id used for the transaction                 | No       | Required when you want to support Multi-Mid functionality. Populate this field with the value of Merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions.                                                                                         |
 3.  You can optionally obtain the session data for <b>Web integration</b> to pass the merchant session object to your Apple Pay session’s completeMerchantValidation method by creating a payment with the following
 
     Note that you can skip this step for Native App integration
@@ -42,6 +45,7 @@
     | custom.type.key          | isv_payment_data                            | Yes       | 
     | custom.fields.isv_applePayValidationUrl | Apple Pay validation URL                        | Yes       | Pass the URL obtained from the event’s validationURL property of onvalidatemerchant function. See [Providing Merchant Validation](https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation) for information.              |
     | custom.fields.isv_applePayDisplayName   | Name to be displayed on Apple Pay payment sheet | Yes       |                                                                                   |
+    | custom.fields.isv_merchantId   | Merchant Id used for the transaction                 | No       | Required when you want to support Multi-Mid functionality. Populate this field with the value of Merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions.                                                                                         |
      
 
     b. Verify the custom.fields.isv_applePaySessionData has data from the update response. If the data exists, pass the merchant session object to your Apple Pay session’s completeMerchantValidation method. You can use the merchant session object a single time. It expires five minutes after it is created, see [Providing Merchant Validation](https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation), else throw error to the customer.
