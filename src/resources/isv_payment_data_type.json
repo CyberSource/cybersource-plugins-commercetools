@@ -391,6 +391,17 @@
         "name": "String"
       },
       "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_securityCode",
+      "label": {
+        "en": "Security code for stored card transaction"
+      },
+      "required": false,
+      "type": {
+        "name": "Number"
+      },
+      "inputHint": "SingleLine"
     }
   ]
 }

@@ -144,6 +144,7 @@ Fields
 | isv_accountType                      | String  | false    |
 | isv_routingNumber                    | String  | false    |
 | isv_merchantId                       | String  | false    |
+| isv_securityCode                       | Number  | false    |
 
 ### Payer authentication enrolment check
 

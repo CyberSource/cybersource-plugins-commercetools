@@ -118,6 +118,7 @@ app.get('/paymentdetails', async (req, res) => {
   let convertedPaymentId = Constants.STRING_EMPTY;
   let pendingCaptureAmount = Constants.VAL_FLOAT_ZERO;
   let pendingAuthorizedAmount = Constants.VAL_FLOAT_ZERO;
+  let captureErrorMessage = Constants.ERROR_MSG_CAPTURE_AMOUNT;
   let refundErrorMessage = Constants.ERROR_MSG_REFUND_AMOUNT;
   orderErrorMessage = Constants.STRING_EMPTY;
   orderSuccessMessage = Constants.STRING_EMPTY;
@@ -180,6 +181,7 @@ app.get('/paymentdetails', async (req, res) => {
     errorMessage: errorMessage,
     successMessage: successMessage,
     refundErrorMessage: refundErrorMessage,
+    captureErrorMessage: captureErrorMessage,
   });
 });
 
@@ -310,6 +312,13 @@ app.post('/api/extension/payment/update', async (req, res) => {
               paymentResponse.status = updatePaymentObj.custom.fields.isv_payerEnrollStatus;
               paymentResponse.transactionId = updatePaymentObj.custom.fields.isv_payerEnrollTransactionId;
               updateResponse = paymentService.getAuthResponse(paymentResponse, updateTransactions);
+              if (updatePaymentObj?.custom?.fields?.isv_securityCode && null != updatePaymentObj.custom.fields.isv_securityCode) {
+                updateResponse.actions.push({
+                  action: Constants.SET_CUSTOM_FIELD,
+                  name: Constants.ISV_SECURITY_CODE,
+                  value: null,
+                });
+              }
               if (null != paymentResponse && Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == paymentResponse.status) {
                 updateResponse = await paymentHandler.getPayerAuthReversalHandler(updatePaymentObj, paymentResponse, updateTransactions, updateResponse);
               }
@@ -471,7 +480,7 @@ app.get('/capture', async (req, res) => {
         if (null != capturePaymentObj) {
           pendingAuthorizedAmount = paymentService.getAuthorizedAmount(capturePaymentObj);
           if (Constants.VAL_ZERO == captureAmount) {
-            errorMessage = Constants.ERROR_MSG_CAPTURE_AMOUNT;
+            errorMessage = Constants.ERROR_MSG_CAPTURE_AMOUNT_GREATER_THAN_ZERO;
             successMessage = Constants.STRING_EMPTY;
           } else if (captureAmount > pendingAuthorizedAmount) {
             errorMessage = Constants.ERROR_MSG_CAPTURE_EXCEEDS_AUTHORIZED_AMOUNT;

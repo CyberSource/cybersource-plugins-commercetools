@@ -56,7 +56,6 @@ const getAllMidDetails = async () => {
   let secretKeyIndex: any;
   let exceptionData: any;
   try {
-    ;
     environment = process.env;
     for (let variable in environment) {
       if ((variable.includes(Constants.STRING_SECRET_KEY)) && variable != Constants.DEFAULT_MERCHANT_SECRET_KEY_VARIABLE) {

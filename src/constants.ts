@@ -343,6 +343,7 @@ export abstract class Constants {
   static readonly ISV_RESPONSE_JWT = 'isv_responseJwt';
   static readonly ISV_SALE_ENABLED = 'isv_saleEnabled';
   static readonly ISV_SAVED_TOKEN = 'isv_savedToken';
+  static readonly ISV_SECURITY_CODE = 'isv_securityCode';
   static readonly ISV_STEPUP_URL = 'isv_stepUpUrl';
   static readonly ISV_TOKEN = 'isv_token';
   static readonly ISV_TOKEN_ALIAS = 'isv_tokenAlias';
@@ -440,19 +441,20 @@ export abstract class Constants {
   static readonly ERROR_MSG_REFUND_FAILURE = 'Cannot process refund as there are no transaction id available';
   static readonly ERROR_MSG_REFUND_GREATER_THAN_ZERO = 'Refund amount should be greater than zero';
   static readonly ERROR_MSG_REFUND_SERVICE = 'Error in triggering refund service, please try again';
-  static readonly ERROR_MSG_REFUND_AMOUNT = 'Amount must be a number and should be greater than zero';
+  static readonly ERROR_MSG_REFUND_AMOUNT = 'Refund amount must be a number and should be greater than zero';
   static readonly ERROR_MSG_RETRIEVE_PAYMENT_DETAILS = 'Unable to retrieve payment details';
   static readonly ERROR_MSG_REVERSAL_FAILURE = 'Cannot process authorization reversal as there are no transaction id available';
   static readonly ERROR_MSG_REVERSAL_SERVICE = 'Error in triggering authorization reversal service';
   static readonly ERROR_MSG_SERVICE_PROCESS = 'Unable to process your request';
   static readonly ERROR_MSG_SETUP_RESOURCES = 'Failed to create extensions and custom fields, please provide all the required data in env file';
-  static readonly ERROR_MSG_SHIPPING_DETAILS_NOT_FOUND = 'Unable to fetech the shipping details for the payment : ';
+  static readonly ERROR_MSG_SHIPPING_DETAILS_NOT_FOUND = 'Unable to fetch the shipping details for the payment : ';
   static readonly ERROR_MSG_SYNC_PAYMENT_DETAILS = 'An error occurred while trying to sync the payments details';
   static readonly ERROR_MSG_TOKEN_UPDATE = 'Failed to update card tokens';
   static readonly ERROR_MSG_UPDATE_CART = 'Unable to update the cart';
   static readonly ERROR_MSG_UPDATE_CUSTOM_TYPE = 'There was an error updating custom type';
   static readonly ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA = 'Unable to update click to pay card details';
-  static readonly ERROR_MSG_CAPTURE_AMOUNT = 'Capture amount should be greater than zero';
+  static readonly ERROR_MSG_CAPTURE_AMOUNT = 'Capture amount must be a number and should be greater than zero';
+  static readonly ERROR_MSG_CAPTURE_AMOUNT_GREATER_THAN_ZERO = 'Capture amount should be greater than zero';
   static readonly ERROR_MSG_CAPTURE_EXCEEDS_AUTHORIZED_AMOUNT = 'Cannot perform capture as the entered amount exceeds authorized amount';
   static readonly ERROR_MSG_RETRY_TRANSACTION_SEARCH = 'Missing transaction details';
 

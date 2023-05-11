@@ -96,6 +96,11 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           var paymentInformatioPaymentInstrument = new restApi.Ptsv2paymentsPaymentInformationPaymentInstrument();
           paymentInformatioPaymentInstrument.id = cardTokens.paymentInstrumentId;
           paymentInformation.paymentInstrument = paymentInformatioPaymentInstrument;
+          if (payment?.custom?.fields?.isv_securityCode && null != payment.custom.fields.isv_securityCode) {
+            var paymentInformationCard = new restApi.Ptsv2paymentsPaymentInformationCard();
+            paymentInformationCard.securityCode = payment.custom.fields.isv_securityCode
+            paymentInformation.card = paymentInformationCard;
+          }
         } else {
           if (null != cardTokens && null != cardTokens.customerTokenId) {
             var paymentInformationCustomer = new restApi.Ptsv2paymentsPaymentInformationCustomer();
@@ -224,6 +229,8 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
             j++;
             discountPrice = Constants.VAL_FLOAT_ZERO;
           });
+        } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_SHIPPING_DETAILS_NOT_FOUND + payment.id);
         }
       });
       if (Constants.STRING_CUSTOM_LINE_ITEMS in cart && Constants.VAL_ZERO < cart.customLineItems.length) {

@@ -264,7 +264,7 @@
         </tr>
         <%})%> <%} } else {%> <% if(cart.shippingInfo){ %> <%discountAmount=0.0 %> <%if(cart.shippingInfo.discountedPrice){%> <%shippingCost=amountConversion(cart.shippingInfo.discountedPrice.value.centAmount)%> <%if(cart.shippingInfo.discountedPrice.includedDiscounts){%>
         <%cart.shippingInfo.discountedPrice.includedDiscounts.forEach(function(shippingDiscount){%> <%discountAmount=amountConversion(shippingDiscount.discountedAmount.centAmount) + discountAmount%> <%}) }%> <%}else{%>
-        <%shippingCost=amountConversion(cart.shippingInfo.price.centAmount)%> <%} }%>
+          <%shippingCost=amountConversion(cart.shippingInfo.price.centAmount)%> <%} %>
         <tr>
           <td>
             <b>Shipping Cost (<%= cart.shippingInfo.shippingMethodName %>)</b>
@@ -276,7 +276,7 @@
           <%}%>
           <td><%= cart.shippingInfo.price.currencyCode %> <%=shippingCost%></td>
         </tr>
-        <% } %>
+        <% }%> <% } %>
         <tr>
           <td></td>
           <td></td>
@@ -346,7 +346,7 @@
         <div class="div-padding">You can capture amount <%= authorizedAmount%></div>
         <form action="/capture" class="div-padding" id="partialCaptureForm">
           <input type="hidden" name="captureId" id="captureId" value="<%=id%>" />
-          Capture amount: <input type="text" name="captureAmount" id="captureAmount" size="6" value="" autocomplete="off" oninput="validateAmount(this)" required />
+          Capture amount: <input type="text" name="captureAmount" id="captureAmount" size="6" value="" autocomplete="off"  required />
           <button type="submit" id="captureButton" class="button">Capture</button>
         </form>
         <% } if(authPresent && !capturePresent && !authReversalPresent && !refundPresent){ %>
@@ -355,11 +355,12 @@
         <div class="div-padding">You can refund amount <%= captureAmount%></div>
         <form action="/refund" class="div-padding" id="refundForm">
           <input type="hidden" name="refundId" id="refundId" value="<%=id%>" />
-          Refund amount: <input type="text" name="refundAmount" id="refundAmount" size="6" value="" autocomplete="off" oninput="validateAmount(this)" required />
+          Refund amount: <input type="text" name="refundAmount" id="refundAmount" size="6" value="" autocomplete="off" required />
           <button type="submit" id="refundButton" class="button">Refund</button>
         </form>
         <% } %>
-        <div id="msg"><%= refundErrorMessage%></div>
+        <div id="captureMsg"><%= captureErrorMessage%></div>
+        <div id="refundMsg"><%= refundErrorMessage%></div>
       </div>
       <% } %>
     </div>

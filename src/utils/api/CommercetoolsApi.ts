@@ -540,7 +540,7 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
           isvTokens = customerInfo.custom.fields.isv_tokens;
           mappedTokens = isvTokens.map((item) => item);
           length = mappedTokens.length;
-          mappedTokens.set(length, stringTokenData);
+          mappedTokens[length] = stringTokenData;
           tokenResponse = await setCustomType(customerId, mappedTokens, failedTokens);
         } else {
           if (null != customerInfo && Constants.STRING_CUSTOM in customerInfo && Constants.STRING_FIELDS in customerInfo.custom) {
@@ -770,25 +770,52 @@ const syncAddTransaction = async (syncUpdateObject) => {
           projectKey: process.env.CT_PROJECT_KEY,
         });
         uri = requestBuilder.payments.byId(syncUpdateObject.id).build();
-        channelsRequest = {
-          uri: uri,
-          method: Constants.HTTP_METHOD_POST,
-          body: JSON.stringify({
-            version: syncUpdateObject.version,
-            actions: [
-              {
-                action: Constants.ADD_TRANSACTION,
-                transaction: {
-                  type: syncUpdateObject.type,
-                  timestamp: new Date(Date.now()).toISOString(),
-                  amount: syncUpdateObject.amountPlanned,
-                  state: syncUpdateObject.state,
-                  interactionId: syncUpdateObject.interactionId,
+        if (syncUpdateObject.securityCodePresent) {
+          channelsRequest = {
+            uri: uri,
+            method: Constants.HTTP_METHOD_POST,
+            body: JSON.stringify({
+              version: syncUpdateObject.version,
+              actions: [
+                {
+                  action: Constants.ADD_TRANSACTION,
+                  transaction: {
+                    type: syncUpdateObject.type,
+                    timestamp: new Date(Date.now()).toISOString(),
+                    amount: syncUpdateObject.amountPlanned,
+                    state: syncUpdateObject.state,
+                    interactionId: syncUpdateObject.interactionId,
+                  },
                 },
-              },
-            ],
-          }),
-        };
+                {
+                  action: Constants.SET_CUSTOM_FIELD,
+                  name: Constants.ISV_SECURITY_CODE,
+                  value: null,
+                }
+              ],
+            }),
+          };
+        } else {
+          channelsRequest = {
+            uri: uri,
+            method: Constants.HTTP_METHOD_POST,
+            body: JSON.stringify({
+              version: syncUpdateObject.version,
+              actions: [
+                {
+                  action: Constants.ADD_TRANSACTION,
+                  transaction: {
+                    type: syncUpdateObject.type,
+                    timestamp: new Date(Date.now()).toISOString(),
+                    amount: syncUpdateObject.amountPlanned,
+                    state: syncUpdateObject.state,
+                    interactionId: syncUpdateObject.interactionId,
+                  },
+                },
+              ],
+            }),
+          };
+        }
         syncAddTransactionResponse = await client.execute(channelsRequest);
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + syncUpdateObject.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);

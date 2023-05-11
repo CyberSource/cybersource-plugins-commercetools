@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import sync from '../../service/payment/DecisionSyncService';
 
-test('Check http code for decisiom sync', async (t) => {
+test('Check http code for decision sync', async (t) => {
   const midCredentials = {
     merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
     merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
