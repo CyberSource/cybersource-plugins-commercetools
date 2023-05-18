@@ -645,7 +645,7 @@ const googlePayResponse = async (updatePaymentObj, cartObj, updateTransactions, 
   return returnResponse;
 };
 
-const getTransactionSummaries = async (updatePaymentObj) => {
+const getTransactionSummaries = async (updatePaymentObj, retryCount) => {
   let query = Constants.STRING_EMPTY;
   let transactionDetail: any;
   let exceptionData: any;
@@ -661,7 +661,7 @@ const getTransactionSummaries = async (updatePaymentObj) => {
     return await new Promise(async function (resolve, reject) {
       await setTimeout(async () => {
         transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, Constants.STRING_SYNC_SORT, authMid);
-        if (null != transactionDetail && Constants.HTTP_CODE_TWO_HUNDRED_ONE == transactionDetail.httpCode && transactionDetail?.data?._embedded?.transactionSummaries && Constants.VAL_ONE < transactionDetail.data.totalCount) {
+        if ((null != transactionDetail && Constants.HTTP_CODE_TWO_HUNDRED_ONE == transactionDetail.httpCode && transactionDetail?.data?._embedded?.transactionSummaries) && ((Constants.CC_PAYER_AUTHENTICATION == updatePaymentObj.paymentMethodInfo.method && Constants.VAL_TWO <= transactionDetail.data.totalCount && Constants.VAL_THREE == retryCount) || (Constants.VAL_ONE == transactionDetail.data.totalCount && updatePaymentObj?.custom?.fields?.isv_saleEnabled && updatePaymentObj.custom.fields.isv_saleEnabled) || (Constants.VAL_ONE < transactionDetail.data.totalCount && Constants.CC_PAYER_AUTHENTICATION != updatePaymentObj.paymentMethodInfo.method))) {
           transactionSummaryObject.summaries = transactionDetail.data._embedded.transactionSummaries;
           transactionSummaryObject.historyPresent = true;
           resolve(transactionSummaryObject);
@@ -731,7 +731,7 @@ const checkAuthReversalTriggered = async (updatePaymentObj, cartObj, paymentResp
   };
   try {
     for (let i = Constants.VAL_ZERO; i < Constants.VAL_THREE; i++) {
-      transactionDetail = await getTransactionSummaries(updatePaymentObj);
+      transactionDetail = await getTransactionSummaries(updatePaymentObj, i + Constants.VAL_ONE);
       if (null != transactionDetail) {
         transactionSummaries = transactionDetail.summaries;
         if (true == transactionDetail.historyPresent) {
