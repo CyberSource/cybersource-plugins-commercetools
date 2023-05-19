@@ -1,0 +1,23 @@
+{
+    "key": "isv_transaction_data",
+    "name": {
+        "en": "ISV payment service custom transaction fields"
+    },
+    "resourceTypeIds": [
+        "transaction"
+    ],
+    "fieldDefinitions": [
+        {
+            "name": "isv_availableCaptureAmount",
+            "label": {
+                "en": "Value indicating pending capture amount for transaction"
+            },
+            "required": false,
+            "type": {
+                "name": "Number"
+            },
+            "inputHint": "SingleLine"
+        }
+        
+    ]
+}

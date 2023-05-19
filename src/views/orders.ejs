@@ -22,10 +22,10 @@
     <% } %>
 
     <div class="leftDiv"><h1>Payments</h1></div>
-    <div class="buttonright"><a class="button" href="/configurePlugin" role="button" id="runScript" onclick="showDiv()">Run Script</a></div>
+    <div class="buttonright"><a class="button" href="/configurePlugin" role="button" id="runScript">Run Script</a></div>
     <% if(total != 0) { %>
-    <div class="buttonright"><a class="button" href="/decisionSync" role="button" id="decisionSync" onclick="showDiv()">Run Decision Sync</a></div>
-    <div class="buttonright"><a class="button" href="/sync" role="button" id="sync" onclick="showDiv()">Run Sync</a></div>
+    <div class="buttonright"><a class="button" href="/decisionSync" role="button" id="decisionSync">Run Decision Sync</a></div>
+    <div class="buttonright"><a class="button" href="/sync" role="button" id="sync">Run Sync</a></div>
     <% } %>
     <table class="order" id="paymentDetailsTable">
       <tr>
@@ -40,8 +40,8 @@
         <td colspan="6" class="text-align">There are no orders</td>
       </tr>
       <% } else{ %> <% orderList.forEach(function(list){ %> <% if(list.transactions.length!=0) { %>
-      <tr id="cell-<%= i++ %>" class="row" onclick="window.location='/paymentdetails?id=<%=list.id %>'">
-        <td><%=list.id %></td>
+        <tr id="cell-<%= i++ %>" class="row" data-href='/paymentdetails?id=<%=list.id %>' data-url="/paymentdetails?id=<%=list.id %>">
+          <td><%=list.id %></td>
         <td><%= list.amountPlanned.currencyCode%> <%=amountConversion(list.amountPlanned.centAmount) %></td>
         <% if (list.paymentMethodInfo.name) { %>
         <td><%=list.paymentMethodInfo.name.en%></td>

@@ -215,7 +215,12 @@ div.div-font {
 .div-padding {
   padding-left: 10px;
 }
-#msg {
+#captureMsg {
+  color: red;
+  padding-left: 10px;
+  display: none;
+}
+#refundMsg {
   color: red;
   padding-left: 10px;
   display: none;

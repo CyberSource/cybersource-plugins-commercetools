@@ -34,3 +34,7 @@ The plugin is a publicly exposed service that acts as a middleware between the C
 
 - Follow [Setup Guide](./docs/Setup.md) for getting started with the integration of Commercetools with the plugin.
 - Follow [Usage Guide](./docs/Usage.md) to see more information about the payment services.
+
+## Network Capability
+
+By accepting this document, you acknowledge and accept that you are responsible for and assume liability for the functionality, maintenance and availability of your software and network. At all times, it is your responsibility to ensure the accuracy, technical sufficiency and functionality of your software, network, plug-ins, configurations, applications, code, application program interfaces (APIs), software development kits and all other technology (“Your Network”). You are responsible for Your Network’s ability to use and/or access the Cybersource network, any Cybersource API and receive the benefit of Cybersource’s services. You are responsible for all costs, fees, expenses and liabilities associated with Your Network’s ability to access and interface with the Cybersource network and receive the benefit of Cybersource’s services. Cybersource will not be responsible or liable for loss or costs associated with or that results from Your Network’s inability to connect to or process transactions on the Cybersource network.
