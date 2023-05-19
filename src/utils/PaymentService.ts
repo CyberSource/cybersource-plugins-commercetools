@@ -11,17 +11,17 @@ const { combine, printf } = format;
 const logData = (fileName, methodName, type, id, message) => {
   let loggingFormat;
   let logger;
-  if(null != id && Constants.STRING_EMPTY != id){
+  if (null != id && Constants.STRING_EMPTY != id) {
     loggingFormat = printf(({ label, methodName, level, message }) => {
       return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}] [${id}] : ${message}`;
     });
   }
-  else{
+  else {
     loggingFormat = printf(({ label, methodName, level, message }) => {
       return `[${new Date(Date.now()).toISOString()}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
     });
   }
-  if(Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS){
+  if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS) {
     logger = winston.createLogger({
       level: type,
       format: combine(loggingFormat),
@@ -40,7 +40,7 @@ const logData = (fileName, methodName, type, id, message) => {
       ],
     });
   }
-  else{
+  else {
     logger = winston.createLogger({
       level: type,
       format: combine(loggingFormat),
@@ -55,7 +55,7 @@ const logData = (fileName, methodName, type, id, message) => {
       ],
     });
   }
-  if(null != id && Constants.STRING_EMPTY != id){
+  if (null != id && Constants.STRING_EMPTY != id) {
     logger.log({
       label: fileName,
       methodName: methodName,
@@ -64,12 +64,12 @@ const logData = (fileName, methodName, type, id, message) => {
       message: message,
     });
   }
-  else{
+  else {
     logger.log({
-     label: fileName,
-     methodName: methodName,
-     level: type,
-     message: message,
+      label: fileName,
+      methodName: methodName,
+      level: type,
+      message: message,
     });
   }
 };
@@ -533,11 +533,11 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
         } else {
           setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
         }
-        response = createResponse(setTransaction, setCustomField, null);
+        response = createResponse(setTransaction, setCustomField, null, null);
       } else if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW == paymentResponse.status || Constants.API_STATUS_PENDING_REVIEW == paymentResponse.status) && null != transactionDetail) {
         setTransaction = setTransactionId(paymentResponse, transactionDetail);
         setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_PENDING);
-        response = createResponse(setTransaction, setCustomField, null);
+        response = createResponse(setTransaction, setCustomField, null, null);
       } else if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode && Constants.API_STATUS_COMPLETED == paymentResponse.status) {
         isv_requestJwt = paymentResponse.accessToken;
         isv_cardinalReferenceId = paymentResponse.referenceId;
@@ -587,7 +587,7 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
           setTransaction = setTransactionId(paymentResponse, transactionDetail);
           setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_FAILURE);
           paymentFailure = failureResponse(paymentResponse, transactionDetail);
-          response = createResponse(setTransaction, setCustomField, paymentFailure);
+          response = createResponse(setTransaction, setCustomField, paymentFailure, null);
         }
       }
     } else {
@@ -606,7 +606,7 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
   return response;
 };
 
-function createResponse(setTransaction, setCustomField, paymentFailure) {
+function createResponse(setTransaction, setCustomField, paymentFailure, setCustomType) {
   let actions = [] as any;
   let exceptionData: any;
   let returnResponse = {};
@@ -617,6 +617,9 @@ function createResponse(setTransaction, setCustomField, paymentFailure) {
     }
     if (null != paymentFailure) {
       actions.push(paymentFailure);
+    }
+    if (null != setCustomType) {
+      actions.push(setCustomType);
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -635,23 +638,27 @@ function createResponse(setTransaction, setCustomField, paymentFailure) {
   return returnResponse;
 }
 
-const getOMServiceResponse = (paymentResponse, transactionDetail) => {
+const getOMServiceResponse = (paymentResponse, transactionDetail, captureId, pendingAmount) => {
   let setTransaction: any;
   let setCustomField: any;
   let paymentFailure: any;
+  let setCustomType: any;
   let exceptionData: any;
   let response = {};
   try {
     if (null != paymentResponse && null != transactionDetail) {
       if (Constants.API_STATUS_PENDING == paymentResponse.status || Constants.API_STATUS_REVERSED == paymentResponse.status) {
         setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
+        if (null != captureId && null != pendingAmount && pendingAmount >= 0) {
+          setCustomType = setCustomTypeData(captureId, pendingAmount);
+        }
         paymentFailure = null;
       } else {
         setCustomField = changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_FAILURE);
         paymentFailure = failureResponse(paymentResponse, transactionDetail);
       }
       setTransaction = setTransactionId(paymentResponse, transactionDetail);
-      response = createResponse(setTransaction, setCustomField, paymentFailure);
+      response = createResponse(setTransaction, setCustomField, paymentFailure, setCustomType);
     } else {
       logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_SERVICE_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_OPERATION);
     }
@@ -685,7 +692,11 @@ const getCapturedAmount = (refundPaymentObj) => {
         return index;
       });
       if (Constants.VAL_ZERO <= indexValue) {
-        capturedAmount = Number(refundTransaction[indexValue].amount.centAmount);
+        refundTransaction.forEach((transaction) => {
+          if (Constants.CT_TRANSACTION_TYPE_CHARGE == transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS == transaction.state) {
+            capturedAmount = capturedAmount + Number(transaction.amount.centAmount);
+          }
+        });
         refundedAmount = Constants.VAL_FLOAT_ZERO;
         refundTransaction.forEach((transaction) => {
           if (Constants.CT_TRANSACTION_TYPE_REFUND == transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS == transaction.state) {
@@ -711,6 +722,117 @@ const getCapturedAmount = (refundPaymentObj) => {
   return pendingCaptureAmount;
 };
 
+const getAuthorizedAmount = (capturePaymentObj) => {
+  let captureTransaction: any;
+  let indexValue: any;
+  let exceptionData: any;
+  let authorizedAmount = Constants.VAL_FLOAT_ZERO;
+  let capturedAmount = Constants.VAL_ZERO;
+  let pendingAuthorizedAmount = Constants.VAL_ZERO;
+  try {
+    if (null != capturePaymentObj) {
+      captureTransaction = capturePaymentObj.transactions;
+      indexValue = captureTransaction.findIndex((transaction, index) => {
+        if (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == transaction.type) {
+          return true;
+        }
+        return index;
+      });
+      if (Constants.VAL_ZERO <= indexValue) {
+        authorizedAmount = Number(captureTransaction[indexValue].amount.centAmount);
+        capturedAmount = Constants.VAL_FLOAT_ZERO;
+        captureTransaction.forEach((transaction) => {
+          if (Constants.CT_TRANSACTION_TYPE_CHARGE == transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS == transaction.state) {
+            capturedAmount = capturedAmount + Number(transaction.amount.centAmount);
+          }
+        });
+        pendingAuthorizedAmount = authorizedAmount - capturedAmount;
+        pendingAuthorizedAmount = convertCentToAmount(pendingAuthorizedAmount);
+      }
+    } else {
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_AUTHORIZED_AMOUNT, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_OPERATION);
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_AUTHORIZED_AMOUNT, Constants.LOG_ERROR, null, exceptionData);
+  }
+  return pendingAuthorizedAmount;
+};
+
+
+const addRefundAction = (amount, orderResponse, state) => {
+  let refundAction: any;
+  let exceptionData: any;
+  try {
+    if (null != amount && null != orderResponse) {
+      refundAction = {
+        action: Constants.ADD_TRANSACTION,
+        transaction: {
+          type: Constants.CT_TRANSACTION_TYPE_REFUND,
+          timestamp: new Date(Date.now()).toISOString(),
+          amount: amount,
+          state: state,
+          interactionId: orderResponse.transactionId
+        },
+      }
+    }
+    else {
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_REFUND_ACTION, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);
+    }
+  }
+  catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_REFUND_ACTION, Constants.LOG_ERROR, null, exceptionData);
+
+  }
+  return refundAction;
+}
+
+const setCustomTypeData = (transactionId, pendingAmount) => {
+  let returnResponse: any;
+  let exceptionData: any;
+  try {
+    if (null != transactionId && null != pendingAmount) {
+      returnResponse = {
+        action: Constants.SET_TRANSACTION_CUSTOM_TYPE,
+        type: {
+          key: Constants.ISV_TRANSACTION_DATA,
+          typeId: Constants.TYPE_ID_TYPE,
+        },
+        fields: {
+          isv_availableCaptureAmount: pendingAmount,
+        },
+        transactionId: transactionId
+      }
+    }
+    else {
+      logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE_DATA, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOM_TYPE_DATA, Constants.LOG_ERROR, null, exceptionData);
+  }
+
+  return returnResponse;
+}
 const convertCentToAmount = (num) => {
   let amount = Constants.VAL_ZERO;
   if (null != num) {
@@ -770,23 +892,23 @@ const invalidInputResponse = () => {
   };
 };
 const encryption = (data) => {
-  let key:any;
-  let baseEncodedData:any;
-  let exceptionData:any;
-  let encryption:any
-  let encryptStringData:any;
-  try{
-    if(data){
+  let key: any;
+  let baseEncodedData: any;
+  let exceptionData: any;
+  let encryption: any
+  let encryptStringData: any;
+  try {
+    if (data) {
       key = process.env.CT_CLIENT_SECRET;
       const iv = crypto.randomBytes(Constants.VAL_TWELVE);
       const cipher = crypto.createCipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, key, iv);
       encryption = cipher.update(data, Constants.UNICODE_ENCODING_SYSTEM, Constants.ENCODING_BASE_SIXTY_FOUR);
       encryption += cipher.final(Constants.ENCODING_BASE_SIXTY_FOUR);
       const authTag = cipher.getAuthTag();
-      encryptStringData = iv.toString(Constants.HEX)+Constants.STRING_FULLCOLON+encryption.toString()+Constants.STRING_FULLCOLON+authTag.toString(Constants.HEX);
+      encryptStringData = iv.toString(Constants.HEX) + Constants.STRING_FULLCOLON + encryption.toString() + Constants.STRING_FULLCOLON + authTag.toString(Constants.HEX);
       baseEncodedData = (Buffer.from(encryptStringData)).toString(Constants.ENCODING_BASE_SIXTY_FOUR);
     }
-  }catch(exception){
+  } catch (exception) {
     baseEncodedData = null;
     if (typeof exception === 'string') {
       exceptionData = exception.toUpperCase();
@@ -801,15 +923,15 @@ const encryption = (data) => {
 };
 
 const decryption = (encodedCredentials) => {
-  let key:any;
-  let data:any;
-  let decryptedData:any;
-  let encryptedData:any;
-  let exceptionData:any;
-  let ivBuff:any;
-  let authTagBuff:any;
-  try{
-    if(encodedCredentials){
+  let key: any;
+  let data: any;
+  let decryptedData: any;
+  let encryptedData: any;
+  let exceptionData: any;
+  let ivBuff: any;
+  let authTagBuff: any;
+  try {
+    if (encodedCredentials) {
       key = process.env.CT_CLIENT_SECRET;
       data = (Buffer.from(encodedCredentials, Constants.ENCODING_BASE_SIXTY_FOUR)).toString(Constants.ASCII);
       ivBuff = Buffer.from(data.split(Constants.STRING_FULLCOLON)[Constants.VAL_ZERO], Constants.HEX);
@@ -820,7 +942,7 @@ const decryption = (encodedCredentials) => {
       decryptedData = decipher.update(encryptedData, Constants.ENCODING_BASE_SIXTY_FOUR, Constants.UNICODE_ENCODING_SYSTEM);
       decryptedData += decipher.final(Constants.UNICODE_ENCODING_SYSTEM);
     }
-  }catch(exception){
+  } catch (exception) {
     decryptedData = null;
     if (typeof exception === 'string') {
       exceptionData = exception.toUpperCase();
@@ -855,4 +977,7 @@ export default {
   roundOff,
   encryption,
   decryption,
+  getAuthorizedAmount,
+  addRefundAction,
+  setCustomTypeData,
 };

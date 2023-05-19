@@ -15,7 +15,7 @@ For using Synchronizing services, it should be enabled from the configuration fi
 
 > **_NOTE:_** These fields are case sensitive
 
-The `run sync` button in plugin UI (<https://{domain_where_plugin_is_hosted}/orders>) will synchronize every payment found for the current day i.e., 50 payments at a time. Where as the `decision sync` also works in the similar way such that, it will update the state of payment that is in 'Pending' to either 'Success' or 'Failure' based on the Decision taken by the merchant.
+The `run sync` button in plugin UI (<https://{domain_where_plugin_is_hosted}/orders>) will synchronize every payment found for the current day i.e., 50 payments at a time across all the mids configured in the .env file. Where as the `decision sync` also works in the similar way such that, it will update the state of payment that is in 'Pending' to either 'Success' or 'Failure' based on the Decision taken by the merchant.
 
 Alternatively, Scheduler can be used to run the sync periodically. Below are the endpoints for synchronization:
 

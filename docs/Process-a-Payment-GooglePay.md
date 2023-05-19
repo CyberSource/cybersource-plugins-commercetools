@@ -10,6 +10,8 @@
 
     a. Ensure your cart locale is set
 
+    > **_NOTE:_** : If the cart has multiple shipping methods, the  shipping address of the first available shipping method applied to the cart will be used to process the payment
+
 2.  Create a Commercetools payment
     (https://docs.commercetools.com/api/projects/payments) and
     populate the following
@@ -26,7 +28,8 @@
     | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id      | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_customerIpAddress | Customer IP address | Yes | Populated from client-side libraries |
     | custom.fields.isv_saleEnabled               | false             | Yes       | Set the value to true if sale is enabled           |
-    | custom.fields.isv_walletType                | Wallet type | No  |   This value is required if walletType is to be passed in authorization. Refer [Cybersource Processing a Payment](https://developer.cybersource.com/api-reference-assets/index.html#payments_payments_process-a-payment) for more information about the wallet type value to be passed. It is supported only for ApplePay, ClicktoPay and GooglePay payment methods|  
+    | custom.fields.isv_walletType                | Wallet type | No  |   This value is required if walletType is to be passed in authorization. Refer [Cybersource Processing a Payment](https://developer.cybersource.com/api-reference-assets/index.html#payments_payments_process-a-payment) for more information about the wallet type value to be passed. It is supported only for ApplePay, ClicktoPay and GooglePay payment methods|
+    | custom.fields.isv_merchantId   | Merchant Id used for the transaction                 | No       | Required when you want to support Multi-Mid functionality. Populate this field with the value of Merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions.                                                                                         |  
     
 
 3.  Add the payment to the cart

@@ -9,6 +9,7 @@ import enrollValidateJson from '../../resources/isv_payments_payer_authenticatio
 import customerTokensJson from '../../resources/isv_payments_customer_tokens_type.json';
 import paymentErrorJson from '../../resources/isv_payment_error_type.json';
 import paymentFailureJson from '../../resources/isv_payment_failure_type.json';
+import transactionCustomJson from '../../resources/isv_transaction_data_type.json';
 
 const ensurePaymentCustomType = async () => {
   return syncCustomType(paymentCustomJson);
@@ -33,6 +34,10 @@ const ensurePaymentErrorCustomType = async () => {
 const ensurePaymentFailureCustomType = async () => {
   return syncCustomType(customerTokensJson);
 };
+
+const ensureTransactionCustomType = async () => {
+  return syncCustomType(transactionCustomJson);
+}
 
 const syncCustomType = async (paymentCustomType) => {
   let scriptResponse: any;
@@ -68,4 +73,5 @@ export default {
   ensureCustomerTokensCustomType,
   ensurePayerEnrollCustomType,
   ensurePayerValidateCustomType,
+  ensureTransactionCustomType
 };

@@ -9,6 +9,7 @@ const ensureCustomTypes = async () => {
     customType.ensureCustomerTokensCustomType(),
     customType.ensurePaymentErrorCustomType(),
     customType.ensurePaymentFailureCustomType(),
+    customType.ensureTransactionCustomType(),
   ]);
 };
 
