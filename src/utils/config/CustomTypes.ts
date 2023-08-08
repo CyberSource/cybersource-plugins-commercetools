@@ -1,7 +1,6 @@
 import path from 'path';
 import commercetoolsApi from '../api/CommercetoolsApi';
 import paymentService from '../PaymentService';
-import paymentHandler from '../PaymentHandler';
 import { Constants } from '../../constants';
 import paymentCustomJson from '../../resources/isv_payment_data_type.json';
 import enrollCheckJson from '../../resources/isv_payments_payer_authentication_enrolment_check_type.json';
@@ -55,7 +54,7 @@ const syncCustomType = async (paymentCustomType) => {
         getCustomType = await commercetoolsApi.getCustomType(paymentCustomType.key);
         if (null != getCustomType && Constants.HTTP_CODE_TWO_HUNDRED == getCustomType.statusCode) {
           typeObj = getCustomType.body;
-          paymentHandler.updateCustomField(paymentCustomType.fieldDefinitions, typeObj.fieldDefinitions, typeObj.id, typeObj.version);
+          paymentService.updateCustomField(paymentCustomType.fieldDefinitions, typeObj.fieldDefinitions, typeObj.id, typeObj.version);
         }
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CONFIGURE_PLUGIN, Constants.LOG_INFO, null, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse.message);

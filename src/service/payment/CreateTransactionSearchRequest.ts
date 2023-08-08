@@ -13,11 +13,7 @@ const getTransactionSearchResponse = async (query, sort, midCredentials) => {
   };
   try {
     if (null != query && null != sort && null != midCredentials) {
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
         runEnvironment: runEnvironment,
@@ -35,11 +31,9 @@ const getTransactionSearchResponse = async (query, sort, midCredentials) => {
       requestObj.limit = Constants.VAL_FIFTY;
       requestObj.offset = Constants.VAL_ZERO;
       requestObj.sort = sort;
-
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST + JSON.stringify(requestObj));
       }
-
       const searchTransactionsApiInstance = new restApi.SearchTransactionsApi(configObject, apiClient);
       return await new Promise((resolve, reject) => {
         searchTransactionsApiInstance.createSearch(requestObj, function (error, data, response) {
@@ -66,7 +60,7 @@ const getTransactionSearchResponse = async (query, sort, midCredentials) => {
           }
         });
       }).catch((error) => {
-        return searchResponse;
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);

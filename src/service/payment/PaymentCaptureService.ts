@@ -14,15 +14,13 @@ const captureResponse = async (payment, updateTransactions, authId, orderNo) => 
     status: null,
   };
   let midCredentials: any;
+  let fractionDigits = Constants.VAL_ZERO;
   try {
     if (null != authId && null != payment) {
+      fractionDigits = payment.amountPlanned.fractionDigits;
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.CapturePaymentRequest();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       midCredentials = await multiMid.getMidCredentials(payment);
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
@@ -54,7 +52,7 @@ const captureResponse = async (payment, updateTransactions, authId, orderNo) => 
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION;
       }
       requestObj.processingInformation = processingInformation;
-      const captureAmount = paymentService.convertCentToAmount(updateTransactions.amount.centAmount);
+      const captureAmount = paymentService.convertCentToAmount(updateTransactions.amount.centAmount, fractionDigits);
       var orderInformation = new restApi.Ptsv2paymentsidcapturesOrderInformation();
       var orderInformationAmountDetails = new restApi.Ptsv2paymentsidcapturesOrderInformationAmountDetails();
       orderInformationAmountDetails.totalAmount = captureAmount;
@@ -74,7 +72,14 @@ const captureResponse = async (payment, updateTransactions, authId, orderNo) => 
             paymentResponse.status = data.status;
             resolve(paymentResponse);
           } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+            if (
+              error.hasOwnProperty(Constants.STRING_RESPONSE) &&
+              null != error.response &&
+              Constants.VAL_ZERO < Object.keys(error.response).length &&
+              error.response.hasOwnProperty(Constants.STRING_TEXT) &&
+              null != error.response.text &&
+              Constants.VAL_ZERO < Object.keys(error.response.text).length
+            ) {
               paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CAPTURE_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
               paymentResponse.transactionId = errorData.id;
@@ -94,7 +99,7 @@ const captureResponse = async (payment, updateTransactions, authId, orderNo) => 
           }
         });
       }).catch((error) => {
-        return paymentResponse;
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CAPTURE_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);

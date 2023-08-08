@@ -23,11 +23,7 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
     if (null != payment) {
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.PayerAuthSetupRequest();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       midCredentials = await multiMid.getMidCredentials(payment);
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
@@ -42,20 +38,18 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
       var clientReferenceInformation = new restApi.Riskv1decisionsClientReferenceInformation();
       clientReferenceInformation.code = payment.id;
       requestObj.clientReferenceInformation = clientReferenceInformation;
-
       var clientReferenceInformationpartner = new restApi.Riskv1decisionsClientReferenceInformationPartner();
       clientReferenceInformationpartner.solutionId = Constants.PAYMENT_GATEWAY_PARTNER_SOLUTION_ID;
       clientReferenceInformation.partner = clientReferenceInformationpartner;
       requestObj.clientReferenceInformation = clientReferenceInformation;
-
-      if (Constants.ISV_SAVED_TOKEN in payment.custom.fields && Constants.STRING_EMPTY != payment.custom.fields.isv_savedToken) {
+      if (payment?.custom?.fields?.isv_savedToken) {
         var paymentInformation = new restApi.Riskv1authenticationsetupsPaymentInformation();
         var paymentInformationCustomer = new restApi.Riskv1authenticationsetupsPaymentInformationCustomer();
         paymentInformationCustomer.id = cardTokens.customerTokenId;
         paymentInformation.customer = paymentInformationCustomer;
         requestObj.paymentInformation = paymentInformation;
       } else {
-        jtiToken = jwtDecode(payment.custom.fields.isv_token);
+        jtiToken = (payment?.custom?.fields?.isv_transientToken) ? jwtDecode(payment.custom.fields.isv_transientToken) : jtiToken = jwtDecode(payment.custom.fields.isv_token);
         var tokenInformation = new restApi.Riskv1authenticationsetupsTokenInformation();
         tokenInformation.transientToken = jtiToken.jti;
         requestObj.tokenInformation = tokenInformation;
@@ -76,7 +70,14 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
             paymentResponse.deviceDataCollectionUrl = data.consumerAuthenticationInformation.deviceDataCollectionUrl;
             resolve(paymentResponse);
           } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+            if (
+              error.hasOwnProperty(Constants.STRING_RESPONSE) &&
+              null != error.response &&
+              Constants.VAL_ZERO < Object.keys(error.response).length &&
+              error.response.hasOwnProperty(Constants.STRING_TEXT) &&
+              null != error.response.text &&
+              Constants.VAL_ZERO < Object.keys(error.response.text).length
+            ) {
               paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
               paymentResponse.transactionId = errorData.id;
@@ -96,7 +97,7 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
           }
         });
       }).catch((error) => {
-        return paymentResponse;
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);

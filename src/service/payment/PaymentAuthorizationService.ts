@@ -22,16 +22,14 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
     data: null,
   };
   let midCredentials: any;
+  let fractionDigits = Constants.VAL_ZERO;
   try {
     if (null != payment && null != cart && null != service && Constants.STRING_LOCALE in cart && null != cart.locale) {
+      fractionDigits = payment.amountPlanned.fractionDigits;
       cartLocale = cart.locale;
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.CreatePaymentRequest();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       midCredentials = await multiMid.getMidCredentials(payment);
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
@@ -98,7 +96,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           paymentInformation.paymentInstrument = paymentInformatioPaymentInstrument;
           if (payment?.custom?.fields?.isv_securityCode && null != payment.custom.fields.isv_securityCode) {
             var paymentInformationCard = new restApi.Ptsv2paymentsPaymentInformationCard();
-            paymentInformationCard.securityCode = payment.custom.fields.isv_securityCode
+            paymentInformationCard.securityCode = payment.custom.fields.isv_securityCode;
             paymentInformation.card = paymentInformationCard;
           }
         } else {
@@ -110,7 +108,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           var paymentInformationCard = new restApi.Ptsv2paymentsPaymentInformationCard();
           paymentInformationCard.typeSelectionIndicator = Constants.VAL_ONE;
           paymentInformation.card = paymentInformationCard;
-          tokenInformation.transientTokenJwt = payment.custom.fields.isv_token;
+          tokenInformation.transientTokenJwt = payment.custom.fields?.isv_token;
           requestObj.tokenInformation = tokenInformation;
         }
         if (Constants.VALIDATION == service) {
@@ -136,10 +134,10 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           }
           requestObj.consumerAuthenticationInformation = consumerAuthenticationInformation;
         }
-      } else if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
+      } else if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method && payment?.custom?.fields?.isv_token && Constants.STRING_EMPTY != payment.custom.fields.isv_token) {
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
         processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
-      } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
+      } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method && payment?.custom?.fields?.isv_token && Constants.STRING_EMPTY != payment.custom.fields.isv_token) {
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
         var fluidData = new restApi.Ptsv2paymentsPaymentInformationFluidData();
         fluidData.value = payment.custom.fields.isv_token;
@@ -171,9 +169,15 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         paymentInformationPaymentType.name = Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE;
         paymentInformation.paymentType = paymentInformationPaymentType;
       }
+      if (payment?.custom?.fields?.isv_transientToken && Constants.STRING_EMPTY != payment.custom.fields.isv_transientToken) {
+        var tokenInformation = new restApi.Ptsv2paymentsTokenInformation();
+        tokenInformation.transientTokenJwt = payment.custom.fields.isv_transientToken;
+        requestObj.tokenInformation = tokenInformation;
+        processingInformation.commerceIndicator = Constants.STRING_INTERNET;
+      }
       requestObj.processingInformation = processingInformation;
       requestObj.paymentInformation = paymentInformation;
-      totalAmount = paymentService.convertCentToAmount(payment.amountPlanned.centAmount);
+      totalAmount = paymentService.convertCentToAmount(payment.amountPlanned.centAmount, fractionDigits);
       var orderInformation = new restApi.Ptsv2paymentsOrderInformation();
       var orderInformationAmountDetails = new restApi.Ptsv2paymentsOrderInformationAmountDetails();
       orderInformationAmountDetails.totalAmount = totalAmount;
@@ -195,9 +199,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         if (Constants.STRING_DISCOUNTED_PRICE_PER_QUANTITY in lineItem && Constants.VAL_ZERO == lineItem.discountedPricePerQuantity.length) {
           var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
           if (Constants.STRING_DISCOUNTED in lineItem.price) {
-            unitPrice = paymentService.convertCentToAmount(lineItem.price.discounted.value.centAmount);
+            unitPrice = paymentService.convertCentToAmount(lineItem.price.discounted.value.centAmount, fractionDigits);
           } else {
-            unitPrice = paymentService.convertCentToAmount(lineItem.price.value.centAmount);
+            unitPrice = paymentService.convertCentToAmount(lineItem.price.value.centAmount, fractionDigits);
           }
           orderInformationLineItems.productName = lineItem.name[cartLocale];
           orderInformationLineItems.quantity = lineItem.quantity;
@@ -212,16 +216,16 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         } else if (Constants.STRING_DISCOUNTED_PRICE_PER_QUANTITY in lineItem && Constants.VAL_ZERO < lineItem.discountedPricePerQuantity.length) {
           lineItem.discountedPricePerQuantity.forEach((item) => {
             var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
-            unitPrice = paymentService.convertCentToAmount(item.discountedPrice.value.centAmount);
+            unitPrice = paymentService.convertCentToAmount(item.discountedPrice.value.centAmount, fractionDigits);
             orderInformationLineItems.productName = lineItem.name[cartLocale];
             orderInformationLineItems.quantity = item.quantity;
             orderInformationLineItems.productSku = lineItem.variant.sku;
             orderInformationLineItems.productCode = Constants.STRING_DEFAULT;
             orderInformationLineItems.unitPrice = unitPrice;
             item.discountedPrice.includedDiscounts.forEach((discount) => {
-              discountPrice = discountPrice + paymentService.convertCentToAmount(discount.discountedAmount.centAmount) * item.quantity;
+              discountPrice = discountPrice + paymentService.convertCentToAmount(discount.discountedAmount.centAmount, fractionDigits) * item.quantity;
             });
-            orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice);
+            orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice, fractionDigits);
             if (Constants.STRING_TAX_RATE in lineItem && null != lineItem.taxRate && true === lineItem.taxRate.includedInPrice) {
               orderInformationLineItems.taxRate = lineItem.taxRate.amount;
             }
@@ -237,7 +241,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         cart.customLineItems.forEach((customLineItem) => {
           if (Constants.STRING_DISCOUNTED_PRICE_PER_QUANTITY in customLineItem && Constants.VAL_ZERO == customLineItem.discountedPricePerQuantity.length) {
             var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
-            unitPrice = paymentService.convertCentToAmount(customLineItem.money.centAmount);
+            unitPrice = paymentService.convertCentToAmount(customLineItem.money.centAmount, fractionDigits);
             orderInformationLineItems.productName = customLineItem.name[cartLocale];
             orderInformationLineItems.quantity = customLineItem.quantity;
             orderInformationLineItems.productSku = customLineItem.slug;
@@ -251,16 +255,16 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           } else if (Constants.STRING_DISCOUNTED_PRICE_PER_QUANTITY in customLineItem && Constants.VAL_ZERO < customLineItem.discountedPricePerQuantity.length) {
             customLineItem.discountedPricePerQuantity.forEach((customItem) => {
               var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
-              unitPrice = paymentService.convertCentToAmount(customItem.discountedPrice.value.centAmount);
+              unitPrice = paymentService.convertCentToAmount(customItem.discountedPrice.value.centAmount, fractionDigits);
               orderInformationLineItems.productName = customLineItem.name[cartLocale];
               orderInformationLineItems.quantity = customItem.quantity;
               orderInformationLineItems.productSku = customLineItem.slug;
               orderInformationLineItems.productCode = Constants.STRING_DEFAULT;
               orderInformationLineItems.unitPrice = unitPrice;
               customItem.discountedPrice.includedDiscounts.forEach((discount) => {
-                discountPrice = discountPrice + paymentService.convertCentToAmount(discount.discountedAmount.centAmount) * customItem.quantity;
+                discountPrice = discountPrice + paymentService.convertCentToAmount(discount.discountedAmount.centAmount, fractionDigits) * customItem.quantity;
               });
-              orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice);
+              orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice, fractionDigits);
               if (Constants.STRING_TAX_RATE in customLineItem && null != customLineItem.taxRate && true === customLineItem.taxRate.includedInPrice) {
                 orderInformationLineItems.taxRate = customLineItem.taxRate.amount;
               }
@@ -290,15 +294,15 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           orderInformationLineItems.productSku = Constants.SHIPPING_AND_HANDLING;
           orderInformationLineItems.productCode = Constants.SHIPPING_AND_HANDLING;
           if (Constants.STRING_DISCOUNTED_PRICE in shippingDetail.shippingInfo) {
-            shippingCost = paymentService.convertCentToAmount(shippingDetail.shippingInfo.discountedPrice.value.centAmount);
+            shippingCost = paymentService.convertCentToAmount(shippingDetail.shippingInfo.discountedPrice.value.centAmount, fractionDigits);
             if (Constants.STRING_INCLUDED_DISCOUNTS in shippingDetail.shippingInfo.discountedPrice) {
               shippingDetail.shippingInfo.discountedPrice.includedDiscounts.forEach((discount) => {
-                discountPrice += paymentService.convertCentToAmount(discount.discountedAmount.centAmount);
+                discountPrice += paymentService.convertCentToAmount(discount.discountedAmount.centAmount, fractionDigits);
               });
-              orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice);
+              orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice, fractionDigits);
             }
           } else {
-            shippingCost = paymentService.convertCentToAmount(shippingDetail.shippingInfo.price.centAmount);
+            shippingCost = paymentService.convertCentToAmount(shippingDetail.shippingInfo.price.centAmount, fractionDigits);
           }
           orderInformationLineItems.unitPrice = shippingCost;
           if (Constants.STRING_TAX_RATE in shippingDetail.shippingInfo && null != shippingDetail.shippingInfo.taxRate && true === shippingDetail.shippingInfo.taxRate.includedInPrice) {
@@ -307,7 +311,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           orderInformation.lineItems[j] = orderInformationLineItems;
           j++;
         });
-      } else if (cart?.shippingInfo) {
+      } else if (cart?.shippingAddress) {
         var orderInformationShipTo = new restApi.Ptsv2paymentsOrderInformationShipTo();
         orderInformationShipTo.firstName = cart.shippingAddress.firstName;
         orderInformationShipTo.lastName = cart.shippingAddress.lastName;
@@ -319,28 +323,30 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         orderInformationShipTo.email = cart.shippingAddress.email;
         orderInformationShipTo.phoneNumber = cart.shippingAddress.phone;
         orderInformation.shipTo = orderInformationShipTo;
-        var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
-        orderInformationLineItems.productName = cart.shippingInfo.shippingMethodName;
-        orderInformationLineItems.quantity = Constants.VAL_ONE;
-        orderInformationLineItems.productSku = Constants.SHIPPING_AND_HANDLING;
-        orderInformationLineItems.productCode = Constants.SHIPPING_AND_HANDLING;
-        if (Constants.STRING_DISCOUNTED_PRICE in cart.shippingInfo) {
-          shippingCost = paymentService.convertCentToAmount(cart.shippingInfo.discountedPrice.value.centAmount);
-          if (Constants.STRING_INCLUDED_DISCOUNTS in cart.shippingInfo.discountedPrice) {
-            cart.shippingInfo.discountedPrice.includedDiscounts.forEach((discount) => {
-              discountPrice += paymentService.convertCentToAmount(discount.discountedAmount.centAmount);
-            });
-            orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice);
+        if (cart?.shippingInfo) {
+          var orderInformationLineItems = new restApi.Ptsv2paymentsOrderInformationLineItems();
+          orderInformationLineItems.productName = cart.shippingInfo.shippingMethodName;
+          orderInformationLineItems.quantity = Constants.VAL_ONE;
+          orderInformationLineItems.productSku = Constants.SHIPPING_AND_HANDLING;
+          orderInformationLineItems.productCode = Constants.SHIPPING_AND_HANDLING;
+          if (Constants.STRING_DISCOUNTED_PRICE in cart.shippingInfo) {
+            shippingCost = paymentService.convertCentToAmount(cart.shippingInfo.discountedPrice.value.centAmount, fractionDigits);
+            if (Constants.STRING_INCLUDED_DISCOUNTS in cart.shippingInfo.discountedPrice) {
+              cart.shippingInfo.discountedPrice.includedDiscounts.forEach((discount) => {
+                discountPrice += paymentService.convertCentToAmount(discount.discountedAmount.centAmount, fractionDigits);
+              });
+              orderInformationLineItems.discountAmount = paymentService.roundOff(discountPrice, fractionDigits);
+            }
+          } else {
+            shippingCost = paymentService.convertCentToAmount(cart.shippingInfo.price.centAmount, fractionDigits);
           }
-        } else {
-          shippingCost = paymentService.convertCentToAmount(cart.shippingInfo.price.centAmount);
+          orderInformationLineItems.unitPrice = shippingCost;
+          if (Constants.STRING_TAX_RATE in cart.shippingInfo && null != cart.shippingInfo.taxRate && true === cart.shippingInfo.taxRate.includedInPrice) {
+            orderInformationLineItems.taxRate = cart.shippingInfo.taxRate.amount;
+          }
+          orderInformation.lineItems[j] = orderInformationLineItems;
+          j++;
         }
-        orderInformationLineItems.unitPrice = shippingCost;
-        if (Constants.STRING_TAX_RATE in cart.shippingInfo && null != cart.shippingInfo.taxRate && true === cart.shippingInfo.taxRate.includedInPrice) {
-          orderInformationLineItems.taxRate = cart.shippingInfo.taxRate.amount;
-        }
-        orderInformation.lineItems[j] = orderInformationLineItems;
-        j++;
       }
       requestObj.orderInformation = orderInformation;
       var deviceInformation = new restApi.Ptsv2paymentsDeviceInformation();
@@ -406,7 +412,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
           }
         });
       }).catch((error) => {
-        return paymentResponse;
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_AUTHORIZATION_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);

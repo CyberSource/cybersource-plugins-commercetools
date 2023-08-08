@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="styles.css" />
     <script type="text/javascript" src="orders.js"></script>
     <% var i=0 %>
+    <% var fractionDigits = 0 %>
   </head>
 
   <body>
@@ -39,10 +40,13 @@
       <tr>
         <td colspan="6" class="text-align">There are no orders</td>
       </tr>
-      <% } else{ %> <% orderList.forEach(function(list){ %> <% if(list.transactions.length!=0) { %>
-        <tr id="cell-<%= i++ %>" class="row" data-href='/paymentdetails?id=<%=list.id %>' data-url="/paymentdetails?id=<%=list.id %>">
-          <td><%=list.id %></td>
-        <td><%= list.amountPlanned.currencyCode%> <%=amountConversion(list.amountPlanned.centAmount) %></td>
+      <% } else{ %> 
+        <% orderList.forEach(function(list){ %> 
+          <% if(list.transactions.length!=0) { %>
+            <% fractionDigits = list.amountPlanned.fractionDigits %>
+            <tr id="cell-<%= i++ %>" class="row" data-href='/paymentdetails?id=<%=list.id %>' data-url="/paymentdetails?id=<%=list.id %>">
+            <td><%=list.id %></td>
+            <td><%= list.amountPlanned.currencyCode%> <%=amountConversion(list.amountPlanned.centAmount, fractionDigits) %></td>
         <% if (list.paymentMethodInfo.name) { %>
         <td><%=list.paymentMethodInfo.name.en%></td>
         <% } else { %>

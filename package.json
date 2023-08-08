@@ -1,6 +1,6 @@
 {
   "name": "commercertools-extension",
-  "version": "23.2.0",
+  "version": "23.3.0",
   "description": "Payment Services Commercetools Extension",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -40,34 +40,42 @@
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
     "reset-hard": "git clean -dfx && git reset --hard && npm i",
-    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
+    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish",
+    "zip-function": "npm run build && run-func ./build/main/zipFile.js setupZipFile"
   },
   "engines": {
     "node": ">=10"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.382.0",
     "@bitauth/libauth": "^1.17.1",
-    "@commercetools/api-request-builder": "^5.6.3",
-    "@commercetools/platform-sdk": "^1.18.1",
-    "@commercetools/sdk-auth": "^3.0.12",
+    "@commercetools/api-request-builder": "^6.0.0",
+    "@commercetools/platform-sdk": "^4.11.0",
+    "@commercetools/sdk-auth": "^4.0.1",
+    "@commercetools/sdk-client": "^3.0.0",
     "aws-sdk": "2.1264.0",
     "axios": "^0.24.0",
+    "chunk": "^0.0.3",
     "cors": "^2.8.5",
-    "cybersource-rest-client": "^0.0.44",
+    "cybersource-rest-client": "^0.0.48",
+    "dir-archiver": "^2.1.0",
     "dotenv": "^10.0.0",
     "ejs": "^3.1.7",
     "express": "^4.18.2",
     "flatted": "^3.2.7",
-    "jsonwebtoken": "^9.0.0",
+    "jsonwebtoken": "^9.0.1",
     "jwk-to-pem": "^2.0.5",
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.2",
     "path": "^0.12.7",
     "rimraf": "^3.0.2",
+    "run-func": "^3.0.0",
     "serverless": "^3.30.1",
     "serverless-http": "^3.0.1",
+    "winston-azure-transport": "^3.0.5",
     "winston-cloudwatch": "^6.0.1",
-    "run-func": "^3.0.0"
+    "serverless-ignore": "^0.2.1"
+   
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",

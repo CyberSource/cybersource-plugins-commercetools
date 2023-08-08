@@ -10,7 +10,7 @@
     {
       "name": "isv_token",
       "label": {
-        "en": "Token"
+        "en": "Payment Token from payment gateway"
       },
       "required": false,
       "type": {
@@ -307,7 +307,7 @@
     {
       "name": "isv_applePaySessionData",
       "label": {
-        "en": "Session data for session"
+        "en": "Session data for Apple Pay"
       },
       "required": false,
       "type": {
@@ -400,6 +400,17 @@
       "required": false,
       "type": {
         "name": "Number"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_transientToken",
+      "label": {
+        "en": "Transient token for Unified Checkout"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
       },
       "inputHint": "SingleLine"
     }

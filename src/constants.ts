@@ -14,7 +14,9 @@ export abstract class Constants {
   static readonly POST_CUSTOMER_UPDATE = 'postCustomerUpdate';
   static readonly POST_PAYMENT_CREATE = 'postPaymentCreate';
   static readonly POST_PAYMENT_UPDATE = 'postPaymentUpdate';
+  static readonly POST_CAPTURE_CONTEXT_CREATE = 'postCaptureContextCreate';
 
+  static readonly FUNC_ADD_ADDRESS = 'FuncAddAddress';
   static readonly FUNC_ADD_CARD_HANDLER = 'FuncAddCardHandler';
   static readonly FUNC_ADD_CUSTOM_FIELD = 'FuncAddCustomField';
   static readonly FUNC_ADD_CUSTOM_TYPES = 'FuncAddCustomTypes';
@@ -38,6 +40,7 @@ export abstract class Constants {
   static readonly FUNC_FAILURE_RESPONSE = 'FuncFailureResponse';
   static readonly FUNC_FIELD_MAPPER = 'FuncFieldMapper';
   static readonly FUNC_FIELD_MAPPER_NULL = 'FuncFieldMapperNull';
+  static readonly FUNC_GENERATE_DIGEST = 'FuncGenerateDigest';
   static readonly FUNC_GET_ALL_MID_DETAILS = 'FuncGetAllMidDetails';
   static readonly FUNC_GET_APPLICATIONS_PRESENT = 'FuncGetApplicationsPresent';
   static readonly FUNC_GET_AUTH_RESPONSE = 'FuncGetAuthResponse';
@@ -48,6 +51,7 @@ export abstract class Constants {
   static readonly FUNC_GET_CART_DETAILS_BY_PAYMENT_ID = 'FuncGetCartDetailsByPaymentId';
   static readonly FUNC_GET_CLIENT = 'FuncGetClient';
   static readonly FUNC_GET_CUSTOMER = 'FuncGetCustomer';
+  static readonly FUNC_GET_HTTP_SIGNATURE = 'FuncGetHttpSignature';
   static readonly FUNC_GET_MID_CREDENTIALS = 'FuncGetMidCredentials';
   static readonly FUNC_GET_ORDERS = 'FuncGetOrders';
   static readonly FUNC_GET_PAYER_AUTH_REVERSAL_HANDLER = 'FuncGetPayerAuthReversalHandler';
@@ -79,8 +83,11 @@ export abstract class Constants {
   static readonly FUNC_SET_CUSTOM_TYPE = 'FuncSetCustomType';
   static readonly FUNC_SET_TRANSACTION_ID = 'FuncSetTransactionId';
   static readonly FUNC_SETUP_RESOURCES = 'FuncSetupResources';
+  static readonly FUNC_SET_UP_ZIP_FILE = "setUpZipFile"
   static readonly FUNC_SYNC_HANDLER = 'FuncSyncHandler';
+  static readonly FUNC_TRANSIENT_TOKEN_DATA_RESPONSE = 'FuncTransientTokenDataResponse';
   static readonly FUNC_UPDATE_CART_BY_PAYMENT_ID = 'FuncUpdateCartByPaymentId';
+  static readonly FUNC_UPDATE_CART_WITH_UC_ADDRESS = 'FuncUpdateCartWithUCAddress';
   static readonly FUNC_UPDATE_CARD_HANDLER = 'FuncUpdateCardHandler';
   static readonly FUNC_UPDATE_CUSTOM_FIELDS = 'FuncUpdateCustomField';
   static readonly FUNC_UPDATE_DECISION_SYNC = 'FuncUpdateDecisionSync';
@@ -97,6 +104,7 @@ export abstract class Constants {
   static readonly FUNC_SET_CUSTOM_TYPE_DATA = 'FuncSetCustomTypeData';
   static readonly FUNC_UPDATE_AVAILABLE_AMOUNT = 'FuncUpdateAvailableAmount';
   static readonly FUNC_ADD_REFUND_ACTION = 'FuncAddRefundAction';
+  static readonly FUNC_GENERATE_CAPTURE_CONTEXT = 'FuncGenerateCaptureContext';
 
   //Numbers
   static readonly VAL_NEGATIVE_ONE = -1;
@@ -105,6 +113,7 @@ export abstract class Constants {
   static readonly VAL_ONE = 1;
   static readonly VAL_TWO = 2;
   static readonly VAL_THREE = 3;
+  static readonly VAL_TEN = 10;
   static readonly VAL_TWELVE = 12;
   static readonly VAL_TWENTY_THREE = 23;
   static readonly VAL_THIRTY_SIX = 36;
@@ -115,6 +124,9 @@ export abstract class Constants {
   static readonly VAL_FOUR_SEVENTY_FIVE = 475;
   static readonly VAL_FOUR_EIGHTY = 480;
   static readonly VAL_FOUR_EIGHTY_ONE = 481;
+  static readonly VAL_THREE_SIXTY_FIVE = 365
+  static readonly VAL_ZERO_ONE_FIVE = '0.15';
+  static readonly VAL_ZERO_ZERO_ONE = 0.01;
 
   //Payments data
   static readonly PAYMENT_GATEWAY_TEST_ENVIRONMENT = 'apitest.cybersource.com';
@@ -170,8 +182,10 @@ export abstract class Constants {
   static readonly DOMAIN_REGEX = /^[^:/.]*[:/]+/i;
   static readonly REGEX_COMMA = ',';
   static readonly REGEX_DOUBLE_SLASH = '//';
+  static readonly REGEX_SINGLE_SLASH = '/';
   static readonly REGEX_DOT = '.';
   static readonly REGEX_HYPHEN = '-';
+  static readonly REGEX_UNDERSCORE = '_';
   static readonly STRING_EMPTY = '';
   static readonly STRING_FULLCOLON = ':';
   static readonly STRING_HYPHEN = ' - ';
@@ -186,6 +200,8 @@ export abstract class Constants {
   static readonly GOOGLE_PAY = 'googlePay';
 
   //Strings
+  static readonly STRING_AWS = "aws";
+  static readonly STRING_AZURE = "azure";
   static readonly STRING_KEY_ID = '_KEY_ID';
   static readonly STRING_SECRET_KEY = '_SECRET_KEY';
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
@@ -220,6 +236,7 @@ export abstract class Constants {
   static readonly STRING_CUSTOMER = 'customer';
   static readonly STRING_DATA = 'data';
   static readonly STRING_DELETE = 'delete';
+  static readonly STRING_DOT_LOG_EXTENSION = '.log'
   static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
   static readonly STRING_EMAIL = 'email';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
@@ -232,6 +249,7 @@ export abstract class Constants {
   static readonly STRING_GOOGLE = 'google';
   static readonly STRING_HOURS = 'hours';
   static readonly STRING_ID = 'id';
+  static readonly STRING_INTERNET = 'internet';
   static readonly STRING_MOTO = 'MOTO';
   static readonly STRING_MY_APPLICATION = 'my-application';
   static readonly STRING_MY_REQUESTS = 'my-requests-';
@@ -265,6 +283,15 @@ export abstract class Constants {
   static readonly STRING_VISA = 'visa';
   static readonly STRING_WWW_AUTHENTICATE = 'WWW-Authenticate';
   static readonly STRING_DEFAULT = 'default';
+  static readonly STRING_CAPITAL_VISA = 'VISA';
+  static readonly STRING_CAPITAL_MASTERCARD = 'MASTERCARD';
+  static readonly STRING_CAPITAL_AMEX = 'AMEX';
+  static readonly STRING_PANENTRY = 'PANENTRY';
+  static readonly STRING_SRC = 'SRC';
+  static readonly STRING_GOOGLEPAY = 'GOOGLEPAY';
+  static readonly STRING_CART_ID = 'CartId: ';
+  static readonly STRING_SINGLE = 'Single';
+  static readonly STRING_ZIP_FILE_NAME = 'ctPlugin.zip'
 
   static readonly ASCII = 'ascii';
   static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
@@ -287,6 +314,7 @@ export abstract class Constants {
   static readonly STRING_DISCOUNTED_PRICE = 'discountedPrice';
   static readonly STRING_INCLUDED_DISCOUNTS = 'includedDiscounts';
   static readonly STRING_LOCALE = 'locale';
+  static readonly STRING_FULL = 'FULL';
 
   //Defalt env variables
   static readonly DEFAULT_MERCHANT_SECRET_KEY_VARIABLE = 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY';
@@ -304,6 +332,7 @@ export abstract class Constants {
   static readonly CT_TRANSACTION_STATE_SUCCESS = 'Success';
 
   //CT custom fields
+  static readonly ADD_ADDRESS = 'addAddress';
   static readonly ADD_FIELD_DEFINITION = 'addFieldDefinition';
   static readonly ADD_INTERFACE_INTERACTION = 'addInterfaceInteraction';
   static readonly ADD_TRANSACTION = 'addTransaction';
@@ -321,7 +350,10 @@ export abstract class Constants {
   static readonly ISV_CARDINAL_REFERENCE_ID = 'isv_cardinalReferenceId';
   static readonly ISV_CAPTURE_CONTEXT_SIGNATURE = 'isv_tokenCaptureContextSignature';
   static readonly ISV_CARD_EXPIRY_MONTH = 'isv_cardExpiryMonth';
+  static readonly ISV_CURRENCY_CODE = 'isv_currencyCode';
   static readonly ISV_CARD_EXPIRY_YEAR = 'isv_cardExpiryYear';
+  static readonly ISV_CARD_NEW_EXPIRY_YEAR = 'isv_cardNewExpiryYear';
+  static readonly ISV_CARD_NEW_EXPIRY_MONTH = 'isv_cardNewExpiryMonth';
   static readonly ISV_CARD_TYPE = 'isv_cardType';
   static readonly ISV_DEVICE_FINGERPRINT_ID = 'isv_deviceFingerprintId';
   static readonly ISV_ENABLED_MOTO = 'isv_enabledMoto';
@@ -349,11 +381,14 @@ export abstract class Constants {
   static readonly ISV_TOKEN_ALIAS = 'isv_tokenAlias';
   static readonly ISV_TOKEN_VERIFICATION_CONTEXT = 'isv_tokenVerificationContext';
   static readonly ISV_TOKENS = 'isv_tokens';
+  static readonly ISV_TOKEN_UPDATED = 'isv_tokenUpdated';
+  static readonly ISV_TOKEN_ACTION = 'isv_tokenAction';
   static readonly ISV_TRANSACTION_DATA = 'isv_transaction_data';
   static readonly ISV_USER_AGENT_HEADER = 'isv_userAgentHeader';
   static readonly ISV_WALLET_TYPE = 'isv_walletType';
   static readonly PAYMENT_CREATE_KEY = 'isv_payment_create_extension';
   static readonly PAYMENT_UPDATE_KEY = 'isv_payment_update_extension';
+  static readonly ISV_PAYMENT_TRANSIENT_TOKEN = "isv_transientToken";
   static readonly SEC_CODE_TEL = 'TEL';
   static readonly SEC_CODE_WEB = 'WEB';
   static readonly SET_BILLING_ADDRESS = 'setBillingAddress';
@@ -362,6 +397,7 @@ export abstract class Constants {
   static readonly SET_TRANSACTION_CUSTOM_TYPE = 'setTransactionCustomType';
   static readonly SET_SHIPPING_ADDRESS = 'setShippingAddress';
   static readonly TYPE_ID_TYPE = 'type';
+  static readonly UC_ADDRESS = 'UCAddress';
 
   //Success messages
   static readonly SUCCESS_MSG_CAPTURE_SERVICE = 'Capture is completed successfully';
@@ -372,12 +408,14 @@ export abstract class Constants {
   static readonly SUCCESS_MSG_SYNC_SERVICE = 'Successfully updated payment details';
   static readonly SUCCESS_MSG_SCRIPT_PLUGIN = 'Successfully executed the script';
   static readonly SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS = 'Updated click to pay card details successfully';
+  static readonly SUCCESS_MSG_UC_ADDRESS_DETAILS = 'Successfully updated cart address as the UC address';
 
   //Exception messages
   static readonly EXCEPTION_MSG_ADD_EXTENSION = 'An exception occurred while adding extension to Commercetools';
   static readonly EXCEPTION_MSG_ADD_TRANSACTION = 'An exception occurred while adding transaction to the payment';
   static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception ocurred while retrieving multi-mid details';
   static readonly EXCEPTION_MSG_AUTHORIZING_PAYMENT = 'An exception occurred while authorizing the payment';
+  static readonly EXCEPTION_MSG_ADDING_A_CARD = 'An exception occurred while addding a card token to customer';
   static readonly EXCEPTION_MSG_CART_UPDATE = 'An exception occurred while updating the cart';
   static readonly EXCEPTION_MSG_CART_DETAILS = 'An exception occurred while fetching cart details';
   static readonly EXCEPTION_MSG_COMMERCETOOLS_CONNECT = 'An exception occurred while connecting to Commercetools';
@@ -426,6 +464,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS = 'Invalid Authentication Credentials';
   static readonly ERROR_MSG_INVALID_OPERATION = 'Cannot process the payment due to invalid operation';
   static readonly ERROR_MSG_INVALID_INPUT = 'Cannot process the payment due to invalid input';
+  static readonly ERROR_MSG_INVALID_REQUEST = 'Cannot process the request due to invalid input';
   static readonly ERROR_MSG_MISSING_AUTHORIZATION_HEADER = 'Missing Authorization Header';
   static readonly ERROR_MSG_MERCHANT_ID_NOT_FOUND = ' is not found. Please configure it in the env variables';
   static readonly ERROR_MSG_MULTI_MID_NOT_ENABLED = 'Multi mid not enabled. Using Default credentials for transaction';
@@ -457,6 +496,9 @@ export abstract class Constants {
   static readonly ERROR_MSG_CAPTURE_AMOUNT_GREATER_THAN_ZERO = 'Capture amount should be greater than zero';
   static readonly ERROR_MSG_CAPTURE_EXCEEDS_AUTHORIZED_AMOUNT = 'Cannot perform capture as the entered amount exceeds authorized amount';
   static readonly ERROR_MSG_RETRY_TRANSACTION_SEARCH = 'Missing transaction details';
+  static readonly ERROR_MSG_UC_ADDRESS_DETAILS = 'Unable to update the address as the UC address';
+  static readonly ERROR_MSG_CAPTURE_CONTEXT = 'Failed to generate capture context';
+  static readonly ERROR_MSG_TRANSIENT_TOKEN_DATA = 'Unable to get transient token data';
 
   //script data
   static readonly PAYMENT_CREATE_DESTINATION_URL = '/api/extension/payment/create';
@@ -485,10 +527,16 @@ export abstract class Constants {
   static readonly CAPTURE_RESPONSE = 'Capture Response = ';
   static readonly REFUND_REQUEST = 'Refund Request = ';
   static readonly REFUND_RESPONSE = 'Refund Response = ';
+  static readonly TRANSIENT_TOKEN_DATA_RESPONSE = 'Transient Token Data Response = ';
   static readonly UPDATE_TOKEN_REQUEST = 'Update Token Request = ';
   static readonly UPDATE_TOKEN_RESPONSE = 'Update Token Response = ';
+  static readonly CAPTURE_CONTEXT_REQUEST = 'Capture Context Request = ';
+  static readonly CAPTURE_CONTEXT_RESPONSE = 'Capture Context Response = ';
   static readonly LOG_CUSTOMER_ID = 'CustomerId : ';
   static readonly LOG_ANONYMOUS_ID = 'AnonymousId : ';
   static readonly LOG_CART_ID = 'CartId : ';
   static readonly LOG_PAYMENT_ID = 'PaymentId : ';
+  static readonly SERVICE_PAYMENT = 'Payments';
+  static readonly SERVICE_MY_ACCOUNTS = 'MyAccounts';
+
 }

@@ -4,17 +4,22 @@ import express from 'express';
 import moment from 'moment';
 import path from 'path';
 import serverless from 'serverless-http';
-
 import flexKeys from './service/payment/FlexKeys';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
 import paymentHandler from './utils/PaymentHandler';
 import paymentService from './utils/PaymentService';
 import { Constants } from './constants';
 import resourceHandler from './utils/config/ResourceHandler';
+import captureContext from './service/payment/CaptureContextService';
 
 dotenv.config();
 const app = express();
-const port = process.env.CONFIG_PORT;
+var port: any;
+if (Constants.STRING_AZURE == process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
+  port = process.env.FUNCTIONS_HTTPWORKER_PORT;
+} else {
+  port = process.env.CONFIG_PORT;
+}
 let errorMessage = Constants.STRING_EMPTY;
 let successMessage = Constants.STRING_EMPTY;
 let orderSuccessMessage = Constants.STRING_EMPTY;
@@ -29,41 +34,66 @@ app.all('*', authentication);
 app.listen(port, () => {
   console.log(`Application running on port:${port}`);
 });
-
 app.set('views', path.join(__dirname, 'views/'));
 app.set('view engine', 'ejs');
 
 function authentication(req, res, next) {
   let decrypt: any;
   var authHeader = req.headers.authorization;
+  let whitelistUrl: any;
+  let whitelistUrlArray: any;
+  whitelistUrl = process.env.PAYMENT_GATEWAY_WHITELIST_URLS;
+  if (undefined != whitelistUrl && Constants.STRING_EMPTY != whitelistUrl) {
+    whitelistUrlArray = whitelistUrl.split(Constants.REGEX_COMMA);
+  }
   if (!authHeader) {
-    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin') {
+    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/payerAuthReturnUrl') {
       res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
+    } else {
+      if (null != whitelistUrlArray) {
+        for (let whitelistElement of whitelistUrlArray) {
+          if (req.url == Constants.REGEX_SINGLE_SLASH + whitelistElement) {
+            return next();
+          }
+        }
+      }
     }
     return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER });
   }
-  if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin') {
+  if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/payerAuthReturnUrl') {
     const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
     if (base64Credentials == process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
-      next();
+      return next();
     } else {
       res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
       return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
     }
   } else {
-    if (req.url == '/api/extension/payment/create' || req.url == '/api/extension/payment/update' || req.url == '/api/extension/customer/update') {
+    if (req.url == '/api/extension/payment/create' || req.url == '/api/extension/payment/update' || req.url == '/api/extension/customer/update' || req.url == '/captureContext') {
       const encodedCredentials = authHeader.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
       decrypt = paymentService.decryption(encodedCredentials);
       if (null != decrypt && decrypt == process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
-        next();
+        return next();
       } else {
         return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
       }
     } else {
-      next();
+      if (null != whitelistUrlArray) {
+        for (let whitelistElement of whitelistUrlArray) {
+          if (req.url == Constants.REGEX_SINGLE_SLASH + whitelistElement) {
+            return next();
+          }
+        }
+      }
+      return next();
     }
   }
 }
+
+app.get('/generateHeader', async (req, res) => {
+  let headerValue = paymentService.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
+  res.send(headerValue);
+});
 
 app.get('/orders', async (req, res) => {
   let orderResult: any;
@@ -199,7 +229,9 @@ app.post('/api/extension/payment/create', async (req, res) => {
       if (null != requestObj && typeof requestObj === 'object') {
         paymentObj = requestObj;
         paymentMethod = paymentObj.paymentMethodInfo.method;
-        if (paymentMethod == Constants.CREDIT_CARD || paymentMethod == Constants.CC_PAYER_AUTHENTICATION) {
+        if (null != paymentObj && paymentObj?.custom?.fields?.isv_transientToken) {
+          response = paymentService.getEmptyResponse();
+        } else if (Constants.CREDIT_CARD == paymentMethod || Constants.CC_PAYER_AUTHENTICATION == paymentMethod) {
           if (null != paymentObj && Constants.STRING_CUSTOM in paymentObj && Constants.STRING_FIELDS in paymentObj.custom && Constants.ISV_SAVED_TOKEN in paymentObj.custom.fields && Constants.STRING_EMPTY != paymentObj.custom.fields.isv_savedToken) {
             actions = paymentService.fieldMapper(paymentObj.custom.fields);
             response = {
@@ -224,15 +256,13 @@ app.post('/api/extension/payment/create', async (req, res) => {
             response = await paymentHandler.applePaySessionHandler(paymentObj.custom.fields);
           }
         } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_PAYMENT_DATA);
           response = paymentService.getEmptyResponse();
         }
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_PAYMENT_DATA);
         response = paymentService.getEmptyResponse();
       }
-    } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_EMPTY_PAYMENT_DATA);
-      response = paymentService.getEmptyResponse();
     }
   } catch (exception) {
     if (typeof exception === 'string') {
@@ -272,7 +302,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
         transactionLength = updatePaymentObj.transactions.length;
         if (Constants.CC_PAYER_AUTHENTICATION == paymentMethod && Constants.VAL_ZERO == transactionLength) {
           if (null != updatePaymentObj && Constants.STRING_CUSTOM in updatePaymentObj && Constants.STRING_FIELDS in updatePaymentObj.custom && !(Constants.ISV_CARDINAL_REFERENCE_ID in updatePaymentObj.custom.fields)) {
-            updateResponse = await paymentHandler.getPayerAuthSetUpResponse(updatePaymentObj);
+            updateResponse = await paymentService.getPayerAuthSetUpResponse(updatePaymentObj);
           } else if (
             Constants.STRING_CUSTOM in updatePaymentObj &&
             Constants.STRING_FIELDS in updatePaymentObj.custom &&
@@ -280,7 +310,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
             Constants.ISV_CARDINAL_REFERENCE_ID in updatePaymentObj.custom.fields &&
             Constants.STRING_EMPTY != updatePaymentObj.custom.fields.isv_cardinalReferenceId
           ) {
-            updateResponse = await paymentHandler.getPayerAuthEnrollResponse(updatePaymentObj);
+            updateResponse = await paymentService.getPayerAuthEnrollResponse(updatePaymentObj);
           } else if (
             Constants.CC_PAYER_AUTHENTICATION == paymentMethod &&
             Constants.STRING_CUSTOM in updatePaymentObj &&
@@ -292,7 +322,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
             paymentResponse.httpCode = updatePaymentObj.custom.fields.isv_payerEnrollHttpCode;
             paymentResponse.status = updatePaymentObj.custom.fields.isv_payerEnrollStatus;
             paymentResponse.transactionId = updatePaymentObj.custom.fields.isv_payerEnrollTransactionId;
-            updateResponse = await paymentHandler.getPayerAuthValidateResponse(updatePaymentObj);
+            updateResponse = await paymentService.getPayerAuthValidateResponse(updatePaymentObj);
           }
         }
         if (Constants.VAL_ZERO < transactionLength) {
@@ -303,7 +333,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
             Constants.TYPE_ID_TYPE in updateTransactions &&
             (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION == updateTransactions.type ||
               (Constants.CT_TRANSACTION_TYPE_CHARGE == updateTransactions.type &&
-                ((Constants.STRING_CUSTOM in updatePaymentObj && Constants.STRING_FIELDS in updatePaymentObj.custom && Constants.ISV_SALE_ENABLED in updatePaymentObj.custom.fields && updatePaymentObj.custom.fields.isv_saleEnabled) || paymentMethod == Constants.ECHECK)))
+                ((Constants.STRING_CUSTOM in updatePaymentObj && Constants.STRING_FIELDS in updatePaymentObj.custom && Constants.ISV_SALE_ENABLED in updatePaymentObj.custom.fields && updatePaymentObj.custom.fields.isv_saleEnabled) || Constants.ECHECK == paymentMethod)))
           ) {
             if (Constants.CT_TRANSACTION_STATE_SUCCESS == updateTransactions.state || Constants.CT_TRANSACTION_STATE_FAILURE == updateTransactions.state || Constants.CT_TRANSACTION_STATE_PENDING == updateTransactions.state) {
               updateResponse = paymentService.getEmptyResponse();
@@ -364,15 +394,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
   let customerAddress: any;
   let paymentObj: any;
   try {
-    if (
-      Constants.STRING_BODY in req &&
-      Constants.STRING_RESOURCE in req.body &&
-      Constants.STRING_OBJ in req.body.resource &&
-      Constants.STRING_CUSTOM in req.body.resource.obj &&
-      Constants.STRING_FIELDS in req.body.resource.obj.custom &&
-      Constants.ISV_CAPTURE_CONTEXT_SIGNATURE in req.body.resource.obj.custom.fields &&
-      Constants.STRING_EMPTY == req.body.resource.obj.custom.fields.isv_tokenCaptureContextSignature
-    ) {
+    if (Constants.STRING_EMPTY == req?.body?.resource?.obj?.custom?.fields?.isv_tokenCaptureContextSignature) {
       requestObj = req.body.resource;
       if (null != requestObj && typeof requestObj === 'object') {
         paymentObj = requestObj.obj;
@@ -385,32 +407,14 @@ app.post('/api/extension/customer/update', async (req, res) => {
           };
         }
       }
-    } else if (
-      Constants.STRING_BODY in req &&
-      Constants.STRING_RESOURCE in req.body &&
-      Constants.STRING_OBJ in req.body.resource &&
-      Constants.STRING_CUSTOM in req.body.resource.obj &&
-      Constants.STRING_FIELDS in req.body.resource.obj.custom &&
-      Constants.ISV_ADDRESS_ID in req.body.resource.obj.custom.fields &&
-      Constants.STRING_EMPTY != req.body.resource.obj.custom.fields.isv_addressId
-    ) {
+    } else if (req?.body?.resource?.obj?.custom?.fields?.isv_addressId) {
       requestObj = req.body.resource;
       if (null != requestObj && typeof requestObj === 'object') {
         customerObj = requestObj;
         customerAddress = customerObj.obj.addresses;
         response = await paymentHandler.addCardHandler(customerObj.id, customerAddress, customerObj.obj);
       }
-    } else if (
-      Constants.STRING_BODY in req &&
-      Constants.STRING_RESOURCE in req.body &&
-      Constants.STRING_ID in req.body.resource &&
-      Constants.STRING_OBJ in req.body.resource &&
-      Constants.STRING_CUSTOM in req.body.resource.obj &&
-      Constants.STRING_FIELDS in req.body.resource.obj.custom &&
-      Constants.ISV_TOKENS in req.body.resource.obj.custom.fields &&
-      Constants.STRING_EMPTY != req.body.resource.obj.custom.fields.isv_tokens &&
-      Constants.VAL_ZERO < req.body.resource.obj.custom.fields.isv_tokens.length
-    ) {
+    } else if (req?.body?.resource?.obj?.custom?.fields?.isv_tokens && Constants.VAL_ZERO < req.body.resource.obj.custom.fields.isv_tokens.length) {
       requestObj = req.body.resource;
       if (null != requestObj && typeof requestObj === 'object') {
         customerObj = requestObj;
@@ -421,7 +425,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
         } else if (Constants.STRING_UPDATE == customFields.isv_tokenAction) {
           response = await paymentHandler.updateCardHandler(tokensToUpdate, customerObj.id, customerObj.obj);
         } else {
-          response = paymentService.getUpdateTokenActions(customFields.isv_tokens, customFields.isv_failedTokens, true);
+          response = paymentService.getUpdateTokenActions(customFields.isv_tokens, customFields.isv_failedTokens, true, customerObj, null);
         }
       }
     }
@@ -440,15 +444,8 @@ app.post('/api/extension/customer/update', async (req, res) => {
     if (null != requestObj && typeof requestObj === 'object') {
       customerObj = requestObj;
       customerInfo = await commercetoolsApi.getCustomer(customerObj.id);
-      if (
-        null != customerInfo &&
-        Constants.STRING_CUSTOM in customerInfo &&
-        Constants.STRING_FIELDS in customerInfo.custom &&
-        Constants.ISV_TOKENS in customerInfo.custom.fields &&
-        Constants.STRING_EMPTY != customerInfo.custom.fields.isv_tokens &&
-        Constants.VAL_ZERO < customerInfo.custom.fields.isv_tokens.length
-      ) {
-        response = paymentService.getUpdateTokenActions(customerInfo.custom.fields.isv_tokens, customerInfo.custom.fields.isv_failedTokens, true);
+      if (null != customerInfo && customerInfo?.custom?.fields?.isv_tokens && Constants.STRING_EMPTY != customerInfo.custom.fields.isv_tokens && Constants.VAL_ZERO < customerInfo.custom.fields.isv_tokens.length) {
+        response = paymentService.getUpdateTokenActions(customerInfo.custom.fields.isv_tokens, customerInfo.custom.fields.isv_failedTokens, true, customerInfo, null);
       }
     }
   }
@@ -467,6 +464,7 @@ app.get('/capture', async (req, res) => {
   let exceptionData: any;
   let pendingAuthorizedAmount: number;
   let transactionLength = Constants.VAL_ZERO;
+  let fractionDigits = Constants.VAL_ZERO;
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
@@ -478,6 +476,7 @@ app.get('/capture', async (req, res) => {
         captureAmount = requestAmount;
         capturePaymentObj = await commercetoolsApi.retrievePayment(paymentId);
         if (null != capturePaymentObj) {
+          fractionDigits = capturePaymentObj.amountPlanned.fractionDigits;
           pendingAuthorizedAmount = paymentService.getAuthorizedAmount(capturePaymentObj);
           if (Constants.VAL_ZERO == captureAmount) {
             errorMessage = Constants.ERROR_MSG_CAPTURE_AMOUNT_GREATER_THAN_ZERO;
@@ -486,7 +485,7 @@ app.get('/capture', async (req, res) => {
             errorMessage = Constants.ERROR_MSG_CAPTURE_EXCEEDS_AUTHORIZED_AMOUNT;
             successMessage = Constants.STRING_EMPTY;
           } else {
-            capturePaymentObj.amountPlanned.centAmount = paymentService.convertAmountToCent(captureAmount);
+            capturePaymentObj.amountPlanned.centAmount = paymentService.convertAmountToCent(captureAmount, fractionDigits);
             transactionObject = {
               paymentId: paymentId,
               version: capturePaymentObj.version,
@@ -550,6 +549,7 @@ app.get('/refund', async (req, res) => {
   let transactionLength = Constants.VAL_ZERO;
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
+  let fractionDigits = Constants.VAL_ZERO;
   try {
     if (Constants.STRING_QUERY in req && Constants.REFUND_ID in req.query && null != req.query.refundId && Constants.REFUND_AMOUNT in req.query) {
       requestId = req.query.refundId;
@@ -559,6 +559,7 @@ app.get('/refund', async (req, res) => {
         refundAmount = requestAmount;
         refundPaymentObj = await commercetoolsApi.retrievePayment(paymentId);
         if (null != refundPaymentObj) {
+          fractionDigits = refundPaymentObj.amountPlanned.fractionDigits;
           pendingCaptureAmount = paymentService.getCapturedAmount(refundPaymentObj);
           if (Constants.VAL_ZERO == refundAmount) {
             errorMessage = Constants.ERROR_MSG_REFUND_GREATER_THAN_ZERO;
@@ -567,7 +568,7 @@ app.get('/refund', async (req, res) => {
             errorMessage = Constants.ERROR_MSG_REFUND_EXCEEDS_CAPTURE_AMOUNT;
             successMessage = Constants.STRING_EMPTY;
           } else {
-            refundPaymentObj.amountPlanned.centAmount = paymentService.convertAmountToCent(refundAmount);
+            refundPaymentObj.amountPlanned.centAmount = paymentService.convertAmountToCent(refundAmount, fractionDigits);
             transactionObject = {
               paymentId: paymentId,
               version: refundPaymentObj.version,
@@ -706,6 +707,47 @@ app.get('/configurePlugin', async (req, res) => {
   res.redirect('/orders');
 });
 
-if (process.env.PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS == Constants.STRING_TRUE) {
+app.post('/captureContext', async (req, res) => {
+  let requestObj: any;
+  let captureContextResponse = Constants.STRING_EMPTY;
+  let cartId: any;
+  let cartDetails: any;
+  let cartData: any;
+  let merchantId = Constants.STRING_EMPTY;
+  let country = Constants.STRING_EMPTY;
+  let locale = Constants.STRING_EMPTY;
+  let currencyCode = Constants.STRING_EMPTY;
+  let logData: any;
+  if (req?.body) {
+    requestObj = req.body;
+    if (null != requestObj && typeof requestObj === 'object') {
+      if (requestObj?.merchantId) {
+        merchantId = requestObj.merchantId;
+      }
+      if (null != requestObj?.cartId && Constants.STRING_EMPTY != requestObj?.cartId) {
+        cartId = requestObj.cartId;
+        cartDetails = await commercetoolsApi.getCartById(cartId);
+        if (null != cartDetails) {
+          logData = Constants.STRING_CART_ID + cartDetails.id;
+          captureContextResponse = await captureContext.generateCaptureContext(cartDetails, null, null, null, merchantId, Constants.SERVICE_PAYMENT);
+        }
+      } else if (Constants.STRING_EMPTY != requestObj?.country && Constants.STRING_EMPTY != requestObj?.locale && Constants.STRING_EMPTY != requestObj?.currency) {
+        country = requestObj.country;
+        locale = requestObj.locale;
+        currencyCode = requestObj.currency;
+        logData = null;
+        captureContextResponse = await captureContext.generateCaptureContext(cartData, country, locale, currencyCode, merchantId, Constants.SERVICE_MY_ACCOUNTS);
+      } else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_CAPTURE_CONTEXT);
+      }
+      if (Constants.STRING_EMPTY == captureContextResponse) {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, logData, Constants.ERROR_MSG_CAPTURE_CONTEXT);
+      }
+    }
+  }
+  res.send(JSON.stringify(captureContextResponse));
+});
+
+if (Constants.STRING_AWS == process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
   exports.handler = serverless(app);
 }
