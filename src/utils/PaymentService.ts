@@ -43,7 +43,7 @@ const logData = (fileName, methodName, type, id, message) => {
         new WinstonCloudwatch({
           awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
           awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
-          logGroupName: Constants.STRING_MY_APPLICATION,
+          logGroupName: 'my-application',
           logStreamName: function () {
             let date = new Date().toISOString().split('T')[Constants.VAL_ZERO];
             return Constants.STRING_MY_REQUESTS + date;
@@ -56,7 +56,7 @@ const logData = (fileName, methodName, type, id, message) => {
   }
   if (Constants.STRING_AZURE == process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT && Constants.STRING_TRUE == process.env.AZURE_ENABLE_LOGS && undefined != process.env.AZURE_CONTAINER_URL && Constants.STRING_EMPTY != process.env.AZURE_CONTAINER_URL) {
     localDeployment = false;
-    containerUrlString = process.env.AZURE_ENABLE_LOGS;
+    containerUrlString = process.env.AZURE_CONTAINER_URL;
     logger = winston.createLogger({
       level: type,
       format: combine(loggingFormat),
@@ -64,7 +64,7 @@ const logData = (fileName, methodName, type, id, message) => {
         new AzureBlobTransport({
           containerUrl: containerUrlString,
           nameFormat: getFileName(),
-          retention: Constants.VAL_THREE_SIXTY_FIVE,
+          retention: 365,
         }),
       ],
     });
@@ -104,7 +104,7 @@ const logData = (fileName, methodName, type, id, message) => {
 
 const getFileName = () => {
   const date = new Date().toISOString().split('T')[Constants.VAL_ZERO];
-  return Constants.STRING_MY_REQUESTS + date + Constants.STRING_DOT_LOG_EXTENSION;
+  return Constants.STRING_MY_REQUESTS + date + '.log';
 };
 
 const fieldMapper = (fields) => {
@@ -261,7 +261,7 @@ const visaCardDetailsAction = (visaCheckoutData) => {
   let exceptionData: any;
   try {
     if (null != visaCheckoutData && visaCheckoutData.hasOwnProperty(Constants.CARD_FIELD_GROUP) && Constants.VAL_ZERO < Object.keys(visaCheckoutData.cardFieldGroup).length) {
-      if (visaCheckoutData.cardFieldGroup.hasOwnProperty(Constants.STRING_PREFIX) && null != visaCheckoutData.cardFieldGroup.prefix && visaCheckoutData.cardFieldGroup.hasOwnProperty(Constants.STRING_SUFFIX) && null != visaCheckoutData.cardFieldGroup.suffix) {
+      if (visaCheckoutData.cardFieldGroup.hasOwnProperty('prefix') && null != visaCheckoutData.cardFieldGroup.prefix && visaCheckoutData.cardFieldGroup.hasOwnProperty('suffix') && null != visaCheckoutData.cardFieldGroup.suffix) {
         cardPrefix = visaCheckoutData.cardFieldGroup.prefix;
         cardSuffix = visaCheckoutData.cardFieldGroup.suffix;
         maskedPan = cardPrefix.concat(Constants.CLICK_TO_PAY_CARD_MASK, cardSuffix);
@@ -826,9 +826,9 @@ const getAuthResponse = (paymentResponse, transactionDetail) => {
       } else if (
         Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode &&
         Constants.API_STATUS_PENDING_AUTHENTICATION == paymentResponse.status &&
-        paymentResponse.hasOwnProperty(Constants.STRING_DATA) &&
+        paymentResponse.hasOwnProperty('data') &&
         Constants.VAL_ZERO < Object.keys(paymentResponse.data).length &&
-        paymentResponse.data.hasOwnProperty(Constants.STRING_CONSUMER_AUTHENTICATION) &&
+        paymentResponse.data.hasOwnProperty('consumerAuthenticationInformation') &&
         Constants.VAL_ZERO < Object.keys(paymentResponse.data.consumerAuthenticationInformation).length
       ) {
         payerAuthenticationData = {
@@ -1175,7 +1175,7 @@ const encryption = (data) => {
   try {
     if (data) {
       key = process.env.CT_CLIENT_SECRET;
-      const iv = crypto.randomBytes(Constants.VAL_TWELVE);
+      const iv = crypto.randomBytes(12);
       const cipher = crypto.createCipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, key, iv);
       encryption = cipher.update(data, Constants.UNICODE_ENCODING_SYSTEM, Constants.ENCODING_BASE_SIXTY_FOUR);
       encryption += cipher.final(Constants.ENCODING_BASE_SIXTY_FOUR);
@@ -1208,7 +1208,7 @@ const decryption = (encodedCredentials) => {
   try {
     if (encodedCredentials) {
       key = process.env.CT_CLIENT_SECRET;
-      data = Buffer.from(encodedCredentials, Constants.ENCODING_BASE_SIXTY_FOUR).toString(Constants.ASCII);
+      data = Buffer.from(encodedCredentials, Constants.ENCODING_BASE_SIXTY_FOUR).toString('ascii');
       ivBuff = Buffer.from(data.split(Constants.STRING_FULLCOLON)[Constants.VAL_ZERO], Constants.HEX);
       encryptedData = data.split(Constants.STRING_FULLCOLON)[Constants.VAL_ONE];
       authTagBuff = Buffer.from(data.split(Constants.STRING_FULLCOLON)[Constants.VAL_TWO], Constants.HEX);
@@ -1618,7 +1618,7 @@ const clickToPayResponse = async (updatePaymentObj, cartObj, updateTransactions,
     errorFlag: false,
   };
   try {
-    paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_VISA, customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
+    paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, 'visa', customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
     if (null != paymentResponse && null != paymentResponse.httpCode) {
       authResponse = getAuthResponse(paymentResponse, updateTransactions);
       if (null != authResponse) {
@@ -1686,7 +1686,7 @@ const googlePayResponse = async (updatePaymentObj, cartObj, updateTransactions, 
     ) {
       cartObj = await updateCartWithUCAddress(updatePaymentObj, cartObj);
     }
-    paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, Constants.STRING_GOOGLE, customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
+    paymentResponse = await paymentAuthorization.authorizationResponse(updatePaymentObj, cartObj, 'google', customerTokenId, dontSaveTokenFlag, payerAuthMandateFlag, orderNo);
     if (null != paymentResponse && null != paymentResponse.httpCode) {
       authResponse = getAuthResponse(paymentResponse, updateTransactions);
       if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
@@ -2125,7 +2125,7 @@ const setCustomerTokenData = async (cardTokens, paymentResponse, authResponse, e
   let customerId = null;
   let addressId = null;
   let failedTokenLength = Constants.VAL_ZERO;
-  if (null != cartObj && Constants.STRING_BILLING_ADDRESS in cartObj && Constants.STRING_ID in cartObj.billingAddress) {
+  if (null != cartObj && cartObj?.billingAddress?.id) {
     addressId = cartObj.billingAddress.id;
   }
   if (
@@ -2351,7 +2351,7 @@ const updateVisaDetails = async (payment, paymentVersion, transactionId) => {
     visaCheckoutData = await clickToPay.getVisaCheckoutData(visaObject, payment);
     if (null != visaCheckoutData) {
       cartDetails = await getCartDetailsByPaymentId(payment.id);
-      if (null != cartDetails && Constants.STRING_CART_STATE == cartDetails.cartState) {
+      if (null != cartDetails && 'Active' == cartDetails.cartState) {
         visaResponse = await commercetoolsApi.updateCartByPaymentId(cartDetails.id, payment.id, cartDetails.version, visaCheckoutData);
         if (null != visaResponse) {
           updateResponse.cartVersion = visaResponse.version;
@@ -2461,7 +2461,7 @@ const runSyncAddTransaction = async (syncUpdateObject, reasonCode, authPresent, 
     } else if ((Constants.VAL_FOUR_EIGHTY == reasonCode || Constants.VAL_FOUR_EIGHTY_ONE == reasonCode) && authPresent && !authReasonCodePresent) {
       syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
       updateSyncResponse = await commercetoolsApi.syncAddTransaction(syncUpdateObject);
-    } else if (Constants.VAL_HUNDRED != reasonCode && Constants.VAL_FOUR_SEVENTY_FIVE != reasonCode) {
+    } else if (Constants.VAL_HUNDRED != reasonCode && 475 != reasonCode) {
       syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
       updateSyncResponse = await commercetoolsApi.syncAddTransaction(syncUpdateObject);
     }

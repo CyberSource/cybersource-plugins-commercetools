@@ -77,10 +77,10 @@ const generateCaptureContext = async (cartObj, country, locale, currencyCode, me
           allowedPaymentTypesArray = allowedPaymentTypes.split(Constants.REGEX_COMMA);
           requestObj.allowedPaymentTypes = allowedPaymentTypesArray;
         } else {
-          requestObj.allowedPaymentTypes = [Constants.STRING_PANENTRY, Constants.STRING_SRC, Constants.STRING_GOOGLEPAY];
+          requestObj.allowedPaymentTypes = [Constants.STRING_PANENTRY, 'SRC', 'GOOGLEPAY'];
         }
       } else if (Constants.SERVICE_MY_ACCOUNTS == service) {
-        totalAmount = Constants.VAL_ZERO_ZERO_ONE;
+        totalAmount = 0.01;
         orderInformationAmountDetails.totalAmount = `${totalAmount}`;
         orderInformationAmountDetails.currency = currencyCode;
         orderInformation.amountDetails = orderInformationAmountDetails;
@@ -94,14 +94,14 @@ const generateCaptureContext = async (cartObj, country, locale, currencyCode, me
         requestObj.country = country;
         requestObj.allowedPaymentTypes = [Constants.STRING_PANENTRY];
       }
-      requestObj.clientVersion = Constants.VAL_ZERO_ONE_FIVE;
+      requestObj.clientVersion = '0.15';
       captureMandate.showAcceptedNetworkIcons = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_NETWORK_ICONS ? true : false);
       if (undefined != process.env.PAYMENT_GATEWAY_ALLOWED_CARD_NETWORK_FOR_UNIFIED_CHECKOUT && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_ALLOWED_CARD_NETWORK_FOR_UNIFIED_CHECKOUT) {
         allowedCardNetworks = process.env.PAYMENT_GATEWAY_ALLOWED_CARD_NETWORK_FOR_UNIFIED_CHECKOUT;
         allowedCardNetworksArray = allowedCardNetworks.split(Constants.REGEX_COMMA);
         requestObj.allowedCardNetworks = allowedCardNetworksArray;
       } else {
-        requestObj.allowedCardNetworks = [Constants.STRING_CAPITAL_VISA, Constants.STRING_CAPITAL_MASTERCARD, Constants.STRING_CAPITAL_AMEX];
+        requestObj.allowedCardNetworks = ['VISA', 'MASTERCARD', 'AMEX'];
       }
       if (undefined != process.env.PAYMENT_GATEWAY_TARGET_ORIGINS && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_TARGET_ORIGINS) {
         targetOrigins = process.env.PAYMENT_GATEWAY_TARGET_ORIGINS;

@@ -50,7 +50,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       requestObj.clientReferenceInformation = clientReferenceInformation;
       var processingInformation = new restApi.Ptsv2paymentsProcessingInformation();
       if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_ENABLED_MOTO in payment.custom.fields && payment.custom.fields.isv_enabledMoto) {
-        processingInformation.commerceIndicator = Constants.STRING_MOTO;
+        processingInformation.commerceIndicator = 'MOTO';
       }
       if (Constants.STRING_CUSTOM in payment && Constants.STRING_FIELDS in payment.custom && Constants.ISV_SALE_ENABLED in payment.custom.fields && payment.custom.fields.isv_saleEnabled) {
         processingInformation.capture = true;
@@ -173,7 +173,7 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         var tokenInformation = new restApi.Ptsv2paymentsTokenInformation();
         tokenInformation.transientTokenJwt = payment.custom.fields.isv_transientToken;
         requestObj.tokenInformation = tokenInformation;
-        processingInformation.commerceIndicator = Constants.STRING_INTERNET;
+        processingInformation.commerceIndicator = 'internet';
       }
       requestObj.processingInformation = processingInformation;
       requestObj.paymentInformation = paymentInformation;

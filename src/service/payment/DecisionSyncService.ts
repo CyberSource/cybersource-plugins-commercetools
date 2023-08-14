@@ -31,7 +31,7 @@ const conversionDetails = async (midCredentials) => {
           enableLog: false,
         },
       };
-      startTime = moment(Date.now()).subtract(Constants.VAL_TWENTY_THREE, Constants.STRING_HOURS).subtract(Constants.VAL_FIFTY_NINE).format(Constants.DATE_FORMAT);
+      startTime = moment(Date.now()).subtract(23, 'hours').subtract(59).format(Constants.DATE_FORMAT);
       endTime = moment(Date.now()).format(Constants.DATE_FORMAT);
       organizationId = process.env.PAYMENT_GATEWAY_MERCHANT_ID;
       if (null != organizationId) {

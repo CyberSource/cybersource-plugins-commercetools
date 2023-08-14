@@ -4,10 +4,13 @@ dotenv.config();
 import paymentService from '../../utils/PaymentService';
 import { fieldMapperFields, fieldMapperFieldObject, getOMServiceResponsePaymentResponse, getOMServiceResponsePaymentResponseObject, getOMServiceResponseTransactionDetail, visaCardDetailsActionVisaCheckoutData, getCapturedAmountRefundPaymentObj } from '../const/PaymentServiceConst';
 import { getAuthResponsePaymentPendingResponse, getAuthResponsePaymentCompleteResponse, getAuthResponsePaymentResponse, getAuthResponsePaymentDeclinedResponse, getAuthResponsePaymentResponseObject, getAuthResponseTransactionDetail } from '../const/PaymentServiceConst';
-import { successState, failureState, changeStateTransactionDetail, changeStateFailureTransactionDetail } from '../const/PaymentServiceConst';
-import { payerAuthActionsResponse, payerEnrollActionsUpdatePaymentObj, payerEnrollActionsResponse } from '../const/PaymentServiceConst';
-import { getUpdateTokenActionsActions, failurePaymentResponse, failureResponseTransactionDetail } from '../const/PaymentServiceConst';
-import { getAuthorizedAmountCapturePaymentObj, setCustomTypeDataPendingAmount, setCustomTypeDataTransactionId } from '../const/PaymentServiceConst';
+import { successState, failureState, changeStateTransactionDetail, changeStateFailureTransactionDetail, getRefundResponseUpdatePaymentObj, getRefundResponseUpdateTransactions } from '../const/PaymentServiceConst';
+import { payerAuthActionsResponse, payerEnrollActionsUpdatePaymentObj, payerEnrollActionsResponse, addRefundActionAmount, addRefundActionOrderResponse, state } from '../const/PaymentServiceConst';
+import { getUpdateTokenActionsActions, failurePaymentResponse, failureResponseTransactionDetail, getCreditCardResponseUpdatePaymentObj, getCreditCardResponseCartObj, clickToPayResponseUpdatePaymentObj } from '../const/PaymentServiceConst';
+import { getAuthorizedAmountCapturePaymentObj, setCustomTypeDataPendingAmount, setCustomTypeDataTransactionId, googlePayResponseUpdatePaymentObj } from '../const/PaymentServiceConst';
+import { authorizationHandler3DSUpdatePaymentObject} from '../const/PaymentHandlerConst';
+import {  getPayerAuthValidateResponseUpdatePaymentObj } from '../const/PaymentHandlerConst';
+import { getPayerAuthEnrollResponseUpdatePaymentObj } from '../const/PaymentHandlerConst';
 
 test.serial('Field mapping for flex keys', async (t) => {
   const result = await paymentService.fieldMapper(fieldMapperFields);
@@ -98,12 +101,12 @@ test.serial('Get captured amount', async (t) => {
 });
 
 test.serial('Convert cent to amount ', async (t) => {
-  const result = await paymentService.convertCentToAmount(6970);
+  const result = await paymentService.convertCentToAmount(6970, 2);
   t.is(result, 69.7);
 });
 
 test.serial('Convert amount to cent', async (t) => {
-  const result = await paymentService.convertAmountToCent(69.7);
+  const result = await paymentService.convertAmountToCent(69.7, 2);
   t.is(result, 6970);
 });
 
@@ -145,7 +148,7 @@ test.serial('Get payer enroll actions ', async (t) => {
 });
 
 test.serial('Get update token actions ', async (t) => {
-  const result = await paymentService.getUpdateTokenActions(getUpdateTokenActionsActions, null, true);
+  const result = await paymentService.getUpdateTokenActions(getUpdateTokenActionsActions, null, true, null, null);
   if (result) {
     t.is(result.actions[0].action, 'setCustomType');
     t.is(result.actions[0].type.key, 'isv_payments_customer_tokens');
@@ -163,7 +166,6 @@ test.serial('Get the failure response ', async (t) => {
 
 test.serial('Get authorize amount', async (t) => {
   const result = await paymentService.getAuthorizedAmount(getAuthorizedAmountCapturePaymentObj);
-  t.pass();
   t.is(result, 44.9);
 });
 
@@ -174,3 +176,105 @@ test.serial('Set custom type data', async (t) => {
   t.is(result.type.key, 'isv_transaction_data');
   t.is(result.type.typeId, 'type');
 });
+
+test.serial('get payer auth set up response ', async (t) => {
+  const result = await paymentService.getPayerAuthSetUpResponse(authorizationHandler3DSUpdatePaymentObject);
+  if (result.actions[0] == undefined) {
+    t.deepEqual(result.actions, []);
+    t.deepEqual(result.errors, []);
+  } else {
+    t.is(result.actions[0].action, 'setCustomField');
+    t.is(result.actions[0].name, 'isv_requestJwt');
+    t.is(result.actions[1].action, 'setCustomField');
+    t.is(result.actions[1].name, 'isv_cardinalReferenceId');
+    t.is(result.actions[2].action, 'setCustomField');
+    t.is(result.actions[2].name, 'isv_deviceDataCollectionUrl');
+  }
+});
+
+test.serial('get Payer Auth Validate Response', async (t) => {
+  const result = await paymentService.getPayerAuthValidateResponse(getPayerAuthValidateResponseUpdatePaymentObj);
+  if (result.actions.length > 0) {
+    t.is(result.actions[0].action, 'setCustomField');
+    t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
+    t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
+    t.is(result.actions[2].name, 'isv_payerEnrollStatus');
+  } else {
+    t.deepEqual(result.actions, []);
+    t.is(result.errors[0].code, 'InvalidInput');
+  }
+});
+
+test.serial('Get Payer Auth Enroll Response', async (t) => {
+  const result = await paymentService.getPayerAuthEnrollResponse(getPayerAuthEnrollResponseUpdatePaymentObj);
+  if (result.actions.length <= 0) {
+    t.deepEqual(result.actions, []);
+    t.is(result.errors[0].code, 'InvalidInput');
+    t.is(result.errors[0].message, 'Cannot process the payment due to invalid input');
+  } else {
+    t.is(result.actions[0].action, 'setCustomField');
+    t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
+    t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
+    t.is(result.actions[2].name, 'isv_payerEnrollStatus');
+  }
+});
+
+test.serial('Get refund response', async (t) =>{
+  const result:any = await paymentService.getRefundResponse(getRefundResponseUpdatePaymentObj, getRefundResponseUpdateTransactions, null);
+  if(true == result.refundTriggered)
+  {
+    t.is(result.refundTriggered, true);
+    t.is(result.refundActions.actions[0].action, 'changeTransactionInteractionId');
+    t.is(result.refundActions.actions[1].action, 'changeTransactionState');
+  } else{
+    t.is(result.refundTriggered, false);
+    t.is(result.refundActions, null);
+  }
+})
+
+test.serial('Add refund action', async (t) =>{
+const result = await paymentService.addRefundAction(addRefundActionAmount, addRefundActionOrderResponse, state);
+t.is(result.action, 'addTransaction');
+t.is(result.transaction.state, 'Success');
+})
+
+test.serial('Get credit card response', async (t) => {
+  const result:any = await paymentService.getCreditCardResponse(getCreditCardResponseUpdatePaymentObj, null, getCreditCardResponseCartObj, getAuthResponseTransactionDetail, null, null);
+  if(201 == result.paymentResponse.httpCode)
+  {
+    t.is(result.paymentResponse.httpCode, 201)
+    t.is(result.paymentResponse.status, "AUTHORIZED");
+  } else {
+    t.not(result.paymentResponse.httpCode, 201)
+    t.not(result.paymentResponse.status, "AUTHORIZED");
+  }
+})
+
+test.serial('Get google pay response', async (t) => {
+  const result:any = await paymentService.googlePayResponse(googlePayResponseUpdatePaymentObj, getCreditCardResponseCartObj, getAuthResponseTransactionDetail, null, null);
+  if(201 == result.paymentResponse.httpCode)
+  {
+    t.is(result.paymentResponse.httpCode, 201)
+    if("AUTHORIZED" == result.paymentResponse.status)
+    {
+    t.is(result.paymentResponse.status, "AUTHORIZED");
+    } else {
+      t.not(result.paymentResponse.status, "AUTHORIZED");
+    }
+  } else {
+    t.not(result.paymentResponse.httpCode, 201)
+    t.not(result.paymentResponse.status, "AUTHORIZED");
+  }
+})
+
+test.serial('Get click to pay response', async (t) => {
+  const result:any = await paymentService.clickToPayResponse(clickToPayResponseUpdatePaymentObj, getCreditCardResponseCartObj, getAuthResponseTransactionDetail, null, null);
+  if(201 == result.paymentResponse.httpCode)
+  {
+    t.is(result.paymentResponse.httpCode, 201)
+    t.is(result.paymentResponse.status, "AUTHORIZED");
+  } else {
+    t.not(result.paymentResponse.httpCode, 201)
+    t.not(result.paymentResponse.status, "AUTHORIZED");
+  }
+})

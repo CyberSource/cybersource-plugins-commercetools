@@ -1,3 +1,7 @@
+import creditCard from '../JSON/creditCard.json';
+import googlePay from '../JSON/googlePay.json';
+import clickToPay from '../JSON/clickToPay.json'
+
 export const fieldMapperFields = {
   isv_tokenCaptureContextSignature:'eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEihRVWpwa3g1RThRcFhCQUFFSFZpSXVyQjl3NW11ZXBhY0JtcG01UUlyWnNCR1NxQmhheVoyWXM4YS9NbXdTZDg1bEsxZ1g3VmY4Z2dPS1A2VStKU0Qxa3hHMW0vc0lHpXZG4wM2puaFNHaTVIcHpuWTQiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiYyIsIm4iOiIzNmJfcDhXZFR1ZVBOdk5jbVBMeGtaakdtUm1ReUFsN25CaU5DWXBBY0dBekZVcW90RU1ndjZfQXRpMDh6SW5fR3VmQ1F3X05kRnFaUXQtaGxoNy1uZ4NGFpMFdkYlY2eThUV0pzYkxhLXdiNWJYM0VKRWFkdjRkdnZGa0lQQ0lqUWV2R1lnUHdLMkI5cUVORUV2VlpCVTFvWXIxU0owbldUZW5RbTFsOXZsdlRDOUhWOWxGJEZjM2VFcxNGZMNlRWN3Rob08taWx4UUo1UFhRdzRyZExrbVl6d1E0VTFTZk96Sml0MW1MMi1RLXFMREFSS3JxRnQ1U1dCY0YtTm94ZXJIaVpHdllUU2xLYjFWcWwW0wZWs0eXRfU1czYXJTc3g1NmtnTFpnQWtLNTEwbjJqVU5BMVEiLCJraWQiOiIwODVQUzhhVkFXakJ5MEM3dEt2aTBQdkdMVUJxSGh2eSJ9fSwiY3R4IjpbeyJkYXdE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NDE4ODgzMTIsImlhdCI6MTY0MTg4NzQxMiwianRpIjoibFg5eFY5Z25kMTFIcHd4byJ9.DZpFRe8PnMd9WYgL_3419Q4cMkjf-up4teaYxk-xVBSXgo_K9DI7hbnZRFQGSU48NCpIz4MoAQvzjzEYIXIeUDrM5uItkIwYphDynq9vNRYcRmd-b5VYAm1QV5Jrn_gODZmIOV581MuoAZ-zZsYMwidUoPSDrUqAWuUB2KYV5im191t3kVauN_4cqyZM08VLOCjqzThNOq2eSKg95y62JKEP0GI-VnXNujieSBm8Qh1OIDgNym2IGnXBjCw5uD7XsgUwm8xSOPPuEuv4UgHLvxYVm1yqoGuPz7X8zrsZBUYg',
   isv_tokenVerificationContext:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJWpwa3g1RThRcFhCQUFFSFZpSXVyQjl3NW11ZXBhY0JtcG01UUlyWnNCR1NxQmhheVoyWXM4YS9NbXdTZDg1bEsxZ1g3VmY4Z2dPS1A2VStKU0Qxa3hHMW0vc0lFdVZG4wM2puaFNHaTVIcHpuWTQiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsIsIm4iOiIzNmJfcDhXZFR1ZVBOdk5jbVBMeGtaakdtUm1ReUFsN25CaU5DWXBBY0dBekZVcW90RU1ndjZfQXRpMDh6SW5fR3VmQ1F3X05kRnFaUXQtaGxoNy1uZnlRFpMFdkYlY2eThUV0pzYkxhLXdiNWJYM0VKRWFkdjRkdnZGa0lQQ0lqUWV2R1lnUHdLMkI5cUVORUV2VlpCVTFvWXIxU0owbldUZW5RbTFsOXZsdlRDOUhWOWxGVFljM2VFcxNGZMNlRWN3Rob08taWx4UUo1UFhRdzRyZExrbVl6d1E0VTFTZk96Sml0MW1MMi1RLXFMREFSS3JxRnQ1U1dCY0YtTm94ZXJIaVpHdllUU2xLYjFWcWwzYXZWs0eXRfU1czYXJTc3g1NmtnTFpnQWtLNTEwbjJqVU5BMVEiLCJraWQiOiIwODVQUzhhVkFXakJ5MEM3dEt2aTBQdkdMVUJxSGh2eSJ9fSwiY3R4IjpbeyJkYXRhIyaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuNzIjoiRmxleCBBUEkiLCJleHAiOjE2NDE4ODgzMTIsImlhdCI6MTY0MTg4NzQxMiwianRpIjoibFg5eFY5Z25kMTFIcHd4byJ9.6KZEcOTyFEI2sM_gShgzdX4C8Xbac',
@@ -781,3 +785,605 @@ export const getAuthorizedAmountCapturePaymentObj = {
 export const setCustomTypeDataTransactionId = 'c8e05227-8e7f-4e6d-a6b5-615420d0a6c5';
 
 export const setCustomTypeDataPendingAmount = 200;
+
+export const getRefundResponseUpdatePaymentObj  = {
+  "id": "e014e68a-c453-494e-9692-ed4daca9cf4d",
+  "version": 15,
+  "versionModifiedAt": "2023-08-11T08:57:47.643Z",
+  "lastMessageSequenceNumber": 11,
+  "createdAt": "2023-08-10T11:28:45.770Z",
+  "lastModifiedAt": "2023-08-11T08:57:47.643Z",
+  "lastModifiedBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false
+  },
+  "createdBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 5000,
+      "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "creditCard",
+      "name": {
+          "en": "Credit Card"
+      }
+  },
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "919acdd9-f671-4a83-ad81-2b01caa72250"
+      },
+      "fields": {
+          "isv_transientToken": creditCard.isv_transientToken,
+          "isv_deviceFingerprintId": "a82beccd-0fc0-48f8-a84e-0151709df8c8",
+          "isv_merchantId": "visa_isv_opencart_pmt_101",
+          "isv_saleEnabled": false,
+          "isv_acceptHeader": "*/*",
+          "isv_customerIpAddress": "192.140.152.21",
+          "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "bc74c77b-3dc6-4f1f-adec-cabc80cb9234",
+          "timestamp": "2023-08-10T11:28:48.091Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 5000,
+              "fractionDigits": 2
+          },
+          "interactionId": creditCard.authId,
+          "state": "Success"
+      },
+      {
+          "id": "30a11b74-2ea3-483d-8ab4-e9aac2660987",
+          "timestamp": "2023-08-11T08:57:34.933Z",
+          "type": "Charge",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 5000,
+              "fractionDigits": 2
+          },
+          "interactionId": creditCard.captureId,
+          "state": "Success",
+          "custom": {
+              "type": {
+                  "typeId": "type",
+                  "id": "2f335fa3-1381-49c4-aa5d-c64caac073c6"
+              },
+              "fields": {
+                  "isv_availableCaptureAmount": 4900
+              }
+          }
+      },
+      {
+          "id": "fdd7952a-b7e6-408a-80d6-bc48bbc807f0",
+          "timestamp": "2023-08-11T08:57:46.538Z",
+          "type": "Refund",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 100,
+              "fractionDigits": 2
+          },
+          "interactionId": creditCard.refundId,
+          "state": "Success"
+      },
+      {
+          "id": "c68616f7-eaba-4307-9d5b-2117929be514",
+          "timestamp": "2023-08-11T08:57:50.043Z",
+          "type": "Refund",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 100,
+              "fractionDigits": 2
+          },
+          "state": "Initial"
+      }
+  ],
+  "interfaceInteractions": [],
+  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+}
+
+export const getRefundResponseUpdateTransactions = {
+  "id": "c68616f7-eaba-4307-9d5b-2117929be514",
+  "timestamp": "2023-08-11T08:57:50.043Z",
+  "type": "Refund",
+  "amount": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 100,
+      "fractionDigits": 2
+  },
+  "state": "Initial"
+}
+
+export const addRefundActionAmount = {
+  type: 'centPrecision',
+  currencyCode: 'USD',
+  centAmount: 100,
+  fractionDigits: 2
+}
+
+export const addRefundActionOrderResponse = {
+  "httpCode": 201,
+  "transactionId": creditCard.refundId,
+  "status": "PENDING"
+}
+
+export const state = 'Success';
+
+export const getCreditCardResponseUpdatePaymentObj = {
+  "id": "b18ec6af-6802-4638-8f75-d387d2977177",
+  "version": 12,
+  "versionModifiedAt": "2023-08-11T12:24:39.887Z",
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2023-08-11T12:23:58.555Z",
+  "lastModifiedAt": "2023-08-11T12:24:39.887Z",
+  "lastModifiedBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "createdBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 10000,
+      "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "creditCard",
+      "name": {
+          "en": "Credit Card"
+      }
+  },
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "919acdd9-f671-4a83-ad81-2b01caa72250"
+      },
+      "fields": {
+          "isv_tokenCaptureContextSignature": "eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJHQ3k4SzBKbzJpNVRUdDVNSVcxSGxSQUFFS3AxeGMrSmtNa2ZFL2VvNWlraG91UU9hVk5pMXUyZWlwWkZaSFovd0tKWUlLakhoOXJ1M3V5aGcvU2tzc1dENWRkQVVTNXlKQ2JhcW5DSlJFYkhiVzVQRVg3VHlCOC9hOFF2L2cxYXluR2QiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiIzdzhia0lfbG1kaGx4Qzg2Nl82dktUQ1VkTzZzWUNvN2hsX0IzYlVmNk01YmRRbmhrTG14QUhLQ1R0alhWaE1TLVJDbTBJUmVOX2xCYnpzLVpMZU5PMHc5LVJKWW44WUlDcDdOeFV6MmRuRnpNMExpV21MUjhieV9CWEcxdnpMSDY5a3FGMjFiQ1h1NFVZV1ZtUEhzZno5QzJhdS1vTFc1X282b0x0VjgwU3U0QWoxaGVVdVJXSEpNcTUwem96Rm9LMldrRUp5dU5pclFVQzZSdVFFSmFtVTh2ekk5Sm1jVzRSUk84ZFJ4UmcydjhNd3RhWUgzYXN3dzNFQ1Z2bHItejV4TkstZkpTNHVXNzU1SWdJMWx4Ni1qTGNuQW5CcTRjdTVSMDdUVG5JcWZpelFYUUw5RUJPQnRxb1pfc09zZS1jNE0ydGR5TWpkaXc2YmFIeEVFdVEiLCJraWQiOiIwOHhnSzhGZGwxWDBPSUc3RHFCZjNJUnJpSXMzSm1RNiJ9fSwiY3R4IjpbeyJkYXRhIjp7ImNsaWVudExpYnJhcnkiOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbS9taWNyb2Zvcm0vYnVuZGxlL3YxL2ZsZXgtbWljcm9mb3JtLm1pbi5qcyIsInRhcmdldE9yaWdpbnMiOlsiaHR0cHM6Ly9sb2NhbGhvc3Q6ODA4MCJdLCJtZk9yaWdpbiI6Imh0dHBzOi8vdGVzdGZsZXguY3liZXJzb3VyY2UuY29tIn0sInR5cGUiOiJtZi0xLjAuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2OTE3NTc1MzgsImlhdCI6MTY5MTc1NjYzOCwianRpIjoiVHhMZThmTHlMejZvdG42RyJ9.cE4jeVTm7M30w6HLgikh-5-FDzHBWwUy0jxfOwncOu_sKP9vfmNbJYUOkzs2Gus94H8Gjhn8yWHCYrsXyrzmIVXQgHVhXEQ9BXsoms68-g5vmO-MZsWmMoNVuSjMyxNNCdk6RSQE0h8EQLUOmcyKrJYfGRf56tW9jPuwRKJYe6pE3kpGYY4Crkm8xr25VH3knJJcnjDM4djERYnzq9sovYrSTdhoKSIZCFdUULlKYvbBvEkUooXszirKvfAc3zVY1mDLKtNWxM49KPkp6L096t1pFYwKwwrBsBVCd4ZTsswVDPQJ2plegYSHUPN18qe4kQLIV6omLemmgK7W43cruQ",
+          "isv_deviceFingerprintId": "9ee1d36f-15b5-43e5-a41d-a4c9ea70e2b2",
+          "isv_token": creditCard.isv_token,
+          "isv_saleEnabled": false,
+          "isv_cardType": "001",
+          "isv_customerIpAddress": "192.140.152.59",
+          "isv_maskedPan": "411111XXXXXX1111",
+          "isv_cardExpiryMonth": "01",
+          "isv_tokenVerificationContext": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJHQ3k4SzBKbzJpNVRUdDVNSVcxSGxSQUFFS3AxeGMrSmtNa2ZFL2VvNWlraG91UU9hVk5pMXUyZWlwWkZaSFovd0tKWUlLakhoOXJ1M3V5aGcvU2tzc1dENWRkQVVTNXlKQ2JhcW5DSlJFYkhiVzVQRVg3VHlCOC9hOFF2L2cxYXluR2QiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiIzdzhia0lfbG1kaGx4Qzg2Nl82dktUQ1VkTzZzWUNvN2hsX0IzYlVmNk01YmRRbmhrTG14QUhLQ1R0alhWaE1TLVJDbTBJUmVOX2xCYnpzLVpMZU5PMHc5LVJKWW44WUlDcDdOeFV6MmRuRnpNMExpV21MUjhieV9CWEcxdnpMSDY5a3FGMjFiQ1h1NFVZV1ZtUEhzZno5QzJhdS1vTFc1X282b0x0VjgwU3U0QWoxaGVVdVJXSEpNcTUwem96Rm9LMldrRUp5dU5pclFVQzZSdVFFSmFtVTh2ekk5Sm1jVzRSUk84ZFJ4UmcydjhNd3RhWUgzYXN3dzNFQ1Z2bHItejV4TkstZkpTNHVXNzU1SWdJMWx4Ni1qTGNuQW5CcTRjdTVSMDdUVG5JcWZpelFYUUw5RUJPQnRxb1pfc09zZS1jNE0ydGR5TWpkaXc2YmFIeEVFdVEiLCJraWQiOiIwOHhnSzhGZGwxWDBPSUc3RHFCZjNJUnJpSXMzSm1RNiJ9fSwiY3R4IjpbeyJkYXRhIjp7ImNsaWVudExpYnJhcnkiOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbS9taWNyb2Zvcm0vYnVuZGxlL3YxL2ZsZXgtbWljcm9mb3JtLm1pbi5qcyIsInRhcmdldE9yaWdpbnMiOlsiaHR0cHM6Ly9sb2NhbGhvc3Q6ODA4MCJdLCJtZk9yaWdpbiI6Imh0dHBzOi8vdGVzdGZsZXguY3liZXJzb3VyY2UuY29tIn0sInR5cGUiOiJtZi0xLjAuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2OTE3NTc1MzgsImlhdCI6MTY5MTc1NjYzOCwianRpIjoiVHhMZThmTHlMejZvdG42RyJ9.HRrLioN2q7fbFKyHWiiLMriKcwkoVb4nwcu3UBpeYUw",
+          "isv_cardExpiryYear": "2026",
+          "isv_merchantId": "wiproltd"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "6d93adbe-7c8d-45d4-833a-ae60467addcb",
+          "timestamp": "2023-08-11T12:24:43.318Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 10000,
+              "fractionDigits": 2
+          },
+          "state": "Initial"
+      }
+  ],
+  "interfaceInteractions": [],
+  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+}
+
+export const getCreditCardResponseCartObj =  {
+  "type": "Cart",
+  "id": "56414cc7-5e77-4fd9-9d6a-edad661dd95b",
+  "version": 12,
+  "versionModifiedAt": "2023-08-11T13:09:35.169Z",
+  "lastMessageSequenceNumber": 1,
+  "createdAt": "2023-08-11T13:08:57.901Z",
+  "lastModifiedAt": "2023-08-11T13:09:35.169Z",
+  "lastModifiedBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "createdBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a",
+  "locale": "en",
+  "lineItems": [
+      {
+          "id": "1da7495a-70f8-49ea-b443-3625ce8e9366",
+          "productId": "ad0cf3f4-fe64-4517-b7d0-c028d64e04ef",
+          "name": {
+              "de-DE": "Bridal Lahenga",
+              "es-CL": "Bridal Lahenga",
+              "ja": "Bridal Lahenga",
+              "en-GB": "Bridal Lahenga",
+              "en": "Bridal Lahenga",
+              "en-US": "Bridal Lahenga",
+              "ar-BH": "Bridal Lahenga"
+          },
+          "productType": {
+              "typeId": "product-type",
+              "id": "526d8919-fe8f-4e26-8e60-35ecceec9284",
+              "version": 1
+          },
+          "productSlug": {
+              "en": "a16"
+          },
+          "variant": {
+              "id": 1,
+              "sku": "SKU-16",
+              "prices": [
+                  {
+                      "id": "1bf0d8f5-c3f3-47bd-aa51-0c55b4366c7c",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "EUR",
+                          "centAmount": 1580,
+                          "fractionDigits": 2
+                      },
+                      "country": "DE"
+                  },
+                  {
+                      "id": "6cca5967-3537-4ee9-9447-5dc5c08f69b9",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "USD",
+                          "centAmount": 5000,
+                          "fractionDigits": 2
+                      },
+                      "country": "US"
+                  },
+                  {
+                      "id": "d0f0ab75-4f61-4417-84c3-14c5d0cbc40d",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "JPY",
+                          "centAmount": 50,
+                          "fractionDigits": 0
+                      },
+                      "country": "JP"
+                  },
+                  {
+                      "id": "c1dd6377-a92c-4a3c-8922-a38b15a3873f",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "CLP",
+                          "centAmount": 50,
+                          "fractionDigits": 0
+                      },
+                      "country": "CL"
+                  },
+                  {
+                      "id": "be7e1c2a-0d06-4151-a3ce-6d41df9e9809",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "BHD",
+                          "centAmount": 50000,
+                          "fractionDigits": 3
+                      },
+                      "country": "BH"
+                  },
+                  {
+                      "id": "9a2a70a3-9c6f-4ccf-b5c6-f076d238e8b0",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "GBP",
+                          "centAmount": 6000,
+                          "fractionDigits": 2
+                      },
+                      "country": "GB"
+                  }
+              ],
+              "images": [
+                  {
+                      "url": "https://img.weddingbazaar.com/shaadisaga_production/photos/pictures/000/923/067/new_large/the_wedding_conteurs3.jpg?1560777936",
+                      "dimensions": {
+                          "w": 300,
+                          "h": 375
+                      }
+                  }
+              ],
+              "attributes": [],
+              "assets": []
+          },
+          "price": {
+              "id": "6cca5967-3537-4ee9-9447-5dc5c08f69b9",
+              "value": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 5000,
+                  "fractionDigits": 2
+              },
+              "country": "US"
+          },
+          "quantity": 1,
+          "discountedPricePerQuantity": [],
+          "taxRate": {
+              "name": "test-taxes-category",
+              "amount": 0.2,
+              "includedInPrice": true,
+              "country": "US",
+              "id": "4C4h3IUy",
+              "subRates": []
+          },
+          "perMethodTaxRate": [],
+          "addedAt": "2023-08-11T13:08:58.537Z",
+          "lastModifiedAt": "2023-08-11T13:08:58.537Z",
+          "state": [
+              {
+                  "quantity": 1,
+                  "state": {
+                      "typeId": "state",
+                      "id": "16817240-b167-4ddd-82ce-6772851db76a"
+                  }
+              }
+          ],
+          "priceMode": "Platform",
+          "lineItemMode": "Standard",
+          "totalPrice": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 5000,
+              "fractionDigits": 2
+          },
+          "taxedPrice": {
+              "totalNet": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 4167,
+                  "fractionDigits": 2
+              },
+              "totalGross": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 5000,
+                  "fractionDigits": 2
+              },
+              "totalTax": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 833,
+                  "fractionDigits": 2
+              }
+          },
+          "taxedPricePortions": []
+      }
+  ],
+  "cartState": "Active",
+  "totalPrice": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 5000,
+      "fractionDigits": 2
+  },
+  "taxedPrice": {
+      "totalNet": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 4167,
+          "fractionDigits": 2
+      },
+      "totalGross": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 5000,
+          "fractionDigits": 2
+      },
+      "taxPortions": [
+          {
+              "rate": 0.2,
+              "amount": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 833,
+                  "fractionDigits": 2
+              },
+              "name": "test-taxes-category"
+          }
+      ],
+      "totalTax": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 833,
+          "fractionDigits": 2
+      }
+  },
+  "country": "US",
+  "shippingMode": "Single",
+  "shippingAddress": {
+      "firstName": "Shakshi",
+      "lastName": "Poddar",
+      "streetName": "1295 Charleston Road",
+      "postalCode": "94043",
+      "city": "Mountain View",
+      "region": "CA",
+      "country": "US",
+      "phone": "9876543210",
+      "email": "shakshi.poddar@wipro.com"
+  },
+  "shipping": [],
+  "customLineItems": [],
+  "discountCodes": [],
+  "directDiscounts": [],
+  "paymentInfo": {
+      "payments": [
+          {
+              "typeId": "payment",
+              "id": "b5bc1c23-627b-4466-95fb-3ef5b5cc07cc"
+          }
+      ]
+  },
+  "inventoryMode": "None",
+  "taxMode": "Platform",
+  "taxRoundingMode": "HalfEven",
+  "taxCalculationMode": "LineItemLevel",
+  "deleteDaysAfterLastModification": 90,
+  "refusedGifts": [],
+  "origin": "Customer",
+  "billingAddress": {
+      "firstName": "Shakshi",
+      "lastName": "Poddar",
+      "streetName": "1295 Charleston Road",
+      "postalCode": "94043",
+      "city": "Mountain View",
+      "region": "CA",
+      "country": "US",
+      "phone": "9876543210",
+      "email": "shakshi.poddar@wipro.com"
+  },
+  "itemShippingAddresses": [],
+  "totalLineItemQuantity": 1
+}
+
+export const googlePayResponseUpdatePaymentObj = {
+  "id": "9d727280-43f8-46cf-90dd-b2a4909b761f",
+  "version": 2,
+  "versionModifiedAt": "2023-08-11T13:30:01.153Z",
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2023-08-11T13:30:01.153Z",
+  "lastModifiedAt": "2023-08-11T13:30:01.153Z",
+  "lastModifiedBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "createdBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 5000,
+      "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "googlePay",
+      "name": {
+          "en": "Google Pay"
+      }
+  },
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "919acdd9-f671-4a83-ad81-2b01caa72250"
+      },
+      "fields": {
+          "isv_deviceFingerprintId": "9ee1d36f-15b5-43e5-a41d-a4c9ea70e2b2",
+          "isv_merchantId": "wiproltd",
+          "isv_token": googlePay.isv_token,
+          "isv_saleEnabled": false,
+          "isv_acceptHeader": "*/*",
+          "isv_customerIpAddress": "192.140.152.59",
+          "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "cdb4c031-98fa-4a97-b7e9-b180fcce81d3",
+          "timestamp": "2023-08-11T13:30:04.984Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 5000,
+              "fractionDigits": 2
+          },
+          "state": "Initial"
+      }
+  ],
+  "interfaceInteractions": [],
+  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+}
+
+export const clickToPayResponseUpdatePaymentObj = {
+  "id": "6a29a73d-7ade-4d52-a0a3-3b52c15c59a0",
+  "version": 2,
+  "versionModifiedAt": "2023-08-11T13:52:25.234Z",
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2023-08-11T13:52:25.234Z",
+  "lastModifiedAt": "2023-08-11T13:52:25.234Z",
+  "lastModifiedBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "createdBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 5000,
+      "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "clickToPay",
+      "name": {
+          "en": "Click to Pay"
+      }
+  },
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "919acdd9-f671-4a83-ad81-2b01caa72250"
+      },
+      "fields": {
+          "isv_deviceFingerprintId": "3d628d88-af91-4fb5-b498-e42a4484b65b",
+          "isv_merchantId": "wiproltd",
+          "isv_token": clickToPay.isv_token,
+          "isv_saleEnabled": false,
+          "isv_acceptHeader": "*/*",
+          "isv_customerIpAddress": "192.140.152.59",
+          "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "874c9d63-e1c5-4998-9054-fd66aa81a52e",
+          "timestamp": "2023-08-11T13:52:28.760Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 5000,
+              "fractionDigits": 2
+          },
+          "state": "Initial"
+      }
+  ],
+  "interfaceInteractions": [],
+  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+}

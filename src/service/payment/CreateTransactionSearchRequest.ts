@@ -28,7 +28,7 @@ const getTransactionSearchResponse = async (query, sort, midCredentials) => {
       var requestObj = new restApi.CreateSearchRequest();
       requestObj.save = false;
       requestObj.query = query;
-      requestObj.limit = Constants.VAL_FIFTY;
+      requestObj.limit = 50;
       requestObj.offset = Constants.VAL_ZERO;
       requestObj.sort = sort;
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {

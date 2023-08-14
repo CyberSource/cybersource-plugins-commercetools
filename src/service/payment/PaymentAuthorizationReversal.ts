@@ -57,7 +57,7 @@ const authReversalResponse = async (payment, cart, authReversalId) => {
       }
       requestObj.processingInformation = processingInformation;
       var orderInformation = new restApi.Ptsv2paymentsidreversalsOrderInformation();
-      if (null != cart && Constants.VAL_ZERO < cart.count && Constants.STRING_RESULTS in cart) {
+      if (null != cart && Constants.VAL_ZERO < cart.count && 'results' in cart) {
         cartData = cart.results[Constants.VAL_ZERO];
         if (Constants.STRING_LOCALE in cartData && null != cartData.locale) {
           cartLocale = cartData.locale;

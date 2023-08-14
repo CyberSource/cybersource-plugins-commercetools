@@ -432,7 +432,7 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
         });
       }
       if (null != visaCheckoutData.shipToFieldGroup && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup).length) {
-        if (visaCheckoutData.shipToFieldGroup.hasOwnProperty(Constants.STRING_EMAIL) === true && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup.email).length) {
+        if (visaCheckoutData.shipToFieldGroup.hasOwnProperty('email') === true && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup.email).length) {
           shippingEmail = visaCheckoutData.shipToFieldGroup.email;
         } else {
           cartData = await retrieveCartByPaymentId(paymentId);
@@ -474,7 +474,7 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
       if (null != visaCheckoutData && null != visaCheckoutData.shipTo && Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_SHIPPING) {
         const cartDetail = await getCartById(cartId);
         if (null != cartDetail) {
-          if (Constants.STRING_SINGLE == cartDetail.shippingMode) {
+          if ('Single' == cartDetail.shippingMode) {
             actions.push({
               action: Constants.SET_SHIPPING_ADDRESS,
               address: {

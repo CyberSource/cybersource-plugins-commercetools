@@ -351,7 +351,6 @@
           <th>Amount</th>
           <th>Interaction ID</th>
           <th>Transaction ID</th>
-          <th>Available capture Amount</th>
         </tr>
         <% payments.transactions.forEach(function(transaction){ %>
         <tr>
@@ -360,10 +359,6 @@
           <td><%= transaction.amount.currencyCode%> <%=amountConversion(transaction.amount.centAmount, fractionDigits)%></td>
           <td><%= transaction.interactionId%></td>
           <td><%= transaction.id%></td>
-          <% if(null !=transaction.custom && null != transaction.custom.fields && 
-          null !=transaction.custom.fields.isv_availableCaptureAmount){ %>
-            <td><%= transaction.custom.fields.isv_availableCaptureAmount%></td>
-          <% } %>
         </tr>
         <% }) %>
       </table>

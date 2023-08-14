@@ -71,10 +71,10 @@ const getAllMidDetails = async () => {
   try {
     environment = process.env;
     for (let variable in environment) {
-      if ((variable.includes(Constants.STRING_SECRET_KEY)) && variable != Constants.DEFAULT_MERCHANT_SECRET_KEY_VARIABLE) {
+      if ((variable.includes(Constants.STRING_SECRET_KEY)) && variable != 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY') {
         secretKeyIndex = variable.indexOf(Constants.STRING_SECRET_KEY);
         secretKeyPrefix = variable.slice(Constants.VAL_ZERO, secretKeyIndex);
-        keyId = process.env[secretKeyPrefix + Constants.STRING_KEY_ID];
+        keyId = process.env[secretKeyPrefix + '_KEY_ID'];
         secretKey = process.env[variable];
         if (Constants.STRING_EMPTY != secretKeyPrefix && undefined != keyId && Constants.STRING_EMPTY != keyId && undefined != secretKey && Constants.STRING_EMPTY != secretKey) {
           midArray.push({

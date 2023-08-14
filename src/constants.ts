@@ -114,19 +114,12 @@ export abstract class Constants {
   static readonly VAL_TWO = 2;
   static readonly VAL_THREE = 3;
   static readonly VAL_TEN = 10;
-  static readonly VAL_TWELVE = 12;
-  static readonly VAL_TWENTY_THREE = 23;
   static readonly VAL_THIRTY_SIX = 36;
-  static readonly VAL_FIFTY = 50;
-  static readonly VAL_FIFTY_NINE = 59;
   static readonly VAL_HUNDRED = 100;
   static readonly VAL_FOUR_HUNDRED_AND_ONE = 401;
-  static readonly VAL_FOUR_SEVENTY_FIVE = 475;
+  static readonly VAL_FOUR_HUNDRED_AND_FOUR = 404;
   static readonly VAL_FOUR_EIGHTY = 480;
   static readonly VAL_FOUR_EIGHTY_ONE = 481;
-  static readonly VAL_THREE_SIXTY_FIVE = 365
-  static readonly VAL_ZERO_ONE_FIVE = '0.15';
-  static readonly VAL_ZERO_ZERO_ONE = 0.01;
 
   //Payments data
   static readonly PAYMENT_GATEWAY_TEST_ENVIRONMENT = 'apitest.cybersource.com';
@@ -146,7 +139,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
   static readonly PAYMENT_GATEWAY_JWT_FORMAT = 'JWT';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'MQNETIGU';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'ES2M71WT';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
@@ -168,6 +161,8 @@ export abstract class Constants {
   static readonly API_STATUS_AUTHORIZED_RISK_DECLINED = 'AUTHORIZED_RISK_DECLINED';
   static readonly API_STATUS_COMPLETED = 'COMPLETED';
   static readonly API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED = 'CUSTOMER_AUTHENTICATION_REQUIRED';
+  static readonly API_STATUS_DECLINED = 'DECLINED';
+  static readonly API_STATUS_INVALID_REQUEST = 'INVALID_REQUEST';
   static readonly API_STATUS_PENDING = 'PENDING';
   static readonly API_STATUS_AUTHORIZED_PENDING_REVIEW = 'AUTHORIZED_PENDING_REVIEW';
   static readonly API_STATUS_PENDING_AUTHENTICATION = 'PENDING_AUTHENTICATION';
@@ -202,69 +197,38 @@ export abstract class Constants {
   //Strings
   static readonly STRING_AWS = "aws";
   static readonly STRING_AZURE = "azure";
-  static readonly STRING_KEY_ID = '_KEY_ID';
   static readonly STRING_SECRET_KEY = '_SECRET_KEY';
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
   static readonly ANONYMOUS_ID = 'anonymousId';
   static readonly AUTHENTICATION_SCHEME_BASIC = 'Basic';
-  static readonly AUTHENTICATION_SCHEME_BEARER = 'Bearer';
   static readonly CUSTOMER_ID = 'customerId';
   static readonly DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
   static readonly DESC_ORDER = 'desc';
   static readonly LAST_MODIFIED_AT = 'lastModifiedAt';
   static readonly PAYMENT_INSTRUMENT = 'paymentInstrument';
-  static readonly CAPTURE_ID = 'captureId';
-  static readonly CAPTURE_AMOUNT = 'captureAmount';
-  static readonly REFUND_ID = 'refundId';
-  static readonly REFUND_AMOUNT = 'refundAmount';
   static readonly SHIPPING_AND_HANDLING = 'shipping_and_handling';
-  static readonly SHIPPING_INFO = 'shippingInfo';
   static readonly SHIPPING_MODE_MULTIPLE = 'Multiple';
-  static readonly STRING_AMOUNT_PLANNED = 'amountPlanned';
   static readonly STRING_AND = ' AND ';
-  static readonly STRING_BODY = 'body';
-  static readonly STRING_BILLING_ADDRESS = 'billingAddress';
   static readonly STRING_CARD = 'card';
-  static readonly STRING_CARD_EXPIRY_MONTH = 'cardExpiryMonth';
-  static readonly STRING_CARD_EXPIRY_YEAR = 'cardExpiryYear';
-  static readonly STRING_CART_STATE = 'Active';
   static readonly STATUS_CODE = 'statusCode';
   static readonly STRING_CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
   static readonly STRING_CONTENT_SECURITY_POLICY_VALUE = "script-src 'self'";
-  static readonly STRING_CONSUMER_AUTHENTICATION = 'consumerAuthenticationInformation';
   static readonly STRING_CUSTOM = 'custom';
   static readonly STRING_CUSTOMER = 'customer';
-  static readonly STRING_DATA = 'data';
-  static readonly STRING_DELETE = 'delete';
-  static readonly STRING_DOT_LOG_EXTENSION = '.log'
   static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
-  static readonly STRING_EMAIL = 'email';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
   static readonly STRING_ERRORS = 'errors';
   static readonly STRING_EXPIRATION_MONTH = 'expirationMonth';
   static readonly STRING_EXPIRATION_YEAR = 'expirationYear';
   static readonly STRING_FALSE = 'false';
   static readonly STRING_FIELDS = 'fields';
-  static readonly STRING_FLAG = 'flag';
-  static readonly STRING_GOOGLE = 'google';
-  static readonly STRING_HOURS = 'hours';
   static readonly STRING_ID = 'id';
-  static readonly STRING_INTERNET = 'internet';
-  static readonly STRING_MOTO = 'MOTO';
   static readonly STRING_MY_APPLICATION = 'my-application';
   static readonly STRING_MY_REQUESTS = 'my-requests-';
-  static readonly STRING_OBJ = 'obj';
   static readonly STRING_ORDER_NUMBER = 'orderNumber';
-  static readonly STRING_PAYMENT_TOKEN = 'paymentToken';
-  static readonly STRING_PREFIX = 'prefix';
-  static readonly STRING_QUERY = 'query';
   static readonly STRING_REASON = 'reason';
-  static readonly STRING_RESOURCE = 'resource';
   static readonly STRING_RESPONSE = 'response';
   static readonly STRING_RESPONSE_STATUS = 'status';
-  static readonly STRING_RESULTS = 'results';
-  static readonly STRING_SUCCESS = 'success';
-  static readonly STRING_SUFFIX = 'suffix';
   static readonly STRING_SYNC_AUTH_NAME = 'ics_auth';
   static readonly STRING_SYNC_AUTH_REVERSAL_NAME = 'ics_auth_reversal';
   static readonly STRING_SYNC_CAPTURE_NAME = 'ics_bill';
@@ -277,23 +241,11 @@ export abstract class Constants {
   static readonly STRING_TRANSACTIONS = 'transactions';
   static readonly STRING_TRUE = 'true';
   static readonly STRING_TEXT = 'text';
-  static readonly STRING_UPDATE = 'update';
-  static readonly STRING_UPDATED = 'updated';
-  static readonly STRING_VALUE = 'value';
-  static readonly STRING_VISA = 'visa';
   static readonly STRING_WWW_AUTHENTICATE = 'WWW-Authenticate';
   static readonly STRING_DEFAULT = 'default';
-  static readonly STRING_CAPITAL_VISA = 'VISA';
-  static readonly STRING_CAPITAL_MASTERCARD = 'MASTERCARD';
-  static readonly STRING_CAPITAL_AMEX = 'AMEX';
   static readonly STRING_PANENTRY = 'PANENTRY';
-  static readonly STRING_SRC = 'SRC';
-  static readonly STRING_GOOGLEPAY = 'GOOGLEPAY';
   static readonly STRING_CART_ID = 'CartId: ';
-  static readonly STRING_SINGLE = 'Single';
-  static readonly STRING_ZIP_FILE_NAME = 'ctPlugin.zip'
 
-  static readonly ASCII = 'ascii';
   static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
   static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ERROR_INFORMATION = 'errorInformation';
@@ -306,7 +258,6 @@ export abstract class Constants {
   static readonly TOKEN_INFORMATION = 'tokenInformation';
   static readonly UNICODE_ENCODING_SYSTEM = 'utf8';
   static readonly VALIDATION = 'validation';
-  static readonly VALIDATION_CALLBACK = 'validationCallback';
   static readonly STRING_DISCOUNTED_PRICE_PER_QUANTITY = 'discountedPricePerQuantity';
   static readonly STRING_DISCOUNTED = 'discounted';
   static readonly STRING_TAX_RATE = 'taxRate';
@@ -315,9 +266,6 @@ export abstract class Constants {
   static readonly STRING_INCLUDED_DISCOUNTS = 'includedDiscounts';
   static readonly STRING_LOCALE = 'locale';
   static readonly STRING_FULL = 'FULL';
-
-  //Defalt env variables
-  static readonly DEFAULT_MERCHANT_SECRET_KEY_VARIABLE = 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY';
 
   //CT transaction type
   static readonly CT_TRANSACTION_TYPE_AUTHORIZATION = 'Authorization';
@@ -415,7 +363,7 @@ export abstract class Constants {
   static readonly EXCEPTION_MSG_ADD_TRANSACTION = 'An exception occurred while adding transaction to the payment';
   static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception ocurred while retrieving multi-mid details';
   static readonly EXCEPTION_MSG_AUTHORIZING_PAYMENT = 'An exception occurred while authorizing the payment';
-  static readonly EXCEPTION_MSG_ADDING_A_CARD = 'An exception occurred while addding a card token to customer';
+  static readonly EXCEPTION_MSG_ADDING_A_CARD = 'An exception occurred while adding a card token to customer';
   static readonly EXCEPTION_MSG_CART_UPDATE = 'An exception occurred while updating the cart';
   static readonly EXCEPTION_MSG_CART_DETAILS = 'An exception occurred while fetching cart details';
   static readonly EXCEPTION_MSG_COMMERCETOOLS_CONNECT = 'An exception occurred while connecting to Commercetools';
@@ -431,7 +379,7 @@ export abstract class Constants {
   static readonly EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED = 'MerchantseceretKey is Mandatory';
   static readonly EXCEPTION_MSG_PAYER_AUTH = 'An exception occurred while authenticating the payment';
   static readonly EXCEPTION_MSG_SERVICE_PROCESS = 'An exception occurred while processing your payment';
-  static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception occured while creating the extensions and custom fields = ';
+  static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception ocurred while creating the extensions and custom fields = ';
   static readonly EXCEPTION_MSG_SYNC_DETAILS = 'An exception occurred while fetching sync conversion details';
   static readonly EXCEPTION_MSG_TRANSACTION_SEARCH = 'An exception occurred while retrieving the transaction details';
 

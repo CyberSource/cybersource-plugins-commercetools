@@ -15,7 +15,7 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
     card: null,
   };
   try {
-    if (null != tokens && Constants.STRING_VALUE in tokens && Constants.STRING_PAYMENT_TOKEN in tokens && Constants.STRING_CARD_EXPIRY_MONTH in tokens && Constants.STRING_CARD_EXPIRY_YEAR in tokens) {
+    if (null != tokens && tokens?.value && tokens?.paymentToken && tokens?.cardExpiryMonth && tokens?.cardExpiryYear) {
       customerTokenId = tokens.value;
       paymentInstrumentTokenId = tokens.paymentToken;
       const apiClient = new restApi.ApiClient();

@@ -224,7 +224,7 @@ app.post('/api/extension/payment/create', async (req, res) => {
   let exceptionData: any;
   let paymentMethod = Constants.STRING_EMPTY;
   try {
-    if (Constants.STRING_BODY in req && Constants.STRING_RESOURCE in req.body && Constants.STRING_OBJ in req.body.resource) {
+    if (req?.body?.resource?.obj ) {
       requestObj = req.body.resource.obj;
       if (null != requestObj && typeof requestObj === 'object') {
         paymentObj = requestObj;
@@ -293,7 +293,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
     transactionId: null,
   };
   try {
-    if (Constants.STRING_BODY in req && Constants.STRING_RESOURCE in req.body && Constants.STRING_OBJ in req.body.resource) {
+    if (req?.body?.resource?.obj ) {
       requestObj = req.body.resource;
       if (null != requestObj && typeof requestObj === 'object') {
         updatePaymentObj = requestObj.obj;
@@ -420,9 +420,9 @@ app.post('/api/extension/customer/update', async (req, res) => {
         customerObj = requestObj;
         customFields = customerObj.obj.custom.fields;
         tokensToUpdate = JSON.parse(customFields.isv_tokens[Constants.VAL_ZERO]);
-        if (Constants.STRING_DELETE == customFields.isv_tokenAction) {
+        if ('delete' == customFields.isv_tokenAction) {
           response = await paymentHandler.deleteCardHandler(tokensToUpdate, customerObj.id);
-        } else if (Constants.STRING_UPDATE == customFields.isv_tokenAction) {
+        } else if ('update' == customFields.isv_tokenAction) {
           response = await paymentHandler.updateCardHandler(tokensToUpdate, customerObj.id, customerObj.obj);
         } else {
           response = paymentService.getUpdateTokenActions(customFields.isv_tokens, customFields.isv_failedTokens, true, customerObj, null);
@@ -468,7 +468,7 @@ app.get('/capture', async (req, res) => {
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
-    if (Constants.STRING_QUERY in req && Constants.CAPTURE_ID in req.query && null != req.query.captureId && Constants.CAPTURE_AMOUNT in req.query) {
+    if (req?.query?.captureId &&  req.query?.captureAmount) {
       requestId = req.query.captureId;
       requestAmount = Number(req.query.captureAmount);
       if (null != requestId && typeof requestId === 'string' && null != requestAmount && typeof requestAmount === 'number') {
@@ -551,7 +551,7 @@ app.get('/refund', async (req, res) => {
   successMessage = Constants.STRING_EMPTY;
   let fractionDigits = Constants.VAL_ZERO;
   try {
-    if (Constants.STRING_QUERY in req && Constants.REFUND_ID in req.query && null != req.query.refundId && Constants.REFUND_AMOUNT in req.query) {
+    if (req?.query?.refundId && req.query?.refundAmount) {
       requestId = req.query.refundId;
       requestAmount = Number(req.query.refundAmount);
       if (null != requestId && typeof requestId === 'string' && null != requestAmount && typeof requestAmount === 'number') {
@@ -630,7 +630,7 @@ app.get('/authReversal', async (req, res) => {
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
-    if (Constants.STRING_QUERY in req && Constants.STRING_ID in req.query && null != req.query.id) {
+    if ( req?.query && Constants.STRING_ID in req.query && null != req.query.id) {
       requestId = req.query.id;
       if (null != requestId && typeof requestId === 'string') {
         paymentId = requestId;
