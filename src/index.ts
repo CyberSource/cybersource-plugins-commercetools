@@ -47,7 +47,7 @@ function authentication(req, res, next) {
     whitelistUrlArray = whitelistUrl.split(Constants.REGEX_COMMA);
   }
   if (!authHeader) {
-    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/payerAuthReturnUrl') {
+    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/generateHeader') {
       res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
     } else {
       if (null != whitelistUrlArray) {
@@ -60,7 +60,7 @@ function authentication(req, res, next) {
     }
     return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER });
   }
-  if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/payerAuthReturnUrl') {
+  if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/generateHeader') {
     const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
     if (base64Credentials == process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
       return next();
@@ -91,8 +91,12 @@ function authentication(req, res, next) {
 }
 
 app.get('/generateHeader', async (req, res) => {
-  let headerValue = paymentService.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
-  res.send(headerValue);
+  let headerValue: any;
+  let response: any;
+  headerValue = paymentService.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
+  response = headerValue;
+  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
+  res.send(response);
 });
 
 app.get('/orders', async (req, res) => {
@@ -224,7 +228,7 @@ app.post('/api/extension/payment/create', async (req, res) => {
   let exceptionData: any;
   let paymentMethod = Constants.STRING_EMPTY;
   try {
-    if (req?.body?.resource?.obj ) {
+    if (req?.body?.resource?.obj) {
       requestObj = req.body.resource.obj;
       if (null != requestObj && typeof requestObj === 'object') {
         paymentObj = requestObj;
@@ -293,7 +297,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
     transactionId: null,
   };
   try {
-    if (req?.body?.resource?.obj ) {
+    if (req?.body?.resource?.obj) {
       requestObj = req.body.resource;
       if (null != requestObj && typeof requestObj === 'object') {
         updatePaymentObj = requestObj.obj;
@@ -468,7 +472,7 @@ app.get('/capture', async (req, res) => {
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
-    if (req?.query?.captureId &&  req.query?.captureAmount) {
+    if (req?.query?.captureId && req.query?.captureAmount) {
       requestId = req.query.captureId;
       requestAmount = Number(req.query.captureAmount);
       if (null != requestId && typeof requestId === 'string' && null != requestAmount && typeof requestAmount === 'number') {
@@ -630,7 +634,7 @@ app.get('/authReversal', async (req, res) => {
   errorMessage = Constants.STRING_EMPTY;
   successMessage = Constants.STRING_EMPTY;
   try {
-    if ( req?.query && Constants.STRING_ID in req.query && null != req.query.id) {
+    if (req?.query && Constants.STRING_ID in req.query && null != req.query.id) {
       requestId = req.query.id;
       if (null != requestId && typeof requestId === 'string') {
         paymentId = requestId;
@@ -710,6 +714,7 @@ app.get('/configurePlugin', async (req, res) => {
 app.post('/captureContext', async (req, res) => {
   let requestObj: any;
   let captureContextResponse = Constants.STRING_EMPTY;
+  let response = Constants.STRING_EMPTY;
   let cartId: any;
   let cartDetails: any;
   let cartData: any;
@@ -730,6 +735,7 @@ app.post('/captureContext', async (req, res) => {
         if (null != cartDetails) {
           logData = Constants.STRING_CART_ID + cartDetails.id;
           captureContextResponse = await captureContext.generateCaptureContext(cartDetails, null, null, null, merchantId, Constants.SERVICE_PAYMENT);
+            response = captureContextResponse;
         }
       } else if (Constants.STRING_EMPTY != requestObj?.country && Constants.STRING_EMPTY != requestObj?.locale && Constants.STRING_EMPTY != requestObj?.currency) {
         country = requestObj.country;
@@ -737,6 +743,7 @@ app.post('/captureContext', async (req, res) => {
         currencyCode = requestObj.currency;
         logData = null;
         captureContextResponse = await captureContext.generateCaptureContext(cartData, country, locale, currencyCode, merchantId, Constants.SERVICE_MY_ACCOUNTS);
+          response = captureContextResponse;
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_CAPTURE_CONTEXT);
       }
@@ -745,7 +752,8 @@ app.post('/captureContext', async (req, res) => {
       }
     }
   }
-  res.send(JSON.stringify(captureContextResponse));
+  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
+  res.send(response);
 });
 
 if (Constants.STRING_AWS == process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {

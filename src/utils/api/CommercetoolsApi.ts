@@ -13,7 +13,6 @@ const getClient = () => {
   let authMiddleware: any;
   let exceptionData: any;
   try {
-    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
     projectKey = process.env.CT_PROJECT_KEY;
     authMiddleware = createAuthMiddlewareForClientCredentialsFlow({
       host: process.env.CT_AUTH_HOST,
@@ -454,7 +453,7 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
           },
         });
       }
-      if (null != visaCheckoutData && null != visaCheckoutData.billTo && Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_BILLING_TYPE) {
+      if (null != visaCheckoutData && null != visaCheckoutData.billTo && Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
         actions.push({
           action: Constants.SET_BILLING_ADDRESS,
           address: {
@@ -471,7 +470,7 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
           },
         });
       }
-      if (null != visaCheckoutData && null != visaCheckoutData.shipTo && Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_SHIPPING) {
+      if (null != visaCheckoutData && null != visaCheckoutData.shipTo && Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING) {
         const cartDetail = await getCartById(cartId);
         if (null != cartDetail) {
           if ('Single' == cartDetail.shippingMode) {

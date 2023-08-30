@@ -1113,8 +1113,19 @@ const convertCentToAmount = (amount, fractionDigits) => {
 
 const convertAmountToCent = (amount, fractionDigits) => {
   let cent = Constants.VAL_ZERO;
+  let amountArray = [] as any;
   if (null != amount && null != fractionDigits) {
-    cent = Number(Math.trunc(amount * Math.pow(Constants.VAL_TEN, fractionDigits)) / Math.pow(Constants.VAL_TEN, fractionDigits)) * Math.pow(Constants.VAL_TEN, fractionDigits);
+    amountArray = (amount.toString()).split(".");
+    if(Constants.VAL_TWO == amountArray.length){
+      if(Constants.VAL_ZERO != fractionDigits ){
+          amount = Number(amountArray[Constants.VAL_ZERO] + "."+amountArray[Constants.VAL_ONE].substring(Constants.VAL_ZERO,fractionDigits));
+      } else {
+          amount = Number(amountArray[Constants.VAL_ZERO]);
+      }
+  }else {
+      amount = Number(amountArray[0]);
+  }
+    cent = Math.round(amount * (Math.pow(Constants.VAL_TEN, fractionDigits)));
   }
   return cent;
 };
@@ -1259,7 +1270,7 @@ const getCreditCardResponse = async (updatePaymentObj, customerInfo, cartObj, up
         dontSaveTokenFlag = true;
       }
     }
-    if (updatePaymentObj?.custom?.fields?.isv_transientToken && (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_BILLING_TYPE || Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_SHIPPING)
+    if (updatePaymentObj?.custom?.fields?.isv_transientToken && (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING)
     ) {
       cartObj = await updateCartWithUCAddress(updatePaymentObj, cartObj);
     }
@@ -1331,7 +1342,7 @@ const getPayerAuthSetUpResponse = async (updatePaymentObj) => {
           }
         }
         if (
-          (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_BILLING_TYPE || Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_SHIPPING) &&
+          (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING) &&
           updatePaymentObj?.custom?.fields?.isv_transientToken
         ) {
           cartObj = await commercetoolsApi.retrieveCartByPaymentId(updatePaymentObj.id);
@@ -1682,7 +1693,7 @@ const googlePayResponse = async (updatePaymentObj, cartObj, updateTransactions, 
     errorFlag: false,
   };
   try {
-    if (updatePaymentObj?.custom?.fields?.isv_transientToken && (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_BILLING_TYPE || Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_SHIPPING)
+    if (updatePaymentObj?.custom?.fields?.isv_transientToken && (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING)
     ) {
       cartObj = await updateCartWithUCAddress(updatePaymentObj, cartObj);
     }

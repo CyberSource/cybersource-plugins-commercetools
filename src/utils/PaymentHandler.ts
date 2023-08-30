@@ -869,8 +869,7 @@ const syncHandler = async () => {
                     }
                   }
                 }
-              } else {
-              }
+              } 
             }
           }
         }

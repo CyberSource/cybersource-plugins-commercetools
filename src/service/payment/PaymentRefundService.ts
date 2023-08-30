@@ -44,8 +44,13 @@ const refundResponse = async (payment, captureId, updateTransactions, orderNo) =
         processingInformation.reconciliationId = orderNo;
       }
       if (Constants.CLICK_TO_PAY == payment.paymentMethodInfo.method) {
-        processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
-        processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
+        if (payment?.custom?.fields?.isv_transientToken) {
+          processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_UC_PAYMENT_SOLUTION;
+          processingInformation.visaCheckoutId = payment.custom.fields.isv_transientToken;
+        } else {
+          processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
+          processingInformation.visaCheckoutId = payment.custom.fields.isv_token;
+        }
       } else if (Constants.GOOGLE_PAY == payment.paymentMethodInfo.method) {
         processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION;
       } else if (Constants.APPLE_PAY == payment.paymentMethodInfo.method) {

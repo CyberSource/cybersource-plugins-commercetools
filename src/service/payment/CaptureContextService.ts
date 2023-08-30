@@ -52,17 +52,17 @@ const generateCaptureContext = async (cartObj, country, locale, currencyCode, me
         orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
         orderInformation.amountDetails = orderInformationAmountDetails;
         requestObj.orderInformation = orderInformation;
-        captureMandate.billingType = process.env.PAYMENT_GATEWAY_BILLING_TYPE;
-        if (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_BILLING_TYPE) {
-          captureMandate.requestEmail = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_EMAIL) ? true : false;
-          captureMandate.requestPhone = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_PHONE) ? true : false;
+        captureMandate.billingType = process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE;
+        if (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
+          captureMandate.requestEmail = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_EMAIL) ? true : false;
+          captureMandate.requestPhone = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_PHONE) ? true : false;
         } else {
           captureMandate.requestEmail = false;
           captureMandate.requestPhone = false;
         }
-        captureMandate.requestShipping = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_SHIPPING) ? true : false;
-        if (undefined != process.env.PAYMENT_GATEWAY_ALLOWED_SHIP_TO_COUNTRY_FOR_UNIFIED_CHECKOUT && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_ALLOWED_SHIP_TO_COUNTRY_FOR_UNIFIED_CHECKOUT) {
-          shipToCountries = process.env.PAYMENT_GATEWAY_ALLOWED_SHIP_TO_COUNTRY_FOR_UNIFIED_CHECKOUT;
+        captureMandate.requestShipping = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING) ? true : false;
+        if (undefined != process.env.PAYMENT_GATEWAY_UC_ALLOWED_SHIP_TO_COUNTRIES && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_UC_ALLOWED_SHIP_TO_COUNTRIES) {
+          shipToCountries = process.env.PAYMENT_GATEWAY_UC_ALLOWED_SHIP_TO_COUNTRIES;
           shipToCountriesArray = shipToCountries.split(Constants.REGEX_COMMA);
           captureMandate.shipToCountries = shipToCountriesArray;
         }
@@ -72,8 +72,8 @@ const generateCaptureContext = async (cartObj, country, locale, currencyCode, me
         }
         requestObj.locale = cartObj.locale;
         requestObj.country = cartObj.country;
-        if (undefined != process.env.PAYMENT_GATEWAY_ALLOWED_PAYMENT_METHODS_FOR_UNIFIED_CHECKOUT && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_ALLOWED_PAYMENT_METHODS_FOR_UNIFIED_CHECKOUT) {
-          allowedPaymentTypes = process.env.PAYMENT_GATEWAY_ALLOWED_PAYMENT_METHODS_FOR_UNIFIED_CHECKOUT;
+        if (undefined != process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS) {
+          allowedPaymentTypes = process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS;
           allowedPaymentTypesArray = allowedPaymentTypes.split(Constants.REGEX_COMMA);
           requestObj.allowedPaymentTypes = allowedPaymentTypesArray;
         } else {
@@ -85,19 +85,19 @@ const generateCaptureContext = async (cartObj, country, locale, currencyCode, me
         orderInformationAmountDetails.currency = currencyCode;
         orderInformation.amountDetails = orderInformationAmountDetails;
         requestObj.orderInformation = orderInformation;
-        captureMandate.billingType = process.env.PAYMENT_GATEWAY_BILLING_TYPE;
+        captureMandate.billingType = process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE;
         captureMandate.requestShipping = false;
-        captureMandate.requestEmail = (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_BILLING_TYPE) ? true : false;
-        captureMandate.requestPhone = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_PHONE) ? true : false;
+        captureMandate.requestEmail = (Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) ? true : false;
+        captureMandate.requestPhone = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_PHONE) ? true : false;
         requestObj.captureMandate = captureMandate;
         requestObj.locale = locale;
         requestObj.country = country;
         requestObj.allowedPaymentTypes = [Constants.STRING_PANENTRY];
       }
       requestObj.clientVersion = '0.15';
-      captureMandate.showAcceptedNetworkIcons = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_NETWORK_ICONS ? true : false);
-      if (undefined != process.env.PAYMENT_GATEWAY_ALLOWED_CARD_NETWORK_FOR_UNIFIED_CHECKOUT && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_ALLOWED_CARD_NETWORK_FOR_UNIFIED_CHECKOUT) {
-        allowedCardNetworks = process.env.PAYMENT_GATEWAY_ALLOWED_CARD_NETWORK_FOR_UNIFIED_CHECKOUT;
+      captureMandate.showAcceptedNetworkIcons = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_NETWORK_ICONS ? true : false);
+      if (undefined != process.env.PAYMENT_GATEWAY_UC_ALLOWED_CARD_NETWORKS && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_UC_ALLOWED_CARD_NETWORKS) {
+        allowedCardNetworks = process.env.PAYMENT_GATEWAY_UC_ALLOWED_CARD_NETWORKS;
         allowedCardNetworksArray = allowedCardNetworks.split(Constants.REGEX_COMMA);
         requestObj.allowedCardNetworks = allowedCardNetworksArray;
       } else {

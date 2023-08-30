@@ -132,6 +132,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION = '001';
   static readonly PAYMENT_GATEWAY_AUTHENTICATION_TYPE = 'http_signature';
   static readonly PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION = 'visaCheckout';
+  static readonly PAYMENT_GATEWAY_CLICK_TO_PAY_UC_PAYMENT_SOLUTION = '027';
   static readonly PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE = 'clientReferenceInformation.code:';
   static readonly PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION = 'CONSUMER_AUTHENTICATION';
   static readonly PAYMENT_GATEWAY_DECISION_SKIP = 'DECISION_SKIP';
