@@ -96,8 +96,8 @@ const generateCaptureContext = async (cartObj, country, locale, currencyCode, me
       }
       requestObj.clientVersion = '0.15';
       captureMandate.showAcceptedNetworkIcons = (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_NETWORK_ICONS ? true : false);
-      if (undefined != process.env.PAYMENT_GATEWAY_UC_ALLOWED_CARD_NETWORKS && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_UC_ALLOWED_CARD_NETWORKS) {
-        allowedCardNetworks = process.env.PAYMENT_GATEWAY_UC_ALLOWED_CARD_NETWORKS;
+      if (undefined != process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS && Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS) {
+        allowedCardNetworks = process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS;
         allowedCardNetworksArray = allowedCardNetworks.split(Constants.REGEX_COMMA);
         requestObj.allowedCardNetworks = allowedCardNetworksArray;
       } else {

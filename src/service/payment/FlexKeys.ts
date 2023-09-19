@@ -17,6 +17,8 @@ const keys = async (paymentObj) => {
   let midCredentials: any;
   let targetOrigins: any;
   let targetOriginArray: any;
+  let allowedCardNetworksArray = [];
+  let allowedCardNetworks;
   try {
     if (null != paymentObj) {
       const apiClient = new restApi.ApiClient();
@@ -40,6 +42,14 @@ const keys = async (paymentObj) => {
       for (let element of targetOriginArray) {
         requestObj.targetOrigins.push(element);
       }
+      if (undefined !== process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS && Constants.STRING_EMPTY !== process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS) {
+        allowedCardNetworks = process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS;
+        allowedCardNetworksArray = allowedCardNetworks.split(Constants.REGEX_COMMA);
+        requestObj.allowedCardNetworks = allowedCardNetworksArray;
+      } else {
+        requestObj.allowedCardNetworks = ['VISA', 'MASTERCARD', 'AMEX', 'MAESTRO', 'CARTESBANCAIRES', 'CUP', 'JCB', 'DINERSCLUB', 'DISCOVER'];
+      }
+      requestObj.clientVersion = "v2.0";
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.FLEX_KEYS_REQUEST + JSON.stringify(requestObj));
       }

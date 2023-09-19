@@ -11,6 +11,7 @@ import paymentService from './utils/PaymentService';
 import { Constants } from './constants';
 import resourceHandler from './utils/config/ResourceHandler';
 import captureContext from './service/payment/CaptureContextService';
+import keyVerification from './service/payment/getPublicKeys';
 
 dotenv.config();
 const app = express();
@@ -227,6 +228,7 @@ app.post('/api/extension/payment/create', async (req, res) => {
   let actions: any;
   let exceptionData: any;
   let paymentMethod = Constants.STRING_EMPTY;
+  let verifiedCaptureContext;
   try {
     if (req?.body?.resource?.obj) {
       requestObj = req.body.resource.obj;
@@ -245,11 +247,17 @@ app.post('/api/extension/payment/create', async (req, res) => {
           } else {
             microFormKeys = await flexKeys.keys(paymentObj);
             if (null != microFormKeys) {
-              actions = paymentService.fieldMapper(microFormKeys);
-              response = {
-                actions: actions,
-                errors: [],
-              };
+              verifiedCaptureContext = await keyVerification.getPublicKeys(microFormKeys.isv_tokenCaptureContextSignature, paymentObj);
+              if (verifiedCaptureContext) {
+                actions = paymentService.fieldMapper(microFormKeys);
+                response = {
+                  actions: actions,
+                  errors: [],
+                };
+              } else {
+                paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_CAPTURE_CONTEXT);
+                response = paymentService.getEmptyResponse();
+              }
             } else {
               paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_PAYMENT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_FLEX_TOKEN_KEYS);
               response = paymentService.invalidOperationResponse();
@@ -735,7 +743,7 @@ app.post('/captureContext', async (req, res) => {
         if (null != cartDetails) {
           logData = Constants.STRING_CART_ID + cartDetails.id;
           captureContextResponse = await captureContext.generateCaptureContext(cartDetails, null, null, null, merchantId, Constants.SERVICE_PAYMENT);
-            response = captureContextResponse;
+          response = captureContextResponse;
         }
       } else if (Constants.STRING_EMPTY != requestObj?.country && Constants.STRING_EMPTY != requestObj?.locale && Constants.STRING_EMPTY != requestObj?.currency) {
         country = requestObj.country;
@@ -743,7 +751,7 @@ app.post('/captureContext', async (req, res) => {
         currencyCode = requestObj.currency;
         logData = null;
         captureContextResponse = await captureContext.generateCaptureContext(cartData, country, locale, currencyCode, merchantId, Constants.SERVICE_MY_ACCOUNTS);
-          response = captureContextResponse;
+        response = captureContextResponse;
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_CAPTURE_CONTEXT);
       }

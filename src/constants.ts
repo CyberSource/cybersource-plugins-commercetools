@@ -58,6 +58,7 @@ export abstract class Constants {
   static readonly FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE = 'FuncGetPayerAuthEnrollResponse';
   static readonly FUNC_GET_PAYER_AUTH_SETUP_RESPONSE = 'FuncGetPayerAuthSetUpResponse';
   static readonly FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE = 'FuncGetPayerAuthValidateResponse';
+  static readonly FUNC_GET_PUBLIC_KEY = 'FuncGetPublicKeys';
   static readonly FUNC_GET_TRANSACTION_SEARCH_RESPONSE = 'FuncGetTransactionSearchResponse';
   static readonly FUNC_GET_TRANSACTION_SUMMARIES = 'FuncGetTransactionSummaries';
   static readonly FUNC_GET_SERVICE_RESPONSE = 'FuncGetOMServiceResponse';
@@ -380,7 +381,7 @@ export abstract class Constants {
   static readonly EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED = 'MerchantseceretKey is Mandatory';
   static readonly EXCEPTION_MSG_PAYER_AUTH = 'An exception occurred while authenticating the payment';
   static readonly EXCEPTION_MSG_SERVICE_PROCESS = 'An exception occurred while processing your payment';
-  static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception ocurred while creating the extensions and custom fields = ';
+  static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception occurred while creating the extensions and custom fields = ';
   static readonly EXCEPTION_MSG_SYNC_DETAILS = 'An exception occurred while fetching sync conversion details';
   static readonly EXCEPTION_MSG_TRANSACTION_SEARCH = 'An exception occurred while retrieving the transaction details';
 
@@ -409,6 +410,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_CREATE_EXTENSION = 'There was an error creating extension';
   static readonly ERROR_MSG_FETCH_TRANSACTIONS = 'Unable to fetch transactions details';
   static readonly ERROR_MSG_FLEX_TOKEN_KEYS = 'Failed to generate one time key for Flex token';
+  static readonly ERROR_MSG_INVALID_CAPTURE_CONTEXT = 'Invalid capture context';
   static readonly ERROR_MSG_INVALID_CUSTOMER_INPUT = 'Cannot delete the token due to invalid input';
   static readonly ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS = 'Invalid Authentication Credentials';
   static readonly ERROR_MSG_INVALID_OPERATION = 'Cannot process the payment due to invalid operation';
@@ -424,6 +426,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_NO_TOKENS = 'There are no tokens to update';
   static readonly ERROR_MSG_NO_TRANSACTION = 'There are no transactions created for the payment';
   static readonly ERROR_MSG_PAYMENT_DETAILS = 'Unable to fetch payment details';
+  static readonly ERROR_MSG_PUBLIC_KEY_VERIFICATION = 'Failed to verify capture context';
   static readonly ERROR_MSG_RATE_LIMITER = 'Please provide card count and hours for rate limiter';
   static readonly ERROR_MSG_REFUND_EXCEEDS_CAPTURE_AMOUNT = 'Cannot perform refund as the entered amount exceeds captured amount';
   static readonly ERROR_MSG_REFUND_FAILURE = 'Cannot process refund as there are no transaction id available';
@@ -485,6 +488,7 @@ export abstract class Constants {
   static readonly LOG_ANONYMOUS_ID = 'AnonymousId : ';
   static readonly LOG_CART_ID = 'CartId : ';
   static readonly LOG_PAYMENT_ID = 'PaymentId : ';
+  static readonly PUBLIC_KEY_RESPONSE = 'Public Key Response =';
   static readonly SERVICE_PAYMENT = 'Payments';
   static readonly SERVICE_MY_ACCOUNTS = 'MyAccounts';
 
