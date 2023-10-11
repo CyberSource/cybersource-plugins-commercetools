@@ -45,7 +45,7 @@ const getPublicKeys = async (captureContext, paymentObj) => {
         }
         const digest = crypto.createHash('sha256').update(JSON.stringify(publicKeyRequestBody), 'utf8').digest('base64');
         publicKeyHeaderParams['Digest'] = `SHA-256=${digest}`;
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             apiClient.callApi(
                 publicKeyURL, 'GET', publicKeyPathParams, {},
                 publicKeyHeaderParams, null, publicKeyRequestBody, [],
@@ -53,8 +53,12 @@ const getPublicKeys = async (captureContext, paymentObj) => {
                 (error, data, response) => {
                     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PUBLIC_KEY, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.PUBLIC_KEY_RESPONSE + JSON.stringify(response));
                     if (data) {
-                        pemPublicKey = jwkToPem(data);
-                        isSignatureValid = jwt.verify(captureContext, pemPublicKey);
+                        try {
+                            pemPublicKey = jwkToPem(data);
+                            isSignatureValid = jwt.verify(captureContext, pemPublicKey);
+                        }catch (exception) {
+                            paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_PUBLIC_KEY, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + exception);
+                        }
                         isSignatureValid?.flx?.data ? resolve(true) : reject(false)
                     } else {
                         if (
@@ -74,6 +78,8 @@ const getPublicKeys = async (captureContext, paymentObj) => {
                     }
                 }
             );
+        }).catch((error) => {
+            return error;
         });
     } catch (exception) {
         if (typeof exception === 'string') {

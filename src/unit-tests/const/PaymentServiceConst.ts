@@ -1387,3 +1387,96 @@ export const clickToPayResponseUpdatePaymentObj = {
   "interfaceInteractions": [],
   "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
 }
+
+export const tokenCreateFlagCustomerInfo = {
+  id: '19357cc7-8edf-4e19-ad10-37d9ecd26398',
+  version: 1,
+  versionModifiedAt: '2023-10-06T06:41:47.315Z',
+  lastMessageSequenceNumber: 1,
+  createdAt: '2023-10-06T06:41:47.315Z',
+  lastModifiedAt: '2023-10-06T06:41:47.315Z',
+  lastModifiedBy: {
+    clientId: '58JLGBoIQt5xVaer1FVEvFCA',
+    isPlatformClient: false,
+    customer: { typeId: 'customer', id: '5ab91b4c-7eeb-4bd7-92bd-bf6d72fd7e8e' }
+  },
+  createdBy: {
+    clientId: '58JLGBoIQt5xVaer1FVEvFCA',
+    isPlatformClient: false,
+    customer: { typeId: 'customer', id: '5ab91b4c-7eeb-4bd7-92bd-bf6d72fd7e8e' }
+  },
+  email: 'testerkevin@gmail.com',
+  firstName: 'Tester',
+  lastName: 'kevin',
+  password: '****k/8=',
+  addresses: [],
+  shippingAddressIds: [],
+  billingAddressIds: [],
+  isEmailVerified: false,
+  stores: [],
+  authenticationMode: 'Password'
+}
+
+export const tokenCreateFlagPaymentObj = {
+  id: 'a16d2aa2-4e89-404d-ac45-2c048e4e8cda',
+  version: 14,
+  versionModifiedAt: '2023-10-06T06:42:28.223Z',
+  lastMessageSequenceNumber: 2,
+  createdAt: '2023-10-06T06:42:17.122Z',
+  lastModifiedAt: '2023-10-06T06:42:28.223Z',
+  lastModifiedBy: {
+    clientId: '58JLGBoIQt5xVaer1FVEvFCA',
+    isPlatformClient: false,
+    customer: { typeId: 'customer', id: '19357cc7-8edf-4e19-ad10-37d9ecd26398' }
+  },
+  createdBy: {
+    clientId: '58JLGBoIQt5xVaer1FVEvFCA',
+    isPlatformClient: false,
+    customer: { typeId: 'customer', id: '19357cc7-8edf-4e19-ad10-37d9ecd26398' }
+  },
+  customer: { typeId: 'customer', id: '19357cc7-8edf-4e19-ad10-37d9ecd26398' },
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 6585,
+    fractionDigits: 2
+  },
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'creditCard',
+    name: { en: 'Credit Card' }
+  },
+  custom: {
+    type: { 
+      typeId: 'type', 
+      id: '245b313c-b21c-46c4-9825-e2a71ee793df' 
+    },
+    fields: {
+      isv_tokenCaptureContextSignature: 'Q',
+      isv_deviceFingerprintId: '25ebc821-8a83-497b-a9cf-5014e0b07514',
+      isv_token: 'Hs_YDi305SE6_Sg',
+      isv_cardType: '001',
+      isv_customerIpAddress: '192.1.1',
+      isv_maskedPan: '411111XXXXXXXXXXXX1111',
+      isv_cardExpiryMonth: '01',
+      isv_tokenVerificationContext: 's',
+      isv_cardExpiryYear: '2026',
+      isv_merchantId: 'wipro_dm',
+      isv_saleEnabled: false,
+      isv_tokenAlias: 'card1'
+    }
+  },
+  paymentStatus: {},
+  transactions: [
+    {
+      id: '5575f965-7326-40ca-911b-c4e4528b4801',
+      timestamp: '2023-10-06T06:42:31.510Z',
+      type: 'Authorization',
+      amount: [Object],
+      state: 'Initial'
+    }
+  ],
+  interfaceInteractions: []
+}
+
+export const tokenCreateFlagFunctionName = 'FuncGetCreditCardResponse'

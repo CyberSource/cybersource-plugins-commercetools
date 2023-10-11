@@ -290,9 +290,9 @@ const orderManagementHandler = async (paymentId, updatePaymentObj, updateTransac
       } else if (Constants.CT_TRANSACTION_TYPE_REFUND == updateTransactions.type && Constants.CT_TRANSACTION_STATE_INITIAL == updateTransactions.state) {
         refundAction = true;
         refundResponse = await paymentService.getRefundResponse(updatePaymentObj, updateTransactions, orderNo);
-        if (null != refundResponse && null != refundResponse.refundActions && refundResponse.refundTriggered) {
+        if (null != refundResponse && null != refundResponse.refundActions && refundResponse.refundTriggered && refundResponse.refundExecuted) {
           serviceResponse = refundResponse.refundActions;
-        } else if (!refundResponse.refundTriggered) {
+        } else if (!refundResponse.refundTriggered  && !refundResponse.refundExecuted) {
           refundAddResponse = await paymentService.getAddRefundResponse(updatePaymentObj, updateTransactions, orderNo);
           if (null != refundAddResponse) {
             serviceResponse = refundAddResponse;
@@ -483,10 +483,6 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
   let failedTokens: any;
   let existingFailedTokens: any;
   let existingFailedTokensMap: any;
-  let startTime: any;
-  let limiterResponse: any;
-  let cardRate: any;
-  let cardRateCount: any;
   let paymentInstrumentId = null;
   let instrumentIdentifier = null;
   let customerTokenId = null;
@@ -498,147 +494,143 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
   let ucAddressData: any;
   let addressIdField: any;
   let billToFields: any;
+  let tokenCreateResponse : any;
   try {
-    if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER && null != customerId && null != customerObj) {
-      cardRate = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME ? process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME : Constants.DEFAULT_PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME;
-      cardRateCount = Constants.STRING_EMPTY != process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE ? process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE : Constants.DEFAULT_PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE;
-      startTime = new Date();
-      startTime.setHours(startTime.getHours() - cardRate);
-      limiterResponse = await paymentService.rateLimiterAddToken(customerObj, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
-      if (null != limiterResponse && limiterResponse >= parseInt(cardRateCount)) {
-        dontSaveTokenFlag = true;
-      }
-    }
-    if (!dontSaveTokenFlag && Constants.STRING_EMPTY != customerObj?.custom?.fields?.isv_addressId && customerObj.custom.fields?.isv_token && Constants.STRING_EMPTY != customerObj.custom.fields.isv_token) {
-      cardTokens = await paymentService.getCardTokens(customerObj, null);
-      if (Constants.UC_ADDRESS == customerObj.custom.fields.isv_addressId) {
-        ucAddressData = await getTransientTokenData.transientTokenDataResponse(customerObj, Constants.SERVICE_MY_ACCOUNTS);
-        if (Constants.HTTP_CODE_TWO_HUNDRED == ucAddressData?.httpCode) {
-          billToFields = JSON.parse(ucAddressData.data).orderInformation.billTo;
-        }
-        cardResponse = await addTokenService.addTokenResponse(customerId, customerObj, billToFields, cardTokens);
-      } else {
-        addressObj.forEach((address) => {
-          if (customerObj.custom.fields.isv_addressId == address.id) {
-            addressData = address;
+    tokenCreateResponse = await paymentService.tokenCreateFlag(customerObj, null, Constants.FUNC_ADD_CARD_HANDLER);
+    if(!tokenCreateResponse.errorFlag){
+      dontSaveTokenFlag = tokenCreateResponse.dontSaveTokenFlag;
+      if (!dontSaveTokenFlag && Constants.STRING_EMPTY != customerObj?.custom?.fields?.isv_addressId && customerObj.custom.fields?.isv_token && Constants.STRING_EMPTY != customerObj.custom.fields.isv_token) {
+        cardTokens = await paymentService.getCardTokens(customerObj, null);
+        if (Constants.UC_ADDRESS == customerObj.custom.fields.isv_addressId) {
+          ucAddressData = await getTransientTokenData.transientTokenDataResponse(customerObj, Constants.SERVICE_MY_ACCOUNTS);
+          if (Constants.HTTP_CODE_TWO_HUNDRED == ucAddressData?.httpCode) {
+            billToFields = JSON.parse(ucAddressData.data).orderInformation.billTo;
           }
-        });
-        cardResponse = await addTokenService.addTokenResponse(customerId, customerObj, addressData, cardTokens);
-      }
-      if (
-        Constants.HTTP_CODE_TWO_HUNDRED_ONE == cardResponse.httpCode &&
-        Constants.API_STATUS_AUTHORIZED == cardResponse.status &&
-        cardResponse.data.hasOwnProperty(Constants.TOKEN_INFORMATION) &&
-        Constants.VAL_ZERO < Object.keys(cardResponse.data.tokenInformation).length &&
-        cardResponse.data.tokenInformation.hasOwnProperty(Constants.PAYMENT_INSTRUMENT) &&
-        Constants.VAL_ZERO < Object.keys(cardResponse.data.tokenInformation.paymentInstrument).length
-      ) {
-        customerTokenId = cardResponse.data.tokenInformation.hasOwnProperty(Constants.STRING_CUSTOMER) && Constants.VAL_ZERO < Object.keys(cardResponse.data.tokenInformation.customer).length ? cardResponse.data.tokenInformation.customer.id : cardTokens.customerTokenId;
-        paymentInstrumentId = cardResponse.data.tokenInformation.paymentInstrument.id;
-        instrumentIdentifier = cardResponse.data.tokenInformation.instrumentIdentifier.id;
-        if (customerObj.custom.fields?.isv_tokens && Constants.STRING_EMPTY != customerObj.custom.fields.isv_tokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_tokens.length) {
-          existingTokens = customerObj.custom.fields.isv_tokens;
-          existingTokensMap = existingTokens.map((item) => item);
-          existingTokensMap.forEach((token, index) => {
-            newToken = JSON.parse(token);
-            if (newToken.cardNumber == customerObj.custom.fields.isv_maskedPan && newToken.value == customerTokenId && newToken.instrumentIdentifier == instrumentIdentifier) {
-              length = index;
+          cardResponse = await addTokenService.addTokenResponse(customerId, customerObj, billToFields, cardTokens);
+        } else {
+          addressObj.forEach((address) => {
+            if (customerObj.custom.fields.isv_addressId == address.id) {
+              addressData = address;
             }
           });
-          if (Constants.VAL_NEGATIVE_ONE < length) {
-            parsedTokens = JSON.parse(existingTokensMap[length]);
-            parsedTokens.alias = customerObj.custom.fields.isv_tokenAlias;
-            parsedTokens.value = customerTokenId;
-            parsedTokens.paymentToken = paymentInstrumentId;
-            parsedTokens.cardExpiryMonth = customerObj.custom.fields.isv_cardExpiryMonth;
-            parsedTokens.cardExpiryYear = customerObj.custom.fields.isv_cardExpiryYear;
-            parsedTokens.addressId = customerObj.custom.fields.isv_addressId;
-            if (Constants.UC_ADDRESS == customerObj.custom.fields.isv_addressId) {
-              parsedTokens.address = billToFields;
+          cardResponse = await addTokenService.addTokenResponse(customerId, customerObj, addressData, cardTokens);
+        }
+        if (
+          Constants.HTTP_CODE_TWO_HUNDRED_ONE == cardResponse.httpCode &&
+          Constants.API_STATUS_AUTHORIZED == cardResponse.status &&
+          cardResponse.data.hasOwnProperty(Constants.TOKEN_INFORMATION) &&
+          Constants.VAL_ZERO < Object.keys(cardResponse.data.tokenInformation).length &&
+          cardResponse.data.tokenInformation.hasOwnProperty(Constants.PAYMENT_INSTRUMENT) &&
+          Constants.VAL_ZERO < Object.keys(cardResponse.data.tokenInformation.paymentInstrument).length
+        ) {
+          customerTokenId = cardResponse.data.tokenInformation.hasOwnProperty(Constants.STRING_CUSTOMER) && Constants.VAL_ZERO < Object.keys(cardResponse.data.tokenInformation.customer).length ? cardResponse.data.tokenInformation.customer.id : cardTokens.customerTokenId;
+          paymentInstrumentId = cardResponse.data.tokenInformation.paymentInstrument.id;
+          instrumentIdentifier = cardResponse.data.tokenInformation.instrumentIdentifier.id;
+          if (customerObj.custom.fields?.isv_tokens && Constants.STRING_EMPTY != customerObj.custom.fields.isv_tokens && Constants.VAL_ZERO < customerObj.custom.fields.isv_tokens.length) {
+            existingTokens = customerObj.custom.fields.isv_tokens;
+            existingTokensMap = existingTokens.map((item) => item);
+            existingTokensMap.forEach((token, index) => {
+              newToken = JSON.parse(token);
+              if (newToken.cardNumber == customerObj.custom.fields.isv_maskedPan && newToken.value == customerTokenId && newToken.instrumentIdentifier == instrumentIdentifier) {
+                length = index;
+              }
+            });
+            if (Constants.VAL_NEGATIVE_ONE < length) {
+              parsedTokens = JSON.parse(existingTokensMap[length]);
+              parsedTokens.alias = customerObj.custom.fields.isv_tokenAlias;
+              parsedTokens.value = customerTokenId;
+              parsedTokens.paymentToken = paymentInstrumentId;
+              parsedTokens.cardExpiryMonth = customerObj.custom.fields.isv_cardExpiryMonth;
+              parsedTokens.cardExpiryYear = customerObj.custom.fields.isv_cardExpiryYear;
+              parsedTokens.addressId = customerObj.custom.fields.isv_addressId;
+              if (Constants.UC_ADDRESS == customerObj.custom.fields.isv_addressId) {
+                parsedTokens.address = billToFields;
+              }
+              existingTokensMap[length] = JSON.stringify(parsedTokens);
+            } else {
+              newTokenFlag = true;
+              tokensExists = true;
             }
-            existingTokensMap[length] = JSON.stringify(parsedTokens);
           } else {
             newTokenFlag = true;
-            tokensExists = true;
+          }
+          if (newTokenFlag) {
+            if (Constants.UC_ADDRESS == customerObj.custom.fields.isv_addressId) {
+              addressIdField = billToFields;
+              tokenData = {
+                alias: customerObj.custom.fields.isv_tokenAlias,
+                value: customerTokenId,
+                paymentToken: paymentInstrumentId,
+                instrumentIdentifier: instrumentIdentifier,
+                cardType: customerObj.custom.fields.isv_cardType,
+                cardName: customerObj.custom.fields.isv_cardType,
+                cardNumber: customerObj.custom.fields.isv_maskedPan,
+                cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
+                cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
+                addressId: customerObj.custom.fields.isv_addressId,
+                address: addressIdField,
+                timeStamp: new Date(Date.now()).toISOString(),
+              };
+            } else {
+              tokenData = {
+                alias: customerObj.custom.fields.isv_tokenAlias,
+                value: customerTokenId,
+                paymentToken: paymentInstrumentId,
+                instrumentIdentifier: instrumentIdentifier,
+                cardType: customerObj.custom.fields.isv_cardType,
+                cardName: customerObj.custom.fields.isv_cardType,
+                cardNumber: customerObj.custom.fields.isv_maskedPan,
+                cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
+                cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
+                addressId: customerObj.custom.fields.isv_addressId,
+                timeStamp: new Date(Date.now()).toISOString(),
+              };
+            }
+            if (tokensExists) {
+              length = existingTokensMap.length;
+              existingTokensMap[length] = JSON.stringify(tokenData);
+            } else {
+              existingTokensMap = [JSON.stringify(tokenData)];
+            }
+            customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokensMap, customerObj.custom.fields.isv_failedTokens, true, customerObj, billToFields);
+          } else {
+            customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokensMap, customerObj.custom.fields.isv_failedTokens, false, customerObj, billToFields);
           }
         } else {
-          newTokenFlag = true;
-        }
-        if (newTokenFlag) {
           if (Constants.UC_ADDRESS == customerObj.custom.fields.isv_addressId) {
-            addressIdField = billToFields;
-            tokenData = {
-              alias: customerObj.custom.fields.isv_tokenAlias,
-              value: customerTokenId,
-              paymentToken: paymentInstrumentId,
-              instrumentIdentifier: instrumentIdentifier,
-              cardType: customerObj.custom.fields.isv_cardType,
-              cardName: customerObj.custom.fields.isv_cardType,
-              cardNumber: customerObj.custom.fields.isv_maskedPan,
-              cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
-              cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
-              addressId: customerObj.custom.fields.isv_addressId,
-              address: addressIdField,
-              timeStamp: new Date(Date.now()).toISOString(),
-            };
+            addressIdField = null;
           } else {
-            tokenData = {
-              alias: customerObj.custom.fields.isv_tokenAlias,
-              value: customerTokenId,
-              paymentToken: paymentInstrumentId,
-              instrumentIdentifier: instrumentIdentifier,
-              cardType: customerObj.custom.fields.isv_cardType,
-              cardName: customerObj.custom.fields.isv_cardType,
-              cardNumber: customerObj.custom.fields.isv_maskedPan,
-              cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
-              cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
-              addressId: customerObj.custom.fields.isv_addressId,
-              timeStamp: new Date(Date.now()).toISOString(),
-            };
+            addressIdField = customerObj.custom.fields.isv_addressId;
           }
-          if (tokensExists) {
-            length = existingTokensMap.length;
-            existingTokensMap[length] = JSON.stringify(tokenData);
+          failedTokens = {
+            alias: customerObj.custom.fields.isv_tokenAlias,
+            cardType: customerObj.custom.fields.isv_cardType,
+            cardName: customerObj.custom.fields.isv_cardType,
+            cardNumber: customerObj.custom.fields.isv_maskedPan,
+            cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
+            cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
+            addressId: addressIdField,
+            timeStamp: new Date(Date.now()).toISOString(),
+          };
+          if (customerObj.custom.fields?.isv_failedTokens && customerObj?.custom?.fields?.isv_failedTokens.length) {
+            existingFailedTokens = customerObj.custom.fields.isv_failedTokens;
+            existingFailedTokensMap = existingFailedTokens.map((item) => item);
+            failedTokenLength = customerObj.custom.fields.isv_failedTokens.length;
+            existingFailedTokensMap[failedTokenLength] = JSON.stringify(failedTokens);
           } else {
-            existingTokensMap = [JSON.stringify(tokenData)];
+            existingFailedTokensMap = [JSON.stringify(failedTokens)];
           }
-          customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokensMap, customerObj.custom.fields.isv_failedTokens, true, customerObj, billToFields);
-        } else {
-          customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokensMap, customerObj.custom.fields.isv_failedTokens, false, customerObj, billToFields);
+          if (customerObj.custom.fields?.isv_tokens && customerObj?.custom?.fields?.isv_tokens.length) {
+            existingTokens = customerObj.custom.fields.isv_tokens;
+          }
+          customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokens, existingFailedTokensMap, true, customerObj, null);
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_SERVICE_PROCESS);
         }
       } else {
-        if (Constants.UC_ADDRESS == customerObj.custom.fields.isv_addressId) {
-          addressIdField = null;
-        } else {
-          addressIdField = customerObj.custom.fields.isv_addressId;
-        }
-        failedTokens = {
-          alias: customerObj.custom.fields.isv_tokenAlias,
-          cardType: customerObj.custom.fields.isv_cardType,
-          cardName: customerObj.custom.fields.isv_cardType,
-          cardNumber: customerObj.custom.fields.isv_maskedPan,
-          cardExpiryMonth: customerObj.custom.fields.isv_cardExpiryMonth,
-          cardExpiryYear: customerObj.custom.fields.isv_cardExpiryYear,
-          addressId: addressIdField,
-          timeStamp: new Date(Date.now()).toISOString(),
-        };
-        if (customerObj.custom.fields?.isv_failedTokens && customerObj?.custom?.fields?.isv_failedTokens.length) {
-          existingFailedTokens = customerObj.custom.fields.isv_failedTokens;
-          existingFailedTokensMap = existingFailedTokens.map((item) => item);
-          failedTokenLength = customerObj.custom.fields.isv_failedTokens.length;
-          existingFailedTokensMap[failedTokenLength] = JSON.stringify(failedTokens);
-        } else {
-          existingFailedTokensMap = [JSON.stringify(failedTokens)];
-        }
-        if (customerObj.custom.fields?.isv_tokens && customerObj?.custom?.fields?.isv_tokens.length) {
-          existingTokens = customerObj.custom.fields.isv_tokens;
-        }
-        customerTokenResponse = await paymentService.getUpdateTokenActions(existingTokens, existingFailedTokensMap, true, customerObj, null);
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_SERVICE_PROCESS);
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_INVALID_INPUT);
       }
-    } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_INVALID_INPUT);
-    }
+    } 
+    
   } catch (exception) {
     if (typeof exception === 'string') {
       exceptionData = Constants.EXCEPTION_MSG_ADDING_A_CARD + Constants.STRING_HYPHEN + exception.toUpperCase();
@@ -869,7 +861,7 @@ const syncHandler = async () => {
                     }
                   }
                 }
-              } 
+              }
             }
           }
         }

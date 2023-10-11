@@ -7,7 +7,7 @@ import { getAuthResponsePaymentPendingResponse, getAuthResponsePaymentCompleteRe
 import { successState, failureState, changeStateTransactionDetail, changeStateFailureTransactionDetail, getRefundResponseUpdatePaymentObj, getRefundResponseUpdateTransactions } from '../const/PaymentServiceConst';
 import { payerAuthActionsResponse, payerEnrollActionsUpdatePaymentObj, payerEnrollActionsResponse, addRefundActionAmount, addRefundActionOrderResponse, state } from '../const/PaymentServiceConst';
 import { getUpdateTokenActionsActions, failurePaymentResponse, failureResponseTransactionDetail, getCreditCardResponseUpdatePaymentObj, getCreditCardResponseCartObj, clickToPayResponseUpdatePaymentObj } from '../const/PaymentServiceConst';
-import { getAuthorizedAmountCapturePaymentObj, setCustomTypeDataPendingAmount, setCustomTypeDataTransactionId, googlePayResponseUpdatePaymentObj } from '../const/PaymentServiceConst';
+import { getAuthorizedAmountCapturePaymentObj, setCustomTypeDataPendingAmount, setCustomTypeDataTransactionId, googlePayResponseUpdatePaymentObj, tokenCreateFlagCustomerInfo, tokenCreateFlagPaymentObj, tokenCreateFlagFunctionName } from '../const/PaymentServiceConst';
 import { authorizationHandler3DSUpdatePaymentObject} from '../const/PaymentHandlerConst';
 import {  getPayerAuthValidateResponseUpdatePaymentObj } from '../const/PaymentHandlerConst';
 import { getPayerAuthEnrollResponseUpdatePaymentObj } from '../const/PaymentHandlerConst';
@@ -277,4 +277,16 @@ test.serial('Get click to pay response', async (t) => {
     t.not(result.paymentResponse.httpCode, 201)
     t.not(result.paymentResponse.status, "AUTHORIZED");
   }
+})
+
+test.serial('get response for token create flag for checkout', async (t) => {
+  const result = await paymentService.tokenCreateFlag(tokenCreateFlagCustomerInfo, tokenCreateFlagPaymentObj, tokenCreateFlagFunctionName);
+  t.is(result.dontSaveTokenFlag, false);
+  t.is(result.errorFlag, false);
+})
+
+test.serial('get response for token create flag for my account', async (t) => {
+  const result = await paymentService.tokenCreateFlag(tokenCreateFlagCustomerInfo, null, tokenCreateFlagFunctionName);
+  t.is(result.dontSaveTokenFlag, false);
+  t.is(result.errorFlag, false);
 })

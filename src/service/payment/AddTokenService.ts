@@ -77,10 +77,16 @@ const addTokenResponse = async (customerId, customerObj, address, cardTokens) =>
       if (Constants.UC_ADDRESS == customerObj?.custom?.fields?.isv_addressId) {
         orderInformationBillTo.administrativeArea = address.administrativeArea;
         orderInformationBillTo.address1 = address.address1;
+        if (address?.buildingNumber) {
+          orderInformationBillTo.address2 = address.buildingNumber;
+        }
         orderInformationBillTo.locality = address.locality;
       } else {
         orderInformationBillTo.administrativeArea = address.region;
         orderInformationBillTo.address1 = address.streetName;
+        if(address?.additionalStreetInfo){
+          orderInformationBillTo.address2 = address.additionalStreetInfo;
+        }
         orderInformationBillTo.locality = address.city;
       }
       orderInformationBillTo.postalCode = address.postalCode;

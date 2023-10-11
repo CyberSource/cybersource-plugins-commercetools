@@ -202,7 +202,7 @@ export abstract class Constants {
   static readonly STRING_SECRET_KEY = '_SECRET_KEY';
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
   static readonly ANONYMOUS_ID = 'anonymousId';
-  static readonly AUTHENTICATION_SCHEME_BASIC = 'Basic';
+  static readonly AUTHENTICATION_SCHEME = 'Basic';
   static readonly CUSTOMER_ID = 'customerId';
   static readonly DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
   static readonly DESC_ORDER = 'desc';
@@ -412,6 +412,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_FLEX_TOKEN_KEYS = 'Failed to generate one time key for Flex token';
   static readonly ERROR_MSG_INVALID_CAPTURE_CONTEXT = 'Invalid capture context';
   static readonly ERROR_MSG_INVALID_CUSTOMER_INPUT = 'Cannot delete the token due to invalid input';
+  static readonly ERROR_MSG_INVALID_RATE_LIMITER_CONFIGURATIONS = 'Invalid configurations. Please configure the valid values for rate limiter in env file';
   static readonly ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS = 'Invalid Authentication Credentials';
   static readonly ERROR_MSG_INVALID_OPERATION = 'Cannot process the payment due to invalid operation';
   static readonly ERROR_MSG_INVALID_INPUT = 'Cannot process the payment due to invalid input';

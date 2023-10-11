@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>ISV Commercetools Plugin</title>
+    <title>ISV Commercetools Extension</title>
     <base href="/" />
     <link rel="stylesheet" href="styles.css" />
     <script type="text/javascript" src="orders.js"></script>
@@ -9,7 +9,7 @@
   </head>
 
   <body>
-    <h1 class="order">ISV Commercetools Plugin</h1>
+    <h1 class="order">ISV Commercetools Extension</h1>
     <% if(orderErrorMessage){%>
     <div class="alert alert-error alert-dismissible" id="orderErrorMessage">
       <em class="mark error"></em>
@@ -23,7 +23,7 @@
     <% } %>
 
     <div class="leftDiv"><h1>Payments</h1></div>
-    <div class="buttonright"><a class="button" href="/configurePlugin" role="button" id="runScript">Run Script</a></div>
+    <div class="buttonright"><a class="button" href="/configureExtension" role="button" id="runScript">Run Script</a></div>
     <% if(total != 0) { %>
     <div class="buttonright"><a class="button" href="/decisionSync" role="button" id="decisionSync">Run Decision Sync</a></div>
     <div class="buttonright"><a class="button" href="/sync" role="button" id="sync">Run Sync</a></div>

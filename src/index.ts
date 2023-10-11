@@ -35,58 +35,61 @@ app.all('*', authentication);
 app.listen(port, () => {
   console.log(`Application running on port:${port}`);
 });
+
 app.set('views', path.join(__dirname, 'views/'));
 app.set('view engine', 'ejs');
 
 function authentication(req, res, next) {
   let decrypt: any;
-  var authHeader = req.headers.authorization;
+  let authHeader = req.headers.authorization;
+  let whitelistFlag = false;
   let whitelistUrl: any;
   let whitelistUrlArray: any;
   whitelistUrl = process.env.PAYMENT_GATEWAY_WHITELIST_URLS;
-  if (undefined != whitelistUrl && Constants.STRING_EMPTY != whitelistUrl) {
+  if (undefined !== whitelistUrl && Constants.STRING_EMPTY !== whitelistUrl) {
     whitelistUrlArray = whitelistUrl.split(Constants.REGEX_COMMA);
   }
   if (!authHeader) {
-    if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/generateHeader') {
-      res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
+    if (req.url === '/' || req.url === '/orders' || req.url === '/decisionSync' || req.url === '/sync' || req.url === '/configurePlugin' || req.url === '/generateHeader') {
+      res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME);
     } else {
-      if (null != whitelistUrlArray) {
-        for (let whitelistElement of whitelistUrlArray) {
-          if (req.url == Constants.REGEX_SINGLE_SLASH + whitelistElement) {
-            return next();
-          }
-        }
-      }
+      whitelistFlag = true;
     }
     return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER });
   }
-  if (req.url == '/' || req.url == '/orders' || req.url == '/decisionSync' || req.url == '/sync' || req.url == '/configurePlugin' || req.url == '/generateHeader') {
-    const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
-    if (base64Credentials == process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
-      return next();
-    } else {
-      res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME_BASIC);
-      return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
-    }
-  } else {
-    if (req.url == '/api/extension/payment/create' || req.url == '/api/extension/payment/update' || req.url == '/api/extension/customer/update' || req.url == '/captureContext') {
-      const encodedCredentials = authHeader.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
-      decrypt = paymentService.decryption(encodedCredentials);
-      if (null != decrypt && decrypt == process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
+  else {
+    if (req.url === '/' || req.url === '/orders' || req.url === '/decisionSync' || req.url === '/sync' || req.url === '/configurePlugin' || req.url === '/generateHeader') {
+      const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
+      if (base64Credentials === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
         return next();
       } else {
+        res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME);
         return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
       }
     } else {
-      if (null != whitelistUrlArray) {
+      if (req.url === '/api/extension/payment/create' || req.url === '/api/extension/payment/update' || req.url === '/api/extension/customer/update' || req.url === '/captureContext') {
+        const encodedCredentials = authHeader.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
+        decrypt = paymentService.decryption(encodedCredentials);
+        if (null !== decrypt && decrypt === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
+          return next();
+        } else {
+          return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS });
+        }
+      } else {
+        whitelistFlag = true;
+      }
+    }
+  }
+  if (whitelistFlag) {
+    if (undefined !== whitelistUrl && Constants.STRING_EMPTY !== whitelistUrl) {
+      whitelistUrlArray = whitelistUrl.split(Constants.REGEX_COMMA);
+      if (null !== whitelistUrlArray) {
         for (let whitelistElement of whitelistUrlArray) {
-          if (req.url == Constants.REGEX_SINGLE_SLASH + whitelistElement) {
+          if (req.url === Constants.REGEX_SINGLE_SLASH + whitelistElement || (req.url.includes(Constants.REGEX_SINGLE_SLASH + whitelistElement + '?'))) {
             return next();
           }
         }
       }
-      return next();
     }
   }
 }
@@ -712,7 +715,7 @@ app.get('/sync', async (req, res) => {
   res.redirect('/orders');
 });
 
-app.get('/configurePlugin', async (req, res) => {
+app.get('/configureExtension', async (req, res) => {
   await resourceHandler.ensureExtension();
   await resourceHandler.ensureCustomTypes();
   orderSuccessMessage = Constants.SUCCESS_MSG_SCRIPT_PLUGIN;
