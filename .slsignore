@@ -1,7 +1,7 @@
 README.md
 docs/**
 src/unit-tests/**
-ctPlugin.zip
+ctExtension.zip
 node_modules/@ava/**
 node_modules/ava/**
 node_modules/chai/**

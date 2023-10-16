@@ -50,7 +50,7 @@ function authentication(req, res, next) {
     whitelistUrlArray = whitelistUrl.split(Constants.REGEX_COMMA);
   }
   if (!authHeader) {
-    if (req.url === '/' || req.url === '/orders' || req.url === '/decisionSync' || req.url === '/sync' || req.url === '/configurePlugin' || req.url === '/generateHeader') {
+    if (req.url === '/' || req.url === '/orders' || req.url.includes('/paymentdetails?') || req.url.includes('/capture?') || req.url.includes('/refund?') || req.url.includes('/authReversal?') || req.url === '/decisionSync' || req.url === '/sync' || req.url === '/configureExtension' || req.url === '/generateHeader') {
       res.setHeader(Constants.STRING_WWW_AUTHENTICATE, Constants.AUTHENTICATION_SCHEME);
     } else {
       whitelistFlag = true;
@@ -58,7 +58,7 @@ function authentication(req, res, next) {
     return res.status(Constants.VAL_FOUR_HUNDRED_AND_ONE).json({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER });
   }
   else {
-    if (req.url === '/' || req.url === '/orders' || req.url === '/decisionSync' || req.url === '/sync' || req.url === '/configurePlugin' || req.url === '/generateHeader') {
+    if (req.url === '/' || req.url === '/orders' || req.url.includes('/paymentdetails?') || req.url.includes('/capture?') || req.url.includes('/refund?') || req.url.includes('/authReversal?') || req.url === '/decisionSync' || req.url === '/sync' || req.url === '/configureExtension' || req.url === '/generateHeader') {
       const base64Credentials = req.headers.authorization.split(Constants.STRING_EMPTY_SPACE)[Constants.VAL_ONE];
       if (base64Credentials === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
         return next();
