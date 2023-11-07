@@ -384,6 +384,7 @@ export abstract class Constants {
   static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception occurred while creating the extensions and custom fields = ';
   static readonly EXCEPTION_MSG_SYNC_DETAILS = 'An exception occurred while fetching sync conversion details';
   static readonly EXCEPTION_MSG_TRANSACTION_SEARCH = 'An exception occurred while retrieving the transaction details';
+  static readonly EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS = 'An exception occurred while updating customer address';
 
   //Error messges
   static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
@@ -452,6 +453,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_UC_ADDRESS_DETAILS = 'Unable to update the address as the UC address';
   static readonly ERROR_MSG_CAPTURE_CONTEXT = 'Failed to generate capture context';
   static readonly ERROR_MSG_TRANSIENT_TOKEN_DATA = 'Unable to get transient token data';
+  static readonly ERROR_MSG_CUSTOMER_UPDATE = 'Unable to update the customer with customer address';
 
   //script data
   static readonly PAYMENT_CREATE_DESTINATION_URL = '/api/extension/payment/create';

@@ -1,26 +1,26 @@
 # Key Creation
 
 - [Commercetools](#Commercetools)
-  - [Cybersource Plugin API Keys](#cybersource-plugin-api-keys)
+  - [Cybersource Extension API Keys](#cybersource-Extension-api-keys)
   - [Frontend API Key](#frontend-api-key)
 - [Cybersource](#cybersource)
   - [REST Shared Secret](#rest-shared-secret)
 
 # Commercetools
 
-## Cybersource Plugin API Keys
+## Cybersource Extension API Keys
 
-The API Extension and the Synchronization Service require an API key which will be used throughout the payments process. The scopes required for this API key are:
+The API Extension and the Synchronization Service requires an API key which will be used throughout the payments process. The scopes required for this API key are:
 
 | Scope             | Reason                                                                                                                                                                                                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| manage_payments   | This is used for adding and updating transactions during synchronization process                                                                                                                             |
-| manage_orders     | This is used for <ul> <li>Updating the cart with Billing and Shipping addresses while using Visa Click to Pay</li><li>Extracting line item data from the cart to send while using Decision Manager</li></ul> |
-| view_types        | This is used to get the Id of the custom payment and payment interface interaction types on API Extension startup                                                                                            |
-| view_customer     | This is used for viewing the customer created and dealing with their custom data                                                                                                                             |
-| manage_customers  | This is used for managing the customer. It is required for creating and updating the customer                                                                                                                |
-| manage_types      | This is used for creating custom types required to process payments and tokens                                                                                                                               |
-| manage_extensions | This is used for extending payment create, update and customer update APIs                                                                                                                                   |
+| manage_payments   | Adding and updating transactions during synchronization process                                                                                                                             |
+| manage_orders     | <ul> <li>Updating the cart with Billing and Shipping addresses while using Visa Click to Pay</li><li>Extracting line item data from the cart </li><li>updating cart address with UC address</li></ul> |
+| manage_customers  | It is required for updating the customer for saved card tokens                                                                                                          |
+| manage_types      | Creating custom types required to process payments and saved card tokens                                                                                                                               |
+| manage_extensions | Extending payment create, update and customer update APIs                                                                                                                                   |
+| view_types        | To get the Id of the custom payment and payment interface interaction types on API Extension startup                                                                                            |
+| view_customer     | For viewing the customer created and dealing with their custom data                                                                                                                             |
 
 ## Frontend API Key
 
@@ -28,12 +28,12 @@ To be used for frontend applications in order to create and manage payments and 
 
 | Scope                   | Reason                                                                                         |
 | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| view_published_products | Required to add items into the cart                                                            |
-| view_orders             | Required to view orders                                                                        |
-| view_categories         | Required to view product categories                                                       |
-| manage_customers        | Required to update or delete saved cards                                      |
+| view_published_products | Adding items into the cart                                                            |
+| view_orders             | To view orders                                                                        |
+| view_categories         | To view product categories                                                       |
+| manage_customers        | To update or delete saved cards                                      |
 | manage_my_payments      | To allow payments to be created in Commercetools to initiate the payment flow with Cybersource |
-| manage_my_orders        | Adding Payments to an Order                                                                    |
+| manage_my_orders        | Adding Payments to the Order                                                                    |
 | manage_my_profile       | Access to the current customers profile so it can be associated with the Payment and Order     |
 | create_anonymous_token  | (optional) If you are using the key to control the customers session                           |
 
@@ -41,4 +41,4 @@ To be used for frontend applications in order to create and manage payments and 
 
 ## REST Shared Secret
 
-Flex token generation uses a shared secret to generate one-time keys to be used when encrypting the user's credit card details on the client side and HTTP Signature authentication for Cybersource REST API services. Set up a secret as per [this guide](https://developer.cybersource.com/library/documentation/dev_guides/REST_API/Getting_Started/Getting_Started_REST_API.pdf)<span> </span>and store the values safely. These should be provided in the API Extension's .env file as described in the [API Extension Setup](API-Extension-Setup.md) page.
+Flex token generation uses a shared secret to generate one-time keys to encrypt the user's Credit Card details on the client side and HTTP Signature authentication for Cybersource REST API services. Set up a secret as per [this guide](https://developer.cybersource.com/library/documentation/dev_guides/REST_API/Getting_Started/Getting_Started_REST_API.pdf)<span> </span>and store the values safely. These should be provided in the API Extension's .env file as described in the [API Extension Setup](API-Extension-Setup.md#configuration) page.

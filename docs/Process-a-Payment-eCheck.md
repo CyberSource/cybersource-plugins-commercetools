@@ -2,7 +2,7 @@
 
 ## eCheck Processing Sequence Diagram
 
-![eCheck Processing flow](./images/Flow-diagram-eCheck.svg)
+![eCheck Processing flow](./images/Flow-Diagram-eCheck.svg)
 
 Make sure the checkout page is setup to collect all the required information from customer as mentioned in [eCheck Setup](./eCheck-Setup.md)
 ## Details
@@ -13,7 +13,7 @@ Make sure the checkout page is setup to collect all the required information fro
     
     b. Ensure the cart billing and shipping addresses are set. Phone number is a mandatory field in address for eCheck transaction 
 
-    > **_NOTE:_** : If the cart has multiple shipping methods, the  shipping address of the first available shipping method applied to the cart will be used to process the payment
+    > **_NOTE:_** : If the cart has multiple shipping methods, the shipping address of the first available shipping method applied to the cart will be used to process the payment
     
 
 2. Enter the account number, account type and routing number
@@ -33,9 +33,9 @@ Make sure the checkout page is setup to collect all the required information fro
     | custom.fields.isv_accountType         | Customer account type               | Yes       | Possible customer account type (Possible values are mentioned in [eCheck Setup](./eCheck-Setup.md))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
     | custom.fields.isv_routingNumber       | Customer routing number             | Yes       | Also named as transit number(Max 9 digits)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
     | amountPlanned                         | Amount to be processed              | Yes       | Should match cart gross total, unless split payments are being used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint id      | Yes       | It must be unique for each merchant Id. You can use any string that you are already generating, such as an order number or web session Id. However, do not use the same uppercase and lowercase letters to indicate different session Ids. Replace sessionId with the unique Id generated in the URL given. Include the script "https://h.online-metrix.net/fp/tags.js?org_id={{org Id}}&session_id={{merchant Id}}{{session Id}}". Replace the below data {{org Id}} - To obtain this value, contact your CyberSource representative and specify to them whether it is for testing or production. {{merchant Id}} - Your unique CyberSource merchant Id. {{session Id}} - Value of unique Id generated above |
+    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint id      | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value|
     | custom.fields.isv_customerIpAddress   | Customer IP address                 | Yes       | Populated from client-side libraries                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-    | custom.fields.isv_merchantId   | Merchant Id used for the transaction                 | No       | Required when you want to support Multi-Mid functionality. Populate this field with the value of Merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions.                                                                                         |
+    | custom.fields.isv_merchantId   | Merchant Id used for the transaction                 | No       | Required when you want to support Multi-Mid functionality. Populate this field with the value of merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions.                                                                                         |
 
 4.  Add the payment to the cart
 
@@ -49,8 +49,8 @@ Make sure the checkout page is setup to collect all the required information fro
 
 6.  Verify the payment state and convey the payment result to the customer
 
-    a. If the transaction was successful the transaction state is updated to **Success**, display the order confirmation page
+    a. If the transaction is successful, transaction state will be updated to **Success**, display the order confirmation page
 
-    b. If the state of the transaction is updated to **Pending** which is due to Fraud Check, display the order confirmation page
+    b. If the state of transaction is updated to **Pending** which is due to Fraud Check, display the order confirmation page
 
-    c. If the state of the transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#error-handling) for handling errors or failures
+    c. If the state of transaction is updated to **Failure**, display the error page and See [Overview\#Errorhandling](Overview.md#error-handling) for handling errors or failures

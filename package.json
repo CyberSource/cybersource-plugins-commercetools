@@ -57,7 +57,7 @@
     "axios": "^0.24.0",
     "chunk": "^0.0.3",
     "cors": "^2.8.5",
-    "cybersource-rest-client": "^0.0.48",
+    "cybersource-rest-client": "^0.0.50",
     "dir-archiver": "^2.1.0",
     "dotenv": "^10.0.0",
     "ejs": "^3.1.7",

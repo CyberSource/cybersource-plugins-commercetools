@@ -2,7 +2,7 @@
 
 ## eCheck
 
-If you would like to support eCheck, you will need to register with one of these processors.
+If you would like to support eCheck, you need to register with one of these processors.
 
 - Chase Paymentech Solutions
 - Cybersource ACH Service
@@ -21,4 +21,4 @@ The FO checkout page has to be done with the setup to get the following informat
 
 
 
-Once the front office setup is ready to pass the required info for eCheck processing, you can continue to [Process a Payment (eCheck)](Process-a-Payment-eCheck.md) process.
+Once the front office setup is ready to pass the required information for eCheck processing, you can continue to [Process a Payment (eCheck)](Process-a-Payment-eCheck.md) process.

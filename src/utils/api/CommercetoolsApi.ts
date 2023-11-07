@@ -1188,6 +1188,93 @@ const getCartById = async (cartId) => {
   return cartResponse;
 };
 
+const addCustomerAddress = async (customerId, addressObj) => {
+  let client: any;
+  let requestBuilder: any;
+  let channelsRequest: any;
+  let exceptionData: any;
+  let uri: string;
+  let actions = [] as any;
+  let customerResponse: any;
+  let customerData: any;
+  try {
+    if (null != customerId && Constants.STRING_EMPTY != customerId) {
+      customerData = await getCustomer(customerId);
+      if(customerData){
+        if ('FULL' == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
+          actions.push({
+            action: "addAddress",
+            address: {
+              firstName: addressObj.firstName,
+              lastName: addressObj.lastName,
+              streetName: addressObj.address1,
+              city: addressObj.locality,
+              postalCode: addressObj.postalCode,
+              region: addressObj.administrativeArea,
+              country: addressObj.country,
+              email: addressObj.email,
+              phone: addressObj.phoneNumber
+            }
+          })
+        } else {
+          actions.push({
+            action: "addAddress",
+            address: {
+              firstName: addressObj.firstName,
+              lastName: addressObj.lastName,
+              streetName: addressObj.streetName,
+              city: addressObj.city,
+              postalCode: addressObj.postalCode,
+              region: addressObj.buildingNumber,
+              country: addressObj.country,
+              email: addressObj.email,
+              phone: addressObj.phone
+            }
+          })
+        }
+        if (null != actions && Constants.VAL_ZERO < actions.length) {
+          client = getClient();
+          if (null != client) {
+            requestBuilder = createRequestBuilder({
+              projectKey: process.env.CT_PROJECT_KEY,
+            });
+            uri = requestBuilder.customers.byId(customerId).build();
+            channelsRequest = {
+              uri: uri,
+              method: Constants.HTTP_METHOD_POST,
+              body: JSON.stringify({
+                version: customerData.version,
+                actions: actions,
+              }),
+            };
+            customerResponse = await client.execute(channelsRequest);
+          } else {
+            paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+          }
+        } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_CUSTOMER_UPDATE);
+        }
+      }else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      }
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, exceptionData);
+  }
+  if(customerResponse){
+    customerResponse = customerResponse.body;
+  }
+  return customerResponse;
+};
+
+
 
 export default {
   retrieveCartByAnonymousId,
@@ -1211,5 +1298,6 @@ export default {
   addExtensions,
   addCustomField,
   updateAvailableAmount,
-  getCartById
+  getCartById,
+  addCustomerAddress
 };

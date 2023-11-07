@@ -734,35 +734,48 @@ app.post('/captureContext', async (req, res) => {
   let locale = Constants.STRING_EMPTY;
   let currencyCode = Constants.STRING_EMPTY;
   let logData: any;
-  if (req?.body) {
-    requestObj = req.body;
-    if (null != requestObj && typeof requestObj === 'object') {
-      if (requestObj?.merchantId) {
-        merchantId = requestObj.merchantId;
-      }
-      if (null != requestObj?.cartId && Constants.STRING_EMPTY != requestObj?.cartId) {
-        cartId = requestObj.cartId;
-        cartDetails = await commercetoolsApi.getCartById(cartId);
-        if (null != cartDetails) {
-          logData = Constants.STRING_CART_ID + cartDetails.id;
-          captureContextResponse = await captureContext.generateCaptureContext(cartDetails, null, null, null, merchantId, Constants.SERVICE_PAYMENT);
-          response = captureContextResponse;
+  let exceptionData: any;
+  try{
+    if (req?.body) {
+      requestObj = req.body;
+      if (null != requestObj && typeof requestObj === 'object') {
+        if (requestObj?.merchantId) {
+          merchantId = requestObj.merchantId;
         }
-      } else if (Constants.STRING_EMPTY != requestObj?.country && Constants.STRING_EMPTY != requestObj?.locale && Constants.STRING_EMPTY != requestObj?.currency) {
-        country = requestObj.country;
-        locale = requestObj.locale;
-        currencyCode = requestObj.currency;
-        logData = null;
-        captureContextResponse = await captureContext.generateCaptureContext(cartData, country, locale, currencyCode, merchantId, Constants.SERVICE_MY_ACCOUNTS);
-        response = captureContextResponse;
-      } else {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_CAPTURE_CONTEXT);
-      }
-      if (Constants.STRING_EMPTY == captureContextResponse) {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, logData, Constants.ERROR_MSG_CAPTURE_CONTEXT);
+        if (null != requestObj?.cartId && Constants.STRING_EMPTY != requestObj?.cartId) {
+          cartId = requestObj.cartId;
+          cartDetails = await commercetoolsApi.getCartById(cartId);
+          if (null != cartDetails && undefined != cartDetails) {
+            logData = Constants.STRING_CART_ID + cartDetails.id;
+            captureContextResponse = await captureContext.generateCaptureContext(cartDetails, null, null, null, merchantId, Constants.SERVICE_PAYMENT);
+            response = captureContextResponse;
+          }
+        } else if (Constants.STRING_EMPTY != requestObj?.country && Constants.STRING_EMPTY != requestObj?.locale && Constants.STRING_EMPTY != requestObj?.currency) {
+          country = requestObj.country;
+          locale = requestObj.locale;
+          currencyCode = requestObj.currency;
+          logData = null;
+          captureContextResponse = await captureContext.generateCaptureContext(cartData, country, locale, currencyCode, merchantId, Constants.SERVICE_MY_ACCOUNTS);
+          response = captureContextResponse;
+        } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, null, Constants.ERROR_MSG_CAPTURE_CONTEXT);
+        }
+        if (Constants.STRING_EMPTY == captureContextResponse) {
+          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CAPTURE_CONTEXT_CREATE, Constants.LOG_INFO, logData, Constants.ERROR_MSG_CAPTURE_CONTEXT);
+        }
       }
     }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = exception.message;
+    } else {
+      exceptionData = JSON.stringify(exception);
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, 'postCaptureContextCreate', Constants.LOG_ERROR, '', exceptionData);
   }
+  
   res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
   res.send(response);
 });

@@ -402,17 +402,6 @@
         "name": "Number"
       },
       "inputHint": "SingleLine"
-    },
-    {
-      "name": "isv_transientToken",
-      "label": {
-        "en": "Transient token for Unified Checkout"
-      },
-      "required": false,
-      "type": {
-        "name": "String"
-      },
-      "inputHint": "SingleLine"
     }
   ]
 }

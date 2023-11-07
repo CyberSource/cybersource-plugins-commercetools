@@ -189,6 +189,8 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
       orderInformationBillTo.address1 = cart.billingAddress.streetName;
       if (cart?.billingAddress?.additionalStreetInfo) {
         orderInformationBillTo.address2 = cart.billingAddress.additionalStreetInfo;
+      }else if(cart?.billingAddress?.streetNumber){
+        orderInformationBillTo.address2 = cart.billingAddress.streetNumber;
       }
       orderInformationBillTo.locality = cart.billingAddress.city;
       orderInformationBillTo.administrativeArea = cart.billingAddress.region;
@@ -284,7 +286,9 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         orderInformationShipTo.lastName = cart.shipping[Constants.VAL_ZERO].shippingAddress.lastName;
         orderInformationShipTo.address1 = cart.shipping[Constants.VAL_ZERO].shippingAddress.streetName;
         if (cart?.shipping[Constants.VAL_ZERO]?.shippingAddress?.additionalStreetInfo) {
-          orderInformationShipTo.address2 = cart.shipping[Constants.VAL_ZERO].shippingAddress.additionalStreetInfo
+          orderInformationShipTo.address2 = cart.shipping[Constants.VAL_ZERO].shippingAddress.additionalStreetInfo;
+        }else if(cart?.shipping[Constants.VAL_ZERO]?.shippingAddress?.streetNumber){
+          orderInformationShipTo.address2 = cart.shipping[Constants.VAL_ZERO].shippingAddress.streetNumber;
         }
         orderInformationShipTo.locality = cart.shipping[Constants.VAL_ZERO].shippingAddress.city;
         orderInformationShipTo.administrativeArea = cart.shipping[Constants.VAL_ZERO].shippingAddress.region;
@@ -324,6 +328,8 @@ const authorizationResponse = async (payment, cart, service, cardTokens, dontSav
         orderInformationShipTo.address1 = cart.shippingAddress.streetName;
         if (cart?.shippingAddress?.additionalStreetInfo) {
           orderInformationShipTo.address2 = cart.shippingAddress.additionalStreetInfo;
+        }else if(cart?.shippingAddress?.streetNumber){
+          orderInformationShipTo.address2 = cart.shippingAddress.streetNumber;
         }
         orderInformationShipTo.locality = cart.shippingAddress.city;
         orderInformationShipTo.administrativeArea = cart.shippingAddress.region;

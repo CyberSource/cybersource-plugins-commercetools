@@ -397,7 +397,7 @@
           <button type="submit" id="captureButton" class="button">Capture</button>
         </form>
         <% } if(authPresent && !capturePresent && !authReversalPresent && !refundPresent){ %>
-        <a class="button" id="auth" href="/authreversal?id=<%=id%>" role="button">Reverse </a>
+        <a class="button" id="auth" href="/authReversal?id=<%=id%>" role="button">Reverse </a>
         <% } if(capturePresent && !authReversalPresent &&((refundPresent && captureAmount) || (!refundPresent && captureAmount))){ %>
         <div class="div-padding">You can refund amount <%= captureAmount%></div>
         <form action="/refund" class="div-padding" id="refundForm">

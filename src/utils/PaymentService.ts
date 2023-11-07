@@ -2190,6 +2190,17 @@ const setCustomerTokenData = async (cardTokens, paymentResponse, authResponse, e
   if (null != cartObj && cartObj?.billingAddress?.id) {
     addressId = cartObj.billingAddress.id;
   }
+  if (null == addressId && updatePaymentObj?.customer?.id) {
+    if (updatePaymentObj?.custom?.fields?.isv_token) {
+      customerId = updatePaymentObj.customer.id;
+      customerInfo = await commercetoolsApi.getCustomer(customerId);
+    } else if (null != cartObj && updatePaymentObj?.custom?.fields?.isv_transientToken) {
+      customerInfo = await addTokenAddressForUC(updatePaymentObj, cartObj);
+    }
+    if (customerInfo?.addresses && 0 < customerInfo.addresses.length ) {
+      addressId = customerInfo.addresses[customerInfo.addresses.length - 1].id;
+    }
+  }
   if (
     !errorFlag &&
     Constants.STRING_CUSTOMER in updatePaymentObj &&
@@ -2727,6 +2738,39 @@ const updateCartWithUCAddress = async (updatePaymentObj, cartObj) => {
   return cartObj;
 };
 
+const addTokenAddressForUC = async (updatePaymentObj, cartObj) => {
+  let transientTokenData: any;
+  let customerAddress: any;
+  let transientTokenDataObj: any;
+  let exceptionData: any;
+  try{
+    if (null != updatePaymentObj && 'FULL' == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
+      transientTokenData = await getTransientTokenData.transientTokenDataResponse(updatePaymentObj, Constants.SERVICE_PAYMENT);
+      if (Constants.STRING_EMPTY != transientTokenData && null != getTransientTokenData && Constants.HTTP_CODE_TWO_HUNDRED == transientTokenData?.httpCode) {
+        transientTokenDataObj = JSON.parse(transientTokenData.data);
+        customerAddress = await commercetoolsApi.addCustomerAddress(updatePaymentObj.customer.id, transientTokenDataObj.orderInformation.billTo)
+      }else {
+        logData(path.parse(path.basename(__filename)).name, 'FuncAddTokenAddressForUC', Constants.LOG_INFO, null, Constants.ERROR_MSG_UC_ADDRESS_DETAILS);
+      }
+    } else if (null != updatePaymentObj && ('NONE' == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || 'PARTIAL' == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE)) {
+      if (null != cartObj && undefined != cartObj && cartObj?.billingAddress) {
+        customerAddress = await commercetoolsApi.addCustomerAddress(updatePaymentObj.customer.id, cartObj.billingAddress);
+      }else {
+        logData(path.parse(path.basename(__filename)).name, 'FuncAddTokenAddressForUC', Constants.LOG_INFO, null, Constants.ERROR_MSG_CUSTOMER_UPDATE);
+      }
+    }
+  }catch (exception){
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception;
+    }
+    logData(path.parse(path.basename(__filename)).name, 'FuncAddTokenAddressForUC', Constants.LOG_ERROR, null, exceptionData);
+  }
+  return customerAddress;
+};
 
 export default {
   logData,

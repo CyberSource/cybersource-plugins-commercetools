@@ -1,7 +1,7 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 dotenv.config();
-import { anonymousId, cartId, customerId, paymentId, key } from '../const/CommercetoolsApiConst';
+import { address, anonymousId, cartId, customerId, paymentId, key } from '../const/CommercetoolsApiConst';
 import commercetoolsApi from '../../utils/api/CommercetoolsApi';
 
 test.serial('Retrieving cart using customerid ', async (t) => {
@@ -135,11 +135,32 @@ test.serial('Retrieving order by payment id ', async (t) => {
 
 test.serial('Get custom type ', async (t) => {
   const result = await commercetoolsApi.getCustomType(key);
-  if(result.statusCode == 200)
-  {
+  if (result.statusCode == 200) {
     t.is(result.statusCode, 200);
   } else {
     t.not(result.statusCode, 200);
   }
-  
+
+});
+
+test.serial('Add customer address ', async (t) => {
+  const result = await commercetoolsApi.addCustomerAddress(customerId, address);
+  var i = 0;
+  if (undefined != result && null != result) {
+    if (0 < result.addresses.length) {
+      i++;
+    }
+    t.is(i, 1);
+  } else {
+    t.is(i, 0);
+  }
+});
+
+test.serial('Add customer address with invalid customer id', async (t) => {
+  const result = await commercetoolsApi.addCustomerAddress('123', address);
+  var i = 0;
+  if (0 < result?.addresses.length) {
+    i++;
+  }
+  t.is(i, 0);
 });

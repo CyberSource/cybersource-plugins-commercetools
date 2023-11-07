@@ -1,12 +1,12 @@
 # Docker
-Docker is an open platform for developing, shipping, and running applications. It enables you to separate your applications from your infrastructure so you can deliver software quickly.
+Docker is an open platform for developing, shipping and running applications. It enables you to separate your applications from your infrastructure so you can deliver software quickly.
 
-By using Docker, image of Cybersource-Commercetools-Plugin can be created and run in various platforms wherever Docker is supported.
+By using Docker, image of Cybersource-Commercetools Extension can be created and run in various platforms wherever Docker is supported.
 
 Before using it, make sure to install Docker Desktop in the respective system.
 
 ## Building the Docker image
-  Navigate to the root directory of plugin and run the following command to build the Docker image
+  Navigate to the root directory of extension and run the following command to build the Docker image
     
   **_Note_**: Make sure to remove `node_modules` folder if it exists before building the image and ensure that Docker is running.
 
@@ -25,7 +25,7 @@ Before using it, make sure to install Docker Desktop in the respective system.
 
     
   - `env variables` are the key value pairs present in env file, Refer
-  [API-Extension-Setup](API-Extension-Setup.md#a-name"environmentproperties"aenvironment-properties) to set env variables and make sure that to maintain -e separately for every env variable setting.
+  [API-Extension-Setup](API-Extension-Setup.md#configuration) to set env variables and make sure that to maintain <b>-e</b> separately for every env variable setting.
   - `hostport` is the port number to use in host machine and `containerport` is the port to be used by the docker container. 
   - `imagename` is the name of the image that you built in the previous step
 
@@ -33,6 +33,3 @@ Before using it, make sure to install Docker Desktop in the respective system.
 
 ## Running the Docker image in AWS
  To run the docker image in AWS, refer the following guide [Docker-Container-in-AWS](Docker-Container-in-AWS.md)
-
-
-       
