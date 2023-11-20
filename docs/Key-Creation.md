@@ -15,7 +15,7 @@ The API Extension and the Synchronization Service requires an API key which will
 | Scope             | Reason                                                                                                                                                                                                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | manage_payments   | Adding and updating transactions during synchronization process                                                                                                                             |
-| manage_orders     | <ul> <li>Updating the cart with Billing and Shipping addresses while using Visa Click to Pay</li><li>Extracting line item data from the cart </li><li>updating cart address with UC address</li></ul> |
+| manage_orders     | <ul> <li>Updating the cart with Billing and Shipping addresses while using Visa Click to Pay</li><li>Extracting line item data from the cart</ul> |
 | manage_customers  | It is required for updating the customer for saved card tokens                                                                                                          |
 | manage_types      | Creating custom types required to process payments and saved card tokens                                                                                                                               |
 | manage_extensions | Extending payment create, update and customer update APIs                                                                                                                                   |

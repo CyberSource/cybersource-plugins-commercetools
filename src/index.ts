@@ -99,7 +99,7 @@ app.get('/generateHeader', async (req, res) => {
   let response: any;
   headerValue = paymentService.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
   response = headerValue;
-  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
+  res.setHeader('Content-Security-Policy', "script-src 'self'");
   res.send(response);
 });
 
@@ -131,7 +131,7 @@ app.get('/orders', async (req, res) => {
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.GET_ORDERS, Constants.LOG_ERROR, null, exceptionData);
     orderErrorMessage = Constants.ERROR_MSG_NO_ORDER_DETAILS;
   }
-  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
+  res.setHeader('Content-Security-Policy', "script-src 'self'");
   res.render('orders', {
     count: orderCount,
     orderList: orderResult,
@@ -206,7 +206,7 @@ app.get('/paymentdetails', async (req, res) => {
     orderErrorMessage = Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.redirect('/orders');
   }
-  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
+  res.setHeader('Content-Security-Policy', "script-src 'self'");
   res.render('paymentdetails', {
     id: convertedPaymentId,
     payments: paymentDetails,
@@ -775,8 +775,7 @@ app.post('/captureContext', async (req, res) => {
     }
     paymentService.logData(path.parse(path.basename(__filename)).name, 'postCaptureContextCreate', Constants.LOG_ERROR, '', exceptionData);
   }
-  
-  res.setHeader(Constants.STRING_CONTENT_SECURITY_POLICY, Constants.STRING_CONTENT_SECURITY_POLICY_VALUE);
+  res.setHeader('Content-Security-Policy', "script-src 'self'");
   res.send(response);
 });
 

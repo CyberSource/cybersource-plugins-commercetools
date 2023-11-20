@@ -213,8 +213,6 @@ export abstract class Constants {
   static readonly STRING_AND = ' AND ';
   static readonly STRING_CARD = 'card';
   static readonly STATUS_CODE = 'statusCode';
-  static readonly STRING_CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
-  static readonly STRING_CONTENT_SECURITY_POLICY_VALUE = "script-src 'self'";
   static readonly STRING_CUSTOM = 'custom';
   static readonly STRING_CUSTOMER = 'customer';
   static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
