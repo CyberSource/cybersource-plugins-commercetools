@@ -1,6 +1,6 @@
 # Tokenization
 
-- [Tokenization with Flex Microform](#Tokenization-with-Flex-Microform)
+- [Tokenization with Microform](#Tokenization-with-Microform)
 
 - [Customization-in-Tokenization](#customization-in-tokenization)
 
@@ -16,11 +16,11 @@ The customer saved tokens can be viewed in:
 
 Merchant Centre → Customers → Customer list → Select a Customer → Custom Fields
 
-# Tokenization with Flex Microform
+# Tokenization with Microform
 
 ## Tokenize a card
 
-1.  Tokenize Credit Card details using Cybersource Flex Microform v2
+1.  Tokenize Credit Card details using Cybersource Microform v2
 
     a. If there are no cards available, update the customer by creating a custom type with the following
 
@@ -36,11 +36,11 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
     | custom.fields.isv_tokenCaptureContextSignature | empty string | Yes      |
 
 2.  The response should have the `isv_tokenCaptureContextSignature` and `isv_tokenVerificationContext` custom fields.
-    Set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Flex Microform
+    Set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Microform
 
             flexInstance = new Flex(captureContext);
 
-3.  Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Flex Microform JS to tokenize a Credit Card
+3.  Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Microform JS to tokenize a Credit Card
 
 4.  After the card details are entered by the customer, ask the customer to add billing address for the card and update the customer by populating the following
 

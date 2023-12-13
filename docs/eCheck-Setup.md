@@ -10,7 +10,7 @@ If you would like to support eCheck, you need to register with one of these proc
 
 ## Legal Compliance Text
 
-Once you have registered with any of the processors above, to proceed with eCheck you might display the legal compliance text for Internet Check Acceptance Authorization. See the [Electronic Check services](https://developer.cybersource.com/library/documentation/sbc/echecks/SB_Electronic_Checks.pdf) document from the Cybersource Developer center.
+Once you have registered with any of the processors above, to proceed with eCheck you might display the legal compliance text for Internet Check Acceptance Authorization. See the [Electronic Check services](https://developer.cybersource.com/api/soap-developer-guides/dita-payments/intro.html) document from the Cybersource Developer center.
 
 The FO checkout page has to be done with the setup to get the following information from the customer
 | Field             | Notes                                                                                                                                                                                                       |

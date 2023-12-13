@@ -52,7 +52,7 @@ The details of the specific customizations listed above is documented here: [Com
 The bulk of integration works when using the Commercetools-Cybersource Extension is within the user-interface. This is because Commercetools does not come with a user-interface and therefore all implementations will be different.
 
 For setting up client-side application on any of the payment methods, use the following guide:
-- Credit Card - [Flex Microform Setup](Flex-Microform-Setup.md)
+- Credit Card - [Microform Setup](Microform-Setup.md)
 - Visa Click to Pay - [Visa Click to Pay Setup](Visa-ClicktoPay-Setup.md)
 - Google Pay - [Google Pay Setup](GooglePay-Setup.md)
 - Apple Pay - [Apple Pay Setup](ApplePay-Setup.md)

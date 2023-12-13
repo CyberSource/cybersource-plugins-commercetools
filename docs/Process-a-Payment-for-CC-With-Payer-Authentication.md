@@ -47,11 +47,11 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.type.key                    | isv_payment_data                    | Yes       |                                                                                                                                                                     |
     | custom.fields.isv_merchantId                      | Merchant Id used for the transaction                               | No       |             Required when you want to support Multi-Mid functionality. Populate this field with the value of merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions.                                                                                                                                                                                                                                                                                                     |
 
-    b. The response should have the `isv_tokenCaptureContextSignature` and `isv_tokenVerificationContext` custom fields. Set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Flex Microform
+    b. The response should have the `isv_tokenCaptureContextSignature` and `isv_tokenVerificationContext` custom fields. Set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Microform
 
         flexInstance = new Flex(captureContext);
 
-    c. Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Flex Microform JS to tokenize a Credit Card.
+    c. Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Microform JS to tokenize a Credit Card.
 
 3.  For saved token, create a Commercetools payment (https://docs.commercetools.com/api/projects/payments) and populate the following
 
@@ -103,7 +103,7 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | Yes      | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
 
 
-6.  Wait for the event to return back the following fields, verify the following fields from update response. If the data exists for below fields, submit the device data collection form using below data, else throw error to the user. See [Device Data Collection Iframe](https://docs.cybersource.com/content/dam/new-documentation/documentation/en/fraud-management/payer-auth/rest/payer-auth-rest.pdf) to get more details about device data collection Iframe
+6.  Wait for the event to return back the following fields, verify the following fields from update response. If the data exists for below fields, submit the device data collection form using below data, else throw error to the user. See [Device Data Collection](https://developer.cybersource.com/docs/cybs/en-us/payer-authentication/developer/all/rest/payer-auth/pa2-ccdc-ddc-intro.html) to get more details about device data collection Iframe
 
         accessToken
         referenceId
@@ -130,7 +130,7 @@ After authentication is complete, authorization of the payment can then be tri
 10. Check the value of the isv_payerAuthenticationRequired field on the
     updated payment. If the value is true, perform the following steps
 
-    a. Submit the stepup form by using the `stepUpURL` & `accessToken`. See [Step-Up IFrame](https://docs.cybersource.com/content/dam/new-documentation/documentation/en/fraud-management/payer-auth/rest/payer-auth-rest.pdf) to get more details about step up Iframe
+    a. Submit the stepup form by using the `stepUpURL` & `accessToken`. See [Step-Up IFrame](https://developer.cybersource.com/docs/cybs/en-us/payer-authentication/developer/all/rest/payer-auth/pa2-ccdc-stepup-frame-intro.html) to get more details about step up Iframe
 
     b. The Payer Authentication window will be displayed and when the user completes the process, the user is redirected back to the consumerAuthenticationInformation.returnUrl within the iframe
 
@@ -197,4 +197,4 @@ See [Commercetools Setup](Commercetools-Setup.md) for more details on the indiv
 
 ## Further reading
 
-- [Cybersource Payer Authentication documentation](https://docs.cybersource.com/content/dam/new-documentation/documentation/en/fraud-management/payer-auth/rest/payer-auth-rest.pdf)
+- [Cybersource Payer Authentication documentation](https://developer.cybersource.com/docs/cybs/en-us/payer-authentication/developer/all/rest/payer-auth/pa-revisions.html)

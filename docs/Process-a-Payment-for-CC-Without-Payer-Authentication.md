@@ -43,11 +43,11 @@ Processing of a payment is triggered by adding an initial transaction to a Comme
     | custom.type.key                    | isv_payment_data                    | Yes       |                                                                                                                                                                     |
     | custom.fields.isv_merchantId                      | Merchant Id used for the transaction                               | No       |              Required when you want to support Multi-Mid functionality. Populate this field with the value of merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions..                                                                                                                                                                                                                                                                                                       |
 
-    b. The response should have the `isv_tokenCaptureContextSignature` and `isv_tokenVerificationContext` custom fields, set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Flex Microform
+    b. The response should have the `isv_tokenCaptureContextSignature` and `isv_tokenVerificationContext` custom fields, set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Microform
 
         flexInstance = new Flex(captureContext);
 
-    c. Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Flex Microform JS to tokenize a Credit Card
+    c. Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Microform JS to tokenize a Credit Card
 
 3.  For saved token, create a Commercetools payment (https://docs.commercetools.com/api/projects/payments) and populate the following
 

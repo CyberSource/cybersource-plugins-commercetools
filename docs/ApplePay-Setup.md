@@ -16,7 +16,7 @@ In order to use the Cybersource platform to process Apple Pay transactions, one 
 
 ### Enrolling in Apple Pay
 
-See [Enrolling in Apple Pay](https://docs.cybersource.com/content/dam/new-documentation/documentation/en/apple-pay/smartpay/rest/applepay-rest-smartpay.pdf) to register Apple Pay merchant Id and generate CSR(Certificate Signing Request) in Cybersource merchant center.
+See [Enrolling in Apple Pay](https://developer.cybersource.com/docs/cybs/en-us/apple-pay/developer/smartpay/rest/applepay/applepay-doc-revisions.html) to register Apple Pay merchant Id and generate CSR(Certificate Signing Request) in Cybersource merchant center.
 
 ## Apple Pay Setup
 

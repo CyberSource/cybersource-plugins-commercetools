@@ -33,6 +33,8 @@ Replace the below data:
 - {{merchant Id}} - Unique Cybersource merchant Id. 
 - {{session Id}} - Value of unique Id generated above
 
+> **_NOTE:_** Extension will send value present in the field `isv_deviceFingerprintId` to Cybersource, only if `PAYMENT_GATEWAY_DECISION_MANAGER` is enabled from the env file. 
+
 
 ### Enabling/disabling Decision Manager for specific payments
 

@@ -1,4 +1,4 @@
-# Flex Microform Integration
+# Microform Integration
 
 Microform Integration replaces the primary account number (PAN) or card verification number (CVN) field or both in your payment input form.
 
@@ -46,4 +46,4 @@ Microform Integration replaces the primary account number (PAN) or card verifica
 
 Once the microform integration v2 is setup, you can continue to the [Process a Payment with CC(Without Payer Authentication)](Process-a-Payment-for-CC-Without-Payer-Authentication.md) or [Process a Payment with CC(With Payer Authentication)](Process-a-Payment-for-CC-With-Payer-Authentication.md) process.
 
-**_NOTE:_** For more details, refer [Microform Integration v2 Cybersource Documentation](https://developer.cybersource.com/content/dam/docs/cybs/en-us/digital-accept-flex/developer/all/rest/digital-accept-flex.pdf).
+**_NOTE:_** For more details, refer [Microform Integration v2 Cybersource Documentation](https://developer.cybersource.com/docs/cybs/en-us/digital-accept-flex/developer/all/rest/digital-accept-flex/microform-integ-v2.html).

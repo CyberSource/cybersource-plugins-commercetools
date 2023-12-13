@@ -2,7 +2,7 @@
 
 ## eCheck Processing Sequence Diagram
 
-![eCheck Processing flow](./images/Flow-Diagram-eCheck.svg)
+![eCheck Processing flow](./images/Flow-diagram-eCheck.svg)
 
 Make sure the checkout page is setup to collect all the required information from customer as mentioned in [eCheck Setup](./eCheck-Setup.md)
 ## Details
