@@ -91,40 +91,6 @@ Below is an example to set the value for PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID
 
 > **_NOTE:_** For tokenization service i.e., adding, updating and deleting a card data in my account section, extension will always consider default mid.
 
-## Support for Multi-Mid
-
-In this section mid refers to Cybersource Merchant Id. 
-
-The new mid configurations should be added in the .env file of the plugin in the following format
-
-      XXXX_KEY_ID = <Id of a Cybersource shared secret key>
-      XXXX_SECRET_KEY = <Value of a Cybersource shared secret key>
-
-Likewise you can configure, as many mids you want to support.
-
-The mid added for `PAYMENT_GATEWAY_MERCHANT_ID` should be the default mid in which transactions will be processed when Multi-Mid is not enabled.
-
- Following are the constraints to be followed when you want to support multiple mids in your plugin instance.
-
-      1. It is mandatory to provide the env variables for multi-mid in recommended format only.
-      2. All env variables should be in block letters
-      3. First part of the variable (XXXX) should be your Cybersource merchant Id in block letters
-      4. Second part of the variable to store key Id should be _KEY_ID
-      5. Second part of the variable to store secret key should be _SECRET_KEY
-
-Example :
-  
-Below is the env variables for the mid which has merchant Id as `merchantid123`
-  
-      
-      MERCHANTID123_KEY_ID = <Id of a Cybersource shared secret key>
-      MERCHANTID123_SECRET_KEY = <Value of a Cybersource shared secret key>
-
-Below is an example to set the value for PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID variable.
-
-      PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID = merchantId1,merchantId2,merchantId3,...
-
-For tokenization service i.e adding a card, updating a card and deleting a card in my account section, plugin will always consider default mid.
 # Deployment
 
 The Commercetools - Cybersource extension is a typescript project which is built using cybersource-rest-client npm package and other several node packages.
@@ -136,8 +102,6 @@ To deploy your extension on any of the below serverless environment, refer the b
 - AWS Lambda - [AWS-Serverless-Deployment\#AWSDeploymentSteps](AWS-Serverless-Deployment.md#steps-to-deploy-extension-on-aws-lambda)
 - Azure function - [Azure-Serverless-Deployment\#AzureDeploymentSteps](Azure-Serverless-Deployment.md#azure-deployment-steps)
 - Docker in AWS - [Docker-Container-in-AWS\#DockerDeploymentSteps](Docker-Container-in-AWS.md#deploying-docker-containers-on-aws-elastic-container-serviceecs)
-
-If you want serverless deployment of the plugin on AWS Lambda, refer [AWS-Serverless-Deployment\#AWSDeploymentSteps](AWS-Serverless-Deployment.md#AWSDeploymentSteps)
 
 ## Example deployment steps
 

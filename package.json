@@ -12,7 +12,6 @@
     "tsc": "tsc",
     "start": "npm run build && node build/main/index.js",
     "deploy": "npm run build && serverless deploy",
-    "deploy": "npm run build && serverless deploy",
     "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 src/**/*.ejs src/**/*.css src/**/*.js src/**/*.png build/main",
     "setup-resources": "npm run build && run-func ./build/main/setup.js setupExtensionResources",
     "build:main": "tsc -p tsconfig.json",

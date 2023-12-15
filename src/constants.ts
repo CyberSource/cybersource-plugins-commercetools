@@ -267,12 +267,6 @@ export abstract class Constants {
   static readonly STRING_LOCALE = 'locale';
   static readonly STRING_FULL = 'FULL';
 
-  //Defalt env variables
-  static readonly DEFAULT_MERCHANT_SECRET_KEY_VARIABLE = 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY';
-
-  //Defalt env variables
-  static readonly DEFAULT_MERCHANT_SECRET_KEY_VARIABLE = 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY';
-
   //CT transaction type
   static readonly CT_TRANSACTION_TYPE_AUTHORIZATION = 'Authorization';
   static readonly CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION = 'CancelAuthorization';

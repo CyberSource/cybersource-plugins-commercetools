@@ -201,35 +201,3 @@ test.serial('Check status of payment authorization for UC', async (t) => {
     t.pass();
   }
 });
-
-test.serial('Authorizing a payment with multiple shipping mode and check http code', async (t) => {
-  const result: any = await auth.authorizationResponse(payment, shippingCart, service, cardTokens, dontSaveTokenFlag, payerAuthMandateFlag, orderNumber);
-  paymentResponse.httpCode = result.httpCode;
-  paymentResponse.status = result.status;
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.httpCode, 201);
-  } else {
-    t.not(paymentResponse.httpCode, 201);
-  }
-});
-
-test.serial('Check status of payment authorization with multiple shipping mode', async (t) => {
-  if (paymentResponse.httpCode == 201) {
-    if (paymentResponse.status == 'AUTHORIZED') {
-      t.is(paymentResponse.status, 'AUTHORIZED');
-    } else if (paymentResponse.status == 'AUTHORIZED_PENDING_REVIEW') {
-      t.is(paymentResponse.status, 'AUTHORIZED_PENDING_REVIEW');
-    } else if (paymentResponse.status == 'DECLINED') {
-      t.is(paymentResponse.status, 'DECLINED');
-    } else if (paymentResponse.status == 'AUTHORIZED_RISK_DECLINED') {
-      t.is(paymentResponse.status, 'AUTHORIZED_RISK_DECLINED');
-    }
-  } else {
-    if (paymentResponse.status == 'INVALID_REQUEST') {
-      t.is(paymentResponse.status, 'INVALID_REQUEST');
-    } else {
-      t.pass();
-    }
-  }
-});
-
