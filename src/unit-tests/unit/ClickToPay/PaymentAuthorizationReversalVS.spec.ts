@@ -98,3 +98,22 @@ test.serial('Check status of auth reversal  with multiple shipping', async (t) =
     t.not(paymentResponse.status, 'REVERSED');
   }
 });
+
+test.serial('Reversing a payment with multiple shipping and check http code', async (t) => {
+  const result: any = await reverse.authReversalResponse(multipleShippingPayment, shippingCart, multipleShippingReversalId);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  if (paymentResponse.httpCode == 201) {
+    t.is(paymentResponse.httpCode, 201);
+  } else {
+    t.not(paymentResponse.httpCode, 201);
+  }
+});
+
+test.serial('Check status of auth reversal  with multiple shipping', async (t) => {
+  if (paymentResponse.httpCode == 201) {
+    t.is(paymentResponse.status, 'REVERSED');
+  } else {
+    t.not(paymentResponse.status, 'REVERSED');
+  }
+});
