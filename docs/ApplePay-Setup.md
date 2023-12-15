@@ -16,7 +16,7 @@ In order to use the Cybersource platform to process Apple Pay transactions, one 
 
 ### Enrolling in Apple Pay
 
-See [Enrolling in Apple Pay](https://docs.cybersource.com/content/dam/new-documentation/documentation/en/apple-pay/smartpay/rest/applepay-rest-smartpay.pdf) to register Apple Pay merchant Id and generate CSR in Cybersource merchant center.
+See [Enrolling in Apple Pay](https://developer.cybersource.com/docs/cybs/en-us/apple-pay/developer/smartpay/rest/applepay/applepay-doc-revisions.html) to register Apple Pay merchant Id and generate CSR(Certificate Signing Request) in Cybersource merchant center.
 
 ## Apple Pay Setup
 
@@ -26,4 +26,6 @@ See the [Apple Pay JS API](https://developer.apple.com/documentation/apple_pay_
 
 See the [PassKit (Apple Pay and Wallet)](https://developer.apple.com/documentation/passkit) document from the Apple Pay developer center to setup Apple Pay in your App.
 
-Once the Apple Pay is setup and you are receiving an Apple Pay Payment Token, you can continue to the [Process a Payment (Apple Pay)](Process-a-Payment-ApplePay.md) process.
+> **_NOTE:_** Enter the Apple Pay credentials(merchant Id, Domain Name, Path where the Apple Pay key and Apple Pay certificate is stored) in the .env file once setup is completed.
+
+Once the Apple Pay setup is completed and you are receiving an Apple Pay Payment Token, you can continue to the [Process a Payment (Apple Pay)](Process-a-Payment-ApplePay.md) process.

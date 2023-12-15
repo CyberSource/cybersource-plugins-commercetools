@@ -29,20 +29,22 @@ You can use any unique string such as an order number or web session Id or Comme
 Replace sessionId with the unique Id generated in the URL "https://h.online-metrix.net/fp/tags.js?org_id={{org Id}}&session_id={{merchant Id}}{{session Id}}" and include the script wherever you want deviceFingerprint Id to be captured.
 
 Replace the below data:
-- {{org Id}} - To obtain this value, contact your Cybersource representative and specify to them whether it is for testing or production. 
-- {{merchant Id}} - Your unique Cybersource merchant Id. 
+- {{org Id}} - To obtain this value, contact the Cybersource representative and specify to them whether it is for testing or production. 
+- {{merchant Id}} - Unique Cybersource merchant Id. 
 - {{session Id}} - Value of unique Id generated above
 
+> **_NOTE:_** Extension will send value present in the field `isv_deviceFingerprintId` to Cybersource, only if `PAYMENT_GATEWAY_DECISION_MANAGER` is enabled from the env file. 
 
-### Enabling/disabling decision manager for specific payments
 
-The Cybersource Plugin has environment variable for decision manager as PAYMENT_GATEWAY_DECISION_MANAGER, you can set the values to true or false to enable or disable decision manager. If set to true, PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID variable must be configured with comma separated values of different merchant Ids in which decision manager has to be executed.
+### Enabling/disabling Decision Manager for specific payments
 
-> **_NOTE:_** This field is case sensitive
+The Cybersource Extension has environment variable for decision manager as `PAYMENT_GATEWAY_DECISION_MANAGER`, you can set the values to true or false to enable or disable decision manager. If set to true, `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` variable must be configured with comma separated values of different merchant Ids in which decision manager has to be executed.
+
+> **_NOTE:_** `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` is case sensitive without any spaces.
 
 ## Optional fields
 
-To pass additional data to Decision Manager it is possible to customize your Commercetools resources to add extra fields. If these fields exist and there are values present for these then the plugin will pass the values on to Cybersource in the appropriate request
+To pass additional data to Decision Manager, it is possible to customize the Commercetools resources to add extra fields. If these fields exist and there are values present for these, then the extension will pass the values on to Cybersource in the appropriate request
 
 | Resource          | Field name   | Cybersource field | 
 | ----------------- | ------------ | ----------------- |
@@ -83,8 +85,8 @@ To support testing Decision Manager responses it is necessary to configure Decis
 - In Decision Manager → Configuration → Extended Settings enable
   Decision Manager for Authorization
   - Also ensure the reply flags are set to DREVIEW and DREJECT
-  - If you need EBC to trigger Authorization Reversal automatically during Reject After Auth cases, make sure that you check the checkbox under Decision Manager → Configuration → Extended Settings to enable it. Otherwise, plugin will automatically trigger Authorization Reversal
-  - When Sale transaction is in review state, before reviewing it navigate to Decision Manager → Configuration → Extended Settings and make sure to select the "Enable Settlement With Selected" for payment processing. And while accepting the order, always make sure that settle checkbox is checked and the amount being settled matches with the total authorization amount, as the plugin will not support the partial settlement
+  - If you need EBC to trigger Authorization Reversal automatically during Reject After Auth cases, make sure that you check the checkbox under Decision Manager → Configuration → Extended Settings to enable it. Otherwise, extension will automatically trigger Authorization Reversal
+  - When Sale transaction is in review state, before reviewing it navigate to Decision Manager → Configuration → Extended Settings and make sure to select the "Enable Settlement With Selected" for payment processing. Make sure the amount entered for settlement is same to the amount authorized in this case.
 
 
 - In Decision Manager → Configuration → Profiles create a new profile

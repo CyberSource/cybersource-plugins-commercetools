@@ -2,7 +2,7 @@
 
 ## eCheck
 
-If you would like to support eCheck, you will need to register with one of these processors.
+If you would like to support eCheck, you need to register with one of these processors.
 
 - Chase Paymentech Solutions
 - Cybersource ACH Service
@@ -10,7 +10,7 @@ If you would like to support eCheck, you will need to register with one of these
 
 ## Legal Compliance Text
 
-Once you have registered with any of the processors above, to proceed with eCheck you might display the legal compliance text for Internet Check Acceptance Authorization. See the [Electronic Check services](https://developer.cybersource.com/library/documentation/sbc/echecks/SB_Electronic_Checks.pdf) document from the Cybersource Developer center.
+Once you have registered with any of the processors above, to proceed with eCheck you might display the legal compliance text for Internet Check Acceptance Authorization. See the [Electronic Check services](https://developer.cybersource.com/api/soap-developer-guides/dita-payments/intro.html) document from the Cybersource Developer center.
 
 The FO checkout page has to be done with the setup to get the following information from the customer
 | Field             | Notes                                                                                                                                                                                                       |
@@ -21,4 +21,4 @@ The FO checkout page has to be done with the setup to get the following informat
 
 
 
-Once the front office setup is ready to pass the required info for eCheck processing, you can continue to [Process a Payment (eCheck)](Process-a-Payment-eCheck.md) process.
+Once the front office setup is ready to pass the required information for eCheck processing, you can continue to [Process a Payment (eCheck)](Process-a-Payment-eCheck.md) process.

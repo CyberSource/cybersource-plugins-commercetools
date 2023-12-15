@@ -20,11 +20,7 @@ const conversionDetails = async (midCredentials) => {
   try {
     if (null != midCredentials) {
       const apiClient = new restApi.ApiClient();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
         runEnvironment: runEnvironment,
@@ -35,7 +31,7 @@ const conversionDetails = async (midCredentials) => {
           enableLog: false,
         },
       };
-      startTime = moment(Date.now()).subtract(Constants.VAL_TWENTY_THREE, Constants.STRING_HOURS).subtract(Constants.VAL_FIFTY_NINE).format(Constants.DATE_FORMAT);
+      startTime = moment(Date.now()).subtract(23, 'hours').subtract(59).format(Constants.DATE_FORMAT);
       endTime = moment(Date.now()).format(Constants.DATE_FORMAT);
       organizationId = process.env.PAYMENT_GATEWAY_MERCHANT_ID;
       if (null != organizationId) {
@@ -51,7 +47,14 @@ const conversionDetails = async (midCredentials) => {
             conversionDetailResponse.status = response[Constants.STRING_RESPONSE_STATUS];
             resolve(conversionDetailResponse);
           } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+            if (
+              error.hasOwnProperty(Constants.STRING_RESPONSE) &&
+              null != error.response &&
+              Constants.VAL_ZERO < Object.keys(error.response).length &&
+              error.response.hasOwnProperty(Constants.STRING_TEXT) &&
+              null != error.response.text &&
+              Constants.VAL_ZERO < Object.keys(error.response.text).length
+            ) {
               paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_ERROR, null, error.response.text);
               errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
               conversionDetailResponse.status = errorData.status;
@@ -70,7 +73,7 @@ const conversionDetails = async (midCredentials) => {
           }
         });
       }).catch((error) => {
-        return conversionDetailResponse;
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_CONVERSION_DETAILS, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);

@@ -919,3 +919,68 @@ export const shippingCart = {
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
+
+export const ucPayment  = {
+  "id": "50d4bb1f-d322-406e-a3de-b559cc7ad0c2",
+  "version": 2,
+  "versionModifiedAt": "2023-08-10T07:29:16.868Z",
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2023-08-10T07:29:16.868Z",
+  "lastModifiedAt": "2023-08-10T07:29:16.868Z",
+  "lastModifiedBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "createdBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 5000,
+      "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "creditCard",
+      "name": {
+          "en": "Credit Card"
+      }
+  },
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "919acdd9-f671-4a83-ad81-2b01caa72250"
+      },
+      "fields": {
+          "isv_transientToken": creditCard.isv_transientToken,
+          "isv_deviceFingerprintId": "6e0a8cfe-f7de-48c7-ad22-ef9ef2b80774",
+          "isv_merchantId": "visa_isv_opencart_barc_dm",
+          "isv_saleEnabled": false,
+          "isv_acceptHeader": "*/*",
+          "isv_customerIpAddress": "192.140.152.71",
+          "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "6584af2b-001b-41ba-a0b7-1018b46887a8",
+          "timestamp": "2023-08-10T07:29:19.713Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 5000,
+              "fractionDigits": 2
+          },
+          "state": "Initial"
+      }
+  ],
+  "interfaceInteractions": [],
+  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+}
+

@@ -1,6 +1,6 @@
 # Serverless Deployment
 
-Serverless deployment is one of the latest trends in cloud technologies. It is a development model built for creating and running applications without the need for server management. They are provisioned, maintained, and scaled by a third-party cloud provider, while the developers just write and deploy the code.
+Serverless deployment is one of the latest trends in cloud technologies. It is a development model built for creating and running applications without the need for server management. They are provisioned, maintained and scaled by a third-party cloud provider, while the developers just write and deploy the code.
 
 ## AWS Lambda
 
@@ -10,7 +10,7 @@ AWS Lambda is a serverless, event-driven compute service that lets you run virtu
 
 Here is a list of pre-requisites that you need to have before proceeding with deployment:
 
-- NodeJS and NPM
+- NodeJS and npm
 - Active AWS account
 - Active AWS subscription
 - AWS credentials
@@ -31,7 +31,7 @@ To connect the application to AWS account, you need to generate AWS Security Cre
 
 ## Serverless Framework Services
 
-The Serverless Framework is a command-line tool that uses easy and approachable YAML syntax to deploy your code. A service is configured via `serverless.yml` file where you define your functions, the events that trigger them, and the AWS resources to deploy. Each service configuration is managed in the serverless.yml file. You can see the name of the service and here you can provide your service name as per your convenience. The function inside the functions definition, it should point to `build/main/index.handler` since in index file we are wrapping our API for serverless use.
+The Serverless Framework is a command-line tool that uses easy and approachable `yml` syntax to deploy your code. A service is configured via `serverless.yml` file where you define your functions, the events that trigger them and the AWS resources to deploy. Each service configuration is managed in the serverless.yml file. You can see the name of the service and here you can provide your service name as per your convenience. The function inside the functions definition, it should point to `build/main/index.handler` since in index file we are wrapping our API for serverless use.
 
 Specify the event along with the path which will trigger the handler function.
 The serverless.yml file should looks like as follows:
@@ -62,6 +62,11 @@ In order to get logs in AWS Cloudwatch, you need to provide following permission
           Resource:
               - arn:aws:logs:*:*:*
 
+In order to exclude files while zipping, you need to provide following
+
+    plugins:
+    - serverless-ignore
+
 Inside provider, you need to provide timeout for your API gateway as 20 second 
  
       timeout: 20
@@ -70,9 +75,10 @@ Inside provider, you need to provide timeout for your API gateway as 20 second
 
 ## Loggers in AWS Cloudwatch
 
-You can see all your logs in AWS Cloudwatch, for that you need to pass the value as `true` for the ENV variable `PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md))
+You can see all your logs in AWS Cloudwatch by passing the value as true for the env variable AWS_ENABLE_LOGS in .env file(Refer [API-Extension-Setup](API-Extension-Setup.md))
 
-## Steps to Deploy Plugin on AWS Lambda
+
+## Steps to Deploy Extension on AWS Lambda
 
 1.  Navigate to the root directory and run the following command to include the npm dependencies
 
@@ -88,33 +94,37 @@ You can see all your logs in AWS Cloudwatch, for that you need to pass the value
 
          Serverless create -t aws-nodejs
 
-4.  Above command will add one file in the root directory i.e. serverless.yml . Populate the required values in this file. (Refer [Serverless Framework Services](#serverless-framework-services))
+4.  Above command will add a file in the root directory i.e. serverless.yml . Populate the required values in this file. (Refer [Serverless Framework Services](#serverless-framework-services))
 
 5.  To deploy a service, run the below command in the same directory as serverless.yml i.e. root directory
 
          npm run deploy
 
-6.  Once the deployment is done, to set/modify the ENV variables you have to login to your AWS account.
+6.  Once the deployment is done, to set/modify the env variables you have to login to your AWS account.
 - Navigate to the lambda and click on the lambda function that has been created after successful deployment.
 - Navigate to Configuration -> Environment variables and click on Add environment variable.
-- Enter key and value for your ENV variable and click on save. (Refer [API-Extension-Setup](API-Extension-Setup.md))
+- Enter key and value for your env variable and click on save. (Refer [API-Extension-Setup](API-Extension-Setup.md#configuration))
    
     **_NOTE:_** AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_REGION can't be modified since they are AWS reserved keywords.
     
     The execution role which will be created while deploying to AWS lambda will provide the credentials to lambda function which can be used to run and invoke other web services. Therefore, you don't need to provide AWS credentials in .env file.
 
- **_NOTE:_** If You need to have custom domain for your application since your application will be hosted on that URL and that URL will be used to create API extensions, refer  [Serverless-Api-Gateway-Domain](https://www.serverless.com/blog/serverless-api-gateway-domain/) for more information
+ **_NOTE:_** if you need to have a public domain for your extension as that domain URL will be used to create API extensions, refer [Serverless-Api-Gateway-Domain](https://www.serverless.com/blog/serverless-api-gateway-domain/) for more information
+
 
 ## Troubleshoot
 
-1.  While deploying the application, if deployment is failed with error messsage "Cannot read file due to EMFILE: too many open files" then this error you may have received because your system has certain limit to open files and when that limit is reached this error is thrown. After sometime, try to deploy your application again after closing opened files.
+1.  While deploying the application, if deployment is failed with an error message `Cannot read file due to EMFILE: too many open files`, you may have received this error because your system has certain limit to open files and that limit is reached. Deleting and re-installing the following files/folders may fix the issue:
+ - .serverless
+ - node-modules 
+ - package-lock.json
 
-2.  While configuring serverless with your AWS security credentials, sometimes you may get error message as ' The term 'serverless' is not recognized as the name of a cmdlet, function, script file, or operable program' so another way for configuration is to open the credentials file. This file is usually found at ~/.aws/credentials . You may need to show hidden files in your file browser.
+2.  While configuring serverless with your AWS security credentials, sometimes you may get an error message as `The term 'serverless' is not recognized as the name of a cmdlet, function, script file or operable program`. Another way to configure serverless is by opening the credentials file, which is typically located at ~/.aws/credentials. It may be a hidden file in your file browser.
 
-    Your file may be empty or may not even exist. If it doesn’t exist create an empty file. In that file you can paste your credentials in this format.
+    Your file may be an empty or may not even exist. If it doesn’t exist create an empty file and paste your credentials in the below format 
 
           [default]
           aws_access_key_id=${Your access key ID}
           aws_secret_access_key=${Your secret access key}
 
-3. If you are getting "Internal server error" while running sync service, increase the timeout of your API gateway to 30 seconds in serverless.yml file or in General Configuration of Lambda Function of AWS Console to avoid such error.
+3. If you are getting `Internal server error` while running sync service, increase the timeout of your API gateway to 30 seconds in serverless.yml file or in General Configuration of Lambda Function of AWS Console.

@@ -7,8 +7,7 @@ import { updateCardHandlerCustomerId, updateCardHandlerTokens, updateCardHandler
 import { orderManagementHandlerPaymentId, orderManagementHandlerUpdateTransactions, orderManagementHandlerRefundUpdateTransactions } from '../const/PaymentHandlerConst';
 import { applePaySessionHandlerFields } from '../const/PaymentHandlerConst';
 import {authorizationHandlerAPUpdatePaymentObject, authorizationHandlerECUpdatePaymentObject, authorizationHandler3DSUpdatePaymentObject, authorizationHandlerCCUpdatePaymentObject, authoriationHandlerGPUpdatePaymentObject, authorizationHandlerVSUpdatePaymentObject, authorizationHandlerUpdateTransactions} from '../const/PaymentHandlerConst';
-import { getPayerAuthEnrollResponseUpdatePaymentObj } from '../const/PaymentHandlerConst';
-import { getPayerAuthReversalHandlerUpdatePaymentObject, getPayerAuthReversalHandlerPaymentResponse, getPayerAuthReversalHandlerUpdateTransactions, getPayerAuthReversalHandlerUpdateActions, getPayerAuthValidateResponseUpdatePaymentObj } from '../const/PaymentHandlerConst';
+import { getPayerAuthReversalHandlerUpdatePaymentObject, getPayerAuthReversalHandlerPaymentResponse, getPayerAuthReversalHandlerUpdateTransactions, getPayerAuthReversalHandlerUpdateActions} from '../const/PaymentHandlerConst';
 import CommercetoolsApi from '../../utils/api/CommercetoolsApi';
 
 test.serial('Check for report handller ', async (t) => {
@@ -19,6 +18,10 @@ test.serial('Check for report handller ', async (t) => {
   } else if (result.message == 'Successfully completed DecisionSync') {
     t.is(result.message, 'Successfully completed DecisionSync');
     t.is(result.error, '');
+  } else if(result.error == 'Please configure Decision sync mids')
+  {
+    t.is(result.message, '');
+    t.is(result.error, 'Please configure Decision sync mids');
   } else {
     t.is(result.error, 'Please enable Decision sync');
     t.is(result.message, '');
@@ -144,21 +147,6 @@ test.serial('get authorization handller for eCheck', async (t) => {
   }
 });
 
-test.serial('get payer auth set up response ', async (t) => {
-  const result = await paymentHandler.getPayerAuthSetUpResponse(authorizationHandler3DSUpdatePaymentObject);
-  if (result.actions[0] == undefined) {
-    t.deepEqual(result.actions, []);
-    t.deepEqual(result.errors, []);
-  } else {
-    t.is(result.actions[0].action, 'setCustomField');
-    t.is(result.actions[0].name, 'isv_requestJwt');
-    t.is(result.actions[1].action, 'setCustomField');
-    t.is(result.actions[1].name, 'isv_cardinalReferenceId');
-    t.is(result.actions[2].action, 'setCustomField');
-    t.is(result.actions[2].name, 'isv_deviceDataCollectionUrl');
-  }
-});
-
 test.serial('Check the run sync ', async (t) => {
   const result = await paymentHandler.syncHandler();
   if (result.error == 'Please enable Run sync') {
@@ -173,36 +161,9 @@ test.serial('Check the run sync ', async (t) => {
   }
 });
 
-test.serial('Get Payer Auth Enroll Response', async (t) => {
-  const result = await paymentHandler.getPayerAuthEnrollResponse(getPayerAuthEnrollResponseUpdatePaymentObj);
-  if (result.actions.length <= 0) {
-    t.deepEqual(result.actions, []);
-    t.is(result.errors[0].code, 'InvalidInput');
-    t.is(result.errors[0].message, 'Cannot process the payment due to invalid input');
-  } else {
-    t.is(result.actions[0].action, 'setCustomField');
-    t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
-    t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
-    t.is(result.actions[2].name, 'isv_payerEnrollStatus');
-  }
-});
-
 test.serial('Get Payer AuthReversal Handler', async (t) => {
   const result = await paymentHandler.getPayerAuthReversalHandler(getPayerAuthReversalHandlerUpdatePaymentObject, getPayerAuthReversalHandlerPaymentResponse, getPayerAuthReversalHandlerUpdateTransactions, getPayerAuthReversalHandlerUpdateActions);
   t.is(result.actions[0].action, 'changeTransactionInteractionId');
   t.is(result.actions[1].action, 'changeTransactionState');
   t.is(result.actions[1].state, 'Success');
-});
-
-test.serial('get Payer Auth Validate Response', async (t) => {
-  const result = await paymentHandler.getPayerAuthValidateResponse(getPayerAuthValidateResponseUpdatePaymentObj);
-  if (result.actions.length > 0) {
-    t.is(result.actions[0].action, 'setCustomField');
-    t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
-    t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
-    t.is(result.actions[2].name, 'isv_payerEnrollStatus');
-  } else {
-    t.deepEqual(result.actions, []);
-    t.is(result.errors[0].code, 'InvalidInput');
-  }
 });

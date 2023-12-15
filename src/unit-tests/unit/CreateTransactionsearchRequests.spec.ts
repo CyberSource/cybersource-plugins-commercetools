@@ -11,6 +11,5 @@ test('Run sync ', async (t) => {
     merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
   };
   const result: any = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY, Constants.STRING_SYNC_SORT, midCredentials);
-  t.pass();
-  t.is(result.httpCode, 201);
+  t.is(result.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
 });

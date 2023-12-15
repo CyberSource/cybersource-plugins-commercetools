@@ -1,5 +1,4 @@
 import path from 'path';
-
 import paymentService from '../PaymentService';
 import { Constants } from '../../constants';
 
@@ -15,8 +14,22 @@ const getMidCredentials = async (payment) => {
   let allMidCredentials: any;
   try {
     if (payment && null != payment) {
-      if (payment?.custom?.fields?.isv_merchantId && Constants.STRING_EMPTY != payment.custom.fields.isv_merchantId) {
-        merchantIdentifier = payment.custom.fields.isv_merchantId;
+      if (typeof payment === 'object') {
+        if (Constants.STRING_EMPTY == payment?.custom?.fields?.isv_merchantId) {
+          midData = midCredentials;
+        } else {
+          merchantIdentifier = payment.custom.fields.isv_merchantId;
+        }
+      } else if (typeof payment === 'string') {
+        merchantIdentifier = payment;
+        if (Constants.STRING_EMPTY == merchantIdentifier) {
+          midData = midCredentials;
+        }
+      } else {
+        midData = midCredentials;
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_MID_CREDENTIALS, Constants.LOG_WARN, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_MULTI_MID_NOT_ENABLED);
+      }
+      if (undefined != merchantIdentifier && Constants.STRING_EMPTY != merchantIdentifier) {
         allMidCredentials = await getAllMidDetails();
         allMidCredentials.forEach(async element => {
           if (element.merchantId == merchantIdentifier) {
@@ -31,10 +44,10 @@ const getMidCredentials = async (payment) => {
         }
       } else {
         midData = midCredentials;
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_MID_CREDENTIALS, Constants.LOG_WARN, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_MULTI_MID_NOT_ENABLED);
       }
     }
-  } catch (exception) {
+  }
+  catch (exception) {
     if (typeof exception === 'string') {
       exceptionData = Constants.EXCEPTION_MSG_GET_MID_CREDENTIALS + Constants.STRING_HYPHEN + exception.toUpperCase();
     } else if (exception instanceof Error) {
@@ -58,10 +71,10 @@ const getAllMidDetails = async () => {
   try {
     environment = process.env;
     for (let variable in environment) {
-      if ((variable.includes(Constants.STRING_SECRET_KEY)) && variable != Constants.DEFAULT_MERCHANT_SECRET_KEY_VARIABLE) {
+      if ((variable.includes(Constants.STRING_SECRET_KEY)) && variable != 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY') {
         secretKeyIndex = variable.indexOf(Constants.STRING_SECRET_KEY);
         secretKeyPrefix = variable.slice(Constants.VAL_ZERO, secretKeyIndex);
-        keyId = process.env[secretKeyPrefix + Constants.STRING_KEY_ID];
+        keyId = process.env[secretKeyPrefix + '_KEY_ID'];
         secretKey = process.env[variable];
         if (Constants.STRING_EMPTY != secretKeyPrefix && undefined != keyId && Constants.STRING_EMPTY != keyId && undefined != secretKey && Constants.STRING_EMPTY != secretKey) {
           midArray.push({
