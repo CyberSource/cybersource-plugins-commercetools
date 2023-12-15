@@ -13,7 +13,6 @@ const getClient = () => {
   let authMiddleware: any;
   let exceptionData: any;
   try {
-    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
     projectKey = process.env.CT_PROJECT_KEY;
     authMiddleware = createAuthMiddlewareForClientCredentialsFlow({
       host: process.env.CT_AUTH_HOST,
@@ -432,7 +431,7 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
         });
       }
       if (null != visaCheckoutData.shipToFieldGroup && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup).length) {
-        if (visaCheckoutData.shipToFieldGroup.hasOwnProperty(Constants.STRING_EMAIL) === true && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup.email).length) {
+        if (visaCheckoutData.shipToFieldGroup.hasOwnProperty('email') === true && Constants.VAL_ZERO != Object.keys(visaCheckoutData.shipToFieldGroup.email).length) {
           shippingEmail = visaCheckoutData.shipToFieldGroup.email;
         } else {
           cartData = await retrieveCartByPaymentId(paymentId);
@@ -453,6 +452,45 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
             email: shippingEmail,
           },
         });
+      }
+      if (null != visaCheckoutData && null != visaCheckoutData.billTo && Constants.STRING_FULL == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
+        actions.push({
+          action: Constants.SET_BILLING_ADDRESS,
+          address: {
+            firstName: visaCheckoutData.billTo.firstName,
+            lastName: visaCheckoutData.billTo.lastName,
+            streetName: visaCheckoutData.billTo.address1,
+            streetNumber: visaCheckoutData.billTo.buildingNumber,
+            postalCode: visaCheckoutData.billTo.postalCode,
+            city: visaCheckoutData.billTo.locality,
+            region: visaCheckoutData.billTo.administrativeArea,
+            country: visaCheckoutData.billTo.country,
+            phone: visaCheckoutData.billTo.phoneNumber,
+            email: visaCheckoutData.billTo.email,
+          },
+        });
+      }
+      if (null != visaCheckoutData && null != visaCheckoutData.shipTo && Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING) {
+        const cartDetail = await getCartById(cartId);
+        if (null != cartDetail) {
+          if ('Single' == cartDetail.shippingMode) {
+            actions.push({
+              action: Constants.SET_SHIPPING_ADDRESS,
+              address: {
+                firstName: visaCheckoutData.shipTo.firstName,
+                lastName: visaCheckoutData.shipTo.lastName,
+                streetName: visaCheckoutData.shipTo.address1,
+                streetNumber: visaCheckoutData.shipTo.buildingNumber,
+                postalCode: visaCheckoutData.shipTo.postalCode,
+                city: visaCheckoutData.shipTo.locality,
+                region: visaCheckoutData.shipTo.administrativeArea,
+                country: visaCheckoutData.shipTo.country,
+                phone: visaCheckoutData.shipTo.phoneNumber,
+                email: visaCheckoutData.shipTo.email,
+              },
+            });
+          }
+        }
       }
       if (null != actions && Constants.VAL_ZERO != actions.length) {
         client = getClient();
@@ -791,7 +829,7 @@ const syncAddTransaction = async (syncUpdateObject) => {
                   action: Constants.SET_CUSTOM_FIELD,
                   name: Constants.ISV_SECURITY_CODE,
                   value: null,
-                }
+                },
               ],
             }),
           };
@@ -1077,7 +1115,7 @@ const updateAvailableAmount = async (paymentId, version, transactionId, pendingA
                 fields: {
                   isv_availableCaptureAmount: pendingAmount,
                 },
-                transactionId: transactionId
+                transactionId: transactionId,
               },
             ],
           }),
@@ -1086,12 +1124,10 @@ const updateAvailableAmount = async (paymentId, version, transactionId, pendingA
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_INFO, null, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
-    }
-    else {
+    } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentId, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
-  }
-  catch (exception) {
+  } catch (exception) {
     if (typeof exception === 'string') {
       exceptionData = Constants.EXCEPTION_MSG_CUSTOM_TYPE + Constants.STRING_HYPHEN + exception.toUpperCase();
     } else if (exception instanceof Error) {
@@ -1105,7 +1141,139 @@ const updateAvailableAmount = async (paymentId, version, transactionId, pendingA
     updateResponse = updateResponse.body;
   }
   return updateResponse;
-}
+};
+
+const getCartById = async (cartId) => {
+  let cartResponse: any;
+  let client: any;
+  let requestBuilder: any;
+  let channelsRequest: any;
+  let exceptionData: any;
+  let uri: string;
+  try {
+    if (null != cartId) {
+      client = getClient();
+      if (null != client) {
+        requestBuilder = createRequestBuilder({
+          projectKey: process.env.CT_PROJECT_KEY,
+        });
+        uri = requestBuilder.carts
+          .byId(cartId)
+
+          .build();
+        channelsRequest = {
+          uri: uri,
+          method: Constants.HTTP_METHOD_GET,
+        };
+        cartResponse = await client.execute(channelsRequest);
+      } else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, 'CartId : ' + cartId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      }
+    } else {
+      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_INFO, 'CartId : ' + cartId, Constants.ERROR_MSG_CART_DETAILS);
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CART_DETAILS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_RETRIEVE_CART_BY_ANONYMOUS_ID, Constants.LOG_ERROR, 'CartId : ' + cartId, exceptionData);
+  }
+  if (null != cartResponse) {
+    cartResponse = cartResponse.body;
+  }
+  return cartResponse;
+};
+
+const addCustomerAddress = async (customerId, addressObj) => {
+  let client: any;
+  let requestBuilder: any;
+  let channelsRequest: any;
+  let exceptionData: any;
+  let uri: string;
+  let actions = [] as any;
+  let customerResponse: any;
+  let customerData: any;
+  try {
+    if (null != customerId && Constants.STRING_EMPTY != customerId) {
+      customerData = await getCustomer(customerId);
+      if(customerData){
+        if ('FULL' == process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
+          actions.push({
+            action: "addAddress",
+            address: {
+              firstName: addressObj.firstName,
+              lastName: addressObj.lastName,
+              streetName: addressObj.address1,
+              city: addressObj.locality,
+              postalCode: addressObj.postalCode,
+              region: addressObj.administrativeArea,
+              country: addressObj.country,
+              email: addressObj.email,
+              phone: addressObj.phoneNumber
+            }
+          })
+        } else {
+          actions.push({
+            action: "addAddress",
+            address: {
+              firstName: addressObj.firstName,
+              lastName: addressObj.lastName,
+              streetName: addressObj.streetName,
+              city: addressObj.city,
+              postalCode: addressObj.postalCode,
+              region: addressObj.buildingNumber,
+              country: addressObj.country,
+              email: addressObj.email,
+              phone: addressObj.phone
+            }
+          })
+        }
+        if (null != actions && Constants.VAL_ZERO < actions.length) {
+          client = getClient();
+          if (null != client) {
+            requestBuilder = createRequestBuilder({
+              projectKey: process.env.CT_PROJECT_KEY,
+            });
+            uri = requestBuilder.customers.byId(customerId).build();
+            channelsRequest = {
+              uri: uri,
+              method: Constants.HTTP_METHOD_POST,
+              body: JSON.stringify({
+                version: customerData.version,
+                actions: actions,
+              }),
+            };
+            customerResponse = await client.execute(channelsRequest);
+          } else {
+            paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+          }
+        } else {
+          paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_CUSTOMER_UPDATE);
+        }
+      }else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      }
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, exceptionData);
+  }
+  if(customerResponse){
+    customerResponse = customerResponse.body;
+  }
+  return customerResponse;
+};
+
 
 
 export default {
@@ -1130,4 +1298,6 @@ export default {
   addExtensions,
   addCustomField,
   updateAvailableAmount,
+  getCartById,
+  addCustomerAddress
 };

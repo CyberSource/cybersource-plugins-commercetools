@@ -16,11 +16,7 @@ const deleteCustomerToken = async (customerTokenObj) => {
     if (null != customerTokenObj) {
       var customerTokenId = customerTokenObj.value;
       var paymentInstrumentTokenId = customerTokenObj.paymentToken;
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
         runEnvironment: runEnvironment,
@@ -41,7 +37,14 @@ const deleteCustomerToken = async (customerTokenObj) => {
             customerTokenDeleteResponse.deletedToken = paymentInstrumentTokenId;
             resolve(customerTokenDeleteResponse);
           } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+            if (
+              error.hasOwnProperty(Constants.STRING_RESPONSE) &&
+              null != error.response &&
+              Constants.VAL_ZERO < Object.keys(error.response).length &&
+              error.response.hasOwnProperty(Constants.STRING_TEXT) &&
+              null != error.response.text &&
+              Constants.VAL_ZERO < Object.keys(error.response.text).length
+            ) {
               paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DELETE_CUSTOMER_TOKEN, Constants.LOG_ERROR, null, error.response.text);
             } else {
               if (typeof error === 'object') {
@@ -58,7 +61,7 @@ const deleteCustomerToken = async (customerTokenObj) => {
           }
         });
       }).catch((error) => {
-        return customerTokenDeleteResponse;
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_DELETE_CUSTOMER_TOKEN, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_CUSTOMER_INPUT);

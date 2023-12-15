@@ -1,8 +1,9 @@
 # Deploying Docker Containers on AWS Elastic Container Service(ECS)
-The Docker Compose CLI enables developers to use native Docker commands to run applications in Amazon Elastic Container Service (ECS) when building cloud-native applications. Using docker compose, the Commercetools-Cybersource-Plugin can be deployed into the AWS easily. For this, the docker image of the plugin has to be built and the same needs to be pushed into the AWS Elastic Container Registry.
+The Docker Compose CLI enables developers to use native Docker commands to run applications in Amazon Elastic Container Service (ECS) when building cloud-native applications. Using docker compose, the Commercetools-Cybersource Extension can be deployed into the AWS easily. For this, docker image of the extension has to be built and same needs to be pushed into the AWS Elastic Container Registry.
 
 
 ## Pre-Requisites
+
 To deploy Docker containers on ECS, you must meet the following requirements:
 
 1. Download and install the latest version of Docker Desktop
@@ -16,9 +17,6 @@ To deploy Docker containers on ECS, you must meet the following requirements:
 ## Creation of AWS Security Credentials
  
   To generate AWS Security Credentials, Refer [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials)
-
-
-
 
 ## Run an application on ECS
 
@@ -46,14 +44,14 @@ Run the below command to create an Amazon ECS Docker context
 
 where `contextName` is the name of your context
 
-- After running the above command, it will give some options, select '<B>An existing AWS profile</B>' option since we already configured AWS in the above step
+- After running the above command, select `An existing AWS profile` option on listing of the options prompted since we already configured AWS in the above step
 
 
 ### Run a Compose application
    
 You can deploy and manage multi-container applications defined in the Compose files to Amazon ECS using the docker compose command. To do this:
 
-- Create a docker-compose.yml(case-sensitive) file in any folder of your choice and populate the following fields :
+- Create a docker-compose.yml(case-sensitive) file in any folder of your choice and populate the following fields:
     
     
       x-aws-loadbalancer : ARN of the LoadBalancer
@@ -80,7 +78,7 @@ You can deploy and manage multi-container applications defined in the Compose fi
     **_NOTE:_** Make sure to have correct indentation for each line in docker-compose.yml file and give same port number under `ports` and `CONFIG_PORT` under environment in docker-compose.yml file
      
     
-    - To set environment variables, Refer [API-Extension-Setup](API-Extension-Setup.md#a-name"environmentproperties"aenvironment-properties)
+    - To set environment variables, Refer [API-Extension-Setup](API-Extension-Setup.md#configuration)
     - To create a LoadBalancer in AWS, Refer [Creation-of-LoadBalancer](#creation-of-loadbalancer)
     - To get image name, Refer [Pushing-image-into-AWS-ECR](#pushing-the-docker-image-into-aws-elastic-container-registryecr)
 
@@ -89,14 +87,14 @@ You can deploy and manage multi-container applications defined in the Compose fi
 
        docker context use <contextName>
 
-  where `contextName` is the name of your context which is created in the previous step
-- Navigate to the folder where the docker-compose.yml file is present and run the below   command to start a full compose application
+  where `contextName` is the name of your context which was created in the previous step
+- Navigate to the folder where the docker-compose.yml file is present and run the below command to start a full compose application
      
        docker compose up
 
 ## Pushing the docker image into AWS Elastic Container Registry(ECR)
 
-Follow the below steps to deploy the docker image into AWS ECR by using AWS CLI
+Follow the below steps to deploy docker image into AWS ECR by using AWS CLI
 
   ### Step 1: Build a Docker image
    To build a Docker image, Refer [Building-the Docker-image](Docker.md#building-the-docker-image)
@@ -114,9 +112,10 @@ Follow the below steps to deploy the docker image into AWS ECR by using AWS CLI
     
      aws ecr create-repository --repository-name <repositoryName> --region <region>
 
-   where `repositoryName` is the name of your choice and it should start with a letter and can only contain lowercase letters, numbers, hyphens, underscores, and forward slashes. Using a double hyphen, underscore, or forward slash isn't supported.
+   where `repositoryName` is the name of your choice and it should start with a letter and can only contain lowercase letters, numbers, hyphens, underscores and forward slashes. Use of double hyphen, underscore or forward slash isn't supported.
 
  ### Step 4: Push an image to Amazon ECR
+
   To push the image into ECR, first tag the image to push into your repository by using the following command:
 
     docker tag <imageName>:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/<repositoryName>
@@ -125,11 +124,11 @@ Follow the below steps to deploy the docker image into AWS ECR by using AWS CLI
   
     docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/<repositoryName>
 
- After the image is pushed successfully, copy the  respective image URI present in AWS console under ECR service and use the same URI in docker-compose.yml file for image field.
+ Once the image is pushed successfully, copy the respective image URI present in AWS console under ECR service and use the same URI in docker-compose.yml file for image field.
 
 
 ## Creation of LoadBalancer
-LoadBalancer is used to assign the custom DNS name for application, which will be helpful for creating commercetools API extensions.
+LoadBalancer is used to assign the custom DNS name for application which will be helpful for creating commercetools API extensions.
 You can also access the application using the same DNS name followed by port number(Example: DNSname:portnumber/xxx)
     
 To create the LoadBalancer, follow the below steps :
@@ -150,10 +149,9 @@ To create the LoadBalancer, follow the below steps :
 
         
 
+Once the application is deployed, if you want to update any env settings for extension, just update the value in docker-compose.yml file and run the docker compose up command again.
 
-Once the application is deployed, if you want to update any env settings for plugin, just change the docker-compose.yml file and again run docker compose up command.
-
-**_NOTE:_**  During updation, don't interrupt in between untill the status is updated as 'UPDATE_COMPLETE'. You can check the status of application under CloudFormation service in AWS console.
+**_NOTE:_**  During updation, don't interrupt in between untill the status is updated as `UPDATE_COMPLETE`. You can check the status of application under CloudFormation service in AWS console.
 
 To access an application, use LoadBalancer DNS name followed by port number specified in docker-compose.yml file
 
@@ -168,15 +166,15 @@ DNS name will available in AWS console under respective LoadBalancer details in 
 
 You can see all your logs in AWS Cloudwatch, for that you need to perform below steps.
 
-- Provide your AWS Access Key ID ,Secret Key and AWS Region Name in .env file. (Refer [API-Extension-Setup](API-Extension-Setup.md))
-- Pass the value as `true` for the ENV variable `PAYMENT_GATEWAY_ENABLE_CLOUD_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md))
+- Provide your AWS Access Key ID, Secret Key and AWS Region Name in .env file. (Refer [API-Extension-Setup](API-Extension-Setup.md#configuration))
+- Pass the value as `true` for the env variable `AWS_ENABLE_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md#configuration))
 
 ## Troubleshoot
- - When using `docker compose up` command, if you get the following error "`pulling from host <accountId>.dkr.ecr.<region>.amazonaws.com failed with status code [manifests latest]: 403 Forbidden`", it means that authentication is expired. Refer [Authenticate-to-default-registry](#step-2-authenticate-the-docker-cli-to-your-default-registry) to authenticate again.
+ - When using `docker compose up` command, if you get the following error `pulling from host <accountId>.dkr.ecr.<region>.amazonaws.com failed with status code [manifests latest]: 403 Forbidden`, it means that authentication is expired. Refer [Authenticate-to-default-registry](#step-2-authenticate-the-docker-cli-to-your-default-registry) to authenticate again.
 
  - It's better to use `PowerShell` if any of the above commands are not working or not retrieving the data in cmd terminal.
 
- - If you get "`This error may indicate that the docker daemon is not running.: The system cannot find the file specified.error during connect: This error may indicate that the docker daemon is not running.: Post http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/auth: open //./pipe/docker_engine: The system cannot find the file specified`", it means that Docker is not running, ensure to start Docker to resolve the error.
+ - If you get `This error may indicate that the docker daemon is not running.: The system cannot find the file specified.error during connect: This error may indicate that the docker daemon is not running.: Post http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/auth: open //./pipe/docker_engine: The system cannot find the file specified`, it means that Docker is not running, ensure to start Docker.
 
     
     

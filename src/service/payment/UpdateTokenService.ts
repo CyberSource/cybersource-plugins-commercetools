@@ -15,16 +15,12 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
     card: null,
   };
   try {
-    if (null != tokens && Constants.STRING_VALUE in tokens && Constants.STRING_PAYMENT_TOKEN in tokens && Constants.STRING_CARD_EXPIRY_MONTH in tokens && Constants.STRING_CARD_EXPIRY_YEAR in tokens) {
+    if (null != tokens && tokens?.value && tokens?.paymentToken && tokens?.cardExpiryMonth && tokens?.cardExpiryYear) {
       customerTokenId = tokens.value;
       paymentInstrumentTokenId = tokens.paymentToken;
       const apiClient = new restApi.ApiClient();
       var requestObj = new restApi.PatchCustomerPaymentInstrumentRequest();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
         runEnvironment: runEnvironment,
@@ -69,7 +65,14 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
             tokenResponse.card = data.card;
             resolve(tokenResponse);
           } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
+            if (
+              error.hasOwnProperty(Constants.STRING_RESPONSE) &&
+              null != error.response &&
+              Constants.VAL_ZERO < Object.keys(error.response).length &&
+              error.response.hasOwnProperty(Constants.STRING_TEXT) &&
+              null != error.response.text &&
+              Constants.VAL_ZERO < Object.keys(error.response.text).length
+            ) {
               paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, null, error.response.text);
             } else {
               if (typeof error === 'object') {
@@ -86,7 +89,7 @@ const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addres
           }
         });
       }).catch((error) => {
-        return tokenResponse;
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);

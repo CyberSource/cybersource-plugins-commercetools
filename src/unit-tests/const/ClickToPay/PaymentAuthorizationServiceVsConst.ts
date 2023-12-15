@@ -671,3 +671,68 @@ export const shippingCart = {
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
+
+export const ucPayment = {
+  "id": "8e1d7b65-d653-4f39-82f4-86cf55df8b60",
+  "version": 2,
+  "versionModifiedAt": "2023-08-10T07:46:36.014Z",
+  "lastMessageSequenceNumber": 2,
+  "createdAt": "2023-08-10T07:46:36.014Z",
+  "lastModifiedAt": "2023-08-10T07:46:36.014Z",
+  "lastModifiedBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "createdBy": {
+      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
+      "isPlatformClient": false,
+      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 5000,
+      "fractionDigits": 2
+  },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "clickToPay",
+      "name": {
+          "en": "Click to Pay"
+      }
+  },
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "919acdd9-f671-4a83-ad81-2b01caa72250"
+      },
+      "fields": {
+          "isv_transientToken": clickToPay.ïsv_transientToken,
+          "isv_deviceFingerprintId": "a82beccd-0fc0-48f8-a84e-0151709df8c8",
+          "isv_merchantId": "visa_isv_opencart_pmt_101",
+          "isv_saleEnabled": false,
+          "isv_acceptHeader": "*/*",
+          "isv_customerIpAddress": "192.140.152.21",
+          "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "cc47dace-82d6-4ad1-9182-a3bb724596a4",
+          "timestamp": "2023-08-10T07:46:38.255Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 5000,
+              "fractionDigits": 2
+          },
+          "state": "Initial"
+      }
+  ],
+  "interfaceInteractions": [],
+  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+}
+

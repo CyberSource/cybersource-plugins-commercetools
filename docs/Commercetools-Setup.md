@@ -8,15 +8,16 @@
   - [Payment Interactions](#payment-interactions)
     - [Customer tokens](#customer-tokens)
     - [Payment data](#payment-data)
-    - [Payer authentication enrolment check](#payer-authentication-enrolment-check)
-    - [Payer authentication validate result](#payer-authentication-validate-result)
+    - [Payer Authentication enrolment check](#payer-authentication-enrolment-check)
+    - [Payer Authentication validate result](#payer-authentication-validate-result)
     - [Payment error](#payment-error)
     - [Payment failure](#payment-failure)
+    - [Transaction Data](#transaction-data)
 - [Creating API Extensions and Customizations](#creating-api-extensions-and-customizations)
 
-The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in src/resources folder of the plugin and can be run as an endpoint to load them into Commercetools.
+The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in src/resources folder of the extension and can be run as an endpoint to load them into Commercetools.
 
-> **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms</li></ul>
+> **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms or 4000ms. Once approved by Commercetools support team, if the timeout is 4000ms, change the timeout to 4000 in src --> resources --> customer_update_extension.json before creating the extensions. Otherwise, the customer update extension will have a timeout of 3000ms</li></ul>
 
 # API Extension Setup
 
@@ -28,11 +29,11 @@ actions on a payment resource.
 | Property                   | Value                                  | Note                                                                                               |
 | -------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | key                        | isv_payment_create_extension           |                                                                                                    |
-| type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                         |
-| url                        | {baseUrl}/api/extension/payment/create | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
+| type                       | HTTP                                   | The extension only supports HTTP Destinations                                                         |
+| url                        | {baseUrl}/api/extension/payment/create | The baseUrl will be defined by where you deploy the extension. HTTPS should be used for production    |
 | authentication.type        | AuthorizationHeader                    |                                                                                                    |
 | authentication.headerValue | Bearer {credentials}                   | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
-| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                        |
+| timeoutInMs                | 10000                                  | You will need Commercetools support help to increase the allowable maximum value                        |
 | actions                    | Create                                 |                                                                                                    |
 | resourceTypeId             | payment                                |                                                                                                    |
 
@@ -43,11 +44,11 @@ An extension triggered by payment updates is required to process any update acti
 | Property                   | Value                                  | Note                                                                                               |
 | -------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | key                        | isv_payment_update_extension           |                                                                                                    |
-| type                       | HTTP                                   | The plugin only supports HTTP Destinations                                                         |
-| url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
+| type                       | HTTP                                   | The extension only supports HTTP Destinations                                                         |
+| url                        | {baseUrl}/api/extension/payment/update | The baseUrl will be defined by where you deploy the extension. HTTPS should be used for production    |
 | authentication.type        | AuthorizationHeader                    |                                                                                                    |
 | authentication.headerValue | Bearer {credentials}                   | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
-| timeoutInMs                | 10000                                  | You will need Commercetools support to increase the allowable maximum value                        |
+| timeoutInMs                | 10000                                  | You will need Commercetools support help to increase the allowable maximum value                        |
 | actions                    | Update                                 |                                                                                                    |
 | resourceTypeId             | payment                                |                                                                                                    |
 
@@ -58,11 +59,11 @@ An extension triggered by customer update is required to process any update acti
 | Property                   | Value                                   | Note                                                                                               |
 | -------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | key                        | isv_customer_update_extension           |                                                                                                    |
-| type                       | HTTP                                    | The plugin only supports HTTP Destinations                                                         |
-| url                        | {baseUrl}/api/extension/customer/update | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production    |
+| type                       | HTTP                                    | The extension only supports HTTP Destinations                                                         |
+| url                        | {baseUrl}/api/extension/customer/update | The baseUrl will be defined by where you deploy the extension. HTTPS should be used for production    |
 | authentication.type        | AuthorizationHeader                     |                                                                                                    |
 | authentication.headerValue | Bearer {credentials}                    | {credentials} will be the encrypted Base 64 encode value of the pair username:password of Commercetools |
-| timeoutInMs                | 4000                                    | You will need Commercetools support to increase the allowable maximum value                        |
+| timeoutInMs                | 3000 or 4000                                   | You will need Commercetools support help to increase the allowable maximum value                        |
 | actions                    | Update                                  |                                                                                                    |
 | resourceTypeId             | customer                                |                                                                                                    |
 
@@ -146,7 +147,7 @@ Fields
 | isv_merchantId                       | String  | false    |
 | isv_securityCode                       | Number  | false    |
 
-### Payer authentication enrolment check
+### Payer Authentication enrolment check
 
 | Type                          | Key                                               | Purpose                                                                  |
 | ----------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
@@ -164,13 +165,13 @@ Fields
 | acsUrl                       | String  | false    | Enrolment check response                                 | Passed to Authentication validation call when the Cybersource httpCode is 201 and status is 'PENDING_AUTHENTICATION' for enrolment check                                                          |
 | xid                          | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 | proofXml                     | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged. 3D Secure 1.x only                                                                                                       |
-| specificationVersion         | String  | false    | enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
+| specificationVersion         | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 | directoryServerTransactionId | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged. 3D Secure 2.x only                                                                                                       |
 | veresEnrolled                | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 | commerceIndicator            | String  | false    | Enrolment check response                                 | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 | eci                          | String  | false    | Payer auth validation result or enrolment check response | Stored to verify enrolment check was made in case payment is challenged                                                                                                                           |
 
-### Payer authentication validate result
+### Payer Authentication validate result
 
 | Type                          | Key                                               | Purpose                                                                                                                                                                                                                      |
 | ----------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -220,23 +221,41 @@ Fields
 | reasonCode    | String | true     |
 | transactionId | String | true     |
 
+### Transaction Data
+
+| Type                          | Key                 | Purpose                                                                  |
+| ----------------------------- | ------------------- | ------------------------------------------------------------------------ |
+| transaction | isv_transaction_data | Custom transaction fields for payment service |
+
+Fields
+
+| Name          | Type   | Required |
+| ------------- | ------ | -------- |
+| isv_availableCaptureAmount    | Number | true     |
+
 # Creating API Extensions and Customizations
 
-Once the environment properties are set and the plugin is deployed successfully, the next step is about setting up the plugin to receive requests from Commercetools.
+Once the environment properties are set and the extension is deployed successfully, the next step is about setting up the extension to receive requests from Commercetools.
 
-Below is the Endpoint to create the extensions and the custom fields for the payment and customer resources accordingly to support the Cybersource services. Before running the endpoint, Cybersource Plugin API Key must be created with the required scope, see Cybersource Plugin API Key in [Key Creation](Key-Creation.md)
+Below is the Endpoint to create the extensions and the custom fields for the payment and customer resources accordingly to support the Cybersource services. 
+| Endpoint	| Note |
+|---------------------|--------------|
+| {baseUrl}/configureExtension	| The baseUrl will be defined by where you deploy the Extension. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md#configuration) to know the values to be passed for the fields required before running the script |
 
-| Endpoint                  | Note                                                                                                                                                                                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| {baseUrl}/configurePlugin | The baseUrl will be defined by where you deploy the plugin. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md) to know the values to be passed for the fields required before running the script |
 
-You can navigate to the `{baseUrl}/orders` endpoint and click on **Run Script** button in the UI page. This will invoke the `{baseUrl}/configurePlugin` endpoint to handle the same. Ensure to create the extensions using the plugin endpoint provided in order to avoid authentication overheads later.
+This can be done by following any of the steps:
 
-Alternatively, you can create extensions and custom fields also by executing the following script command.
+- By clicking the button in main page of the extension
+
+  You can navigate to the `{baseUrl}/orders` endpoint and click on Run Script button in the UI page. This will invoke the `{baseUrl}/configureExtension` endpoint to handle the same. 
+
+> **_NOTE:_** Ensure to create the extensions using the extension endpoint provided in order to avoid authentication overheads later.
+
+- By executing the following script command.
 
       npm run setup-resources
 
-Following env variables are mandatory for the script to execute successfully:
+Following env variables are mandatory for Creating API Extensions and Customizations:
 
 - PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL
 - PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE
@@ -246,12 +265,10 @@ Following env variables are mandatory for the script to execute successfully:
 - CT_AUTH_HOST
 - CT_API_HOST
 
-Refer [API Estension Setup](./API-Extension-Setup.md) to know more about the value to be populated to each of the variable.
+Refer [API Extension Setup](./API-Extension-Setup.md#configuration) to know more about the value to be populated to each of the variable.
 
-<b>Ensure to create the extensions using any one of the above approaches only in order to avoid authentication overheads later.</b>
+> **_NOTE:_** For all kind of deployments including local, AWS, Azure and for Docker image, the extension creation and customization using the npm command `npm run setup-resources` will be possible only if the system supports `npm`
 
-> **_NOTE:_** For all kind of deployments including local, AWS and for Docker image, the extension creation and customization using the npm command `npm run setup-resources` will be possible only if the system supports `npm`
-
-> **_NOTE:_** Authentication is required for accessing any endpoint in the plugin, hence ensure to provide the valid values for the same. Refer [Authentication](./Authentication.md) for more information.
+> **_NOTE:_** Authentication is required for accessing any endpoint in the Extension, hence ensure to provide the valid values for the same. Refer [Authentication](./Authentication.md) for more information.
 
 An example  of custom field creation and setting data to the created custom field can be found in [Example-Custom-Field](./Example-Custom-Field.md)

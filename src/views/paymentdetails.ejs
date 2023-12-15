@@ -1,10 +1,11 @@
 <html>
   <head>
-    <title>ISV Commercetools Plugin</title>
+    <title>ISV Commercetools Extension</title>
     <base href="/" />
     <link rel="stylesheet" href="styles.css" />
     <script type="text/javascript" src="orders.js"></script>
     <% var currencyCode = "" %> <%var discountAmount = 0.0 %> <% var subTotal = 0.0 %> <% var shippingCost = 0.0 %> <% var cartDiscount = false %> <% var customLineItemDiscount = false %> <% var shippingDiscount = false %>
+    <% var fractionDigits = 0 %>
   </head>
 
   <body>
@@ -19,6 +20,7 @@
       <%=successMessage%>
     </div>
     <% } if(payments){%>
+      <% fractionDigits = payments.amountPlanned.fractionDigits %>
     <div class="leftDiv">
       <h1 class="payment">Payment Details</h1>
     </div>
@@ -48,6 +50,12 @@
               <b>Additional Street Info: </b>
               <%= cart.shipping[0].shippingAddress.additionalStreetInfo%>
             </div>
+            <%} %>
+            <% if(cart.shipping[0].shippingAddress.streetNumber){%>
+              <div>
+                <b>Street: </b>
+                <%= cart.shipping[0].shippingAddress.streetNumber%>
+              </div>
             <%} %>
             <div>
               <b>City: </b>
@@ -96,6 +104,12 @@
               <%= cart.shippingAddress.additionalStreetInfo%>
             </div>
             <%} %>
+            <% if(cart.shippingAddress.streetNumber){%>
+              <div>
+                <b>Street: </b>
+                <%= cart.shippingAddress.streetNumber%>
+              </div>
+            <%} %>
             <div>
               <b>City: </b>
               <%= cart.shippingAddress.city%>
@@ -142,6 +156,12 @@
             <%= cart.billingAddress.additionalStreetInfo%>
           </div>
           <%} %>
+          <% if(cart.billingAddress.streetNumber){%>
+            <div>
+              <b>Street: </b>
+              <%= cart.billingAddress.streetNumber%>
+            </div>
+          <%} %>
           <div>
             <b>City: </b>
             <%= cart.billingAddress.city%>
@@ -182,15 +202,15 @@
           <th>Product</th>
           <th>Unit price</th>
           <th>Qty</th>
-          <%cart.lineItems.forEach(function(lineItem){%> <%if(lineItem.discountedPricePerQuantity.length> 0 && !cartDiscount){%> <%cartDiscount=true%> <%} })%> <%if(cart.customLineItems.length>0){%> <%cart.customLineItems.forEach(function(customLineItem){%>
-          <%if(customLineItem.discountedPricePerQuantity.length>0 && !customLineItemDiscount){%> <%customLineItemDiscount=true%> <%} }) }%> <%if(cart.shippingInfo && cart.shippingInfo.discountedPrice){%> <%shippingDiscount=true%> <%}%> <%if(cartDiscount ||
-          customLineItemDiscount || shippingDiscount){%>
+          <%cart.lineItems.forEach(function(lineItem){%> <%if( 0 < lineItem.discountedPricePerQuantity.length && !cartDiscount){%> <%cartDiscount=true%> <%} })%> <%if(0 < cart.customLineItems.length){%> <%cart.customLineItems.forEach(function(customLineItem){%>
+              <%if(customLineItem.discountedPricePerQuantity.length>0 && !customLineItemDiscount){%> <%customLineItemDiscount=true%> <%} }) }%> <%if((cart.shippingInfo && cart.shippingInfo.discountedPrice) || cart.shippingMode == 'Multiple' && 0 < cart.shipping.length && cart.shipping[0].shippingInfo.discountedPrice){%> <%shippingDiscount=true%> <%}%> <%if(cartDiscount || 
+              customLineItemDiscount || shippingDiscount){%>
           <th>DiscountAmount</th>
           <%}%>
           <th>Total</th>
         </tr>
-        <% cart.lineItems.forEach(function(item){ %> <%subTotal = 0.0%> <%if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length == 0){%> <%if(item.price.discounted){%> <% unitPrice = amountConversion(item.price.discounted.value.centAmount)%> <%}else{%>
-        <% unitPrice = amountConversion(item.price.value.centAmount)%> <%}%>
+        <% cart.lineItems.forEach(function(item){ %> <%subTotal = 0.0%> <%if(item.discountedPricePerQuantity && 0 == item.discountedPricePerQuantity.length ){%> <%if(item.price.discounted){%> <% unitPrice = amountConversion(item.price.discounted.value.centAmount, fractionDigits)%> <%}else{%>
+        <% unitPrice = amountConversion(item.price.value.centAmount, fractionDigits)%> <%}%>
         <tr>
           <% if(item.name[locale]) { %>
           <td><%=item.name[locale]%></td>
@@ -200,14 +220,18 @@
           <td><%= item.price.value.currencyCode%> <%= unitPrice%></td>
           <td><%= item.quantity%></td>
           <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
-          <td><%=roundOff(discountAmount)%></td>
+            <% if (cart.lineItems?.discountedPricePerQuantity) { %>
+              <td><%=roundOff(discountAmount, fractionDigits)%></td>
+              <% } else { %>
+              <td>0</td>
+              <% } %>
           <%}%>
-          <td><%=item.totalPrice.currencyCode%> <%=amountConversion(item.totalPrice.centAmount)%></td>
+          <td><%=item.totalPrice.currencyCode%> <%=amountConversion(item.totalPrice.centAmount, fractionDigits)%></td>
           <% currencyCode = item.totalPrice.currencyCode %>
         </tr>
-        <%}else if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length> 0){%> <%item.discountedPricePerQuantity.forEach(function(discountObject){%> <%discountAmount = 0.0%> <%subTotal = 0.0%>
-        <% unitPrice=amountConversion(discountObject.discountedPrice.value.centAmount)%> <%subTotal = unitPrice * discountObject.quantity %> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
-        amountConversion(includedDiscount.discountedAmount.centAmount)*discountObject.quantity%> <%})%>
+        <%}else if(item.discountedPricePerQuantity && 0 < item.discountedPricePerQuantity.length){%> <%item.discountedPricePerQuantity.forEach(function(discountObject){%> <%discountAmount = 0.0%> <%subTotal = 0.0%>
+        <% unitPrice=amountConversion(discountObject.discountedPrice.value.centAmount, fractionDigits )%> <%subTotal = unitPrice * discountObject.quantity %> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
+        amountConversion(includedDiscount.discountedAmount.centAmount, fractionDigits)*discountObject.quantity%> <%})%>
         <tr>
           <% if(item.name[locale]) { %>
           <td><%=item.name[locale]%></td>
@@ -216,11 +240,11 @@
           <% } %>
           <td><%= item.price.value.currencyCode%> <%= unitPrice%></td>
           <td><%= discountObject.quantity%></td>
-          <td><%=roundOff(discountAmount)%></td>
-          <td><%=item.totalPrice.currencyCode%> <%=roundOff(subTotal)%></td>
+          <td><%=roundOff(discountAmount, fractionDigits)%></td>
+          <td><%=item.totalPrice.currencyCode%> <%=roundOff(subTotal, fractionDigits)%></td>
           <% currencyCode = item.totalPrice.currencyCode %>
         </tr>
-        <%}) } })%> <%if(cart.customLineItems.length> 0){%> <% cart.customLineItems.forEach(function(item){ %> <%discountAmount = 0.0 %> <%if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length == 0){%> <% unitPrice=amountConversion(item.money.centAmount)%>
+        <%}) } })%> <%if(0 < cart.customLineItems.length){%> <% cart.customLineItems.forEach(function(item){ %> <%discountAmount = 0.0 %> <%if(item.discountedPricePerQuantity && 0 == item.discountedPricePerQuantity.length){%> <% unitPrice=amountConversion(item.money.centAmount, fractionDigits)%>
         <tr>
           <% if(item.name[locale]) { %>
           <td><%=item.name[locale]%></td>
@@ -230,14 +254,14 @@
           <td><%= item.money.currencyCode%> <%= unitPrice%></td>
           <td><%= item.quantity%></td>
           <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
-          <td><%=roundOff(discountAmount)%></td>
+          <td><%=roundOff(discountAmount, fractionDigits)%></td>
           <%}%>
-          <td><%=item.totalPrice.currencyCode%> <%=amountConversion(item.totalPrice.centAmount)%></td>
+          <td><%=item.totalPrice.currencyCode%> <%=amountConversion(item.totalPrice.centAmount, fractionDigits)%></td>
           <% currencyCode = item.totalPrice.currencyCode %>
         </tr>
-        <%}else if(item.discountedPricePerQuantity && item.discountedPricePerQuantity.length> 0){%> <%item.discountedPricePerQuantity.forEach(function(discountObject){%> <%discountAmount = 0.0%> <%subTotal = 0.0%>
-        <%unitPrice = amountConversion(discountObject.discountedPrice.value.centAmount)%> <%subTotal=unitPrice * discountObject.quantity%> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
-        amountConversion(includedDiscount.discountedAmount.centAmount)*discountObject.quantity%> <%})%>
+        <%}else if(item.discountedPricePerQuantity && 0 < item.discountedPricePerQuantity.length){%> <%item.discountedPricePerQuantity.forEach(function(discountObject){%> <%discountAmount = 0.0%> <%subTotal = 0.0%>
+        <%unitPrice = amountConversion(discountObject.discountedPrice.value.centAmount, fractionDigits)%> <%subTotal=unitPrice * discountObject.quantity%> <%discountObject.discountedPrice.includedDiscounts.forEach(function(includedDiscount){%> <%discountAmount = discountAmount +
+        amountConversion(includedDiscount.discountedAmount.centAmount, fractionDigits)*discountObject.quantity%> <%})%>
         <tr>
           <% if(item.name[locale]) { %>
           <td><%=item.name[locale]%></td>
@@ -246,37 +270,60 @@
           <% } %>
           <td><%= item.money.currencyCode%> <%= unitPrice%></td>
           <td><%= discountObject.quantity%></td>
-          <td><%=roundOff(discountAmount)%></td>
-          <td><%=item.totalPrice.currencyCode%> <%=roundOff(subTotal)%></td>
+          <td><%=roundOff(discountAmount, fractionDigits)%></td>
+          <td><%=item.totalPrice.currencyCode%> <%=roundOff(subTotal, fractionDigits)%></td>
           <% currencyCode=item.totalPrice.currencyCode %>
         </tr>
-        <%}) } }) }%> <% if("Multiple" == cart.shippingMode){%> <% if(0 < cart.shipping.length){ %> <%discountAmount=0.0 %> <% cart.shipping.forEach(function(shippingDetail){ %> <% if(shippingDetail.discountedPrice){%> <% shippingCost =
-        amountConversion(shippingDetail.shippingInfo.discountedPrice.value.centAmount)%> <%if(shippingDetail.shippingInfo.discountedPrice.includedDiscounts){%> <%shippingDetail.shippingInfo.discountedPrice.includedDiscounts.forEach(function(shippingDiscount){%>
-        <%discountAmount=amountConversion(shippingDiscount.discountedAmount.centAmount) +discountAmount%> <%}) }%> <%} else { %> <%shippingCost=amountConversion(shippingDetail.shippingInfo.price.centAmount)%> <%}%>
-        <tr>
-          <td><b>Shipping Cost (<%=shippingDetail.shippingInfo.shippingMethodName %>)</b></td>
-          <td><%=currencyCode%> <%=shippingCost%></td>
-          <td>1</td>
-          <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
-          <td><%=roundOff(discountAmount)%></td>
-          <%}%>
-          <td><%= shippingDetail.shippingInfo.price.currencyCode %> <%=shippingCost%></td>
-        </tr>
-        <%})%> <%} } else {%> <% if(cart.shippingInfo){ %> <%discountAmount=0.0 %> <%if(cart.shippingInfo.discountedPrice){%> <%shippingCost=amountConversion(cart.shippingInfo.discountedPrice.value.centAmount)%> <%if(cart.shippingInfo.discountedPrice.includedDiscounts){%>
-        <%cart.shippingInfo.discountedPrice.includedDiscounts.forEach(function(shippingDiscount){%> <%discountAmount=amountConversion(shippingDiscount.discountedAmount.centAmount) + discountAmount%> <%}) }%> <%}else{%>
-          <%shippingCost=amountConversion(cart.shippingInfo.price.centAmount)%> <%} %>
-        <tr>
-          <td>
-            <b>Shipping Cost (<%= cart.shippingInfo.shippingMethodName %>)</b>
-          </td>
-          <td><%=currencyCode%> <%=shippingCost%></td>
-          <td>1</td>
-          <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
-          <td><%=roundOff(discountAmount)%></td>
-          <%}%>
-          <td><%= cart.shippingInfo.price.currencyCode %> <%=shippingCost%></td>
-        </tr>
-        <% }%> <% } %>
+        <%}) } }) }%> 
+        <% if("Multiple" == cart.shippingMode){%> 
+          <% if(0 < cart.shipping.length){ %> 
+            <% cart.shipping.forEach(function(shippingDetail){ %> 
+              <%discountAmount=0.0 %>
+              <% if(shippingDetail.shippingInfo.discountedPrice){%> 
+                <% shippingCost = amountConversion(shippingDetail.shippingInfo.discountedPrice.value.centAmount, fractionDigits)%> 
+                <%if(shippingDetail.shippingInfo.discountedPrice.includedDiscounts){%> 
+                  <%shippingDetail.shippingInfo.discountedPrice.includedDiscounts.forEach(function(shippingDiscount){%>
+                    <%discountAmount=amountConversion(shippingDiscount.discountedAmount.centAmount, fractionDigits) +discountAmount%> 
+                  <%}) 
+                }%> 
+              <%} else { %> 
+                <%shippingCost=amountConversion(shippingDetail.shippingInfo.price.centAmount, fractionDigits)%> 
+              <%}%>
+              <tr>
+                <td><b>Shipping Cost (<%=shippingDetail.shippingInfo.shippingMethodName %>)</b></td>
+                <td><%=currencyCode%> <%=shippingCost%></td>
+                <td>1</td>
+                <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
+                  <td><%=roundOff(discountAmount, fractionDigits)%></td>
+                <%}%>
+                <td><%= shippingDetail.shippingInfo.price.currencyCode %> <%=shippingCost%></td>
+              </tr>
+            <%})%> 
+          <%} 
+        } else if(cart.shippingInfo){%>  
+            <%discountAmount=0.0 %> 
+            <%if(cart.shippingInfo.discountedPrice){%> 
+              <%shippingCost=amountConversion(cart.shippingInfo.discountedPrice.value.centAmount, fractionDigits)%> 
+              <%if(cart.shippingInfo.discountedPrice.includedDiscounts){%>
+                <%cart.shippingInfo.discountedPrice.includedDiscounts.forEach(function(shippingDiscount){%> 
+                  <%discountAmount=amountConversion(shippingDiscount.discountedAmount.centAmount, fractionDigits) + discountAmount%> 
+                <%}) 
+              }%> 
+            <%}else{%>
+              <%shippingCost=amountConversion(cart.shippingInfo.price.centAmount, fractionDigits)%> 
+            <%} %>
+            <tr>
+              <td>
+                <b>Shipping Cost (<%= cart.shippingInfo.shippingMethodName %>)</b>
+              </td>
+              <td><%=currencyCode%> <%=shippingCost%></td>
+              <td>1</td>
+              <%if(cartDiscount || customLineItemDiscount || shippingDiscount){%>
+                <td><%=roundOff(discountAmount, fractionDigits)%></td>
+              <%}%>
+              <td><%= cart.shippingInfo.price.currencyCode %> <%=shippingCost%></td>
+            </tr>
+        <% } %>
         <tr>
           <td></td>
           <td></td>
@@ -287,7 +334,7 @@
             <b>Total</b>
           </td>
           <td>
-            <b> <%=currencyCode%> <%= amountConversion(cart.totalPrice.centAmount) %> </b>
+            <b> <%=currencyCode%> <%= amountConversion(cart.totalPrice.centAmount, fractionDigits) %> </b>
           </td>
         </tr>
       </table>
@@ -312,7 +359,7 @@
           <% } %>
           <td><%= payments.paymentMethodInfo.method%></td>
           <td><%= payments.paymentMethodInfo.paymentInterface%></td>
-          <td><%=payments.amountPlanned.currencyCode%> <%=amountConversion(payments.amountPlanned.centAmount)%></td>
+          <td><%=payments.amountPlanned.currencyCode%> <%=amountConversion(payments.amountPlanned.centAmount, fractionDigits)%></td>
         </tr>
       </table>
     </div>
@@ -332,7 +379,7 @@
         <tr>
           <td><%= transaction.type%></td>
           <td><%= transaction.state%></td>
-          <td><%= transaction.amount.currencyCode%> <%=amountConversion(transaction.amount.centAmount)%></td>
+          <td><%= transaction.amount.currencyCode%> <%=amountConversion(transaction.amount.centAmount, fractionDigits)%></td>
           <td><%= transaction.interactionId%></td>
           <td><%= transaction.id%></td>
         </tr>
@@ -350,7 +397,7 @@
           <button type="submit" id="captureButton" class="button">Capture</button>
         </form>
         <% } if(authPresent && !capturePresent && !authReversalPresent && !refundPresent){ %>
-        <a class="button" id="auth" href="/authreversal?id=<%=id%>" role="button">Reverse </a>
+        <a class="button" id="auth" href="/authReversal?id=<%=id%>" role="button">Reverse </a>
         <% } if(capturePresent && !authReversalPresent &&((refundPresent && captureAmount) || (!refundPresent && captureAmount))){ %>
         <div class="div-padding">You can refund amount <%= captureAmount%></div>
         <form action="/refund" class="div-padding" id="refundForm">
@@ -430,6 +477,14 @@
           <%}%>
         </tr>
       </table>
+      <% } else if(payments.custom.fields.isv_transientToken) { %>
+        <table class="paymenttable2" id="customTransientTokenTable">
+          <tr>
+            <td><b>Transient Token</b></td>
+            <td><%= payments.custom.fields.isv_transientToken%></td>
+          </tr>
+          
+        </table>
       <% } else { %>
       <table class="paymenttable2" id="customSavedTokensTable">
         <tr>

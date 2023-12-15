@@ -15,15 +15,14 @@ const keys = async (paymentObj) => {
   let isv_tokenCaptureContextSignature = Constants.STRING_EMPTY;
   let isv_tokenVerificationContext = Constants.STRING_EMPTY;
   let midCredentials: any;
-  const format = Constants.PAYMENT_GATEWAY_JWT_FORMAT;
+  let targetOrigins: any;
+  let targetOriginArray: any;
+  let allowedCardNetworksArray = [];
+  let allowedCardNetworks;
   try {
     if (null != paymentObj) {
       const apiClient = new restApi.ApiClient();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
+      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
       midCredentials = await multiMid.getMidCredentials(paymentObj);
       const configObject = {
         authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
@@ -35,19 +34,31 @@ const keys = async (paymentObj) => {
           enableLog: false,
         },
       };
-      var requestObj = new restApi.GeneratePublicKeyRequest();
+      var requestObj = new restApi.GenerateCaptureContextRequest();
       requestObj.encryptionType = Constants.PAYMENT_GATEWAY_ENCRYPTION_TYPE;
-      requestObj.targetOrigin = process.env.PAYMENT_GATEWAY_TARGET_ORIGIN;
-
+      requestObj.targetOrigins = [];
+      targetOrigins = process.env.PAYMENT_GATEWAY_TARGET_ORIGINS;
+      targetOriginArray = targetOrigins.split(Constants.REGEX_COMMA);
+      for (let element of targetOriginArray) {
+        requestObj.targetOrigins.push(element);
+      }
+      if (undefined !== process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS && Constants.STRING_EMPTY !== process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS) {
+        allowedCardNetworks = process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS;
+        allowedCardNetworksArray = allowedCardNetworks.split(Constants.REGEX_COMMA);
+        requestObj.allowedCardNetworks = allowedCardNetworksArray;
+      } else {
+        requestObj.allowedCardNetworks = ['VISA', 'MASTERCARD', 'AMEX', 'MAESTRO', 'CARTESBANCAIRES', 'CUP', 'JCB', 'DINERSCLUB', 'DISCOVER'];
+      }
+      requestObj.clientVersion = "v2.0";
       if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.FLEX_KEYS_REQUEST + JSON.stringify(requestObj));
       }
-      const keyGenerationApiInstance = new restApi.KeyGenerationApi(configObject, apiClient);
+      const microFormIntegrationApiInstance = new restApi.MicroformIntegrationApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        keyGenerationApiInstance.generatePublicKey(format, requestObj, function (error, data, response) {
+        microFormIntegrationApiInstance.generateCaptureContext(requestObj, (error, data, response) => {
           paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.FLEX_KEYS_RESPONSE + JSON.stringify(response));
           if (data) {
-            isv_tokenCaptureContextSignature = data.keyId;
+            isv_tokenCaptureContextSignature = data;
             contextWithoutSignature = isv_tokenCaptureContextSignature.substring(Constants.VAL_ZERO, isv_tokenCaptureContextSignature.lastIndexOf(Constants.REGEX_DOT) + Constants.VAL_ONE);
             parsedContext = jwt_decode(contextWithoutSignature);
             isv_tokenVerificationContext = jwt.sign(parsedContext, process.env.PAYMENT_GATEWAY_VERIFICATION_KEY);
@@ -87,7 +98,7 @@ const keys = async (paymentObj) => {
           }
         });
       }).catch((error) => {
-        return { isv_tokenCaptureContextSignature, isv_tokenVerificationContext };
+        return error;
       });
     } else {
       paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_KEYS, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + paymentObj.id, Constants.ERROR_MSG_INVALID_INPUT);
