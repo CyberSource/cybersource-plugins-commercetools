@@ -474,14 +474,14 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
   let cardTokens: any;
   let cardResponse: any;
   let customerTokenResponse: any;
-  let existingTokens: any;
+  let existingTokens: string[] = [];
   let existingTokensMap: any;
   let newToken: any;
   let parsedTokens: any;
   let tokenData: any;
   let exceptionData: any;
   let failedTokens: any;
-  let existingFailedTokens: any;
+  let existingFailedTokens: string [] = [];
   let existingFailedTokensMap: any;
   let paymentInstrumentId = null;
   let instrumentIdentifier = null;
@@ -629,8 +629,8 @@ const addCardHandler = async (customerId, addressObj, customerObj) => {
       } else {
         paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_ADD_CARD_HANDLER, Constants.LOG_ERROR, Constants.LOG_CUSTOMER_ID + customerId, Constants.ERROR_MSG_INVALID_INPUT);
       }
-    } 
-    
+    }
+
   } catch (exception) {
     if (typeof exception === 'string') {
       exceptionData = Constants.EXCEPTION_MSG_ADDING_A_CARD + Constants.STRING_HYPHEN + exception.toUpperCase();

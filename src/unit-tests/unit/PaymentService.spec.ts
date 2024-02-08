@@ -4,7 +4,7 @@ dotenv.config();
 import paymentService from '../../utils/PaymentService';
 import { fieldMapperFields, fieldMapperFieldObject, getOMServiceResponsePaymentResponse, getOMServiceResponsePaymentResponseObject, getOMServiceResponseTransactionDetail, visaCardDetailsActionVisaCheckoutData, getCapturedAmountRefundPaymentObj } from '../const/PaymentServiceConst';
 import { getAuthResponsePaymentPendingResponse, getAuthResponsePaymentCompleteResponse, getAuthResponsePaymentResponse, getAuthResponsePaymentDeclinedResponse, getAuthResponsePaymentResponseObject, getAuthResponseTransactionDetail } from '../const/PaymentServiceConst';
-import { successState, failureState, changeStateTransactionDetail, changeStateFailureTransactionDetail, getRefundResponseUpdatePaymentObj, getRefundResponseUpdateTransactions } from '../const/PaymentServiceConst';
+import { successState, failureState, changeStateTransactionDetail, changeStateFailureTransactionDetail, getRefundResponseUpdatePaymentObj, getRefundResponseUpdateTransactions, deleteTokenCustomerObj } from '../const/PaymentServiceConst';
 import { payerAuthActionsResponse, payerEnrollActionsUpdatePaymentObj, payerEnrollActionsResponse, addRefundActionAmount, addRefundActionOrderResponse, state } from '../const/PaymentServiceConst';
 import { getUpdateTokenActionsActions, failurePaymentResponse, failureResponseTransactionDetail, getCreditCardResponseUpdatePaymentObj, getCreditCardResponseCartObj, clickToPayResponseUpdatePaymentObj } from '../const/PaymentServiceConst';
 import { getAuthorizedAmountCapturePaymentObj, setCustomTypeDataPendingAmount, setCustomTypeDataTransactionId, googlePayResponseUpdatePaymentObj, tokenCreateFlagCustomerInfo, tokenCreateFlagPaymentObj, tokenCreateFlagFunctionName } from '../const/PaymentServiceConst';
@@ -148,10 +148,14 @@ test.serial('Get payer enroll actions ', async (t) => {
 });
 
 test.serial('Get update token actions ', async (t) => {
-  const result = await paymentService.getUpdateTokenActions(getUpdateTokenActionsActions, null, true, null, null);
+  const result = await paymentService.getUpdateTokenActions(getUpdateTokenActionsActions, null, true, deleteTokenCustomerObj, null);
   if (result) {
-    t.is(result.actions[0].action, 'setCustomType');
-    t.is(result.actions[0].type.key, 'isv_payments_customer_tokens');
+    if(deleteTokenCustomerObj?.custom?.type?.id){
+      t.is(result.actions[0].action, 'setCustomField');
+    } else {
+      t.is(result.actions[0].action, 'setCustomType');
+      t.is(result.actions[0].type.key, 'isv_payments_customer_tokens');
+    }
   } else {
     t.pass();
   }

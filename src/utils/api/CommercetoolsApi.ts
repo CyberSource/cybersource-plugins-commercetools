@@ -534,24 +534,26 @@ const updateCartByPaymentId = async (cartId, paymentId, cartVersion, visaCheckou
 };
 
 const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumentIdentifier, updatePaymentObj, addressId) => {
-  let tokenResponse: any;
+  let tokenResponse = null;
   let customerInfo: any;
   let client: any;
   let tokenData: any;
   let isvTokens: any;
-  let mappedTokens: any;
+  let mappedTokens: string[] = [];
   let exceptionData: any;
-  let failedTokens: any;
+  let failedTokens: string[] = [];
   let stringTokenData: string;
   let length: number;
   let tokenArray: Array<string>;
   let customerId = null;
+  let customTypePresent = false;
   try {
     if (null != paymentInstrumentId && null != instrumentIdentifier && null != updatePaymentObj && Constants.STRING_CUSTOMER in updatePaymentObj && Constants.STRING_ID in updatePaymentObj.customer) {
       customerId = updatePaymentObj.customer.id;
       client = getClient();
       if (null != client && null != customerId) {
         customerInfo = await getCustomer(customerId);
+        customTypePresent = (customerInfo?.custom?.type?.id) ? true : false;
         tokenData = {
           alias: updatePaymentObj.custom.fields.isv_tokenAlias,
           value: tokenCustomerId,
@@ -566,24 +568,27 @@ const setCustomerTokens = async (tokenCustomerId, paymentInstrumentId, instrumen
           timeStamp: new Date(Date.now()).toISOString(),
         };
         stringTokenData = JSON.stringify(tokenData);
-        if (
-          null != customerInfo &&
-          Constants.STRING_CUSTOM in customerInfo &&
-          Constants.STRING_FIELDS in customerInfo.custom &&
-          Constants.ISV_TOKENS in customerInfo.custom.fields &&
-          Constants.STRING_EMPTY != customerInfo.custom.fields.isv_tokens &&
-          Constants.VAL_ZERO < customerInfo.custom.fields.isv_tokens.length
-        ) {
-          failedTokens = customerInfo.custom.fields.isv_failedTokens;
-          isvTokens = customerInfo.custom.fields.isv_tokens;
-          mappedTokens = isvTokens.map((item) => item);
-          length = mappedTokens.length;
-          mappedTokens[length] = stringTokenData;
-          tokenResponse = await setCustomType(customerId, mappedTokens, failedTokens);
-        } else {
+        if (customTypePresent) {
+          if (
+            null != customerInfo &&
+            Constants.STRING_CUSTOM in customerInfo &&
+            Constants.STRING_FIELDS in customerInfo.custom &&
+            Constants.ISV_TOKENS in customerInfo.custom.fields &&
+            Constants.STRING_EMPTY != customerInfo.custom.fields.isv_tokens &&
+            Constants.VAL_ZERO < customerInfo.custom.fields.isv_tokens.length
+          ) {
+            isvTokens = customerInfo.custom.fields.isv_tokens;
+            mappedTokens = isvTokens.map((item) => item);
+            length = mappedTokens.length;
+            mappedTokens[length] = stringTokenData;
+          } else {
+            mappedTokens[0] = stringTokenData;
+          }
           if (null != customerInfo && Constants.STRING_CUSTOM in customerInfo && Constants.STRING_FIELDS in customerInfo.custom) {
             failedTokens = customerInfo.custom.fields.isv_failedTokens;
           }
+          tokenResponse = await updateCustomerToken(mappedTokens, customerInfo, failedTokens);
+        } else {
           tokenArray = [stringTokenData];
           tokenResponse = await setCustomType(customerId, tokenArray, failedTokens);
         }
@@ -1274,6 +1279,61 @@ const addCustomerAddress = async (customerId, addressObj) => {
   return customerResponse;
 };
 
+const updateCustomerToken = async (updateObject, customerObject, failedTokens) => {
+  let setCustomFieldResponse;
+  let actions = [] as any;
+  let exceptionData;
+  let customerId = '';
+  try {
+    if (customerObject) {
+      customerId = customerObject.id
+      const client = getClient();
+      if (null !== client) {
+        const requestBuilder = createRequestBuilder({
+          projectKey: process.env.CT_PROJECT_KEY,
+        });
+        const uri = requestBuilder.customers.byId(customerObject.id).build();
+        if (failedTokens) {
+          actions.push({
+            action: "setCustomField",
+            name: "isv_failedTokens",
+            value: failedTokens
+          });
+        }
+        if (updateObject) {
+          actions.push({
+            action: "setCustomField",
+            name: "isv_tokens",
+            value: updateObject
+          })
+        }
+        const channelsRequest = {
+          uri: uri,
+          method: 'POST',
+          body: JSON.stringify({
+            version: customerObject.version,
+            actions: actions
+          })
+        };
+        setCustomFieldResponse = await client.execute(channelsRequest);
+      } else {
+        paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCustomerToken', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      }
+    }
+  } catch (exception) {
+    if (typeof exception === 'string') {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE + Constants.STRING_HYPHEN + exception.toUpperCase();
+    } else if (exception instanceof Error) {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE + Constants.STRING_HYPHEN + exception.message;
+    } else {
+      exceptionData = Constants.EXCEPTION_MSG_CUSTOMER_UPDATE + Constants.STRING_HYPHEN + exception;
+    }
+    paymentService.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCustomerTokens', Constants.LOG_ERROR, 'CustomerId : ' + customerId, exceptionData);
+    setCustomFieldResponse = exception;
+  }
+  return setCustomFieldResponse;
+}
+
 
 
 export default {
@@ -1299,5 +1359,6 @@ export default {
   addCustomField,
   updateAvailableAmount,
   getCartById,
-  addCustomerAddress
+  addCustomerAddress,
+  updateCustomerToken
 };
