@@ -397,7 +397,7 @@ app.post('/api/extension/payment/update', async (req, res) => {
 });
 
 app.post('/api/extension/customer/update', async (req, res) => {
-  let response: any;
+  let response = paymentService.invalidInputResponse();
   let tokensToUpdate: any;
   let exceptionData: any;
   let microFormKeys: any;
@@ -440,7 +440,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
         } else if ('update' == customFields.isv_tokenAction) {
           response = await paymentHandler.updateCardHandler(tokensToUpdate, customerObj.id, customerObj.obj);
         } else {
-          response = paymentService.getUpdateTokenActions(customFields.isv_tokens, customFields.isv_failedTokens, true, customerObj, null);
+          response = paymentService.getUpdateTokenActions(customFields.isv_tokens, customFields.isv_failedTokens, true, customerObj.obj, null);
         }
       }
     }
@@ -454,7 +454,7 @@ app.post('/api/extension/customer/update', async (req, res) => {
     }
     paymentService.logData(path.parse(path.basename(__filename)).name, Constants.POST_CUSTOMER_UPDATE, Constants.LOG_ERROR, null, exceptionData);
   }
-  if (null == response) {
+  if (null == response || undefined == response || (0 == response?.actions?.length && 0 == response?.errors?.length)) {
     requestObj = req.body.resource;
     if (null != requestObj && typeof requestObj === 'object') {
       customerObj = requestObj;
