@@ -1307,6 +1307,13 @@ const updateCustomerToken = async (updateObject, customerObject, failedTokens) =
             value: updateObject
           })
         }
+        if(customerObject?.custom?.fields?.isv_tokenAction){
+          actions.push({
+            action: "setCustomField",
+            name: "isv_tokenAction",
+            value: null
+          })
+        }
         const channelsRequest = {
           uri: uri,
           method: 'POST',
