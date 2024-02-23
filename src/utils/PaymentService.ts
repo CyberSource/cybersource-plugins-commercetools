@@ -501,7 +501,7 @@ const payerEnrollActions = (response, updatePaymentObj) => {
 
 const getUpdateTokenActions = (actions, existingFailedTokensMap, errorFlag, customerObj, address) => {
   let returnResponse: any;
-  if (customerObj?.custom && customerObj.custom.fields?.isv_tokens) {
+  if (customerObj?.custom?.type?.id) {
     returnResponse = {
       actions: [
         {
@@ -2187,6 +2187,7 @@ const setCustomerTokenData = async (cardTokens, paymentResponse, authResponse, e
   let customerId = null;
   let addressId = null;
   let failedTokenLength = Constants.VAL_ZERO;
+  let customTypePresent = true;
   if (null != cartObj && cartObj?.billingAddress?.id) {
     addressId = cartObj.billingAddress.id;
   }
@@ -2197,6 +2198,7 @@ const setCustomerTokenData = async (cardTokens, paymentResponse, authResponse, e
     } else if (null != cartObj && updatePaymentObj?.custom?.fields?.isv_transientToken) {
       customerInfo = await addTokenAddressForUC(updatePaymentObj, cartObj);
     }
+    customTypePresent = (customerInfo?.custom?.type?.id) ? true : false;
     if (customerInfo?.addresses && 0 < customerInfo.addresses.length ) {
       addressId = customerInfo.addresses[customerInfo.addresses.length - 1].id;
     }
@@ -2275,7 +2277,11 @@ const setCustomerTokenData = async (cardTokens, paymentResponse, authResponse, e
           existingFailedTokensMap = [JSON.stringify(failedToken)];
         }
       }
-      customerTokenResponse = await commercetoolsApi.setCustomType(updatePaymentObj.customer.id, existingTokens, existingFailedTokensMap);
+      if (!customTypePresent) {
+        customerTokenResponse = await commercetoolsApi.setCustomType(updatePaymentObj.customer.id, existingTokens, existingFailedTokensMap);
+      } else {
+        customerTokenResponse = await commercetoolsApi.updateCustomerToken(existingTokens, customerInfo, existingFailedTokensMap);
+      }
       if (null != customerTokenResponse) {
         logData(path.parse(path.basename(__filename)).name, Constants.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_INFO, Constants.LOG_CUSTOMER_ID + updatePaymentObj.customer.id, Constants.SUCCESS_MSG_CARD_TOKENS_UPDATE);
       } else {
@@ -2296,7 +2302,9 @@ const processTokens = async (customerTokenId, paymentInstrumentId, instrumentIde
   let length = Constants.VAL_NEGATIVE_ONE;
   let existingCardFlag = false;
   let customerId = updatePaymentObj.customer.id;
+  let customTypePresent = true;
   customerInfo = await commercetoolsApi.getCustomer(customerId);
+  customTypePresent = (customerInfo?.custom?.type?.id) ? true : false;
   if (
     null != customerInfo &&
     Constants.STRING_CUSTOM in customerInfo &&
@@ -2323,7 +2331,11 @@ const processTokens = async (customerTokenId, paymentInstrumentId, instrumentIde
       parsedTokens.cardExpiryYear = updatePaymentObj.custom.fields.isv_cardExpiryYear;
       parsedTokens.addressId = addressId;
       existingTokensMap[length] = JSON.stringify(parsedTokens);
-      updateTokenResponse = await commercetoolsApi.setCustomType(customerId, existingTokensMap, customerInfo.custom.fields.isv_failedTokens);
+      if (!customTypePresent) {
+        updateTokenResponse = await commercetoolsApi.setCustomType(customerId, existingTokensMap, customerInfo.custom.fields.isv_failedTokens);
+      } else {
+        updateTokenResponse = await commercetoolsApi.updateCustomerToken(existingTokensMap, customerInfo, customerInfo.custom.fields?.isv_failedTokens);
+      }
     }
   }
   if (!existingCardFlag) {
