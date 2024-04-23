@@ -1,6 +1,6 @@
 ##	Creation of the MDD field definition
 
-Below is an example of field definitions for the custom fields merchanDefinedFiled_data1 and merchanDefinedFiled_data2
+Below is an example of field definitions for the custom fields merchantDefinedFiled_data1 and merchantDefinedFiled_data2
 
     {
         "version": {{type-version}},
@@ -8,7 +8,7 @@ Below is an example of field definitions for the custom fields merchanDefinedFil
             {
                 "action": "addFieldDefinition",
                 "fieldDefinition": {
-                    "name": "merchanDefinedFiled_data1",
+                    "name": "merchantDefinedField_data1",
                     "label": {
                         "en": "please provide a value"
                     },
@@ -22,7 +22,7 @@ Below is an example of field definitions for the custom fields merchanDefinedFil
             {
                 "action": "addFieldDefinition",
                 "fieldDefinition": {
-                    "name": "merchanDefinedFiled_data2",
+                    "name": "merchantDefinedField_data2",
                     "label": {
                         "en": "please provide a value"
                     },
@@ -38,19 +38,19 @@ Below is an example of field definitions for the custom fields merchanDefinedFil
 
 ##	Set the values for MDD
 
-Below is an example of setting up the value for merchanDefinedFiled_data1 and merchanDefinedFiled_data2
+Below is an example of setting up the value for merchantDefinedFiled_data1 and merchantDefinedFiled_data2
 
     {
         "version": {{payment-version}},
         "actions": [
             {
                 "action": "setCustomField",
-                "name": "merchanDefinedFiled_data1",
+                "name": "merchantDefinedFiled_data1",
                 "value": "value"
             },
             {
                 "action": "setCustomField",
-                "name": "merchanDefinedFiled_data2",
+                "name": "merchantDefinedFiled_data2",
                 "value": "value"
             }
         ]
@@ -58,7 +58,7 @@ Below is an example of setting up the value for merchanDefinedFiled_data1 and me
 
 ##	Set the value for MDD while creating a payment:
 
-Below is an example of setting the value for merchanDefinedFiled_data1 and merchanDefinedFiled_data2 while creating a payment
+Below is an example of setting the value for merchantDefinedFiled_data1 and merchantDefinedFiled_data2 while creating a payment
 
     {
         "amountPlanned": {
@@ -77,10 +77,9 @@ Below is an example of setting the value for merchanDefinedFiled_data1 and merch
                 "key": "isv_payment_data"
             },
             "fields": {
-                "merchanDefinedFiled_data1": "value",
-                "merchanDefinedFiled_data2": "value"
+                "merchantDefinedFiled_data1": "value",
+                "merchantDefinedFiled_data2": "value"
             }
         },
         "paymentStatus": {}
     }
-

@@ -1,9 +1,10 @@
 import test from 'ava';
 import dotenv from 'dotenv';
+
 dotenv.config();
-import { captureId, captureID, payment, updateTransaction, orderNo } from '../../const/ApplePay/PaymentRefundServiceConstAP';
-import {Constants} from '../../../constants';
+import { Constants } from '../../../constants';
 import refundResponse from '../../../service/payment/PaymentRefundService';
+import { captureID, captureId, orderNo, payment, updateTransaction } from '../../const/ApplePay/PaymentRefundServiceConstAP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -15,18 +16,18 @@ let paymentResponseObject: any = {
   status: null,
 };
 
-test.serial('Refunding a payment and check http code', async (t) => {
-  const result: any = await refundResponse.refundResponse(payment, captureId, updateTransaction, orderNo);
+test.serial('Refunding a payment and check http code', async (t: any) => {
+  let result: any = await refundResponse.refundResponse(payment, captureId, updateTransaction, orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
-    t.is(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Check status for payment refund ', async (t) => {
+test.serial('Check status for payment refund ', async (t: any) => {
   if (paymentResponse.httpCode == 201) {
     t.is(paymentResponse.status, Constants.API_STATUS_PENDING);
   } else {
@@ -34,13 +35,13 @@ test.serial('Check status for payment refund ', async (t) => {
   }
 });
 
-test.serial('Refunding an invalid payment and check http code', async (t) => {
-  const result: any = await refundResponse.refundResponse(payment, captureID, updateTransaction, orderNo);
+test.serial('Refunding an invalid payment and check http code', async (t: any) => {
+  let result: any = await refundResponse.refundResponse(payment, captureID, updateTransaction, orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
-  t.not(paymentResponseObject.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
 });
 
-test.serial('Check status for invalid refund ', async (t) => {
+test.serial('Check status for invalid refund ', async (t: any) => {
   t.not(paymentResponseObject.status, Constants.API_STATUS_PENDING);
 });

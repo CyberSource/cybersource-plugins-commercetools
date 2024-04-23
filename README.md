@@ -6,19 +6,18 @@ Commercetools Cybersource Extension provides payment services based integration 
 - [Overview](#overview)
   - [Extension](#Extension)
 
-
 ## Supported features
-- Cybersource based payment methods like Credit Card, 3D Secure, Visa Click to Pay, Google Pay, eCheck & Apple Pay.
+- Cybersource based payment methods like Card Payment, 3D Secure, Visa Click to Pay, Google Pay, eCheck & Apple Pay.
 - [Tokenization](./docs/Tokenization.md) to create, update and delete a card token.
 - [Refunding](./docs/Refund-a-Payment.md) a payment back to the merchant.
 - Authorization [Cancellation](./docs/Reverse-a-Payment.md) on a payment that has not yet been captured.
 - [Manual capture](./docs/Capture-a-Payment.md) of a payment.
 - [Synchronize payments](./docs/Synchronizing-Payments.md) for synchronizing the missing transactions and fraud transactions based on the decision taken by the merchant.
+- [Network Tokenization](./Network-Tokenization.md) for updating the customer tokens through Webhook notifications
 
 ## Overview
 This repository contains one standalone module that interact with Commercetools and Cybersource.
  
-
 ![Architecture](./docs/images/High-Level-Architecture.svg)
 
 1. Front end can be any module which is supported by Commercetools. Refer [create payment](./docs/Creating-a-Payment.md) to know more about the fields that needs to be passed when a payment is created for each of the payment method.

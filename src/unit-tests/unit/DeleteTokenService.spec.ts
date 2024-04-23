@@ -1,30 +1,35 @@
 import test from 'ava';
 import dotenv from 'dotenv';
+
 dotenv.config();
-import {Constants} from '../../constants';
+import { Constants } from '../../constants';
 import deleteToken from '../../service/payment/DeleteTokenService';
-import { customerTokenObj } from '../const/DeleteTokenServiceConst';
+import { customerInvalidPaymentTokenObj, customerInvalidTokenObj, customerTokenObj } from '../const/DeleteTokenServiceConst';
 
-var result: any = {
+let result: any = {
   httpCode: null,
   deletedToken: null,
   message: null,
 };
 
-var resultObject: any = {
-  httpCode: null,
-  deletedToken: null,
-  message: null,
-};
-
-test.serial('Deleting a token and check http code', async (t) => {
-  const response: any = await deleteToken.deleteCustomerToken(customerTokenObj);
+test.serial('Deleting a token and check http code', async (t: any) => {
+  let response: any = await deleteToken.deleteCustomerToken(customerTokenObj);
   result.httpCode = response.httpCode;
-  result.deletedToken = response.deletedToken;
-  result.message = response.message;
-  if (Constants.HTTP_CODE_TWO_HUNDRED_FOUR == result.httpCode) {
-    t.is(result.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_FOUR);
+  if (Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE == result.httpCode) {
+    t.is(result.httpCode, Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE);
   } else {
-    t.not(resultObject.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_FOUR);
+    t.not(result.httpCode, Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE);
   }
+});
+
+test.serial('Deleting a token with invalid token value and check http code', async (t: any) => {
+  let response: any = await deleteToken.deleteCustomerToken(customerInvalidTokenObj);
+  result.httpCode = response.httpCode;
+  t.not(result.httpCode, Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE);
+});
+
+test.serial('Deleting a token with invalid payment token value and check http code', async (t: any) => {
+  let response: any = await deleteToken.deleteCustomerToken(customerInvalidPaymentTokenObj);
+  result.httpCode = response.httpCode;
+  t.not(result.httpCode, Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE);
 });

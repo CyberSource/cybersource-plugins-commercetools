@@ -47,30 +47,20 @@ Here is a list of everything you need to have before proceeding with deployment:
 
              az storage account create --name <Globally_Unique_Storage_Account_Name> --location "<Location_Name>" --resource-group <Resource_Group_Name>
 
-    4.  Create Storage Container by entering below command. This container will be useful for storing log files. Use `Globally_Unique_Storage_Account_Name` created in above step.
-
-             az storage container create -n <Storage_Container_Name> --account-name <Globally_Unique_Storage_Account_Name>
-
-    5.  Create a function app by entering below command. Use `Resource_Group_Name`, `Location_Name` & `Globally_Unique_Storage_Account_Name` created in above steps.
+    4.  Create a function app by entering below command. Use `Resource_Group_Name`, `Location_Name` & `Globally_Unique_Storage_Account_Name` created in above steps.
 
              az functionapp create --resource-group <Resource_Group_Name> --consumption-plan-location <Location_Name> --runtime node --functions-version 4 --name <Globally_Unique_Function_App_Name> --storage-account <Globally_Unique_Storage_Account_Name>
 
-    6.  Deploy your zip file to the function app, by entering below command. Use `Resource_Group_Name` and `Globally_Unique_Function_App_Name` created in above commands.
+    5.  Deploy your zip file to the function app, by entering below command. Use `Resource_Group_Name` and `Globally_Unique_Function_App_Name` created in above commands.
 
-             az functionapp deployment source config-zip -g <Resource_Group_Name> -n <Globally_Unique_Function_App_Name> --src ctPlugin.zip
+             az functionapp deployment source config-zip -g <Resource_Group_Name> -n <Globally_Unique_Function_App_Name> --src ctExtension.zip
 
 Your application is now available at `https://<Globally_Unique_Function_App_Name>.azurewebsites.net`
 
 ## Loggers in Azure
 
-- Login to the Azure Portal
-- Navigate to the Created `Storage Account` -> `Containers` and choose the container which was created earlier.
-- To provide permission for storing log file, navigate to `Settings` -> `Shared Access Tokens`, choose `Read`, `Add`, `Create` and `Write` from the `Permissions` drop down and choose Date and Time for `Start` and `Expiry` and click on `Generate SAS token and URL`.
-
-  **_NOTE:_** Generated token will be valid for the specific interval as mentioned in `Start` and `Expiry` field.
-
-- Provide the above generated URL for `AZURE_CONTAINER_URL` environment variable.
-- Log files will be stored under `Storage Account` -> `Containers`. To see content of log files, click on the file name and `Download` button.
+- In order to see the extension logs, add a console.log statement inside the `logData` function in PaymentUtils.ts file. The logs can be found in your Azure Function, under `Monitoring` --> `Log Stream`
+> **_NOTE:_** Logs displayed here will not be stored permanently
 
 ## Modifying Environment Variables
 

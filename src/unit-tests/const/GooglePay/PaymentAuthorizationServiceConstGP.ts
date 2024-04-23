@@ -1,5 +1,5 @@
-import googlePay from '../../JSON/googlePay.json';
 import creditCard from '../../JSON/creditCard.json';
+import googlePay from '../../JSON/googlePay.json';
 export const payment = {
   id: '33e68f3d-8143-4d07-ac13-2314c7039251',
   version: 2,
@@ -354,7 +354,8 @@ export const payments = {
     },
     fields: {
       isv_deviceFingerprintId: '8a22fb00-dc63-496b-b0de-9f1d1fd36a50',
-      isv_token:'eyJzaWduYXR1cmUiOiJNRVFDSUQ0RmI3YTJNUndKMjJGL3BCRVBZaFA2ZHdtN2R6VWt4bVQ2MGVKMEpPOHRBaUJyOFNvZVd5TTRxTmt5N3ltbDZOektqMjlFSzNoZlk2SGs4bURTbm1YRmF3XHUwMDNkXHUwMDNkIiwicHJvdG9jb2xWZXJzaW9uIjoiRUN2MSIsInNpZ25lZE1lc3NhZ2UiOiJ7XCJlbmNyeXB0ZWRNZXNzYWdlXCI6XCJYNFluRmpqeFMzRk92Z2NxYkh5OGFpdC93N2UvMmZJcG5kWlVXZ3pmR2FiUE9kbHhKRWFKK3JnL2xCWWU4dVh6RkZEb2loQWU1bnJlSFN0RUVVR2dBcEVZMW1uWkxmWkplZTB0WXNLOWVZeTVBYVkvNEdQR2s3ZVZ3TlllTWhCY01ZeWUwMjN5bUZOL1VzMmtNeUFqRFlGNkFPQkRRK0tUNTQrbzMwNGptdFkzdzV0R1NYOWtPZnFuU3V0aFFYMFlXVVVHUU0wSmdQL2duMW5WSDFJeFNyTmpmbHFtY1k5MWlWSk5ZTXB1a1E1WmFieEhlaTQvcDFYVXppNUcyVEZSN1RhaEM3UTJGRWpqeGs2d3o3cWJkMUhBNlg0RUE3TnEzMjFHTm1LaFAyQVZPVmtqRy9ZVW5VSWNJQlNMb3BmZVhPYWxMVFVsdnR2ZDN1QkUzTDhRcTFyVHIxSnE2UCtVaFJSY1doRXlsVVNvbkxURGlqM0cxVFNCSTJ1UVZUd2U4RXVjbThaNDYzZnJUOVNpQjlCc0NGeVZzM25mNC9aa0pIckNmemVvSFVzdTVkYklrNFMzNDRqRG1iZVhSM3hVSjVlNVwiLFwiZXBoZW1lcmFsUHVibGljS2V5XCI6XCJCQ3hCRk5LV3NBZUwyQ0NGR2hVRWptOFBVbmxVZWdmYlFYNWRQdy9KSGIvUGVPL3QxZ3FuYlpoYlRrU2tlOE93akU5UUwraFBiNzNEN0llQlNKMDNkN0FcXHUwMDNkXCIsXCJ0YWdcIjpcIkYvMzJpb2o4blNtdU5ZU3JIYUdTeEkzYWR5a3pSSVNQUmMvQVlHSldoREVcXHUwMDNkXCJ9In0',
+      isv_token:
+        'eyJzaWduYXR1cmUiOiJNRVFDSUQ0RmI3YTJNUndKMjJGL3BCRVBZaFA2ZHdtN2R6VWt4bVQ2MGVKMEpPOHRBaUJyOFNvZVd5TTRxTmt5N3ltbDZOektqMjlFSzNoZlk2SGs4bURTbm1YRmF3XHUwMDNkXHUwMDNkIiwicHJvdG9jb2xWZXJzaW9uIjoiRUN2MSIsInNpZ25lZE1lc3NhZ2UiOiJ7XCJlbmNyeXB0ZWRNZXNzYWdlXCI6XCJYNFluRmpqeFMzRk92Z2NxYkh5OGFpdC93N2UvMmZJcG5kWlVXZ3pmR2FiUE9kbHhKRWFKK3JnL2xCWWU4dVh6RkZEb2loQWU1bnJlSFN0RUVVR2dBcEVZMW1uWkxmWkplZTB0WXNLOWVZeTVBYVkvNEdQR2s3ZVZ3TlllTWhCY01ZeWUwMjN5bUZOL1VzMmtNeUFqRFlGNkFPQkRRK0tUNTQrbzMwNGptdFkzdzV0R1NYOWtPZnFuU3V0aFFYMFlXVVVHUU0wSmdQL2duMW5WSDFJeFNyTmpmbHFtY1k5MWlWSk5ZTXB1a1E1WmFieEhlaTQvcDFYVXppNUcyVEZSN1RhaEM3UTJGRWpqeGs2d3o3cWJkMUhBNlg0RUE3TnEzMjFHTm1LaFAyQVZPVmtqRy9ZVW5VSWNJQlNMb3BmZVhPYWxMVFVsdnR2ZDN1QkUzTDhRcTFyVHIxSnE2UCtVaFJSY1doRXlsVVNvbkxURGlqM0cxVFNCSTJ1UVZUd2U4RXVjbThaNDYzZnJUOVNpQjlCc0NGeVZzM25mNC9aa0pIckNmemVvSFVzdTVkYklrNFMzNDRqRG1iZVhSM3hVSjVlNVwiLFwiZXBoZW1lcmFsUHVibGljS2V5XCI6XCJCQ3hCRk5LV3NBZUwyQ0NGR2hVRWptOFBVbmxVZWdmYlFYNWRQdy9KSGIvUGVPL3QxZ3FuYlpoYlRrU2tlOE93akU5UUwraFBiNzNEN0llQlNKMDNkN0FcXHUwMDNkXCIsXCJ0YWdcIjpcIkYvMzJpb2o4blNtdU5ZU3JIYUdTeEkzYWR5a3pSSVNQUmMvQVlHSldoREVcXHUwMDNkXCJ9In0',
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '106.202.150.94',
       isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
@@ -370,13 +371,16 @@ export const cardTokens = {
   paymentInstrumentId: creditCard.savedToken,
 };
 
-export const guestCardTokens = null;
+export const guestCardTokens = {
+  customerTokenId: '',
+  paymentInstrumentId: '',
+};
 
-export const dontSaveTokenFlag = false;
+export const notSaveToken = false;
 
 export const payerAuthMandateFlag = false;
 
-export const orderNo = null;
+export const orderNo = '';
 
 export const orderNumber = '10';
 
@@ -404,11 +408,11 @@ export const shippingCart = {
     {
       id: '77197bf1-a747-499b-88e4-df16ff235f9f',
       productId: 'c28cfa09-801e-4309-8e2e-edf39f85ddf2',
-      "name": {
-        "en": "sandalen “Aubrey” Michael Kors brown",
-        "de": "sandalen “Aubrey” Michael Kors brown",
-        "en-US": "sandalen “Aubrey” Michael Kors brown",
-        "de-DE": "sandalen “Aubrey” Michael Kors brown"
+      name: {
+        en: 'sandalen Aubrey Michael Kors brown',
+        de: 'sandalen Aubrey Michael Kors brown',
+        'en-US': 'sandalen Aubrey Michael Kors brown',
+        'de-DE': 'sandalen Aubrey Michael Kors brown',
       },
       productType: {
         typeId: 'product-type',
@@ -416,8 +420,8 @@ export const shippingCart = {
         version: 1,
       },
       productSlug: {
-        'en': 'a5',
-        'de': 'a5',
+        en: 'a5',
+        de: 'a5',
         'en-US': 'a5',
         'de-DE': 'a5',
       },
@@ -674,66 +678,65 @@ export const shippingCart = {
 };
 
 export const ucPayment = {
-  "id": "1fa9dc70-4007-4520-9268-a90992285a5c",
-  "version": 2,
-  "versionModifiedAt": "2023-08-10T07:52:49.107Z",
-  "lastMessageSequenceNumber": 2,
-  "createdAt": "2023-08-10T07:52:49.107Z",
-  "lastModifiedAt": "2023-08-10T07:52:49.107Z",
-  "lastModifiedBy": {
-      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
-      "isPlatformClient": false,
-      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  id: '1fa9dc70-4007-4520-9268-a90992285a5c',
+  version: 2,
+  versionModifiedAt: '2023-08-10T07:52:49.107Z',
+  lastMessageSequenceNumber: 2,
+  createdAt: '2023-08-10T07:52:49.107Z',
+  lastModifiedAt: '2023-08-10T07:52:49.107Z',
+  lastModifiedBy: {
+    clientId: 'vjOtikmRR04ldgMx3H3Dgc63',
+    isPlatformClient: false,
+    anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
   },
-  "createdBy": {
-      "clientId": "vjOtikmRR04ldgMx3H3Dgc63",
-      "isPlatformClient": false,
-      "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
+  createdBy: {
+    clientId: 'vjOtikmRR04ldgMx3H3Dgc63',
+    isPlatformClient: false,
+    anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
   },
-  "amountPlanned": {
-      "type": "centPrecision",
-      "currencyCode": "USD",
-      "centAmount": 5000,
-      "fractionDigits": 2
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 5000,
+    fractionDigits: 2,
   },
-  "paymentMethodInfo": {
-      "paymentInterface": "cybersource",
-      "method": "googlePay",
-      "name": {
-          "en": "Google Pay"
-      }
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'googlePay',
+    name: {
+      en: 'Google Pay',
+    },
   },
-  "custom": {
-      "type": {
-          "typeId": "type",
-          "id": "919acdd9-f671-4a83-ad81-2b01caa72250"
+  custom: {
+    type: {
+      typeId: 'type',
+      id: '919acdd9-f671-4a83-ad81-2b01caa72250',
+    },
+    fields: {
+      isv_transientToken: googlePay.isv_transientToken,
+      isv_deviceFingerprintId: 'a82beccd-0fc0-48f8-a84e-0151709df8c8',
+      isv_merchantId: 'visa_isv_opencart_pmt_101',
+      isv_saleEnabled: false,
+      isv_acceptHeader: '*/*',
+      isv_customerIpAddress: '192.140.152.21',
+      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+    },
+  },
+  paymentStatus: {},
+  transactions: [
+    {
+      id: 'acc4bb4a-880d-49cb-8880-b1dc456e0a20',
+      timestamp: '2023-08-10T07:52:51.661Z',
+      type: 'Authorization',
+      amount: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 5000,
+        fractionDigits: 2,
       },
-      "fields": {
-          "isv_transientToken": googlePay.ïsv_transientToken,
-          "isv_deviceFingerprintId": "a82beccd-0fc0-48f8-a84e-0151709df8c8",
-          "isv_merchantId": "visa_isv_opencart_pmt_101",
-          "isv_saleEnabled": false,
-          "isv_acceptHeader": "*/*",
-          "isv_customerIpAddress": "192.140.152.21",
-          "isv_userAgentHeader": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-      }
-  },
-  "paymentStatus": {},
-  "transactions": [
-      {
-          "id": "acc4bb4a-880d-49cb-8880-b1dc456e0a20",
-          "timestamp": "2023-08-10T07:52:51.661Z",
-          "type": "Authorization",
-          "amount": {
-              "type": "centPrecision",
-              "currencyCode": "USD",
-              "centAmount": 5000,
-              "fractionDigits": 2
-          },
-          "state": "Initial"
-      }
+      state: 'Initial',
+    },
   ],
-  "interfaceInteractions": [],
-  "anonymousId": "9f414dca-2701-400f-86ad-f1af98d6a81a"
-}
-
+  interfaceInteractions: [],
+  anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
+};

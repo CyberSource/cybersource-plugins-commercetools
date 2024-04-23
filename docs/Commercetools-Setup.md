@@ -17,9 +17,11 @@
 
 The customizations below are required for the API Extension to work correctly. JSON versions of these definitions are available in src/resources folder of the extension and can be run as an endpoint to load them into Commercetools.
 
-> **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms or 4000ms. Once approved by Commercetools support team, if the timeout is 4000ms, change the timeout to 4000 in src --> resources --> customer_update_extension.json before creating the extensions. Otherwise, the customer update extension will have a timeout of 3000ms</li></ul>
+> **_NOTE:_** <ul><li>The extension timeout of 10000ms is required for Payment create and update API</li><li>Commercetools by default will have 2000ms for Customer update API, contact Commercetools support team to increase the timeout to 3000ms or 4000ms. Once approved by Commercetools support team, if the timeout is 3000/4000 ms, change the timeout to 3000/4000 in src --> resources --> customer_update_extension.json before creating the extensions. Otherwise, the customer update extension will have a timeout of 2000ms</li></ul>
 
 # API Extension Setup
+
+> **_NOTE:_** It is always recommented to use HTTPS endpoints for the extension. In case, if the extension is hosted in VM, leverage the reverse proxy to use HTTPS protocol.
 
 ## Payment Create
 
@@ -99,6 +101,7 @@ Fields
 | isv_tokenAction                  | String         | false    |
 | isv_tokenUpdated                 | Boolean        | false    |
 | isv_failedTokens                 | Set of Strings | false    |
+| is_customerId                 | String | false    |
 
 ### Payment Data
 
@@ -241,7 +244,6 @@ Below is the Endpoint to create the extensions and the custom fields for the pay
 | Endpoint	| Note |
 |---------------------|--------------|
 | {baseUrl}/configureExtension	| The baseUrl will be defined by where you deploy the Extension. HTTPS should be used for production. See [API Extension Setup](API-Extension-Setup.md#configuration) to know the values to be passed for the fields required before running the script |
-
 
 This can be done by following any of the steps:
 

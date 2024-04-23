@@ -1,68 +1,49 @@
-import restApi from 'cybersource-rest-client';
 import path from 'path';
-import jwtDecode from 'jwt-decode';
-import { Constants } from '../../constants';
-import paymentService from '../../utils/PaymentService';
-import multiMid from '../../utils/config/MultiMid';
 
-const payerAuthSetupResponse = async (payment, cardTokens) => {
-  let runEnvironment: any;
-  let jtiToken: any;
-  let errorData: any;
-  let exceptionData: any;
-  let paymentResponse = {
-    accessToken: null,
-    referenceId: null,
-    deviceDataCollectionUrl: null,
-    httpCode: null,
-    transactionId: null,
+import restApi from 'cybersource-rest-client';
+
+import { Constants } from '../../constants';
+import { paymentType, responseType } from '../../types/Types';
+import paymentUtils from '../../utils/PaymentUtils';
+import prepareFields from '../../utils/PrepareFields';
+
+const payerAuthSetupResponse = async (payment: paymentType, customerTokenId: string) => {
+  const paymentResponse = {
+    accessToken: '',
+    referenceId: '',
+    deviceDataCollectionUrl: '',
+    httpCode: 0,
+    transactionId: '',
+    status: '',
+  };
+  let errorData = {
+    id: null,
     status: null,
   };
-  let midCredentials: any;
   try {
-    if (null != payment) {
+    if (payment) {
       const apiClient = new restApi.ApiClient();
-      var requestObj = new restApi.PayerAuthSetupRequest();
-      runEnvironment = (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      midCredentials = await multiMid.getMidCredentials(payment);
-      const configObject = {
-        authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
-        runEnvironment: runEnvironment,
-        merchantID: midCredentials.merchantId,
-        merchantKeyId: midCredentials.merchantKeyId,
-        merchantsecretKey: midCredentials.merchantSecretKey,
-        logConfiguration: {
-          enableLog: false,
-        },
-      };
-      var clientReferenceInformation = new restApi.Riskv1decisionsClientReferenceInformation();
-      clientReferenceInformation.code = payment.id;
-      requestObj.clientReferenceInformation = clientReferenceInformation;
-      var clientReferenceInformationpartner = new restApi.Riskv1decisionsClientReferenceInformationPartner();
-      clientReferenceInformationpartner.solutionId = Constants.PAYMENT_GATEWAY_PARTNER_SOLUTION_ID;
-      clientReferenceInformation.partner = clientReferenceInformationpartner;
-      requestObj.clientReferenceInformation = clientReferenceInformation;
+      const configObject = await prepareFields.getConfigObject('FuncPayerAuthSetupResponse', null, payment, null);
+      const requestObj = new restApi.PayerAuthSetupRequest();
+
+      requestObj.clientReferenceInformation = await prepareFields.getClientReferenceInformation('FuncPayerAuthSetupResponse', payment.id);
+      const tokenInformation = await prepareFields.getTokenInformation(payment, 'FuncPayerAuthSetupResponse');
       if (payment?.custom?.fields?.isv_savedToken) {
-        var paymentInformation = new restApi.Riskv1authenticationsetupsPaymentInformation();
-        var paymentInformationCustomer = new restApi.Riskv1authenticationsetupsPaymentInformationCustomer();
-        paymentInformationCustomer.id = cardTokens.customerTokenId;
-        paymentInformation.customer = paymentInformationCustomer;
+        const paymentInformation = await prepareFields.getPaymentInformation('FuncPayerAuthSetupResponse', payment, null, customerTokenId);
         requestObj.paymentInformation = paymentInformation;
       } else {
-        jtiToken = (payment?.custom?.fields?.isv_transientToken) ? jwtDecode(payment.custom.fields.isv_transientToken) : jtiToken = jwtDecode(payment.custom.fields.isv_token);
-        var tokenInformation = new restApi.Riskv1authenticationsetupsTokenInformation();
-        tokenInformation.transientToken = jtiToken.jti;
         requestObj.tokenInformation = tokenInformation;
       }
-      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_REQUEST + JSON.stringify(requestObj));
+
+      if (Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
+        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Payer Authentication Setup Request = ' + JSON.stringify(requestObj));
       }
       const payerAuthenticationApiInstance = new restApi.PayerAuthenticationApi(configObject, apiClient);
-      return await new Promise(function (resolve, reject) {
-        payerAuthenticationApiInstance.payerAuthSetup(requestObj, function (error, data, response) {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_RESPONSE + JSON.stringify(response));
+      return await new Promise<responseType>(function (resolve, reject) {
+        payerAuthenticationApiInstance.payerAuthSetup(requestObj, function (error: any, data: any, response: any) {
+          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Payer Authentication Setup Response = ' + JSON.stringify(response));
           if (data) {
-            paymentResponse.httpCode = response[Constants.STATUS_CODE];
+            paymentResponse.httpCode = response[Constants.STATUS_CODE] || response['status'];
             paymentResponse.transactionId = data.id;
             paymentResponse.status = data.status;
             paymentResponse.accessToken = data.consumerAuthenticationInformation.accessToken;
@@ -70,25 +51,17 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
             paymentResponse.deviceDataCollectionUrl = data.consumerAuthenticationInformation.deviceDataCollectionUrl;
             resolve(paymentResponse);
           } else if (error) {
-            if (
-              error.hasOwnProperty(Constants.STRING_RESPONSE) &&
-              null != error.response &&
-              Constants.VAL_ZERO < Object.keys(error.response).length &&
-              error.response.hasOwnProperty(Constants.STRING_TEXT) &&
-              null != error.response.text &&
-              Constants.VAL_ZERO < Object.keys(error.response.text).length
-            ) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
-              errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
-              paymentResponse.transactionId = errorData.id;
-              paymentResponse.status = errorData.status;
-            } else {
-              if (typeof error === 'object') {
-                errorData = JSON.stringify(error);
-              } else {
-                errorData = error;
+            if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
+              paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', Constants.LOG_ERROR, 'PaymentId : ' + payment.id, error.response.text);
+              errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
+              if (errorData?.id && errorData?.status) {
+                paymentResponse.transactionId = errorData.id;
+                paymentResponse.status = errorData.status;
               }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, errorData);
+            } else {
+              let errorDataObj;
+              typeof error === 'object' ? (errorDataObj = JSON.stringify(error)) : (errorDataObj = error);
+              paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', Constants.LOG_ERROR, 'PaymentId : ' + payment.id, errorDataObj);
             }
             paymentResponse.httpCode = error.status;
             reject(paymentResponse);
@@ -100,21 +73,11 @@ const payerAuthSetupResponse = async (payment, cardTokens) => {
         return error;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', Constants.LOG_INFO, 'PaymentId : ', Constants.ERROR_MSG_INVALID_INPUT);
       return paymentResponse;
     }
   } catch (exception) {
-    if (typeof exception === 'string') {
-      exceptionData = exception.toUpperCase();
-    } else if (exception instanceof Error) {
-      exceptionData = exception.message;
-    } else {
-      exceptionData = exception;
-    }
-    if (Constants.EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED == exceptionData || Constants.EXCEPTION_MERCHANT_KEY_ID_REQUIRED == exceptionData) {
-      exceptionData = Constants.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET + midCredentials.merchantId;
-    }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, exceptionData);
+    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', '', exception, payment.id, 'PaymentId : ', '');
     return paymentResponse;
   }
 };

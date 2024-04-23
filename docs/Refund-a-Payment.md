@@ -20,7 +20,6 @@ To refund a payment:
   - If there is more than one capture transaction available with same amount as requested refund amount, then the Id of very first capture transaction is used to perform refund
   - If none of the capture transaction's amount matches with the requested refund amount, then multiple refunds will be triggered using different capture transactions added
    
-
 Refund Response Handling
 
 - A successful refund will change the INITIAL REFUND to a SUCCESS REFUND transaction, adding the Credit Request Id onto the transaction as an `interactionId` when any capture transaction amount is equal to requested refund amount

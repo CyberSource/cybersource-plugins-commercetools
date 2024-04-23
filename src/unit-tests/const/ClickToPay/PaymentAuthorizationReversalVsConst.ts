@@ -472,11 +472,11 @@ export const shippingCart = {
     {
       id: '77197bf1-a747-499b-88e4-df16ff235f9f',
       productId: 'c28cfa09-801e-4309-8e2e-edf39f85ddf2',
-      "name": {
-        "en": "sandalen “Aubrey” Michael Kors brown",
-        "de": "sandalen “Aubrey” Michael Kors brown",
-        "en-US": "sandalen “Aubrey” Michael Kors brown",
-        "de-DE": "sandalen “Aubrey” Michael Kors brown"
+      name: {
+        en: 'sandalen Aubrey Michael Kors brown',
+        de: 'sandalen Aubrey Michael Kors brown',
+        'en-US': 'sandalen Aubrey Michael Kors brown',
+        'de-DE': 'sandalen Aubrey Michael Kors brown',
       },
       productType: {
         typeId: 'product-type',
@@ -484,8 +484,8 @@ export const shippingCart = {
         version: 1,
       },
       productSlug: {
-        'en': 'a5',
-        'de': 'a5',
+        en: 'a5',
+        de: 'a5',
         'en-US': 'a5',
         'de-DE': 'a5',
       },
@@ -769,14 +769,16 @@ export const multipleShippingPayment = {
     fields: {
       isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
       isv_cardExpiryYear: '2030',
-      isv_token:'eyJraWQiOiIwOG5aU1BESXFHRnZpaElMWEVxcEdkUG5lbUVUZXkySCIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAzMCIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTYzNTIzMTM5NCwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTYzNTIzMDQ5NCwianRpIjoiMUU2NTZWNThZVjVUS0hQUU1aTFdaMVlPWU1NNjhWWFNSOEpQTllGOFVFSTAzWFlYTTNCRDYxNzdBNkEyMEU5MiIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDMwIn0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.U-4A01seF4P9kXQLcNTivdWgYokoRUkjus9pujmNjVx4UOWSxRdp_FnCnt93H7_cEH7eZ46grEiYwyDwbCLYmar4zvzadhaMw0LG3L2_nchCO8GDUoroqpChMdgJ269iKg5EsFTQffMYGCc4FfNkHPn1E1_s_n47VDcqKvidAhryQvb16EsOVoheREE_d8fh8ltad32zwSnXcAyXKu_Zj2XFdhzIyq9Yf_ZTN1vlkMCyDEqpGZ-IX-sWdNFrsoU8L7RDeCNnknzl7JUy4usLo6lIf4vq-BgFrHc3b2W_q2CBqMvylixNlblDGChkB743TXXKR9iFrs3ajYXjHdZztA',
+      isv_token:
+        'eyJraWQiOiIwOG5aU1BESXFHRnZpaElMWEVxcEdkUG5lbUVUZXkySCIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAzMCIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTYzNTIzMTM5NCwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTYzNTIzMDQ5NCwianRpIjoiMUU2NTZWNThZVjVUS0hQUU1aTFdaMVlPWU1NNjhWWFNSOEpQTllGOFVFSTAzWFlYTTNCRDYxNzdBNkEyMEU5MiIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDMwIn0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.U-4A01seF4P9kXQLcNTivdWgYokoRUkjus9pujmNjVx4UOWSxRdp_FnCnt93H7_cEH7eZ46grEiYwyDwbCLYmar4zvzadhaMw0LG3L2_nchCO8GDUoroqpChMdgJ269iKg5EsFTQffMYGCc4FfNkHPn1E1_s_n47VDcqKvidAhryQvb16EsOVoheREE_d8fh8ltad32zwSnXcAyXKu_Zj2XFdhzIyq9Yf_ZTN1vlkMCyDEqpGZ-IX-sWdNFrsoU8L7RDeCNnknzl7JUy4usLo6lIf4vq-BgFrHc3b2W_q2CBqMvylixNlblDGChkB743TXXKR9iFrs3ajYXjHdZztA',
       isv_customerIpAddress: '106.202.150.94',
       isv_maskedPan: '411111XXXXXX1111',
       isv_cardExpiryMonth: '01',
       isv_acceptHeader: '*/*',
       isv_cardType: '001',
       isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
-      isv_tokenVerificationContext:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiI3cUE5TzduOU81YjEremZ5c2VyWUloQUFFQ0hDMFhiaVZDY3o2a0plQ0VxMjdMNHZFbnV5MHdGclFyTkhGTkVYRWdGcE1sak43MG8rNy9KNjkvdWhTK3gyTFB2a0FvKzZRdUxja1JhM01nbmRNN0FQb3VSV1BqWkEzaG9yeWJ6MGNlWFAiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJrYlU5MXBmTVR0U1htUDBlMjN4dnFtaDdmdFZyS3Q4WEFHaEhIX3pYbGFqSnBxbG1sTklYUHJOaTA1Q0FSS1hiSVc5cHNaU2xPUEUwMGNlSEtsVXhWWkVnbVVxZHZtczItbk5wZzgxeE1XLTU2Q2tHaG53N281Vk9RdllVakhCcDl5MzFPNjMzaHRqeFZkMGEyRG9WX3kyNHIxNFZzcTFVaFVzX0VEdUY2U0pLQ0pnODlKVzhXcW1SblB0VTVDb2hHRUNqWm5NSVYtM3ByUkNUY3U5VTZtWko5SlhQYktjeUZvZ3NRakozeWs4OVRQOTE4bm5Mc3ozbzRXZTNnWFpvOWFScXBPem5EWlRTbkJ3akNneUNfSUtqNm5XV2Vvc0VHc21NZ3B1VnUwbVJzSDNhdG01OGo5SW5qN2dmcVc5MXdYenZWVElpWjU4aW4wSW9MU3BOSXciLCJraWQiOiIwODV3dGJMZXN5dlJFMVc2QllTV3BISERtQk9LMTVReCJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2MzQxMDk3MzksImlhdCI6MTYzNDEwODgzOSwianRpIjoiM2pTZVZLR3R2UGZ5QU1DaSJ9.A9Ek14fsuCEr63DRuihOx6nVUTb4I5PF91Jcnfbn5YI',
+      isv_tokenVerificationContext:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiI3cUE5TzduOU81YjEremZ5c2VyWUloQUFFQ0hDMFhiaVZDY3o2a0plQ0VxMjdMNHZFbnV5MHdGclFyTkhGTkVYRWdGcE1sak43MG8rNy9KNjkvdWhTK3gyTFB2a0FvKzZRdUxja1JhM01nbmRNN0FQb3VSV1BqWkEzaG9yeWJ6MGNlWFAiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJrYlU5MXBmTVR0U1htUDBlMjN4dnFtaDdmdFZyS3Q4WEFHaEhIX3pYbGFqSnBxbG1sTklYUHJOaTA1Q0FSS1hiSVc5cHNaU2xPUEUwMGNlSEtsVXhWWkVnbVVxZHZtczItbk5wZzgxeE1XLTU2Q2tHaG53N281Vk9RdllVakhCcDl5MzFPNjMzaHRqeFZkMGEyRG9WX3kyNHIxNFZzcTFVaFVzX0VEdUY2U0pLQ0pnODlKVzhXcW1SblB0VTVDb2hHRUNqWm5NSVYtM3ByUkNUY3U5VTZtWko5SlhQYktjeUZvZ3NRakozeWs4OVRQOTE4bm5Mc3ozbzRXZTNnWFpvOWFScXBPem5EWlRTbkJ3akNneUNfSUtqNm5XV2Vvc0VHc21NZ3B1VnUwbVJzSDNhdG01OGo5SW5qN2dmcVc5MXdYenZWVElpWjU4aW4wSW9MU3BOSXciLCJraWQiOiIwODV3dGJMZXN5dlJFMVc2QllTV3BISERtQk9LMTVReCJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2MzQxMDk3MzksImlhdCI6MTYzNDEwODgzOSwianRpIjoiM2pTZVZLR3R2UGZ5QU1DaSJ9.A9Ek14fsuCEr63DRuihOx6nVUTb4I5PF91Jcnfbn5YI',
     },
   },
   paymentStatus: {},

@@ -1,30 +1,64 @@
 import test from 'ava';
 import dotenv from 'dotenv';
-dotenv.config();
-import addTokenService from '../../service/payment/AddTokenService';
-import { addTokenResponseCustomerId, addTokenResponseCustomerObj, addTokenResponseAddress, addTokenResponseCardTokens } from '../const/AddTokenServiceConst';
-import {Constants} from '../../constants';
 
-var paymentResponse: any = {
+dotenv.config();
+import { Constants } from '../../constants';
+import addTokenService from '../../service/payment/AddTokenService';
+import { addTokenAddress, addTokenResponseCardTokens, addTokenResponseCustomerId, addTokenResponseCustomerObj } from '../const/AddTokenServiceConst';
+
+let paymentResponse: any = {
   httpCode: null,
   status: null,
 };
 
-test.serial('Get response of add token and check http code', async (t) => {
-  const result: any = await addTokenService.addTokenResponse(addTokenResponseCustomerId, addTokenResponseCustomerObj, addTokenResponseAddress, addTokenResponseCardTokens);
+test.serial('Get response of add token and check http code', async (t: any) => {
+  let result: any = await addTokenService.addTokenResponse(addTokenResponseCustomerId, addTokenResponseCustomerObj, addTokenAddress, addTokenResponseCardTokens);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
-    t.is(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Get response of add token and check status', async (t) => {
+test.serial('Get response of add token and check status', async (t: any) => {
   if (Constants.API_STATUS_AUTHORIZED == paymentResponse.status) {
     t.is(paymentResponse.status, Constants.API_STATUS_AUTHORIZED);
   } else {
     t.not(paymentResponse.status, Constants.API_STATUS_AUTHORIZED);
   }
+});
+
+test.serial('Get response of add token with invalid customer token and check http code', async (t: any) => {
+  let result: any = await addTokenService.addTokenResponse(addTokenResponseCustomerId, addTokenResponseCustomerObj, addTokenAddress, addTokenResponseCardTokens);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+});
+
+test.serial('Get response of add token with invalid customer token and check status', async (t: any) => {
+  t.not(paymentResponse.status, Constants.API_STATUS_AUTHORIZED);
+});
+
+test.serial('Get response of add token without customer id and check http code', async (t: any) => {
+  let result: any = await addTokenService.addTokenResponse('', addTokenResponseCustomerObj, addTokenAddress, addTokenResponseCardTokens);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  t.is(paymentResponse.httpCode, 0);
+});
+
+test.serial('Get response of add token without customer id and check status', async (t: any) => {
+  t.is(paymentResponse.status, '');
+});
+
+test.serial('Get response of add token without customer address and check http code', async (t: any) => {
+  let result: any = await addTokenService.addTokenResponse('', addTokenResponseCustomerObj, addTokenAddress, addTokenResponseCardTokens);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  t.is(paymentResponse.httpCode, 0);
+});
+
+test.serial('Get response of add token without customer address and check status', async (t: any) => {
+  t.is(paymentResponse.status, '');
 });

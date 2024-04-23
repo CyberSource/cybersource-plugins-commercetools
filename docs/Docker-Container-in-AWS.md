@@ -1,6 +1,5 @@
 # Deploying Docker Containers on AWS Elastic Container Service(ECS)
-The Docker Compose CLI enables developers to use native Docker commands to run applications in Amazon Elastic Container Service (ECS) when building cloud-native applications. Using docker compose, the Commercetools-Cybersource Extension can be deployed into the AWS easily. For this, docker image of the extension has to be built and same needs to be pushed into the AWS Elastic Container Registry.
-
+The Docker Compose CLI enables developers to use native Docker commands to run applications in Amazon Elastic Container Service (ECS) when building cloud-native applications. Using docker compose, the Cybersource-Commercetools Extension can be deployed into the AWS easily. For this, docker image of the extension has to be built and same needs to be pushed into the AWS Elastic Container Registry.
 
 ## Pre-Requisites
 
@@ -31,10 +30,12 @@ If you are using IAM user, ensure that the user has all the required permissions
    
   The above command will give you options like:
 
-    AWS Access Key ID : <Access key Id>
+    AWS Access Key ID : <Access Key Id>
     AWS Secret Access Key : <Secret Key>
     Default region name : <region>
     Default output format : text
+
+  For `Access Key Id` and `Secret Key`, use value returned by [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials), for `region`, use aws region which is convenient.
 
 ### Create AWS Context
 
@@ -46,55 +47,11 @@ where `contextName` is the name of your context
 
 - After running the above command, select `An existing AWS profile` option on listing of the options prompted since we already configured AWS in the above step
 
-
-### Run a Compose application
-   
-You can deploy and manage multi-container applications defined in the Compose files to Amazon ECS using the docker compose command. To do this:
-
-- Create a docker-compose.yml(case-sensitive) file in any folder of your choice and populate the following fields:
-    
-    
-      x-aws-loadbalancer : ARN of the LoadBalancer
-      services:
-        <service-name>:
-          image: Specify the image to start the container from. Can either be a repository/tag or a partial image ID.
-          ports: 
-            - containerport
-          environment:
-            set all the required environment variables
-   
-   Example:
-      
-      x-aws-loadbalancer : arn:aws:elasticloadbalancing:<region>:<accountId>:loadbalancer/net/<LoadBalancername>/<randomly-generated-Id-by-AWS>
-      services:
-        webapp:
-          image: xxx
-          ports:
-            - xxx
-          environment:
-            - CONFIG_PORT=xxx
-            - CT_PROJECT_KEY=xxx
-    
-    **_NOTE:_** Make sure to have correct indentation for each line in docker-compose.yml file and give same port number under `ports` and `CONFIG_PORT` under environment in docker-compose.yml file
-     
-    
-    - To set environment variables, Refer [API-Extension-Setup](API-Extension-Setup.md#configuration)
-    - To create a LoadBalancer in AWS, Refer [Creation-of-LoadBalancer](#creation-of-loadbalancer)
-    - To get image name, Refer [Pushing-image-into-AWS-ECR](#pushing-the-docker-image-into-aws-elastic-container-registryecr)
-
-
-- Ensure that you are using your ECS context. You can do this either by specifying the --context contextname flag with your command or by setting the current context using the below command 
-
-       docker context use <contextName>
-
-  where `contextName` is the name of your context which was created in the previous step
-- Navigate to the folder where the docker-compose.yml file is present and run the below command to start a full compose application
-     
-       docker compose up
-
 ## Pushing the docker image into AWS Elastic Container Registry(ECR)
 
 Follow the below steps to deploy docker image into AWS ECR by using AWS CLI
+
+   **_NOTE:_** Make sure to use same region for following steps
 
   ### Step 1: Build a Docker image
    To build a Docker image, Refer [Building-the Docker-image](Docker.md#building-the-docker-image)
@@ -104,7 +61,7 @@ Follow the below steps to deploy docker image into AWS ECR by using AWS CLI
 
      aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
 
-   **_NOTE:_** Please confirm that Docker is running before executing the above command
+   **_NOTE:_** Make sure Docker is running before executing the above command
 
  ### Step 3: Create a Repository
   
@@ -124,38 +81,55 @@ Follow the below steps to deploy docker image into AWS ECR by using AWS CLI
   
     docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/<repositoryName>
 
- Once the image is pushed successfully, copy the respective image URI present in AWS console under ECR service and use the same URI in docker-compose.yml file for image field.
+### Step 5: Creation of Task Definitions
 
+Task Definition is a configuration that defines your containers and how to launch them. After you create a task definition for your application within Amazon ECS, you can specify the number of tasks to run on your cluster.
 
-## Creation of LoadBalancer
-LoadBalancer is used to assign the custom DNS name for application which will be helpful for creating commercetools API extensions.
-You can also access the application using the same DNS name followed by port number(Example: DNSname:portnumber/xxx)
-    
-To create the LoadBalancer, follow the below steps :
-     
-- Retrieve the default VPC ID and attached subnets using the following commands:
+To create it, navigate to `ECS` -> `Task definitions` -> `Create new task definition`
 
-           aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId'
+Enter Task definition family name. Under `Container`, enter Container name and Image URI which you will get in [Docker Image in ECR](#step-4-push-an-image-to-amazon-ecr). Enter Container port where port number should be same port on which extension is running(as specified in `CONFIG_PORT` environment variable). You can also mention your .env variables under `Environment variables`. Leave all other settings as their defaults and click on `Create`.
 
-    The above command will give the default VPC ID, use the VPC ID to retrieve the attached subnets for it by using the following command:
+### Step 6: Creation of Cluster
 
-         aws ec2 describe-subnets --filters Name=vpc-id,Values=<VPC ID> --query 'Subnets[*].SubnetId'
+ECS clusters is used to run and maintain your desired number of tasks simultaneously. You can create it once task definition is created.
 
-    The above command will give all the attached subnets, use the subnet Id to create a LoadBalancer using the following command:
+To create it, navigate to `ECS` -> `Cluster` -> `Create cluster`
 
-        aws elbv2 create-load-balancer --name <LoadBalancerName> --type network --subnets "<subnet-Id>" "<subnet-Id>"
+Enter Cluster name and click on `Create`.
 
-    you can specify the number of subnets based on your choice.
+### Step 7: Creation of Services under Cluster
 
-        
+Services are higher-level abstractions that manage the desired state of your tasks, ensuring they are running and healthy.
 
-Once the application is deployed, if you want to update any env settings for extension, just update the value in docker-compose.yml file and run the docker compose up command again.
+To Create it, navigate to your cluster and click on `Create`
 
-**_NOTE:_**  During updation, don't interrupt in between untill the status is updated as `UPDATE_COMPLETE`. You can check the status of application under CloudFormation service in AWS console.
+Under `Deployment configuration`, for `Family`, choose your task definition. For `Revision`, choose the latest revision  and enter `Service name`.
 
-To access an application, use LoadBalancer DNS name followed by port number specified in docker-compose.yml file
+Under `Networking`, choose your VPC and add subnets. For `Security group`, use existing security groups or create a new one.
 
-    Example: <DNSname>:<port number>/xxx
+ **_NOTE:_** Make sure that security group has following inbound rules(rules can be added while creation or can be modified later by navigating to `EC2` -> `Security Groups` -> your securuty group -> `Edit inbound rules` -> `Add rule`)
+
+    Rule 1 - choose `Type` as All traffic, `Source` as Custom and add security group Id
+
+    Rule 2 - choose `Type` as Custom TCP, `Port range` as port no where extension is hosted, `Source` as Custom and add 0.0.0.0/0
+
+    Rule 3 - choose `Type` as Custom TCP, `Port range` as port no where extension is hosted, `Source` as Custom and add ::/0
+
+    and add `Save rules`
+
+> **_NOTE:_** Always use port number 80 to use the extension image in AWS, otherwise network tokenization service will not be available.
+
+Under `Load balancing`, choose Application Load Balancer as Load balancer type, choose your container which was created while creating task definition. Create a new load balancer or use existing one. For `Listener`, create a new listener by providing port number as extensions's port number. For `Target group`, choose existing target group or create a new one by entering Target group name. Leave all other settings as their defaults, and click on `Create`.
+
+Once the application is deployed, if you want to update any environment settings for extension, just update the value in docker-compose.yml file and run the docker compose up command again.
+
+If you are usng port 80, to access the application use the following
+
+    Example: <DNSname>/xxx 
+
+Otherwise, use LoadBalancer DNS name followed by port number.
+
+    Example: <DNSname>:<port number>/xxx  
 
 
 DNS name will available in AWS console under respective LoadBalancer details in LoadBalancer service and it will be in the following format
@@ -166,8 +140,7 @@ DNS name will available in AWS console under respective LoadBalancer details in 
 
 You can see all your logs in AWS Cloudwatch, for that you need to perform below steps.
 
-- Provide your AWS Access Key ID, Secret Key and AWS Region Name in .env file. (Refer [API-Extension-Setup](API-Extension-Setup.md#configuration))
-- Pass the value as `true` for the env variable `AWS_ENABLE_LOGS` in .env file.(Refer [API-Extension-Setup](API-Extension-Setup.md#configuration))
+- Before you could create the image of the extension, the  `logData` function in paymentUtils.ts file should be updated with console.log statements, which will log the extension logs properly
 
 ## Troubleshoot
  - When using `docker compose up` command, if you get the following error `pulling from host <accountId>.dkr.ecr.<region>.amazonaws.com failed with status code [manifests latest]: 403 Forbidden`, it means that authentication is expired. Refer [Authenticate-to-default-registry](#step-2-authenticate-the-docker-cli-to-your-default-registry) to authenticate again.
@@ -175,13 +148,3 @@ You can see all your logs in AWS Cloudwatch, for that you need to perform below 
  - It's better to use `PowerShell` if any of the above commands are not working or not retrieving the data in cmd terminal.
 
  - If you get `This error may indicate that the docker daemon is not running.: The system cannot find the file specified.error during connect: This error may indicate that the docker daemon is not running.: Post http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.24/auth: open //./pipe/docker_engine: The system cannot find the file specified`, it means that Docker is not running, ensure to start Docker.
-
-    
-    
-    
-
-  
-
-    
-
-   

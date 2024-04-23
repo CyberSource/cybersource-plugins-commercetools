@@ -44,6 +44,6 @@ Microform Integration replaces the primary account number (PAN) or card verifica
 - Create a function for the customer to submit their payment information and invoke the
   tokenization request to Microform Integration for the transient token
 
-Once the microform integration v2 is setup, you can continue to the [Process a Payment with CC(Without Payer Authentication)](Process-a-Payment-for-CC-Without-Payer-Authentication.md) or [Process a Payment with CC(With Payer Authentication)](Process-a-Payment-for-CC-With-Payer-Authentication.md) process.
+Once the microform integration v2 is setup, you can continue to the [Process a Card Payment Without Payer Authentication](Process-a-Card-Payment-Without-Payer-Authentication.md) or [Process a Payment a Card Payment With Payer Authentication](Process-a-Card-Payment-With-Payer-Authentication.md) process.
 
 **_NOTE:_** For more details, refer [Microform Integration v2 Cybersource Documentation](https://developer.cybersource.com/docs/cybs/en-us/digital-accept-flex/developer/all/rest/digital-accept-flex/microform-integ-v2.html).

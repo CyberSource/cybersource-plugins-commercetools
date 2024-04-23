@@ -23,6 +23,6 @@ Once you have the merchant Id, setup of Google Pay is quite simple:
 
 See the [Overview, Setup & Tutorial](https://developers.google.com/pay/api/web/overview) document from the Google Pay Developer center.
 
-You can also refer to [this guide](https://docs.cybersource.com/content/dam/new-documentation/documentation/en/google-pay/smartpay/rest/googlepay-rest-smartpay.pdf) for more details of integrating Google Pay
+You can also refer to [this guide](https://developer.cybersource.com/docs/cybs/en-us/google-pay/developer/vital/rest/googlepay/googpay-intro.html) for more details of integrating Google Pay
 
 Once the API is setup and you are receiving a Google Pay Payment Token, you can continue to the [Process a Payment (GooglePay)](Process-a-Payment-GooglePay.md) process.

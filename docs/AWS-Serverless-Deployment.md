@@ -33,50 +33,18 @@ To connect the application to AWS account, you need to generate AWS Security Cre
 
 The Serverless Framework is a command-line tool that uses easy and approachable `yml` syntax to deploy your code. A service is configured via `serverless.yml` file where you define your functions, the events that trigger them and the AWS resources to deploy. Each service configuration is managed in the serverless.yml file. You can see the name of the service and here you can provide your service name as per your convenience. The function inside the functions definition, it should point to `build/main/index.handler` since in index file we are wrapping our API for serverless use.
 
-Specify the event along with the path which will trigger the handler function.
-The serverless.yml file should looks like as follows:
+Create `serverless.yml` file having format as specified in [aws-deployment-sample.yml](./serverless-sample-yml/aws-deployment-sample.yml) file.
 
-    functions:
-    HandlerFunction:
-        handler: build/main/index.handler
-        events:
-        - httpApi:
-            path: /
-            method: ANY
-        - httpApi:
-            path: /{proxy+}
-            method: ANY
+Replace value of
 
-In order to get logs in AWS Cloudwatch, you need to provide following permissions inside provider
+- `service-name` with any name. `service-name` is simply the name of your project
+- `aws-region` with aws region of your choice which you want to use for lambda creation
 
-    iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - lambda:InvokeFunction
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-            - logs:DescribeLogStreams
-          Resource:
-              - arn:aws:logs:*:*:*
-
-In order to exclude files while zipping, you need to provide following
-
-    plugins:
-    - serverless-ignore
-
-Inside provider, you need to provide timeout for your API gateway as 20 second 
- 
-      timeout: 20
-
-> **_NOTE:_** Make sure to have correct indentation for each line in `serverless.yml` file. (Refer [Serverless.yml Reference](https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml))
+> **_NOTE:_** Make sure to have correct indentation for each line in `serverless.yml` file. (Refer [Serverless.yml Reference](https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml)). A sample of the same is available at [serverless-sample-yaml](./serverless-sample-yml/aws-deployment-sample.yml) file.
 
 ## Loggers in AWS Cloudwatch
 
-You can see all your logs in AWS Cloudwatch by passing the value as true for the env variable AWS_ENABLE_LOGS in .env file(Refer [API-Extension-Setup](API-Extension-Setup.md))
-
+In order to see the extension logs in Cloudwatch, console.log statement can be added inside the function `logData` in PaymentUtils.ts file. 
 
 ## Steps to Deploy Extension on AWS Lambda
 
@@ -84,33 +52,24 @@ You can see all your logs in AWS Cloudwatch by passing the value as true for the
 
          npm install
 
-> **_NOTE:_** This is not necessary if the dependencies are already available in <b>node_modules</b> repository
+> **_NOTE:_** This is not necessary if the dependencies are already available in <b>node_modules</b> folder
 
 2.  Populate AWS security credentials (Refer [AWS Security Credentials](#aws-security-credentials)) and run the following command
 
          serverless config credentials --provider aws --key <your_aws_access_key_id> --secret <your_aws_access_key_secret>
 
-3.  Remove .gitignore file and and run the following command
-
-         Serverless create -t aws-nodejs
-
-4.  Above command will add a file in the root directory i.e. serverless.yml . Populate the required values in this file. (Refer [Serverless Framework Services](#serverless-framework-services))
-
-5.  To deploy a service, run the below command in the same directory as serverless.yml i.e. root directory
+3.  To deploy a service, run the below command in the same directory as [serverless.yml](#serverless-framework-services) i.e. root directory
 
          npm run deploy
 
-6.  Once the deployment is done, to set/modify the env variables you have to login to your AWS account.
+4.  Once the deployment is done, to set/modify the env variables you have to login to your AWS account.
 - Navigate to the lambda and click on the lambda function that has been created after successful deployment.
 - Navigate to Configuration -> Environment variables and click on Add environment variable.
 - Enter key and value for your env variable and click on save. (Refer [API-Extension-Setup](API-Extension-Setup.md#configuration))
-   
-    **_NOTE:_** AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_REGION can't be modified since they are AWS reserved keywords.
     
     The execution role which will be created while deploying to AWS lambda will provide the credentials to lambda function which can be used to run and invoke other web services. Therefore, you don't need to provide AWS credentials in .env file.
 
- **_NOTE:_** if you need to have a public domain for your extension as that domain URL will be used to create API extensions, refer [Serverless-Api-Gateway-Domain](https://www.serverless.com/blog/serverless-api-gateway-domain/) for more information
-
+ **_NOTE:_** If you need to have a public domain for your extension as that domain URL will be used to create API extensions, refer [Serverless-Api-Gateway-Domain](https://www.serverless.com/blog/serverless-api-gateway-domain/) for more information
 
 ## Troubleshoot
 
@@ -119,9 +78,11 @@ You can see all your logs in AWS Cloudwatch by passing the value as true for the
  - node-modules 
  - package-lock.json
 
-2.  While configuring serverless with your AWS security credentials, sometimes you may get an error message as `The term 'serverless' is not recognized as the name of a cmdlet, function, script file or operable program`. Another way to configure serverless is by opening the credentials file, which is typically located at ~/.aws/credentials. It may be a hidden file in your file browser.
+2.  While configuring serverless with your AWS security credentials, sometimes you may get an error message as `The term 'serverless' is not recognized as the name of a cmdlet, function, script file or operable program`. Try installing serverless globally by entering command
 
-    Your file may be an empty or may not even exist. If it doesn’t exist create an empty file and paste your credentials in the below format 
+         npm install -g serverless
+
+If issue persist, try to configure serverless by opening the credentials file, which is typically located at ~/.aws/credentials. It may be a hidden file in your file browser. Your file may be an empty or may not even exist. If it doesn’t exist create an empty file and paste your credentials in the below format 
 
           [default]
           aws_access_key_id=${Your access key ID}

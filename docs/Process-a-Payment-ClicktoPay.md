@@ -38,7 +38,7 @@ The shipping address should be acquired from Visa Click to Pay. This can be set 
     | ------------------------------------- | ----------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
     | customer                              | Reference to Commercetools customer | See notes | Required for non-guest checkout. If using MyPayments API this will automatically be set to the logged in customer. One of customer or anonymousId must be populated                                                                                                                                                                    |
     | anonymousId                           | Id for tracking guest checkout      | See notes | Required for guest checkout. If using MyPayments API this will automatically be set. One of customer or anonymousId must be populated                                                                                                                                                                                                  |
-    | paymentMethodInfo.paymentInterface    | cybersource                         | Yes       |                                                                                                                                                    |
+    | paymentMethodInfo.paymentInterface    | Cybersource                         | Yes       |                                                                                                                                                    |
     | paymentMethodInfo.method              | visaCheckout                        | Yes       |                                                                                    |
     | amountPlanned                         | Amount to be processed                 | Yes       | Should match cart gross total, unless split payments are being used                                                                                                                                                                                                                                                                    |
     | custom.type.key                    | isv_payment_data                    | Yes       |                                                                                                                                                                     |
@@ -49,8 +49,6 @@ The shipping address should be acquired from Visa Click to Pay. This can be set 
     | custom.fields.isv_walletType                | Wallet type | No  |   This value is required if walletType is to be passed in authorization. Refer [Cybersource Processing a Payment](https://developer.cybersource.com/api-reference-assets/index.html#payments_payments_process-a-payment) for more information about the wallet type value to be passed. It is supported only for ApplePay, ClicktoPay and GooglePay payment methods|
     | custom.fields.isv_merchantId   | Merchant Id used for the transaction                 | No       | Required when you want to support Multi-Mid functionality. Populate this field with the value of merchant Id in which the transaction should happen. When this field is empty, default mid configuration will be considered for the transaction. The same mid will be used for the follow-on transactions.                                                                                         |
     
-    
-
 3.  Add the payment to the cart
 
 4.  Add a transaction to the payment 
@@ -72,7 +70,6 @@ The shipping address should be acquired from Visa Click to Pay. This can be set 
     | type     | Charge              |                                       |
     | state    | Initial             |                                       |
     | amount   | Amount to be processed | Should match amountPlanned on payment |
-
 
 5.  Verify the payment state and convey the payment result to the customer
 

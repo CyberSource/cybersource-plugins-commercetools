@@ -1,9 +1,10 @@
 import test from 'ava';
 import dotenv from 'dotenv';
+
 dotenv.config();
-import { authId, authID, payment, orderNo, orderNumber, updateTransactions } from '../../const/ClickToPay/PaymentCaptureServiceVsConst';
+import { Constants } from '../../../constants';
 import capture from '../../../service/payment/PaymentCaptureService';
-import {Constants} from '../../../constants';
+import { authID, authId, orderNo, orderNumber, payment, updateTransactions } from '../../const/ClickToPay/PaymentCaptureServiceVsConst';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -15,49 +16,49 @@ let paymentResponseObject: any = {
   status: null,
 };
 
-test.serial('Capturing a payment and check http code', async (t) => {
-  const result: any = await capture.captureResponse(payment, updateTransactions, authId, orderNo);
+test.serial('Capturing a payment and check http code', async (t: any) => {
+  let result: any = await capture.captureResponse(payment, updateTransactions, authId, orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
-    t.is(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Check status for payment capture', async (t) => {
-  if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
+test.serial('Check status for payment capture', async (t: any) => {
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
     t.is(paymentResponse.status, Constants.API_STATUS_PENDING);
   } else {
     t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
   }
 });
 
-test.serial('Capturing an invalid payment and check http code', async (t) => {
-  const result: any = await capture.captureResponse(payment, updateTransactions, authID, orderNo);
+test.serial('Capturing an invalid payment and check http code', async (t: any) => {
+  let result: any = await capture.captureResponse(payment, updateTransactions, authID, orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
-  t.not(paymentResponseObject.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
 });
 
-test.serial('Check status for invalid capture ', async (t) => {
+test.serial('Check status for invalid capture ', async (t: any) => {
   t.not(paymentResponseObject.status, Constants.API_STATUS_PENDING);
 });
 
-test.serial('Capturing a payment with reconciliation Id and check http code', async (t) => {
-  const result: any = await capture.captureResponse(payment, updateTransactions, authId, orderNumber);
+test.serial('Capturing a payment with reconciliation Id and check http code', async (t: any) => {
+  let result: any = await capture.captureResponse(payment, updateTransactions, authId, orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
-    t.is(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, Constants.HTTP_CODE_TWO_HUNDRED_ONE);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Check status for payment capture with reconciliation Id', async (t) => {
-  if (Constants.HTTP_CODE_TWO_HUNDRED_ONE == paymentResponse.httpCode) {
+test.serial('Check status for payment capture with reconciliation Id', async (t: any) => {
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
     t.is(paymentResponse.status, Constants.API_STATUS_PENDING);
   } else {
     t.not(paymentResponse.status, Constants.API_STATUS_PENDING);

@@ -8,7 +8,7 @@
   - [Cybersource request failures](#cybersource-request-failures)
   - [API Extension errors](#api-extension-errors)
 
-The Cybersource-Commercetools extension is an implementation of the Cybersource Services in typescript, using the cybersource-rest-client node package manager. The extension allows processing of payments registered in Commercetools through the Cybersource payment gateway. It is realized by the usage of a typescript application configured as a Payment Create, Payment Update API and Customer Update API extensions for a Commercetools project and interacts with Cybersource to carry out various actions depending on the payment state, making further updates to the Commercetools payment as appropriate when Cybersource has processed the request.
+The Cybersource-Commercetools Extension is an implementation of the Cybersource Services in typescript, using the cybersource-rest-client node package manager. The extension allows processing of payments registered in Commercetools through the Cybersource payment gateway. It is realized by the usage of a typescript application configured as a Payment Create, Payment Update API and Customer Update API extensions for a Commercetools project and interacts with Cybersource to carry out various actions depending on the payment state, making further updates to the Commercetools payment as appropriate when Cybersource has processed the request.
 
 It is intended that when using the extension the developer would consider how the application should be secured, ran and scaled before it is exposed to the outside world. The extension provides a reference for functional integration only.
 
@@ -24,9 +24,11 @@ The Commercetools Cybersource extension exposes the following endpoints
 
 | URL          | Method   | Input | Output | Description |
 | ------------ | -------- | ----- | ------ | ----------- |
-| http://{host}:{port}/api/extension/payment/create | POST | Message containing payment | Create payment | Receives and processes payment create messages. This endpoint should be defined in Commercetools as the Payment Create API Extension |
-| http://{host}:{port}/api/extension/payment/update | POST | Message containing payment | Updates to be made to payment |  Receives and processes payment update messages. This endpoint should be defined in Commercetools as the Payment Update API Extension |
-| http://{host}:{port}/api/extension/customer/update | POST | Message containing customer token | Updates to be made to customer token | Receives and processes customer update messages. This endpoint should be defined in Commercetools as the Customer Update API Extension |
+| http(s)://{host}:{port}/api/extension/payment/create | POST | Message containing payment | Create payment | Receives and processes payment create messages. This endpoint should be defined in Commercetools as the Payment Create API Extension |
+| http(s)://{host}:{port}/api/extension/payment/update | POST | Message containing payment | Updates to be made to payment |  Receives and processes payment update messages. This endpoint should be defined in Commercetools as the Payment Update API Extension |
+| http(s)://{host}:{port}/api/extension/customer/update | POST | Message containing customer token | Updates to be made to customer token | Receives and processes customer update messages. This endpoint should be defined in Commercetools as the Customer Update API Extension |
+
+> **_NOTE:_** http(s)://{host}:{port}/orders will serve the sample User Interface(UI) for the back office which displays the latest payments in the project. Other services like Decision Sync, Run Sync, Run Script, order management etc also available with the sample UI. 
 
 ## Requirements and Design Decisions
 
@@ -46,7 +48,8 @@ When an attempt at processing a payment there can be varying responses depending
 
 ## Communications failure on Payment Create
 
-If on a payment create, the API extension cannot communicate with Cybersource, the API Extension will return `InvalidOperation` error.
+If on a payment create for card payment method, if the API extension cannot communicate with Cybersource or the key verification is not successful the API Extension will return `InvalidOperation` error.
+For rest of the cases, the extension will return empty response.
 
 ## Cybersource request failures
 
