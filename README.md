@@ -13,7 +13,7 @@ Commercetools Cybersource Extension provides payment services based integration 
 - Authorization [Cancellation](./docs/Reverse-a-Payment.md) on a payment that has not yet been captured.
 - [Manual capture](./docs/Capture-a-Payment.md) of a payment.
 - [Synchronize payments](./docs/Synchronizing-Payments.md) for synchronizing the missing transactions and fraud transactions based on the decision taken by the merchant.
-- [Network Tokenization](./Network-Tokenization.md) for updating the customer tokens through Webhook notifications
+- [Network Tokens](./docs/Network-Tokens.md) for updating the customer tokens through Webhook notifications
 
 ## Overview
 This repository contains one standalone module that interact with Commercetools and Cybersource.

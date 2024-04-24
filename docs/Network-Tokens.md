@@ -1,8 +1,8 @@
-# Network Tokenization
+# Network Tokens
 
 Network token is a security technique that involves replacing sensitive information such as customer's actual PAN with a non-sensitive place holder token.
 
-Before a MID can be enabled for Network Tokenization, it has to be provisioned with a Token Requestor ID (TRID) for each card scheme. A TRID is a unique identifier that links a MID to a record at the card scheme and is used to identify which entity is using a Network Token.
+Before a MID can be enabled for Network Tokens, it has to be provisioned with a Token Requestor ID (TRID) for each card scheme. A TRID is a unique identifier that links a MID to a record at the card scheme and is used to identify which entity is using a Network Token.
 
 Cybersource-Commercetools Extension only supports the event `tms.networktoken.updated` from Webhooks currently
 
@@ -23,7 +23,7 @@ Once the subscription is created successfully, the merchant id, webhook id, key 
 
 > **_NOTE:_** The command `npm run create-subscription` also can be used, if already a subscription exists for the product id, but the data is not found updated in Commercetools or the base url of Webhook is found different from the one available in PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL. In this case, the command will delete the existing subscription and create new.
 
- > If same card is used by different customers in Commercetools, the extension will support network tokenization only for one customer, which is present in the incoming notification. The card info will remain same for all other customers.
+ > If same card is used by different customers in Commercetools, the extension will support network tokens only for one customer, which is present in the incoming notification. The card info will remain same for all other customers.
 # Subscription Details in Commercetools:
 
 Once the subscription is created, the details will be stored in Commercetools custom object which has key and container name of `webHookSubscription` and `ctWebHookSubscription` respectively. Each array in the array of objects represents the webhook details of the particular merchant id. Below given details can be retrieved from the Custom Object.

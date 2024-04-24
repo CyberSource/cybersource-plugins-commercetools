@@ -117,7 +117,7 @@ Under `Networking`, choose your VPC and add subnets. For `Security group`, use e
 
     and add `Save rules`
 
-> **_NOTE:_** Always use port number 80 to use the extension image in AWS, otherwise network tokenization service will not be available.
+> **_NOTE:_** Always use port number 80 to use the extension image in AWS, otherwise network token service will not be available.
 
 Under `Load balancing`, choose Application Load Balancer as Load balancer type, choose your container which was created while creating task definition. Create a new load balancer or use existing one. For `Listener`, create a new listener by providing port number as extensions's port number. For `Target group`, choose existing target group or create a new one by entering Target group name. Leave all other settings as their defaults, and click on `Create`.
 

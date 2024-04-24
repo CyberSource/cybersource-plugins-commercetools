@@ -1921,7 +1921,7 @@ const retrieveSyncResponse = async (paymentDetails: paymentType, transactionElem
   return updateSyncResponse;
 };
 
-//Network Tokenization
+//Network Tokens
 const verifySubscription = async (searchSubscriptionResponse: any, merchantId: string | undefined) => {
   let getCustomObjectSubscriptions: any;
   const verificationObject = {

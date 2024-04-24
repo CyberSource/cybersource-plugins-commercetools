@@ -923,7 +923,7 @@ const addCustomerAddress = async (customerId: string, addressObj: addressType) =
   return addCustomerAddressResponse;
 };
 
-//Network Tokenization
+//Network Tokens
 const createCTCustomObject = async (customObjectData: any) => {
   let setCustomObjectResponse: any;
   try {

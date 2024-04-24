@@ -17,4 +17,4 @@
 - [Synchronizing Payments](Synchronizing-Payments.md)
 - [Decision Manager](Decision-Manager.md)
 - [Tokenization](Tokenization.md)
-- [Network Tokenization](Network-Tokenization.md)
+- [Network Tokens](Network-Tokens.md)
