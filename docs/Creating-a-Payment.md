@@ -5,10 +5,10 @@ To create a payment, you must first decide which payment method you would like t
 | Payment Method                    | Explanation                                                                                                          |
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | creditCard                        | Processes Card payments without any 3DS checks                                                                       |
-| clickToPay                      | Processes payment using payment network tokenization to make Web payments and mobile payments using Visa Click to Pay                                                          |
+| clickToPay                      | Processes payment using payment network tokens to make Web payments and mobile payments using Visa Click to Pay                                                          |
 | creditCardWithPayerAuthentication | Processes Card payments with 3DS checks. This requires some extra values on Payment Create which are listed below    |
-| googlePay                         | Processes the payment using payment network tokenization to make Web payments and mobile payments using Google Pay |
-| applePay                          | Processes the payment using payment network tokenization to make Web payments and mobile payments on Apple devices using Apple Pay   |
+| googlePay                         | Processes the payment using payment network tokens to make Web payments and mobile payments using Google Pay |
+| applePay                          | Processes the payment using payment network tokens to make Web payments and mobile payments on Apple devices using Apple Pay   |
 | eCheck                            | Processes the payment using appropriate check processors. This requires some extra values on Payment Create which are listed below |
 
 When creating a payment, the following fields are validated
