@@ -1,19 +1,26 @@
 import test from 'ava';
 import dotenv from 'dotenv';
-dotenv.config();
-import {Constants} from '../../constants';
-import sync from '../../service/payment/DecisionSyncService';
 
-test('Check http code for decision sync', async (t) => {
-  const midCredentials = {
+dotenv.config();
+import { Constants } from '../../constants';
+import sync from '../../service/payment/DecisionSyncService';
+import { emptyMidCredentials } from '../const/DeleteWebhookSubscriptionConst';
+
+test('Check http code for decision sync', async (t: any) => {
+  let midCredentials = {
     merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
     merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
     merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
   };
-  const result: any = await sync.conversionDetails(midCredentials);
+  let result: any = await sync.conversionDetails(midCredentials);
   let i = 0;
-  if (Constants.HTTP_CODE_TWO_HUNDRED == result.httpCode || Constants.VAL_FOUR_HUNDRED_AND_FOUR == result.httpCode) {
+  if (Constants.HTTP_OK_STATUS_CODE == result.httpCode || Constants.HTTP_NOT_FOUND_STATUS_CODE == result.httpCode) {
     i++;
   }
   t.is(i, 1);
+});
+
+test('Check http code for decision sync without mid credentials', async (t: any) => {
+  let result: any = await sync.conversionDetails(emptyMidCredentials);
+  t.is(result.httpCode, 0);
 });

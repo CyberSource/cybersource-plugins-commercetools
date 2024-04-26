@@ -7,14 +7,15 @@ Before using it, make sure to install Docker Desktop in the respective system.
 
 ## Building the Docker image
   Navigate to the root directory of extension and run the following command to build the Docker image
+
+  Use appropriate appline of Nodejs and modify the Dockerfile if necessary.
     
   **_Note_**: Make sure to remove `node_modules` folder if it exists before building the image and ensure that Docker is running.
 
      docker build -t <imagename> .
      Example: docker build -t sample .
   where `imagename` is the name of your choice
-
-  
+ 
 ## Running the Docker image
  Once the Docker image is created successfully, you can run the image by setting env variables and port numbers.
  Use the following command to run the docker image 
@@ -22,8 +23,7 @@ Before using it, make sure to install Docker Desktop in the respective system.
      docker run -e <env variables> -p <hostport>:<containerport> -d <imagename>
      
      Example: docker run -e CT_PROJECT_KEY=xxx -e CT_CLIENT_ID=xxx -p 3505:3505 -d sample
-
-    
+ 
   - `env variables` are the key value pairs present in env file, Refer
   [API-Extension-Setup](API-Extension-Setup.md#configuration) to set env variables and make sure that to maintain <b>-e</b> separately for every env variable setting.
   - `hostport` is the port number to use in host machine and `containerport` is the port to be used by the docker container. 
@@ -33,3 +33,4 @@ Before using it, make sure to install Docker Desktop in the respective system.
 
 ## Running the Docker image in AWS
  To run the docker image in AWS, refer the following guide [Docker-Container-in-AWS](Docker-Container-in-AWS.md)
+ - To run the docker image in Azure, [Docker-Container-in-Azure](Docker-Container-in-Azure.md)

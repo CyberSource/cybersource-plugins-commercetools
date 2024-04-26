@@ -1,5 +1,5 @@
-import customType from './CustomTypes';
 import customExtension from './CustomExtensions';
+import customType from './CustomTypes';
 
 const ensureCustomTypes = async () => {
   return Promise.all([

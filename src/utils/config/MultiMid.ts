@@ -1,107 +1,71 @@
 import path from 'path';
-import paymentService from '../PaymentService';
-import { Constants } from '../../constants';
 
-const getMidCredentials = async (payment) => {
-  let midCredentials = {
-    merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
-    merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
-    merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
-  }
-  let midData = [] as any;
-  let exceptionData: any;
-  let merchantIdentifier: any
-  let allMidCredentials: any;
+import { Constants } from '../../constants';
+import { midCredentialsType } from '../../types/Types';
+import paymentUtils from '../PaymentUtils';
+
+const getMidCredentials = async (merchantId: string) => {
+  let midData: midCredentialsType = {
+    merchantId: '',
+    merchantKeyId: '',
+    merchantSecretKey: '',
+  };
+  let allMidCredentials = [midData];
   try {
-    if (payment && null != payment) {
-      if (typeof payment === 'object') {
-        if (Constants.STRING_EMPTY == payment?.custom?.fields?.isv_merchantId) {
-          midData = midCredentials;
-        } else {
-          merchantIdentifier = payment.custom.fields.isv_merchantId;
-        }
-      } else if (typeof payment === 'string') {
-        merchantIdentifier = payment;
-        if (Constants.STRING_EMPTY == merchantIdentifier) {
-          midData = midCredentials;
-        }
-      } else {
-        midData = midCredentials;
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_MID_CREDENTIALS, Constants.LOG_WARN, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_MULTI_MID_NOT_ENABLED);
-      }
-      if (undefined != merchantIdentifier && Constants.STRING_EMPTY != merchantIdentifier) {
-        allMidCredentials = await getAllMidDetails();
-        allMidCredentials.forEach(async element => {
-          if (element.merchantId == merchantIdentifier) {
-            midData = element;
-          }
-        });
-        if (midData.length == Constants.VAL_ZERO) {
-          midData.merchantId = merchantIdentifier;
-          midData.merchantKeyId = null;
-          midData.merchantSecretKey = null;
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_MID_CREDENTIALS, Constants.LOG_WARN, Constants.LOG_PAYMENT_ID + payment.id, merchantIdentifier + Constants.ERROR_MSG_MERCHANT_ID_NOT_FOUND);
-        }
-      } else {
-        midData = midCredentials;
-      }
-    }
-  }
-  catch (exception) {
-    if (typeof exception === 'string') {
-      exceptionData = Constants.EXCEPTION_MSG_GET_MID_CREDENTIALS + Constants.STRING_HYPHEN + exception.toUpperCase();
-    } else if (exception instanceof Error) {
-      exceptionData = Constants.EXCEPTION_MSG_GET_MID_CREDENTIALS + Constants.STRING_HYPHEN + exception.message;
+    if ('' === merchantId) {
+      midData = {
+        merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
+        merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
+        merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
+      };
     } else {
-      exceptionData = Constants.EXCEPTION_MSG_GET_MID_CREDENTIALS + Constants.STRING_HYPHEN + exception;
+      allMidCredentials = await getAllMidDetails();
+      allMidCredentials.forEach((key) => {
+        if (merchantId == key?.merchantId) {
+          midData = key;
+        }
+      });
     }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_MID_CREDENTIALS, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, exceptionData);
+  } catch (exception) {
+    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetMidCredentials', Constants.EXCEPTION_MSG_GET_MID_CREDENTIALS, exception, '', '', '');
   }
   return midData;
-}
+};
 
 const getAllMidDetails = async () => {
-  let environment: any;
-  let midArray = [] as any;
-  let keyId: any;
-  let secretKey: any;
-  let secretKeyPrefix = Constants.STRING_EMPTY;
-  let secretKeyIndex: any;
-  let exceptionData: any;
+  const midArray: midCredentialsType[] = [];
+  let secretKeyIndex: number;
+  let secretKeyPrefix: string;
+  let keyId: string;
+  let secretKey: string;
   try {
-    environment = process.env;
-    for (let variable in environment) {
-      if ((variable.includes(Constants.STRING_SECRET_KEY)) && variable != 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY') {
-        secretKeyIndex = variable.indexOf(Constants.STRING_SECRET_KEY);
-        secretKeyPrefix = variable.slice(Constants.VAL_ZERO, secretKeyIndex);
-        keyId = process.env[secretKeyPrefix + '_KEY_ID'];
-        secretKey = process.env[variable];
-        if (Constants.STRING_EMPTY != secretKeyPrefix && undefined != keyId && Constants.STRING_EMPTY != keyId && undefined != secretKey && Constants.STRING_EMPTY != secretKey) {
-          midArray.push({
-            merchantId: secretKeyPrefix.toLowerCase(),
-            merchantKeyId: keyId,
-            merchantSecretKey: secretKey,
-          })
-        } else {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ALL_MID_DETAILS, Constants.LOG_ERROR, null, Constants.ERROR_MSG_ENV_VARIABLES_NOT_FOUND + secretKeyPrefix.toLowerCase());
+    const environment = process?.env;
+    if (environment) {
+      for (let variable in environment) {
+        if (variable.includes(Constants.STRING_SECRET_KEY) && 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY' !== variable) {
+          secretKeyIndex = variable.indexOf(Constants.STRING_SECRET_KEY);
+          secretKeyPrefix = variable.slice(0, secretKeyIndex);
+          keyId = process.env[secretKeyPrefix + '_KEY_ID'] || '';
+          secretKey = process.env[variable] || '';
+          if (secretKeyPrefix && keyId && secretKey) {
+            midArray.push({
+              merchantId: secretKeyPrefix.toLowerCase(),
+              merchantKeyId: keyId,
+              merchantSecretKey: secretKey,
+            });
+          } else {
+            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetAllMidDetails', Constants.LOG_ERROR, '', Constants.ERROR_MSG_ENV_VARIABLES_NOT_FOUND + secretKeyPrefix.toLowerCase());
+          }
         }
       }
     }
-  }
-  catch (exception) {
-    if (typeof exception === 'string') {
-      exceptionData = Constants.EXCEPTION_MSG_ALL_MID_DETAILS + Constants.STRING_HYPHEN + exception.toUpperCase();
-    } else if (exception instanceof Error) {
-      exceptionData = Constants.EXCEPTION_MSG_ALL_MID_DETAILS + Constants.STRING_HYPHEN + exception.message;
-    } else {
-      exceptionData = Constants.EXCEPTION_MSG_ALL_MID_DETAILS + Constants.STRING_HYPHEN + exception;
-    }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_ALL_MID_DETAILS, Constants.LOG_ERROR, null, exceptionData);
+  } catch (exception) {
+    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetAllMidDetails', Constants.EXCEPTION_MSG_ALL_MID_DETAILS, exception, '', '', '');
   }
   return midArray;
-}
+};
 
 export default {
   getMidCredentials,
-  getAllMidDetails
-}
+  getAllMidDetails,
+};

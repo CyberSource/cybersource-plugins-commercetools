@@ -1,48 +1,53 @@
 import test from 'ava';
 import dotenv from 'dotenv';
-dotenv.config();
-import {Constants} from '../../constants';
-import updateToken from '../../service/payment/UpdateTokenService';
-import { tokenObject, tokens, newExpiryMonth, newExpiryYear, addressData, invalidAddressData } from '../const/UpdateTokenServiceConst';
 
-var result: any = {
+dotenv.config();
+import { Constants } from '../../constants';
+import updateToken from '../../service/payment/UpdateTokenService';
+import { addressData, invalidAddressData, newExpiryMonth, newExpiryYear, tokenObject, tokens } from '../const/UpdateTokenServiceConst';
+
+let result: any = {
   httpCode: null,
   default: null,
 };
 
-test.serial('Check http code for token updation', async (t) => {
-  const response: any = await updateToken.updateTokenResponse(tokens, newExpiryMonth, newExpiryYear, addressData);
+test.serial('Check http code for token update', async (t: any) => {
+  let response: any = await updateToken.updateTokenResponse(tokens, newExpiryMonth, newExpiryYear, addressData);
   result.httpCode = response.httpCode;
   result.default = response.default;
-  if (Constants.HTTP_CODE_TWO_HUNDRED == result.httpCode) {
-    t.is(result.httpCode, Constants.HTTP_CODE_TWO_HUNDRED);
+  if (Constants.HTTP_OK_STATUS_CODE == result.httpCode) {
+    t.is(result.httpCode, Constants.HTTP_OK_STATUS_CODE);
   } else {
-    t.not(result.httpCode, Constants.HTTP_CODE_TWO_HUNDRED);
+    t.not(result.httpCode, Constants.HTTP_OK_STATUS_CODE);
   }
 });
 
-test.serial('Check value of default after token updation', async (t) => {
-  if (Constants.HTTP_CODE_TWO_HUNDRED == result.httpCode) {
+test.serial('Check value of default after token update', async (t: any) => {
+  if (Constants.HTTP_OK_STATUS_CODE == result.httpCode) {
     t.is(result.default, true);
   } else {
     t.not(result.default, true);
   }
 });
 
-test.serial('Check http code for token updation with invalid address', async (t) => {
-  const response: any = await updateToken.updateTokenResponse(tokens, newExpiryMonth, newExpiryYear, invalidAddressData);
+test.serial('Check http code for token updation with invalid address', async (t: any) => {
+  let response: any = await updateToken.updateTokenResponse(tokens, newExpiryMonth, newExpiryYear, invalidAddressData);
   result.httpCode = response.httpCode;
   result.default = response.default;
-  t.not(result.httpCode, Constants.HTTP_CODE_TWO_HUNDRED);
+  t.not(result.httpCode, Constants.HTTP_OK_STATUS_CODE);
 });
 
-test.serial('Check http code for updating invalid token', async (t) => {
-  const response: any = await updateToken.updateTokenResponse(tokenObject, newExpiryMonth, newExpiryYear, addressData);
+test.serial('Check value of default for updating token with invalid address', async (t: any) => {
+  t.not(result.default, true);
+});
+
+test.serial('Check http code for updating invalid token', async (t: any) => {
+  let response: any = await updateToken.updateTokenResponse(tokenObject, newExpiryMonth, newExpiryYear, addressData);
   result.httpCode = response.httpCode;
   result.default = response.default;
-  t.not(result.httpCode, Constants.HTTP_CODE_TWO_HUNDRED);
+  t.not(result.httpCode, Constants.HTTP_OK_STATUS_CODE);
 });
 
-test.serial('Check value of default for updating  invalid token', async (t) => {
+test.serial('Check value of default for token update token with invalid token', async (t: any) => {
   t.not(result.default, true);
 });

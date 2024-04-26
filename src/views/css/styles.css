@@ -36,14 +36,14 @@ table {
   padding: 0.75rem;
   font-size: 0.9rem;
 }
-table.paymenttable1 {
+table.paymentTableAbove {
   border-collapse: collapse;
   width: 100%;
   padding: 0.75rem;
   font-size: 0.9rem;
   table-layout: fixed;
 }
-table.paymenttable2 {
+table.paymentTableBelow {
   border-spacing: 0px;
   table-layout: fixed;
   width: 100%;

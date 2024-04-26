@@ -84,6 +84,6 @@ export const updateTransactions = {
   state: 'Initial',
 };
 
-export const orderNo = null;
+export const orderNo = '';
 
 export const orderNumber = '10';

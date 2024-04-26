@@ -1,8 +1,6 @@
-/* eslint-disable import/order */
-/* eslint-disable no-var */
-import eCheck from '../../JSON/eCheck.json';
 import creditCard from '../../JSON/creditCard.json';
-export var payment = {
+import eCheck from '../../JSON/eCheck.json';
+export let payment = {
   id: 'f3215a29-1f08-4775-9006-22b84b55bae5',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -61,7 +59,7 @@ export var payment = {
   interfaceInteractions: [],
 };
 
-export var paymentGuest = {
+export let paymentGuest = {
   id: 'b793821e-c364-4166-b47f-da3f181664ed',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -111,7 +109,7 @@ export var paymentGuest = {
   anonymousId: '137e1f96-4328-4fda-85f5-b039bb640fec',
 };
 
-export var cart = {
+export let cart = {
   type: 'Cart',
   id: '3d09ed42-1b1b-450a-b670-269437683939',
   version: 10,
@@ -326,16 +324,16 @@ export var cart = {
 };
 export const cardTokens = {
   customerTokenId: creditCard.savedToken,
-  paymentInstrumentId: null,
+  paymentInstrumentId: '',
 };
 
 export const service = 'card';
 
-export const dontSaveTokenFlag = false;
+export const notSaveToken = false;
 
 export const payerAuthMandateFlag = false;
 
-export const orderNo = null;
+export const orderNo = '';
 
 export const shippingCart = {
   type: 'Cart',
@@ -361,11 +359,11 @@ export const shippingCart = {
     {
       id: '77197bf1-a747-499b-88e4-df16ff235f9f',
       productId: 'c28cfa09-801e-4309-8e2e-edf39f85ddf2',
-      "name": {
-        "en": "sandalen “Aubrey” Michael Kors brown",
-        "de": "sandalen “Aubrey” Michael Kors brown",
-        "en-US": "sandalen “Aubrey” Michael Kors brown",
-        "de-DE": "sandalen “Aubrey” Michael Kors brown"
+      name: {
+        en: 'sandalen Aubrey Michael Kors brown',
+        de: 'sandalen Aubrey Michael Kors brown',
+        'en-US': 'sandalen Aubrey Michael Kors brown',
+        'de-DE': 'sandalen Aubrey Michael Kors brown',
       },
       productType: {
         typeId: 'product-type',
@@ -373,8 +371,8 @@ export const shippingCart = {
         version: 1,
       },
       productSlug: {
-        'en': 'a5',
-        'de': 'a5',
+        en: 'a5',
+        de: 'a5',
         'en-US': 'a5',
         'de-DE': 'a5',
       },

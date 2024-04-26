@@ -15,7 +15,7 @@ For using Synchronizing services, it should be enabled from the configuration fi
 
 > **_NOTE:_** These fields are case sensitive
 
-The `run sync` button in extension UI (<https://{domain_where_extension_is_hosted}/orders>) will synchronize every payment found for the current day i.e., 50 payments at a time across all the mids configured in the .env file. `Decision sync` also works in the similar way such that, it will update the state of payment that is in `Pending` to either `Success` or `Failure` based on the Decision taken by the merchant.
+The `run sync` button in extension UI (<https://{domain_where_extension_is_hosted}/orders>) will synchronize every payments found in response at a time i.e., 50 payments at a time across all the mids configured in the .env file. `Decision sync` also works in the similar way such that, it will update the state of payment that is in `Pending` to either `Success` or `Failure` based on the Decision taken by the merchant.
 
 Alternatively, Scheduler can be used to run the sync periodically. Below are the endpoints for synchronization:
 
@@ -24,7 +24,7 @@ Alternatively, Scheduler can be used to run the sync periodically. Below are the
 | Decision sync | {baseUrl}/decisionSync | The baseUrl will be defined by where you deploy the extension. HTTPS should be used for production |
 | Run sync      | {baseUrl}/sync         | The baseUrl will be defined by where you deploy the extension. HTTPS should be used for production |
 
-> **_NOTE:_** In the order or execution, Decision Sync should have the higher priority than Run Sync. Eg: If an authorization is pending for review, and is rejected from EBC along with auth reversal, the Decision status should be synced first and later comes the Run Sync. If a scheduler is configured, always Decision Sync Scheduler should execute before Run Sync scheduler.
+> **_NOTE:_** In the order or execution, Decision Sync should have the higher priority than Run Sync. Eg: If an authorization is pending for review, and is rejected from Business Centre along with auth reversal, the Decision status should be synced first and later comes the Run Sync. If a scheduler is configured, always Decision Sync Scheduler should execute before Run Sync scheduler.
 
 ## Process
 

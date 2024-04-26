@@ -144,4 +144,4 @@ export const updateTransaction = {
   state: 'Initial',
 };
 
-export const orderNo = null;
+export const orderNo = '';

@@ -76,6 +76,6 @@ export const authId = clickToPay.authId;
 
 export const authID = '63972485384166953039';
 
-export const orderNo = null;
+export const orderNo = '';
 
 export const orderNumber = '10';

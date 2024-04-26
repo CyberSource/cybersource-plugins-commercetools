@@ -1,215 +1,224 @@
 {
-    "key": "isv_payments_customer_tokens",
-    "name": {
-      "en": "Payment service customer tokens"
+  "key": "isv_payments_customer_tokens",
+  "name": {
+    "en": "Payment service customer tokens"
+  },
+  "resourceTypeIds": ["customer"],
+  "fieldDefinitions": [
+    {
+      "name": "isv_tokens",
+      "label": {
+        "en": "Payment service card tokens"
+      },
+      "required": false,
+      "type": {
+        "name": "Set",
+        "elementType": {
+          "name": "String"
+        }
+      },
+      "inputHint": "SingleLine"
     },
-    "resourceTypeIds": [
-      "customer"
-    ],
-    "fieldDefinitions": [
-      {
-        "name": "isv_tokens",
-        "label": {
-          "en": "Payment service card tokens"
-        },
-        "required": false,
-        "type": {
-          "name": "Set",
-          "elementType": {
-            "name": "String"
-          }
-        },
-        "inputHint": "SingleLine"
+    {
+      "name": "isv_token",
+      "label": {
+        "en": "Token"
       },
-      {
-        "name": "isv_token",
-        "label": {
-          "en": "Token"
-        },
-        "required": false,
-        "type": {
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_tokenAlias",
+      "label": {
+        "en": "Save token with alias"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_savedToken",
+      "label": {
+        "en": "Saved token (subscription)"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_tokenVerificationContext",
+      "label": {
+        "en": "Token verification context"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_tokenCaptureContextSignature",
+      "label": {
+        "en": "Token capture context signature"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_cardType",
+      "label": {
+        "en": "Card type"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_maskedPan",
+      "label": {
+        "en": "Masked card number"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_cardExpiryMonth",
+      "label": {
+        "en": "Card expiry month"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_cardExpiryYear",
+      "label": {
+        "en": "Card expiry year"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_addressId",
+      "label": {
+        "en": "Address Id"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_currencyCode",
+      "label": {
+        "en": "Currency code of the store"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_deviceFingerprintId",
+      "label": {
+        "en": "Session id used for device fingerprinting"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_cardNewExpiryMonth",
+      "label": {
+        "en": "Card new expiry month to be updated"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_cardNewExpiryYear",
+      "label": {
+        "en": "Card new expiry year to be updated"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_tokenUpdated",
+      "label": {
+        "en": "Flag indicating token is updated"
+      },
+      "required": false,
+      "type": {
+        "name": "Boolean"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_tokenAction",
+      "label": {
+        "en": "Action to trigger update or delete token"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_failedTokens",
+      "label": {
+        "en": "Failed tokens"
+      },
+      "required": false,
+      "type": {
+        "name": "Set",
+        "elementType": {
           "name": "String"
-        },
-        "inputHint": "SingleLine"
+        }
       },
-      {
-        "name": "isv_tokenAlias",
-        "label": {
-          "en": "Save token with alias"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_customerId",
+      "label": {
+        "en": "Customer id from payment gateway"
       },
-      {
-        "name": "isv_savedToken",
-        "label": {
-          "en": "Saved token (subscription)"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
+      "required": false,
+      "type": {
+        "name": "String"
       },
-      {
-        "name": "isv_tokenVerificationContext",
-        "label": {
-          "en": "Token verification context"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_tokenCaptureContextSignature",
-        "label": {
-          "en": "Token capture context signature"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_cardType",
-        "label": {
-          "en": "Card type"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_maskedPan",
-        "label": {
-          "en": "Masked card number"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_cardExpiryMonth",
-        "label": {
-          "en": "Card expiry month"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_cardExpiryYear",
-        "label": {
-          "en": "Card expiry year"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_addressId",
-        "label": {
-          "en": "Address Id"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_currencyCode",
-        "label": {
-          "en": "Currency code of the store"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_deviceFingerprintId",
-        "label": {
-          "en": "Session id used for device fingerprinting"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_cardNewExpiryMonth",
-        "label": {
-          "en": "Card new expiry month to be updated"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_cardNewExpiryYear",
-        "label": {
-          "en": "Card new expiry year to be updated"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_tokenUpdated",
-        "label": {
-          "en": "Flag indicating token is updated"
-        },
-        "required": false,
-        "type": {
-          "name": "Boolean"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_tokenAction",
-        "label": {
-          "en": "Action to trigger update or delete token"
-        },
-        "required": false,
-        "type": {
-          "name": "String"
-        },
-        "inputHint": "SingleLine"
-      },
-      {
-        "name": "isv_failedTokens",
-        "label": {
-          "en": "Failed tokens"
-        },
-        "required": false,
-        "type": {
-          "name": "Set",
-          "elementType": {
-            "name": "String"
-          }
-        },
-        "inputHint": "SingleLine"
-      }
-    ]
-  }
+      "inputHint": "SingleLine"
+    }
+  ]
+}

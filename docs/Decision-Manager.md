@@ -19,7 +19,6 @@ Fields which are used by Decision Manager are mapped from Commercetools fields a
 | cart.lineItem[#] | variant.sku | item_#_productSKU    |  |
 | payment | isv_deviceFingerprintId | deviceInformation_fingerprintSessionId    |  |
 
-
 ### Device Fingerprinting
 
 Follow the appropriate Cybersource guide for device fingerprinting and add the session Id used for this to the Commercetools payment as a custom field called `isv_deviceFingerprintId`. 
@@ -33,14 +32,13 @@ Replace the below data:
 - {{merchant Id}} - Unique Cybersource merchant Id. 
 - {{session Id}} - Value of unique Id generated above
 
-> **_NOTE:_** Extension will send value present in the field `isv_deviceFingerprintId` to Cybersource, only if `PAYMENT_GATEWAY_DECISION_MANAGER` is enabled from the env file. 
-
+> **_NOTE:_** Extension will send value present in the field `isv_deviceFingerprintId` to Cybersource, only if `PAYMENT_GATEWAY_DECISION_MANAGER` is enabled from the .env file. 
 
 ### Enabling/disabling Decision Manager for specific payments
 
 The Cybersource Extension has environment variable for decision manager as `PAYMENT_GATEWAY_DECISION_MANAGER`, you can set the values to true or false to enable or disable decision manager. If set to true, `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` variable must be configured with comma separated values of different merchant Ids in which decision manager has to be executed.
 
-> **_NOTE:_** `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` is case sensitive without any spaces.
+> **_NOTE:_** Value for `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` is case sensitive without any spaces.
 
 ## Optional fields
 
@@ -80,14 +78,13 @@ The following is an example of field definitions for the customer IP address. Th
 
 ## Test settings
 
-To support testing Decision Manager responses it is necessary to configure Decision Manager in EBC. This allows triggering of particular responses by matching line 1 of the billing address
+To support testing Decision Manager responses, it is necessary to configure Decision Manager in Business Centre. This allows triggering of particular responses by matching line 1 of the billing address
 
-- In Decision Manager → Configuration → Extended Settings enable
+- In Decision Manager → Configuration → Extended Settings, enable
   Decision Manager for Authorization
   - Also ensure the reply flags are set to DREVIEW and DREJECT
-  - If you need EBC to trigger Authorization Reversal automatically during Reject After Auth cases, make sure that you check the checkbox under Decision Manager → Configuration → Extended Settings to enable it. Otherwise, extension will automatically trigger Authorization Reversal
+  - If you need Business Centre to trigger Authorization Reversal automatically during Reject After Auth cases, make sure that you select the checkbox under Decision Manager → Configuration → Extended Settings to enable it. Otherwise, extension will automatically trigger Authorization Reversal
   - When Sale transaction is in review state, before reviewing it navigate to Decision Manager → Configuration → Extended Settings and make sure to select the "Enable Settlement With Selected" for payment processing. Make sure the amount entered for settlement is same to the amount authorized in this case.
-
 
 - In Decision Manager → Configuration → Profiles create a new profile
   and set it as default
