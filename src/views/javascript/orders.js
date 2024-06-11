@@ -55,26 +55,26 @@ if (window.location.pathname.includes('orders')) {
   });
 }
 
+/**
+ * Renders a list of orders in a table format.
+ * 
+ * @param {Array} orderList - List of orders to render.
+ */
 async function renderOrders(orderList) {
   const paymentDetailsBody = document.getElementById('paymentDetailsBody');
-  paymentDetailsBody.innerHTML = '';
+  paymentDetailsBody.textContent = '';
 
   if (orderList && orderList.length > 0) {
     await Promise.all(
       orderList.map(async (order, index) => {
         if (order.transactions.length !== 0) {
           const fractionDigits = order?.amountPlanned?.fractionDigits;
-          const newRow = createTableRow(
-            index,
-            order.id,
-            order.amountPlanned.currencyCode,
+          const newRow = createTableRow(index, order.id, order.amountPlanned.currencyCode,
             amountConversion(order?.amountPlanned?.centAmount, fractionDigits),
             order.paymentMethodInfo.name ? order?.paymentMethodInfo?.name?.en : order?.paymentMethodInfo?.method,
             dateConversion(order.createdAt),
             dateConversion(order.lastModifiedAt),
-            `/paymentDetails?id=${order.id}`
-          );
-
+            `/paymentDetails?id=${order.id}`);
           newRow.addEventListener('click', () => {
             const url = newRow.getAttribute('data-href');
             window.location.href = url;
@@ -90,6 +90,19 @@ async function renderOrders(orderList) {
   }
 }
 
+/**
+ * Creates a table row with order details.
+ * 
+ * @param {number} index - The index of the row.
+ * @param {string} orderId - The order ID.
+ * @param {string} currencyCode - The currency code.
+ * @param {number} amount - The amount.
+ * @param {string} paymentMethod - The payment method.
+ * @param {string} createdAt - The creation date of the order.
+ * @param {string} lastModifiedAt - The last modified date of the order.
+ * @param {string} url - The URL associated with the row.
+ * @returns {HTMLTableRowElement} - The created table row element.
+ */
 function createTableRow(index, orderId, currencyCode, amount, paymentMethod, createdAt, lastModifiedAt, url) {
   const newRow = document.createElement('tr');
   newRow.id = `cell-${index}`;
@@ -120,6 +133,11 @@ function createTableRow(index, orderId, currencyCode, amount, paymentMethod, cre
   return newRow;
 }
 
+/**
+ * Creates an empty table row indicating that there are no orders.
+ * 
+ * @returns {HTMLTableRowElement} - The created empty table row element.
+ */
 function createTableRowEmpty() {
   const newRow = document.createElement('tr');
   const cell = document.createElement('td');
@@ -130,20 +148,37 @@ function createTableRowEmpty() {
   return newRow;
 }
 
+/**
+ * Displays an error message on the page.
+ * 
+ * @param {string} message - The error message to be displayed.
+ * @returns {Promise<void>} - A Promise that resolves once the message is displayed.
+ */
 async function displayErrorMessage(message) {
   const orderErrorMessage = document.getElementById('orderErrorMessage');
   const emElement = orderErrorMessage.querySelector('em');
   emElement.classList.add('mark', 'error');
   orderErrorMessage.classList.add('alert', 'alert-error', 'alert-dismissible');
-  orderErrorMessage.innerHTML = message;
+  orderErrorMessage.textContent = message;
 }
 
+/**
+ * Displays a success message on the page.
+ * 
+ * @param {string} message - The success message to be displayed.
+ * @returns {Promise<void>} - A Promise that resolves once the message is displayed.
+ */
 async function displaySuccessMessage(message) {
   const orderSuccessMessage = document.getElementById('orderSuccessMessage');
   orderSuccessMessage.classList.add('alert', 'alert-success', 'alert-dismissible');
-  orderSuccessMessage.innerHTML = message;
+  orderSuccessMessage.textContent = message;
 }
 
+/**
+ * Fetches order information from the server.
+ * 
+ * @returns {Promise<any>} A Promise that resolves with the fetched order information.
+ */
 async function fetchOrdersInfo() {
   const loadingIndicator = document.getElementById('loading');
   try {
@@ -163,10 +198,18 @@ async function fetchOrdersInfo() {
   }
 }
 
+/**
+ * Adds a click event listener to the provided element.
+ * 
+ * @param {HTMLElement} element - The HTML element to attach the event listener to.
+ */
 function addEventListener(element) {
   element.addEventListener('click', showDiv);
 }
 
+/**
+ * Displays the loading div by setting its display style to 'flex'.
+ */
 function showDiv() {
   document.getElementById('loading').style.display = 'flex';
 }

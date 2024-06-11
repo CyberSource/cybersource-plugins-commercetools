@@ -30,6 +30,7 @@ After authentication is complete, authorization of the payment can then be tri
     | region                      | shipTo_state                | billTo_state               |                                                                                                                      |
     | country                     | shipTo_country              | billTo_country             |                                                                                                                      |
     | email                       | shipTo_email                | billTo_email               |                                                                                                                      |
+    | phone                       | shipTo_phone                | billTo_phone               |                                                                                                                      |
 
 2.  Tokenize Card details using Cybersource Flex
 
@@ -75,7 +76,7 @@ After authentication is complete, authorization of the payment can then be tri
 
     a. Also see [Decision Manager](Decision-Manager.md) for additional fields to populate if you are using Decision Manager
 
-    b. When the payment is being updated, the extension will do a Payer Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
+    b. When the payment is being updated, the extension will do a Payer Auth Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
 
         Skip this step for saved token and proceed to step c
 
@@ -91,7 +92,7 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_saleEnabled         | false                         | Yes       | Set the value to true if sale is enabled                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 
-    c. For saved token, when the payment is being updated, the extension will do a Payer Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
+    c. For saved token, when the payment is being updated, the extension will do a Payer Auth Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
 
     | Property                              | Value                          | Required | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
     | ------------------------------------- | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -115,6 +116,9 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_acceptHeader      | Accept header from Customer browser     | Yes      | Used by 3DS process, populated from client-side libraries |
     | custom.fields.isv_userAgentHeader   | User agent header from Customer browser | Yes      | Used by 3DS process, populated from client-side libraries |
     | custom.fields.isv_customerIpAddress | Customer IP address                     | Yes      | Populated from client-side libraries                      |
+    | custom.fields.isv_screenWidth      | Screen width of Customer browser     | Yes      | Used by 3DS process, populated from client-side libraries |
+    | custom.fields.isv_screenHeight   | Screen height of Customer browser | Yes      | Used by 3DS process, populated from client-side libraries |
+
 
 8.  wait for the response from ddc form and if successful, then proceed with enrolment, verify the following fields from update response
 
@@ -124,7 +128,7 @@ After authentication is complete, authorization of the payment can then be tri
         isv_payerEnrollHttpCode
         isv_payerEnrollStatus
 
-9.  Check if the `isv_payerEnrollHttpCode` value is 201 and `isv_payerEnrollStatus` value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 6 else proceed to step 10
+9.  Check if the `isv_payerEnrollHttpCode` value is 201 and `isv_payerEnrollStatus` value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 5 else proceed to step 10. Refer the [DMPA](./Decision-Manager.md#payer-authentication-with-decision-manager) section to know more about the DMPA
 
 10. Check the value of the isv_payerAuthenticationRequired field on the
     updated payment. If the value is true, perform the following steps
@@ -146,7 +150,7 @@ After authentication is complete, authorization of the payment can then be tri
         isv_payerEnrollHttpCode
         isv_payerEnrollStatus
 
-    Check if the isv_payerEnrollHttpCode value is 201 and isv_payerEnrollStatus value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 6 else proceed to step 12.
+    Check if the isv_payerEnrollHttpCode value is 201 and isv_payerEnrollStatus value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 5 else proceed to step 12.
 
 12. Add a transaction to the payment 
 

@@ -111,44 +111,54 @@ Fields
 
 Fields
 
-| Name                                 | Type    | Required | 
-| ------------------------------------ | ------- | -------- |
-| isv_token                            | String  | false    |
-| isv_tokenAlias                       | String  | false    |
-| isv_savedToken                       | String  | false    |
-| isv_tokenVerificationContext         | String  | false    |
-| isv_tokenCaptureContextSignature     | String  | false    |
-| isv_cardType                         | String  | false    |
-| isv_maskedPan                        | String  | false    |
-| isv_cardExpiryMonth                  | String  | false    |
-| isv_cardExpiryYear                   | String  | false    |
-| isv_requestJwt                       | String  | false    |
-| isv_responseJwt                      | String  | false    |
-| isv_payerAuthenticationRequired      | Boolean | false    |
-| isv_payerAuthenticationTransactionId | String  | false    |
-| isv_payerAuthenticationAcsUrl        | String  | false    |
-| isv_payerAuthenticationPaReq         | String  | false    |
-| isv_acceptHeader                     | String  | false    |
-| isv_userAgentHeader                  | String  | false    |
-| isv_deviceFingerprintId              | String  | false    |
-| isv_customerIpAddress                | String  | false    |
-| isv_cardinalReferenceId              | String  | false    |
-| isv_deviceDataCollectionUrl          | String  | false    |
-| isv_stepUpUrl                        | String  | false    |
-| isv_applePayValidationUrl            | String  | false    |
-| isv_applePayDisplayName              | String  | false    |
-| isv_applePaySessionData              | String  | false    |
-| isv_payerEnrollTransactionId         | String  | false    |
-| isv_payerEnrollStatus                | String  | false    |
-| isv_payerEnrollHttpCode              | Number  | false    |
-| isv_saleEnabled                      | Boolean | false    |
-| isv_enabledMoto                      | Boolean | false    |
-| isv_walletType                       | String  | false    |
-| isv_accountNumber                    | String  | false    |
-| isv_accountType                      | String  | false    |
-| isv_routingNumber                    | String  | false    |
-| isv_merchantId                       | String  | false    |
-| isv_securityCode                       | Number  | false    |
+| Name                                 | Type    | Required | Notes  |
+| ------------------------------------ | ------- | -------- | ------ |
+| isv_token                            | String  | false    |        |
+| isv_tokenAlias                       | String  | false    |         |
+| isv_savedToken                       | String  | false    ||
+| isv_tokenVerificationContext         | String  | false    ||
+| isv_tokenCaptureContextSignature     | String  | false    ||
+| isv_cardType                         | String  | false    ||
+| isv_maskedPan                        | String  | false    ||
+| isv_cardExpiryMonth                  | String  | false    ||
+| isv_cardExpiryYear                   | String  | false    ||
+| isv_requestJwt                       | String  | false    ||
+| isv_responseJwt                      | String  | false    ||
+| isv_payerAuthenticationRequired      | Boolean | false    ||
+| isv_payerAuthenticationTransactionId | String  | false    ||
+| isv_payerAuthenticationAcsUrl        | String  | false    ||
+| isv_payerAuthenticationPaReq         | String  | false    ||
+| isv_acceptHeader                     | String  | false    ||
+| isv_userAgentHeader                  | String  | false    ||
+| isv_deviceFingerprintId              | String  | false    ||
+| isv_customerIpAddress                | String  | false    ||
+| isv_cardinalReferenceId              | String  | false    ||
+| isv_deviceDataCollectionUrl          | String  | false    ||
+| isv_stepUpUrl                        | String  | false    ||
+| isv_applePayValidationUrl            | String  | false    ||
+| isv_applePayDisplayName              | String  | false    ||
+| isv_applePaySessionData              | String  | false    ||
+| isv_payerEnrollTransactionId         | String  | false    ||
+| isv_payerEnrollStatus                | String  | false    ||
+| isv_payerEnrollHttpCode              | Number  | false    ||
+| isv_saleEnabled                      | Boolean | false    ||
+| isv_enabledMoto                      | Boolean | false    ||
+| isv_walletType                       | String  | false    ||
+| isv_accountNumber                    | String  | false    ||
+| isv_accountType                      | String  | false    ||
+| isv_routingNumber                    | String  | false    ||
+| isv_merchantId                       | String  | false    ||
+| isv_securityCode                     | Number  | false    ||
+| isv_screenWidth                      | String  | false    ||
+| isv_screenHeight                     | String  | false    ||
+| isv_responseDateAndTime              | String  | false    ||
+| isv_authorizationStatus              | String  | false    |This field will be updated with the initial authorization or sale status from the payment gateway. If Cybersource response doesn't reach the extension, this field will remain empty|
+| isv_authorizationReasonCode          | Number  | false    ||
+| isv_ECI                              | String  | false    ||
+| isv_AVSResponse                      | String  | false    ||
+| isv_CVVResponse                      | String  | false    ||
+| isv_responseCode                     | String  | false    ||
+| isv_dmpaFlag                         | Boolean | false    ||
 
 ### Payer Authentication enrolment check
 

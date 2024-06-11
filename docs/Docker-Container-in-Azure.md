@@ -124,7 +124,7 @@ Replace value of the following
 
 Once `deploy-aci.yaml` is ready with all the values, navigate to the directory where file is present and run the following command 
 
-        az container create --resource-group rg-visa-qa --file deploy-aci.yaml
+        az container create --resource-group <name of resource group> --file deploy-aci.yaml
 
 **_NOTE:_** In `deploy-aci.yaml` file, make sure to mention all the existing variables since modification with yaml file will override all the existing variables.
 

@@ -2,15 +2,20 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
+import { Constants } from '../../constants';
 import paymentUtils from '../../utils/PaymentUtils';
 import unit from '../JSON/unit.json';
+import { notification } from '../const/ApiHandlerConst';
 import { payment } from '../const/CreditCard/PaymentAuthorizationServiceConstCC';
-import { processTokensCustomerCardTokensObject, processTokensInstrumentIdentifier, retrieveAddRefundResponseObjectTransactionWithNoCustom } from '../const/PaymentServiceConst';
+import {payment as capturePayment} from '../const/CreditCard/PaymentCaptureServiceConstCC';
+import { customFields, deleteTokenCustomerObj, getUpdateTokenActionsActions, processTokensCustomerCardTokensObject, processTokensInstrumentIdentifier, retrieveAddRefundResponseObjectTransactionWithNoCustom } from '../const/PaymentServiceConst';
 import {
   changeStateFailureTransactionDetail,
   changeStateTransactionDetail,
   createTokenDataAddress,
   createTokenDataCustomerObj,
+  createTokenDataEmptyCustomField,
+  createTokenEmptyDataAddress,
   failurePaymentResponse,
   failureResponseTransactionDetail,
   failureState,
@@ -20,6 +25,8 @@ import {
   setTransactionIdPaymentResponse,
   setTransactionIdTransactionDetail,
   successState,
+  validAddTokenResponse,
+  validUpdateServiceResponse
 } from '../const/PaymentUtilsConst';
 
 test.serial('get the order id', async (t: any) => {
@@ -236,3 +243,115 @@ test.serial('create failed token data when address id is null', async (t) => {
     t.not(typeof result, 'object');
   }
 });
+
+test.serial('create failed token data when field value is empty', async (t) => {
+  if (createTokenDataAddress?.id) {
+    let result = await paymentUtils.createFailedTokenData(createTokenDataEmptyCustomField, createTokenDataAddress.id);
+    t.is(typeof result, 'object');
+  }
+});
+
+test.serial('create token data when field value is empty', async (t) => {
+  let result = await paymentUtils.createTokenData(
+    createTokenDataEmptyCustomField,
+    createTokenDataCustomerObj,
+    '',
+    '',
+    '',
+    createTokenEmptyDataAddress
+  );
+  t.is(result.alias, '');
+  t.is(result.value, '');
+  t.is(result.paymentToken, '');
+  t.is(result.instrumentIdentifier, '');
+  t.is(result.cardType, '');
+  t.is(result.cardName, '');
+  t.is(result.cardNumber, '');
+  t.is(result.cardExpiryMonth, '');
+  t.is(result.cardExpiryYear, '');
+  t.is(result.addressId, '');
+  t.deepEqual(result.address, {});
+});
+
+test.serial("test OM error message with 0 error code and type as charge", (t) => {
+  const result = paymentUtils.handleOMErrorMessage(0, Constants.CT_TRANSACTION_TYPE_CHARGE);
+  t.is(result, Constants.ERROR_MSG_CAPTURE_AMOUNT_GREATER_THAN_ZERO);
+})
+
+test.serial("test OM error message with 0 error code and type as refund", (t) => {
+  const result = paymentUtils.handleOMErrorMessage(0, Constants.CT_TRANSACTION_TYPE_REFUND);
+  t.is(result, Constants.ERROR_MSG_REFUND_GREATER_THAN_ZERO);
+})
+
+test.serial("test OM error message with 1 error code and type as charge", (t) => {
+  const result = paymentUtils.handleOMErrorMessage(1, Constants.CT_TRANSACTION_TYPE_CHARGE);
+  t.is(result, Constants.ERROR_MSG_CAPTURE_EXCEEDS_AUTHORIZED_AMOUNT);
+})
+
+test.serial("test OM error message with 1 error code and type as refund", (t) => {
+  const result = paymentUtils.handleOMErrorMessage(1, Constants.CT_TRANSACTION_TYPE_REFUND);
+  t.is(result, Constants.ERROR_MSG_REFUND_EXCEEDS_CAPTURE_AMOUNT);
+})
+
+test.serial("test OM error message with 2 error code and type as charge", (t) => {
+  const result = paymentUtils.handleOMErrorMessage(2, Constants.CT_TRANSACTION_TYPE_CHARGE);
+  t.is(result, Constants.ERROR_MSG_CAPTURE_SERVICE);
+})
+
+test.serial("test OM error message with 2 error code and type as refund", (t) => {
+  const result = paymentUtils.handleOMErrorMessage(2, Constants.CT_TRANSACTION_TYPE_REFUND);
+  t.is(result, Constants.ERROR_MSG_REFUND_SERVICE);
+})
+
+test.serial("test OM error message with 2 error code and type as cancel authorization", (t) => {
+  const result = paymentUtils.handleOMErrorMessage(2, Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION);
+  t.is(result, Constants.ERROR_MSG_REVERSAL_SERVICE);
+})
+
+test.serial('update parsed tokens', (t) => {
+  const result = paymentUtils.updateParsedToken(getUpdateTokenActionsActions[0], customFields, processTokensCustomerCardTokensObject.customerTokenId, processTokensCustomerCardTokensObject.paymentInstrumentId, '1wij488', null);
+  t.is(result.alias, customFields.isv_tokenAlias);
+  t.is(result.value, processTokensCustomerCardTokensObject.paymentInstrumentId);
+  t.is(result.paymentToken, processTokensCustomerCardTokensObject.customerTokenId);
+  t.is(result.cardExpiryMonth, customFields.isv_cardExpiryMonth);
+  t.is(result.cardExpiryYear, customFields.isv_cardExpiryYear);
+})
+
+test.serial('Extract token value', (t) => {
+  const result = paymentUtils.extractTokenValue(notification.payload[0].data._links.instrumentIdentifiers[0].href);
+  t.is(result, '7036349999987050572')
+})
+
+test.serial('count of token for an interval', (t) => {
+  let cardRate = Number(process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME);
+  let startTime = new Date();
+  startTime.setHours(startTime.getHours() - cardRate);
+  const result = paymentUtils.tokenCountForInterval(deleteTokenCustomerObj.custom?.fields?.isv_tokens as any, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
+  t.is(result, 0);
+})
+
+test.serial('create transaction object', (t) => {
+  const result = paymentUtils.createTransactionObject(capturePayment.version, capturePayment.amountPlanned, capturePayment.transactions[0].type, capturePayment.transactions[0].state as any, capturePayment.transactions[0].interactionId, new Date(Date.now()).toISOString());
+  t.is(result.amount.centAmount, 100);
+  t.is(result.state, 'Success');
+  t.is(result.type, 'Authorization');
+})
+
+test.serial('Valid Update service response', async (t) => {
+  const result = await paymentUtils.validAddTokenResponse(validAddTokenResponse);
+  t.is(result, true);
+})
+
+test.serial('Valid Update service response when status is declined', (t) => {
+  validAddTokenResponse.status = 'Declined'
+  const result = paymentUtils.validAddTokenResponse(validAddTokenResponse);
+  t.is(result, false);
+})
+
+test.serial('Valid update service response with invalid http code', (t) => {
+  validUpdateServiceResponse.httpCode = 401;
+  validUpdateServiceResponse.default = null;
+  const result = paymentUtils.validUpdateServiceResponse(validUpdateServiceResponse);
+  t.is(result, false);
+})
+

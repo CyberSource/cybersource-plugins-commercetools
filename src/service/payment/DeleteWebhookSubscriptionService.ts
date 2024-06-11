@@ -3,11 +3,17 @@ import path from 'path';
 import restApi from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { midCredentialsType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const deleteWebhookSubscriptionResponse = async (midCredentials: midCredentialsType, subscriptionId: string | undefined): Promise<any> => {
+/**
+ * Deletes a webhook subscription.
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @param {string | undefined} subscriptionId - The subscription ID.
+ * @returns {Promise<any>} A promise that resolves with the delete webhook subscription response.
+ */
+const deleteWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType, subscriptionId: string | undefined): Promise<any> => {
   const deleteResponse = {
     httpCode: 0,
   };

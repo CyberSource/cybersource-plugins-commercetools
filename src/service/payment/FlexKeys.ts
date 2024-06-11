@@ -5,11 +5,16 @@ import jwt from 'jsonwebtoken';
 import { jwtDecode } from 'jwt-decode';
 
 import { Constants } from '../../constants';
-import { paymentType, responseType } from '../../types/Types';
+import { PaymentType, ResponseType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const keys = async (paymentObj: paymentType) => {
+/**
+ * Generates Flex keys for the flex microform.
+ * @param {PaymentType} paymentObj - The payment object.
+ * @returns {Promise<any>} A promise that resolves with Flex keys response.
+ */
+const keys = async (paymentObj: PaymentType): Promise<any> => {
   let errorData: string;
   let contextWithoutSignature: string;
   let parsedContext: string;
@@ -35,7 +40,7 @@ const keys = async (paymentObj: paymentType) => {
         paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncKeys', Constants.LOG_INFO, 'PaymentId : ' + paymentObj.id, 'Flex Keys Request = ' + JSON.stringify(requestObj));
       }
       const microFormIntegrationApiInstance = new restApi.MicroformIntegrationApi(configObject, apiClient);
-      return await new Promise<responseType>(function (resolve, reject) {
+      return await new Promise<ResponseType>(function (resolve, reject) {
         microFormIntegrationApiInstance.generateCaptureContext(requestObj, (error: any, data: string, response: any) => {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncKeys', Constants.LOG_INFO, 'PaymentId : ' + paymentObj.id, 'Flex Keys Response = ' + JSON.stringify(response));
           if (data && process.env.PAYMENT_GATEWAY_VERIFICATION_KEY) {

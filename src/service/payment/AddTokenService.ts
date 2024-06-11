@@ -1,13 +1,24 @@
 import path from 'path';
 
 import restApi from 'cybersource-rest-client';
+import {  PtsV2PaymentsPost201Response} from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { addressType, customerType, customTokenType, responseType } from '../../types/Types';
+import { AddressType, CustomerType, CustomTokenType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const addTokenResponse = async (customerId: string, customerObj: customerType, address: addressType | null, cardTokens: customTokenType) => {
+/**
+ * Service function responsible for Adding token to a customer.
+ * @param {string} customerId - The ID of the customer.
+ * @param {CustomerType} customerObj - The customer object containing necessary information.
+ * @param {AddressType|null} address - The customer's address.
+ * @param {CustomTokenType} cardTokens - The token information.
+ * @returns {Promise<PtsV2PaymentsPost201Response>} A promise that resolves with the payment response.
+ */
+type PtsV2PaymentsPost201Response = typeof PtsV2PaymentsPost201Response;
+
+const addTokenResponse = async (customerId: string, customerObj: CustomerType, address: AddressType | null, cardTokens: CustomTokenType): Promise<PtsV2PaymentsPost201Response> => {
   let errorData: string;
   const paymentResponse = {
     httpCode: 0,
@@ -29,13 +40,13 @@ const addTokenResponse = async (customerId: string, customerObj: customerType, a
       requestObj.paymentInformation = await prepareFields.getPaymentInformation('FuncAddTokenResponse', null, cardTokens, null);
       const currencyCode = customerObj?.custom?.fields?.isv_currencyCode ? customerObj.custom.fields.isv_currencyCode : '';
       requestObj.orderInformation = await prepareFields.getOrderInformation('FuncAddTokenResponse', null, null, '', customerObj, address, null, currencyCode);
-      requestObj.deviceInformation = await prepareFields.getDeviceInformation(null, customerObj);
+      requestObj.deviceInformation = await prepareFields.getDeviceInformation(null, customerObj, '');
 
       if (Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
         paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddTokenResponse', Constants.LOG_INFO, 'CustomerId : ' + customerId, 'Add Token Request = ' + JSON.stringify(requestObj));
       }
       const paymentsApiInstance = new restApi.PaymentsApi(configObject, apiClient);
-      return await new Promise<responseType>(function (resolve, reject) {
+      return await new Promise<PtsV2PaymentsPost201Response>(function (resolve, reject) {
         paymentsApiInstance.createPayment(requestObj, function (error: any, data: any, response: any) {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddTokenResponse', Constants.LOG_INFO, 'CustomerId : ' + customerId, 'Add Token Response = ' + JSON.stringify(response));
           if (data) {

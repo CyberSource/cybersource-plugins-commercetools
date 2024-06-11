@@ -1,13 +1,21 @@
 import path from 'path';
 
 import restApi from 'cybersource-rest-client';
+import {ReportingV3ConversionDetailsGet200Response} from 'cybersource-rest-client';
 import moment from 'moment';
 
 import { Constants } from '../../constants';
-import { midCredentialsType, responseType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
-const conversionDetails = async (midCredentials: midCredentialsType) => {
+
+/**
+ * Retrieves conversion details.
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @returns {Promise<ReportingV3ConversionDetailsGet200Response>} A promise that resolves with the conversion details response.
+ */
+type ReportingV3ConversionDetailsGet200Response = typeof ReportingV3ConversionDetailsGet200Response;
+const conversionDetails = async (midCredentials: MidCredentialsType): Promise<any> => {
   let startTime: string;
   let endTime: string;
   let errorData: string;
@@ -27,7 +35,7 @@ const conversionDetails = async (midCredentials: midCredentialsType) => {
         opts.push(configObject.merchantID);
       }
       const conversionDetailsApiInstance = new restApi.ConversionDetailsApi(configObject, apiClient);
-      return await new Promise<responseType>(function (resolve, reject) {
+      return await new Promise<ReportingV3ConversionDetailsGet200Response>(function (resolve, reject) {
         conversionDetailsApiInstance.getConversionDetail(startTime, endTime, opts, function (error: any, data: any, response: any) {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncConversionDetails', Constants.LOG_INFO, '', 'Decision Sync Response = ' + JSON.stringify(response));
           if (data) {
