@@ -524,6 +524,17 @@
         "name": "Boolean"
       },
       "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_shippingMethod",
+      "label": {
+        "en": "Shipping method selected by the customer"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
     }
   ]
 }

@@ -347,10 +347,14 @@ const getOrderInformation = async (functionName: string, paymentObj: PaymentType
   let captureAmount = 0.0;
   let fractionDigits = 0;
   let lineItemTotalAmount = 0;
+  let shippingMethod = '';
   try {
     if (null !== updateTransactions && null !== paymentObj) {
       centAmount = updateTransactions?.amount?.centAmount ? updateTransactions.amount.centAmount : paymentObj?.amountPlanned?.centAmount;
       captureAmount = paymentUtils.convertCentToAmount(centAmount, paymentObj.amountPlanned.fractionDigits);
+    }
+    if (paymentObj?.custom?.fields?.isv_shippingMethod) {
+      shippingMethod = paymentObj.custom.fields.isv_shippingMethod;
     }
     if ('FuncCaptureResponse' === functionName) {
       orderInformation = new restApi.Ptsv2paymentsidcapturesOrderInformation();
@@ -361,7 +365,7 @@ const getOrderInformation = async (functionName: string, paymentObj: PaymentType
       orderInformationLineItems = new restApi.Ptsv2paymentsidreversalsOrderInformationLineItems();
     } else if ('FuncAuthorizationResponse' === functionName && cartObj) {
       const orderInformationBillTo = await getOrderInformationBillTo('FuncAuthorizationResponse', cartObj, null, null);
-      const orderInformationShipTo = await getOrderInformationShipTo(cartObj);
+      const orderInformationShipTo = await getOrderInformationShipTo(cartObj, shippingMethod);
       orderInformation = new restApi.Ptsv2paymentsOrderInformation();
       orderInformation.billTo = orderInformationBillTo;
       orderInformation.shipTo = orderInformationShipTo;
@@ -397,7 +401,7 @@ const getOrderInformation = async (functionName: string, paymentObj: PaymentType
             } else if (lineItem?.discountedPricePerQuantity && 0 < lineItem?.discountedPricePerQuantity.length) {
               lineItem.discountedPricePerQuantity.forEach(async (item: any) => {
                 unitPrice = paymentUtils.convertCentToAmount(item.discountedPrice.value.centAmount, fractionDigits);
-                lineItemTotalAmount = unitPrice*(item.quantity);
+                lineItemTotalAmount = unitPrice * (item.quantity);
                 orderInformationLineItems = await getLineItemDetails(lineItem, unitPrice, functionName, cartLocale, item, paymentObj, false, cartObj, false, false, lineItemTotalAmount);
                 if (orderInformationLineItems && orderInformation?.lineItems) {
                   orderInformation.lineItems[j] = orderInformationLineItems;
@@ -609,7 +613,7 @@ const getOrderInformationBillTo = async (functionName: string, cartObj: any, add
  * @param {any} cartObj - The cart object.
  * @returns {Promise<any>} - The order information ship-to details.
  */
-const getOrderInformationShipTo = async (cartObj: any): Promise<any> => {
+const getOrderInformationShipTo = async (cartObj: any, shippingMethod: string): Promise<any> => {
   const orderInformationShipTo = new restApi.Ptsv2paymentsOrderInformationShipTo();
   if (cartObj?.shippingMode && Constants.SHIPPING_MODE_MULTIPLE == cartObj?.shippingMode && 0 < cartObj.shipping?.length) {
     orderInformationShipTo.firstName = cartObj.shipping[0].shippingAddress.firstName;
@@ -654,8 +658,8 @@ const getOrderInformationShipTo = async (cartObj: any): Promise<any> => {
       orderInformationShipTo.phoneNumber = cartObj?.shippingAddress?.mobile
     }
   }
-  if (process.env.PAYMENT_GATEWAY_SHIPPING_METHOD) {
-    orderInformationShipTo.method = process.env.PAYMENT_GATEWAY_SHIPPING_METHOD;
+  if (shippingMethod) {
+    orderInformationShipTo.method = shippingMethod;
   }
   return orderInformationShipTo;
 };

@@ -159,6 +159,7 @@ Fields
 | isv_CVVResponse                      | String  | false    ||
 | isv_responseCode                     | String  | false    ||
 | isv_dmpaFlag                         | Boolean | false    ||
+| isv_shippingMethod                   | String  | false    || 
 
 ### Payer Authentication enrolment check
 

@@ -80,6 +80,7 @@ export type PaymentCustomFieldsType = {
   isv_CVVResponse?: string,
   isv_responseCode?: string,
   isv_dmpaFlag?: boolean;
+  isv_shippingMethod?: string
 };
 
 export type PaymentTransactionType = {
