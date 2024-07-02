@@ -5,13 +5,18 @@ import dotenv from 'dotenv';
 import { Constants } from '././constants';
 import paymentUtils from '././utils/PaymentUtils';
 import resourceHandler from '././utils/config/ResourceHandler';
-import { midCredentialsType, subscriptionInformationType } from './types/Types';
+import { MidCredentialsType, SubscriptionInformationType } from './types/Types';
 import paymentHandler from './utils/PaymentHandler';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
 import MultiMid from './utils/config/MultiMid';
 
 dotenv.config();
-const setupExtensionResources = async () => {
+
+/**
+ * Sets up extension resources asynchronously by ensuring the required environment variables are set and creating extension resources.
+ * @returns {Promise<boolean>} A promise that resolves to true if the extension resources are successfully set up, otherwise false.
+ */
+const setupExtensionResources = async (): Promise<boolean> => {
   let extensionResources = false;
   try {
     if (process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL && process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE && process.env.CT_PROJECT_KEY && process.env.CT_CLIENT_ID && process.env.CT_CLIENT_SECRET && process.env.CT_AUTH_HOST && process.env.CT_API_HOST) {
@@ -27,13 +32,17 @@ const setupExtensionResources = async () => {
   return extensionResources;
 };
 
-const createWebhookSubscription = async () => {
+/**
+ * Creates webhook subscription for the payment gateway.
+ * @returns {Promise<any>} A promise that resolves to the response of setting the custom object containing subscription information.
+ */
+const createWebhookSubscription = async (): Promise<any> => {
   let setCustomObjectResponse;
   let subscriptionResponse;
-  let midCredentials: midCredentialsType;
-  let subscriptionInformation: subscriptionInformationType;
+  let midCredentials: MidCredentialsType;
+  let subscriptionInformation: SubscriptionInformationType;
   let networkTokenMultiMidArray: string[] = [];
-  let subscriptionInformationArray: subscriptionInformationType[] = [];
+  let subscriptionInformationArray: SubscriptionInformationType[] = [];
   try {
     if (process.env.PAYMENT_GATEWAY_NETWORK_TOKEN_MULTI_MID) {
       networkTokenMultiMidArray = process.env.PAYMENT_GATEWAY_NETWORK_TOKEN_MULTI_MID.split(',');

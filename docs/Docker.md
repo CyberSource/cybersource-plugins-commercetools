@@ -8,7 +8,7 @@ Before using it, make sure to install Docker Desktop in the respective system.
 ## Building the Docker image
   Navigate to the root directory of extension and run the following command to build the Docker image
 
-  Use appropriate appline of Nodejs and modify the Dockerfile if necessary.
+  Use appropriate appline of Nodejs and modify the `Dockerfile` if necessary.
     
   **_Note_**: Make sure to remove `node_modules` folder if it exists before building the image and ensure that Docker is running.
 

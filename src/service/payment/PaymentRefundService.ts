@@ -1,14 +1,24 @@
 import path from 'path';
 
 import restApi from 'cybersource-rest-client';
+import { PtsV2PaymentsRefundPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { customTokenType, paymentTransactionType, paymentType, responseType } from '../../types/Types';
+import { CustomTokenType, PaymentTransactionType, PaymentType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const refundResponse = async (payment: paymentType, captureId: string, updateTransactions: paymentTransactionType, orderNo: string) => {
-  const cardTokens: customTokenType = {
+/**
+ * Performs refund and returns the response.
+ * @param {PaymentType} payment - The payment object.
+ * @param {string} captureId - The capture ID.
+ * @param {PaymentTransactionType} updateTransactions - The updated transactions object.
+ * @param {string} orderNo - The order number.
+ * @returns { Promise<PtsV2PaymentsRefundPost201Response>} - The refund response.
+ */
+type PtsV2PaymentsRefundPost201Response = typeof PtsV2PaymentsRefundPost201Response;
+const refundResponse = async (payment: PaymentType, captureId: string, updateTransactions: PaymentTransactionType, orderNo: string): Promise<any> => {
+  const cardTokens: CustomTokenType = {
     customerTokenId: '',
     paymentInstrumentId: '',
   };
@@ -35,7 +45,7 @@ const refundResponse = async (payment: paymentType, captureId: string, updateTra
         paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncRefundResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Refund Request = ' + JSON.stringify(requestObj));
       }
       const refundApiInstance = new restApi.RefundApi(configObject, apiClient);
-      return await new Promise<responseType>(function (resolve, reject) {
+      return await new Promise<PtsV2PaymentsRefundPost201Response>(function (resolve, reject) {
         refundApiInstance.refundPayment(requestObj, captureId, function (error: any, data: any, response: any) {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncRefundResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Refund Response = ' + JSON.stringify(response));
           if (data) {

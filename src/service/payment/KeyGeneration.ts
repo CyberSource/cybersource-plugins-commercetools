@@ -3,11 +3,15 @@ import path from 'path';
 import restApi from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { midCredentialsType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
-
-const keyGenerationResponse = async (midCredentials: midCredentialsType) => {
+/**
+ * Generates a key and returns the key generation response.
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @returns {Promise<unknown>}} - The key generation response.
+*/
+const keyGenerationResponse = async (midCredentials: MidCredentialsType): Promise<unknown> => {
   const keyResponse = {
     httpCode: 0,
     organizationId: null,

@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { Constants } from '../../constants';
 import createSearchRequest from '../../service/payment/CreateTransactionSearchRequest';
-import { emptyMidCredentials } from '../const/DeleteWebhookSubscriptionConst';
+import { emptyMidCredentials, invalidMidCredentials } from '../const/DeleteWebhookSubscriptionConst';
 
 test('Run sync ', async (t: any) => {
   let midCredentials = {
@@ -22,6 +22,18 @@ test('Run sync ', async (t: any) => {
 
 test('Run sync without mid credentials', async (t: any) => {
   let result: any = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY, Constants.STRING_SYNC_SORT, emptyMidCredentials);
+  t.is(result.httpCode, 0);
+  t.is(result.data, '');
+});
+
+test('Run sync with invalid mid credentials', async (t: any) => {
+  let result: any = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY, Constants.STRING_SYNC_SORT, invalidMidCredentials);
+  t.is(result.httpCode, 401);
+  t.is(result.data, '');
+});
+
+test('Run sync with empty query', async (t: any) => {
+  let result: any = await createSearchRequest.getTransactionSearchResponse('', '', emptyMidCredentials);
   t.is(result.httpCode, 0);
   t.is(result.data, '');
 });

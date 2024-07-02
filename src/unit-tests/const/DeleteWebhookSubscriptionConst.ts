@@ -5,3 +5,9 @@ export const emptyMidCredentials = {
   merchantKeyId: '',
   merchantSecretKey: '',
 };
+
+export const invalidMidCredentials = {
+  merchantId: '2u827hhnd',
+  merchantKeyId: '@^%*RFR',
+  merchantSecretKey: '*&TFVAGV~P_U&',
+};

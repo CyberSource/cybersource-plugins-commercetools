@@ -1,6 +1,7 @@
 {
-  "customerId": "4e51e653-05a2-4d8c-9c58-3dabf391ebab",
-  "paymentId": "b77e974b-3cb5-40b9-b0d5-5903ade635e2",
+  "customerId": "0f4884e0-b003-4b47-8fde-e7b657e33d34",
+  "paymentId": "25477769-ac09-45f6-a9aa-b383a7be66eb",
   "anonymousId": "88c278f9-82d9-427c-96df-f98a4f23e543",
-  "cartId": "57132fab-04ce-4ced-b917-e847da2becbf"
+  "cartId": "db36c508-6b1a-44e7-86e9-fe9d490dc276",
+  "discountId": "6ed1bd8d-40ab-4b2e-a9a9-7b377c0b0bea"
 }

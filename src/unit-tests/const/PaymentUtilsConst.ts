@@ -1,4 +1,4 @@
-import { addressType } from '../../types/Types';
+import { AddressType } from '../../types/Types';
 
 export const setTransactionIdPaymentResponse: any = {
   httpCode: 201,
@@ -277,7 +277,21 @@ export const createTokenDataCustomerObj = {
   authenticationMode: 'Password',
 };
 
-export const createTokenDataAddress: addressType = {
+export const createTokenDataEmptyCustomField =  {
+    isv_tokenCaptureContextSignature: '',
+    isv_deviceFingerprintId: '',
+    isv_cardExpiryYear: '',
+    isv_token: '',
+    isv_tokenAlias: '',
+    isv_cardType: '',
+    isv_cardExpiryMonth: '',
+    isv_currencyCode: '',
+    isv_tokenVerificationContext:'',
+    isv_addressId: '',
+    isv_maskedPan: '',
+}
+
+export const createTokenDataAddress: AddressType = {
   id: 'Gu_fd8_a',
   firstName: 'shakshi',
   lastName: 'poddar',
@@ -290,3 +304,99 @@ export const createTokenDataAddress: addressType = {
   phone: '+19876543210',
   email: 'shakshi.poddar@wipro.com',
 };
+
+export const createTokenEmptyDataAddress: AddressType = {
+  id: '',
+  firstName: '',
+  lastName: '',
+  streetName: '',
+  additionalStreetInfo: '',
+  postalCode: '',
+  city: '',
+  region: '',
+  country: '',
+  phone: '',
+  email: '',
+};
+
+export let validAddTokenResponse = {
+  "httpCode": 201,
+  "transactionId": "7163560946556935304951",
+  "status": "AUTHORIZED",
+  "data": {
+    "_links": {
+      "self": {
+        "href": "/pts/v2/payments/7163560946556935304951",
+        "method": "GET"
+      },
+      "capture": {
+        "href": "/pts/v2/payments/7163560946556935304951/captures",
+        "method": "POST"
+      }
+    },
+    "id": "7163560946556935304951",
+    "submitTimeUtc": "2024-05-22T05:34:54Z",
+    "status": "AUTHORIZED",
+    "clientReferenceInformation": {
+      "code": "d97e4f9b-d229-449a-9c7d-00625c1da80e"
+    },
+    "processorInformation": {
+      "approvalCode": "831000",
+      "transactionId": "201506041511351",
+      "networkTransactionId": "201506041511351",
+      "responseCode": "00",
+      "avs": {
+        "code": "1"
+      },
+      "cardVerification": {
+        "resultCode": "3"
+      },
+      "merchantAdvice": {
+        "code": "01",
+        "codeRaw": "01"
+      }
+    },
+    "paymentAccountInformation": {
+      "card": {
+        "type": "001"
+      }
+    },
+    "paymentInformation": {
+      "card": {
+        "type": "001"
+      },
+      "tokenizedCard": {
+        "type": "001"
+      },
+      "customer": {
+        "id": "1878CFB968EF50D6E063AF598E0A63D1"
+      }
+    },
+    "orderInformation": {
+      "amountDetails": {
+        "authorizedAmount": "0.00",
+        "currency": "USD"
+      }
+    },
+    "tokenInformation": {
+      "instrumentidentifierNew": false,
+      "paymentInstrument": {
+        "id": "19052119B218A7D3E063AF598E0A06BA"
+      },
+      "instrumentIdentifier": {
+        "id": "7030000000026601088",
+        "state": "ACTIVE"
+      }
+    }
+  }
+}
+
+export let validUpdateServiceResponse : any = {
+  "httpCode": 200,
+  "default": false,
+  "card": {
+    "expirationMonth": "06",
+    "expirationYear": "2033",
+    "type": "001"
+  }
+}

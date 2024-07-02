@@ -80,3 +80,14 @@ test.serial('Check status of auth reversal  with multiple shipping', async (t: a
     t.not(paymentResponse.status, Constants.API_STATUS_REVERSED);
   }
 });
+
+test.serial('Reversing a payment with empty auth reversal id and check http code', async (t: any) => {
+  let result: any = await reverse.authReversalResponse(payment, carts, '');
+  paymentResponseObjects.httpCode = result.httpCode;
+  paymentResponseObjects.status = result.status;
+  t.not(paymentResponseObjects.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+});
+
+test.serial('Check status for auth reversal with empty auth reversal id', async (t: any) => {
+  t.not(paymentResponseObjects.status, Constants.API_STATUS_REVERSED);
+});

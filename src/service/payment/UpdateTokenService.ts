@@ -3,11 +3,19 @@ import path from 'path';
 import restApi from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { addressType, customerTokensType } from '../../types/Types';
+import { AddressType, CustomerTokensType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const updateTokenResponse = async (tokens: customerTokensType, newExpiryMonth: string, newExpiryYear: string, addressData: addressType | null) => {
+/**
+ * Updates the token and returns the response.
+ * @param {CustomerTokensType} tokens - The customer tokens object.
+ * @param {string} newExpiryMonth - The new expiry month.
+ * @param {string} newExpiryYear - The new expiry year.
+ * @param {AddressType | null} addressData - The address data.
+ * @returns {Promise<unknown>} - The update token response.
+ */
+const updateTokenResponse = async (tokens: CustomerTokensType, newExpiryMonth: string, newExpiryYear: string, addressData: AddressType | null): Promise<unknown> => {
   let errorData: string;
   let customerTokenId: string;
   let paymentInstrumentTokenId: string;

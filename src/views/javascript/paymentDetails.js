@@ -1,4 +1,4 @@
-import { amountConversion, roundOff, getPaymentId, createElement, formatCurrency, createTableRow } from './utils.js';
+import { amountConversion, roundOff, getPaymentId, createElement, formatCurrency, createTableRow, createAndSetAttributes } from './utils.js';
 
 if (window.location.pathname.includes('paymentDetails')) {
   document.addEventListener('DOMContentLoaded', async function () {
@@ -11,12 +11,19 @@ if (window.location.pathname.includes('paymentDetails')) {
     const cart = paymentsData?.cart;
     const id = paymentsData?.id;
     const locale = paymentsData.locale;
+    const orderNo = paymentsData.orderNo;
     let contentDiv = document.getElementById('message');
     if (paymentsData?.errorMessage) {
-      contentDiv.innerHTML += '<div class="alert alert-error alert-dismissible" id="paymentErrorMessage">' + '<em class="mark error"></em>' + paymentsData?.errorMessage + '</div>';
+      while (contentDiv.firstChild) {
+        contentDiv.removeChild(contentDiv.firstChild);
+      }
+      appendErrorMessage(contentDiv, paymentsData?.errorMessage);
     }
     if (paymentsData?.successMessage) {
-      contentDiv.innerHTML += '<div id="message" class="alert alert-success alert-dismissible" id="paymentSuccessMessage">' + '<em class="mark check"></em>' + paymentsData?.successMessage + '</div>';
+      while (contentDiv.firstChild) {
+        contentDiv.removeChild(contentDiv.firstChild);
+      }
+      appendSuccessMessage(contentDiv, paymentsData?.successMessage);
     }
     if (paymentsData && paymentsData?.payments && 0 < Object.keys(paymentsData.payments)?.length) {
       var fractionDigits = payments?.amountPlanned?.fractionDigits;
@@ -86,10 +93,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         partialCaptureForm.action = '/capture';
         partialCaptureForm.classList.add('div-padding');
         partialCaptureForm.id = 'partialCaptureForm';
-        partialCaptureForm.innerHTML = `
-               <input type = "hidden" name ="captureId" id ="captureId" value ="${id}">
-                Capture amount: <input type="text" name="captureAmount" id="captureAmount" size="6" value="" autocomplete="off" required>
-                    <button type="submit" id="captureButton" class="button">Capture</button>`;
+        renderPartialCaptureForm(partialCaptureForm, id);
         buttonsDiv.appendChild(captureMsgDiv);
         buttonsDiv.appendChild(partialCaptureForm);
       }
@@ -112,10 +116,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         refundForm.action = '/refund';
         refundForm.classList.add('div-padding');
         refundForm.id = 'refundForm';
-        refundForm.innerHTML = `<input type="hidden" name="refundId" id="refundId" value=${id}>
-                          Refund amount: <input type="text" name="refundAmount" id="refundAmount" size="6" value="" autocomplete="off" required>
-                            <button type="submit" id="refundButton" class="button">Refund</button>`;
-
+        renderRefundForm(refundForm, id);
         buttonsDiv.appendChild(refundMsgDiv);
         buttonsDiv.appendChild(refundForm);
       }
@@ -131,7 +132,7 @@ if (window.location.pathname.includes('paymentDetails')) {
       if (payments?.custom?.fields?.isv_maskedPan && payments?.custom?.fields?.isv_cardType && payments?.custom?.fields?.isv_cardExpiryMonth && payments?.custom?.fields?.isv_cardExpiryYear) {
         renderCardDetails(payments.custom.fields);
       }
-      renderCustomFields(payments);
+      renderCustomFields(payments, orderNo);
 
       let captureButton = document.getElementById('captureButton');
       let refundButton = document.getElementById('refundButton');
@@ -165,6 +166,34 @@ if (window.location.pathname.includes('paymentDetails')) {
   });
 }
 
+function appendErrorMessage(contentDiv, errorMessage) {
+  const fragment = document.createDocumentFragment();
+  const errorIcon = document.createElement('em');
+  errorIcon.className = 'mark error';
+  fragment.appendChild(errorIcon);
+  const errorMessageElement = document.createTextNode(errorMessage || '');
+  fragment.appendChild(errorMessageElement);
+  contentDiv.appendChild(fragment);
+  contentDiv.className = 'alert alert-error alert-dismissible';
+  contentDiv.id = 'paymentErrorMessage';
+}
+
+function appendSuccessMessage(contentDiv, successMessage) {
+  const fragment = document.createDocumentFragment();
+  const successIcon = document.createElement('em');
+  successIcon.className = 'mark success';
+  fragment.appendChild(successIcon);
+  const successMessageElement = document.createTextNode(successMessage || '');
+  fragment.appendChild(successMessageElement);
+  contentDiv.appendChild(fragment);
+  contentDiv.className = 'alert alert-success alert-dismissible';
+  contentDiv.id = 'paymentSuccessMessage';
+}
+
+/**
+ * Fetches payment information based on the payment ID.
+ * @returns {Promise<Object|null>} A promise that resolves to the payment information if successful, otherwise null.
+ */
 async function fetchPaymentsInfo() {
   const loadingIndicator = document.getElementById('loading');
   const paymentId = getPaymentId();
@@ -182,7 +211,22 @@ async function fetchPaymentsInfo() {
   }
 }
 
+/**
+ * Verifies if different types of discounts are present in the cart.
+ * @param {Object} cart - The cart object containing line items, custom line items, shipping information, and total price discount.
+ * @returns {Object} An object indicating whether cart discount, custom line item discount, shipping discount, and total price discount are present.
+ */
 function verifyDiscountPresent(cart) {
+  /**
+   * @typedef {Object} DiscountObject
+   * @property {boolean} cartDiscount - Indicates if a cart discount is present.
+   * @property {boolean} customLineItemDiscount - Indicates if a custom line item discount is present.
+   * @property {boolean} shippingDiscount - Indicates if a shipping discount is present.
+   * @property {boolean} totalPriceDiscount - Indicates if a total price discount is present.
+   */
+
+  /** @type {DiscountObject} */
+
   const discountObject = {
     cartDiscount: false,
     customLineItemDiscount: false,
@@ -210,11 +254,19 @@ function verifyDiscountPresent(cart) {
   return discountObject;
 }
 
+/**
+ * Creates a table row with a label and a value.
+ * @param {string} label - The label for the row.
+ * @param {string} value - The value for the row.
+ * @returns {HTMLTableRowElement} The created table row element.
+ */
 function createRow(label, value) {
   if (label && value) {
     const row = document.createElement('tr');
     const labelCell = document.createElement('td');
-    labelCell.innerHTML = `<b>${label}</b>`;
+    const labelBold = document.createElement('b');
+    labelBold.textContent = label;
+    labelCell.appendChild(labelBold);
     row.appendChild(labelCell);
     const valueCell = document.createElement('td');
     valueCell.textContent = value;
@@ -223,7 +275,13 @@ function createRow(label, value) {
   }
 }
 
-function createCustomFieldsTable(payments) {
+/**
+ * Creates a custom fields table based on payment data.
+ * @param {object} payments - The payment data containing custom fields.
+ * @param {string} orderNo - The order number.
+ * @returns {string} The HTML string representing the custom fields table.
+ */
+function createCustomFieldsTable(payments, orderNo) {
   if (payments?.custom?.fields) {
     const fields = payments.custom.fields;
     let tableHTML = "<table class='paymentTableBelow'>";
@@ -253,45 +311,199 @@ function createCustomFieldsTable(payments) {
         tableHTML += createRow('Saved Token', fields.isv_savedToken).outerHTML;
       }
     }
+    if (fields?.isv_responseDateAndTime) {
+      tableHTML += createRow('Response Date and Time', fields.isv_responseDateAndTime).outerHTML;
+    }
+    if (fields?.isv_authorizationStatus) {
+      tableHTML += createRow('Initial Payment Status', fields.isv_authorizationStatus).outerHTML;
+    }
+    if (fields?.isv_authorizationReasonCode) {
+      tableHTML += createRow('Authorization Reason Code', fields.isv_authorizationReasonCode).outerHTML;
+    }
+    if (fields?.isv_ECI) {
+      tableHTML += createRow('Ecommerce Indicator', fields.isv_ECI).outerHTML;
+    }
+    if (fields?.isv_AVSResponse) {
+      tableHTML += createRow('AVS Response', fields.isv_AVSResponse).outerHTML;
+    }
+    if (fields?.isv_CVVResponse) {
+      tableHTML += createRow('CVV Response', fields.isv_CVVResponse).outerHTML;
+    }
+    if (fields?.isv_responseCode) {
+      tableHTML += createRow('Response Code', fields.isv_responseCode).outerHTML;
+    }
+    if (orderNo) {
+      tableHTML += createRow('Reconciliation Id', orderNo).outerHTML;
+    }
     tableHTML += '</table>';
     return tableHTML;
   }
 }
 
-function renderCustomFields(payments) {
+/**
+ * Renders custom payment fields in the specified HTML element.
+ * @param {object} payments - The payment data containing custom fields.
+ * @param {string} orderNo - The order Number.
+ */
+function renderCustomFields(payments, orderNo) {
   const customFieldsDiv = document.getElementById('paymentCustomFields');
   if (payments?.custom?.fields && customFieldsDiv) {
-    customFieldsDiv.innerHTML = `
-        <h2>ISV Payment Service Custom Payment Fields</h2>
-        ${createCustomFieldsTable(payments)}`;
+    while (customFieldsDiv.firstChild) {
+      customFieldsDiv.removeChild(customFieldsDiv.firstChild)
+    }
+    const customFieldsHeader = document.createElement('h2');
+    customFieldsHeader.textContent = 'Payment Custom Fields';
+    customFieldsDiv.appendChild(customFieldsHeader);
+    const customFieldsTable = createCustomFieldsTable(payments, orderNo);
+    const parser = new DOMParser();
+    const customeFieldsTableContainer = parser.parseFromString(customFieldsTable, 'text/html').body;
+    while (customeFieldsTableContainer.firstChild) {
+      customFieldsDiv.appendChild(customeFieldsTableContainer.firstChild);
+    }
   }
 }
+/**
+ * Renders card details in the specified HTML element.
+ * @param {object} cardDetails - The card details to render.
+ */
 
 function renderCardDetails(cardDetails) {
   const paymentCardDetails = document.getElementById('paymentCardDetails');
   if (paymentCardDetails) {
     paymentCardDetails.classList.add('panel', 'card4', 'padding16');
-    const { isv_maskedPan, isv_cardType, isv_cardExpiryMonth, isv_cardExpiryYear } = cardDetails;
-    paymentCardDetails.innerHTML = `
-        <h2>Payment Card Details</h2>
-        <hr/>
-        <table class="paymentTableAbove">
-        <tr>
-          <th>Masked Card Number </th>
-           ${isv_cardType !== null ? '<th>Card Type</th>' : ''}
-           ${isv_cardExpiryMonth !== null ? '<th>Card Expiry Month</th>' : ''}
-           ${isv_cardExpiryYear !== null ? '<th>Card Expiry Year</th>' : ''}
-        </tr>
-        <tr>
-           <td>${isv_maskedPan}</td>
-           ${isv_cardType !== null ? '<td>' + isv_cardType + '</td>' : ''}
-           ${isv_cardExpiryMonth !== null ? '<td>' + isv_cardExpiryMonth + '</td>' : ''}
-           ${isv_cardExpiryYear !== null ? '<td>' + isv_cardExpiryYear + '</td>' : ''}
-        </tr>
-        </table>`;
+    while (paymentCardDetails.firstChild) {
+      paymentCardDetails.removeChild(paymentCardDetails.firstChild);
+    }
+    const heading = document.createElement('h2');
+    heading.textContent = 'Payment Card Details';
+    paymentCardDetails.appendChild(heading);
+    const hr = document.createElement('hr');
+
+    paymentCardDetails.appendChild(hr);
+    const table = document.createElement('table');
+    table.className = 'paymentTableAbove';
+    const headerRow = document.createElement('tr');
+
+    const thMaskedPan = document.createElement('th');
+    thMaskedPan.textContent = 'Masked Card Number';
+    headerRow.appendChild(thMaskedPan);
+
+    if (cardDetails?.isv_cardType) {
+      const thCardType = document.createElement('th');
+      thCardType.textContent = 'Card Type';
+      headerRow.appendChild(thCardType);
+    }
+
+    if (cardDetails?.isv_cardExpiryMonth) {
+      const thCardExpiryMonth = document.createElement('th');
+      thCardExpiryMonth.textContent = 'Card Expiry Month';
+      headerRow.appendChild(thCardExpiryMonth);
+    }
+
+    if (cardDetails?.isv_cardExpiryYear) {
+      const thCardExpiryYear = document.createElement('th');
+      thCardExpiryYear.textContent = 'Card Expiry Year';
+      headerRow.appendChild(thCardExpiryYear);
+    }
+
+    table.appendChild(headerRow);
+
+    const dataRow = document.createElement('tr');
+
+    const tdMaskedPan = document.createElement('td');
+    tdMaskedPan.textContent = cardDetails.isv_maskedPan;
+    dataRow.appendChild(tdMaskedPan);
+
+    if (cardDetails?.isv_cardType) {
+      const tdCardType = document.createElement('td');
+      tdCardType.textContent = cardDetails.isv_cardType;
+      dataRow.appendChild(tdCardType);
+    }
+
+    if (cardDetails?.isv_cardExpiryMonth) {
+      const tdCardExpiryMonth = document.createElement('td');
+      tdCardExpiryMonth.textContent = cardDetails.isv_cardExpiryMonth;
+      dataRow.appendChild(tdCardExpiryMonth);
+    }
+
+    if (cardDetails?.isv_cardExpiryYear) {
+      const tdCardExpiryYear = document.createElement('td');
+      tdCardExpiryYear.textContent = cardDetails.isv_cardExpiryYear;
+      dataRow.appendChild(tdCardExpiryYear);
+    }
+
+    table.appendChild(dataRow);
+    paymentCardDetails.appendChild(table);
   }
 }
 
+function renderPartialCaptureForm(partialCaptureForm, id) {
+  if (partialCaptureForm) {
+    partialCaptureForm.textContent = '';
+    const captureIdInput = createAndSetAttributes('input', {
+      type: 'hidden',
+      name: 'captureId',
+      id: 'captureId',
+      value: id
+    });
+    partialCaptureForm.appendChild(captureIdInput);
+    const captureAmountLabel = document.createTextNode('Capture amount: ');
+    partialCaptureForm.appendChild(captureAmountLabel);
+    const captureAmountInput = createAndSetAttributes('input', {
+      type: 'text',
+      name: 'captureAmount',
+      id: 'captureAmount',
+      size: '6',
+      value: '',
+      autocomplete: 'off',
+      required: true
+    });
+    partialCaptureForm.appendChild(captureAmountInput);
+    const captureButton = createAndSetAttributes('button', {
+      type: 'submit',
+      id: 'captureButton',
+      className: 'button'
+    }, 'Capture');
+    partialCaptureForm.appendChild(captureButton);
+  }
+}
+
+function renderRefundForm(refundForm, id) {
+  if (refundForm) {
+    refundForm.textContent = '';
+    const refundIdInput = createAndSetAttributes('input', {
+      type: 'hidden',
+      name: 'refundId',
+      id: 'refundId',
+      value: id
+    });
+    refundForm.appendChild(refundIdInput);
+    const refundAmountText = document.createTextNode('Refund amount: ');
+    refundForm.appendChild(refundAmountText);
+    const refundAmountInput = createAndSetAttributes('input', {
+      type: 'text',
+      name: 'refundAmount',
+      id: 'refundAmount',
+      size: '6',
+      value: '',
+      autocomplete: 'off',
+      required: true
+    });
+    refundForm.appendChild(refundAmountInput);
+    const refundButton = createAndSetAttributes('button', {
+      type: 'submit',
+      id: 'refundButton',
+      className: 'button'
+    }, 'Refund');
+    refundForm.appendChild(refundButton);
+  }
+}
+
+/**
+ * Validates the amount entered in the input field.
+ * @param {string} inputId - The ID of the input field containing the amount.
+ * @returns {boolean} - Indicates whether the amount is valid or not.
+ */
 function validateAmount(inputId) {
   var amountElement = document.getElementById(inputId);
   if (amountElement) {
@@ -306,6 +518,9 @@ function validateAmount(inputId) {
   }
 }
 
+/**
+ * Shows the loading indicator.
+ */
 function showLoadingDiv() {
   const loadingDiv = document.getElementById('loading');
   if (loadingDiv) {
@@ -313,6 +528,12 @@ function showLoadingDiv() {
   }
 }
 
+/**
+ * Creates an address element based on the given address object and type.
+ * @param {Object} address - The address object containing address details.
+ * @param {string} type - The type of address (e.g., 'Shipping', 'Billing').
+ * @returns {HTMLElement} - The created address element.
+ */
 function createAddressElement(address, type) {
   const div = createElement('div', '', 'leftDiv');
   if (div) {
@@ -336,6 +557,13 @@ function createAddressElement(address, type) {
   }
 }
 
+/**
+ * Generates the order items table based on the cart data and discount information.
+ * @param {Object} cart - The cart object containing order details.
+ * @param {Object} discountObject - The discount object indicating discount types.
+ * @param {string} locale - The locale used for formatting.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateOrderItemsTable(cart, discountObject, locale, fractionDigits) {
   const orderItemsTable = document.getElementById('orderItemsTable');
   if (cart && orderItemsTable) {
@@ -360,6 +588,14 @@ function generateOrderItemsTable(cart, discountObject, locale, fractionDigits) {
   }
 }
 
+/**
+ * Generates rows for line items in the order items table.
+ * @param {Array} lineItems - Array of line items.
+ * @param {HTMLElement} orderItemsTableBody - Table body element of the order items table.
+ * @param {Object} discountObject - Object indicating if discounts are present.
+ * @param {string} locale - The locale used for formatting.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateLineItems(lineItems, orderItemsTableBody, discountObject, locale, fractionDigits) {
   if (!lineItems || lineItems.length === 0) return;
   lineItems.forEach((item) => {
@@ -373,6 +609,14 @@ function generateLineItems(lineItems, orderItemsTableBody, discountObject, local
   });
 }
 
+/**
+ * Generates rows for custom line items in the order items table.
+ * @param {Array} customLineItems - Array of custom line items.
+ * @param {HTMLElement} orderItemsTableBody - Table body element of the order items table.
+ * @param {Object} discountObject - Object indicating if discounts are present.
+ * @param {string} locale - The locale used for formatting.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateCustomLineItems(customLineItems, orderItemsTableBody, discountObject, locale, fractionDigits) {
   if (!customLineItems || customLineItems.length === 0 || !orderItemsTableBody) return;
   customLineItems.forEach((item) => {
@@ -380,6 +624,14 @@ function generateCustomLineItems(customLineItems, orderItemsTableBody, discountO
   });
 }
 
+/**
+ * Generates rows for shipping details in the order items table.
+ * @param {Object} cart - The cart object containing shipping details.
+ * @param {HTMLElement} orderItemsTableBody - Table body element of the order items table.
+ * @param {Object} discountObject - Object indicating if discounts are present.
+ * @param {string} locale - The locale used for formatting.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateShipping(cart, orderItemsTableBody, discountObject, locale, fractionDigits) {
   if (!cart || !orderItemsTableBody) return;
   if (cart?.shipping && 0 < cart.shipping?.length && 'Multiple' === cart.shippingMode) {
@@ -391,6 +643,14 @@ function generateShipping(cart, orderItemsTableBody, discountObject, locale, fra
   }
 }
 
+/**
+ * Generates a row for a custom line item in the order items table.
+ * @param {Object} item - The custom line item object.
+ * @param {HTMLElement} orderItemsTableBody - Table body element of the order items table.
+ * @param {Object} discountObject - Object indicating if discounts are present.
+ * @param {string} locale - The locale used for formatting.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateCustomLineItemRow(item, orderItemsTableBody, discountObject, locale, fractionDigits) {
   let itemName = '';
   let discountAmountForCustomLineItems = 0;
@@ -433,7 +693,7 @@ function generateCustomLineItemRow(item, orderItemsTableBody, discountObject, lo
       }
       if (0 < discountObjectPerQty?.discountedPrice?.includedDiscounts?.length) {
         discountObjectPerQty.discountedPrice.includedDiscounts.forEach((includedDiscount) => {
-          discountAmountForCustomLineItems += amountConversion(includedDiscount?.discountedAmount?.centAmount, fractionDigits);
+          discountAmountForCustomLineItems += amountConversion(includedDiscount?.discountedAmount?.centAmount, fractionDigits) * discountObjectPerQty.quantity;
         });
       }
       discountAmount = discountObject.customLineItemDiscount || discountObject.cartDiscount || discountObject.shippingDiscount || discountObject.totalPriceDiscount ? `${item?.totalPrice?.currencyCode} ${roundOff(discountAmountForCustomLineItems, fractionDigits)}` : '';
@@ -444,6 +704,14 @@ function generateCustomLineItemRow(item, orderItemsTableBody, discountObject, lo
   }
 }
 
+/**
+ * Generates a row for a line item in the order items table.
+ * @param {Object} item - The line item object.
+ * @param {HTMLElement} orderItemsTableBody - Table body element of the order items table.
+ * @param {Object} discountObject - Object indicating if discounts are present.
+ * @param {string} locale - The locale used for formatting.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateLineItemRow(item, orderItemsTableBody, discountObject, locale, fractionDigits) {
   let unitPrice = 0;
   let discountAmountForLineItems = 0;
@@ -472,6 +740,15 @@ function generateLineItemRow(item, orderItemsTableBody, discountObject, locale, 
   }
 }
 
+/**
+ * Generates a row for a discounted line item in the order items table.
+ * @param {Object} item - The line item object.
+ * @param {Object} discountObjectPerQty - Discount object for the specific quantity of the item.
+ * @param {HTMLElement} orderItemsTableBody - Table body element of the order items table.
+ * @param {Object} discountObject - Object indicating if discounts are present.
+ * @param {string} locale - The locale used for formatting.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateDiscountedLineItemRow(item, discountObjectPerQty, orderItemsTableBody, discountObject, locale, fractionDigits) {
   let discountAmount = 0;
   const unitPrice = amountConversion(discountObjectPerQty.discountedPrice.value.centAmount, fractionDigits);
@@ -491,6 +768,13 @@ function generateDiscountedLineItemRow(item, discountObjectPerQty, orderItemsTab
   }
 }
 
+/**
+ * Generates a row for shipping details in the order items table.
+ * @param {Object} shippingDetail - The shipping detail object.
+ * @param {HTMLElement} orderItemsTableBody - Table body element of the order items table.
+ * @param {Object} discountObject - Object indicating if discounts are present.
+ * @param {number} fractionDigits - The number of fraction digits to display.
+ */
 function generateShippingRow(shippingDetail, orderItemsTableBody, discountObject, fractionDigits) {
   let shippingCost = 0;
   let discountAmount = 0;
@@ -514,6 +798,13 @@ function generateShippingRow(shippingDetail, orderItemsTableBody, discountObject
   }
 }
 
+/**
+ * Validates the input amount using regex.
+ * @param {string} inputId - The ID of the input element.
+ * @param {string} buttonId - The ID of the button element.
+ * @param {string} messageElementId - The ID of the message element to display error.
+ * @returns {boolean} - True if the input is valid, otherwise false.
+ */
 function validateAmountWithRegex(inputId, buttonId, messageElementId) {
   var button = document.getElementById(buttonId);
   var amount = document.getElementById(inputId);

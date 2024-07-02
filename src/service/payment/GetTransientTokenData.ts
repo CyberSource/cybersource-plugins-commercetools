@@ -3,11 +3,18 @@ import path from 'path';
 import restApi from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { paymentCustomFieldsType, responseType } from '../../types/Types';
+import { PaymentCustomFieldsType, ResponseType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 import multiMid from '../../utils/config/MultiMid';
-const transientTokenDataResponse = async (resourceObj: any, service: string) => {
+
+/**
+ * Retrieves transient token data.
+ * @param {any} resourceObj - The resource object.
+ * @param {string} service - The service name.
+ * @returns {Promise<any>} - A promise resolving to transient token data response.
+ */
+const transientTokenDataResponse = async (resourceObj: any, service: string): Promise<any> => {
   let errorData: string;
   let transientToken: string;
   const paymentResponse = {
@@ -21,7 +28,7 @@ const transientTokenDataResponse = async (resourceObj: any, service: string) => 
     merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
     merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
   };
-  let tokenObject: paymentCustomFieldsType;
+  let tokenObject: PaymentCustomFieldsType;
   try {
     if (resourceObj) {
       tokenObject = resourceObj?.custom?.fields;
@@ -40,7 +47,7 @@ const transientTokenDataResponse = async (resourceObj: any, service: string) => 
       }
       const configObject = await prepareFields.getConfigObject('FuncTransientTokenDataResponse', midCredentials, null, null);
       const getTransientTokenDataApiInstance = new restApi.TransientTokenDataApi(configObject, apiClient);
-      return await new Promise<responseType>(function (resolve, reject) {
+      return await new Promise<ResponseType>(function (resolve, reject) {
         getTransientTokenDataApiInstance.getTransactionForTransientToken(transientToken, function (error: any, data: any, response: any) {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncTransientTokenDataResponse', Constants.LOG_INFO, 'PaymentId : ' + resourceObj.id, 'Transient Token Response Data is = ' + JSON.stringify(response));
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncTransientTokenDataResponse', Constants.LOG_INFO, 'PaymentId : ' + resourceObj.id, 'Transient Token Data Response data object = ' + JSON.stringify(data));

@@ -1,12 +1,22 @@
 import path from 'path';
 
 import restApi from 'cybersource-rest-client';
+import { PtsV2PaymentsReversalsPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { paymentType, responseType } from '../../types/Types';
+import { PaymentType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
-const authReversalResponse = async (payment: paymentType, cart: any, authReversalId: string) => {
+
+/**
+ * Performs authorization reversal and returns the response.
+ * @param {PaymentType} payment - The payment object.
+ * @param {any} cart - The cart object.
+ * @param {string} authReversalId - The ID of the authorization reversal.
+ * @returns {Promise<PtsV2PaymentsReversalsPost201Response>} - The authorization reversal response.
+ */
+type PtsV2PaymentsReversalsPost201Response = typeof PtsV2PaymentsReversalsPost201Response;
+const authReversalResponse = async (payment: PaymentType, cart: any, authReversalId: string) => {
   let errorData;
   const paymentResponse = {
     httpCode: 0,
@@ -27,7 +37,7 @@ const authReversalResponse = async (payment: paymentType, cart: any, authReversa
         paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAuthReversalResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Authorization Reversal Request = ' + JSON.stringify(requestObj));
       }
       const reversalApiInstance = new restApi.ReversalApi(configObject, apiClient);
-      return await new Promise<responseType>((resolve, reject) => {
+      return await new Promise<PtsV2PaymentsReversalsPost201Response>((resolve, reject) => {
         reversalApiInstance.authReversal(authReversalId, requestObj, function (error: any, data: any, response: any) {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAuthReversalResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Authorization Reversal Response = ' + JSON.stringify(response));
           if (data) {

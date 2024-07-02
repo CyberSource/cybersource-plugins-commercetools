@@ -6,11 +6,18 @@ import jwt from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
 
 import { Constants } from '../../constants';
-import { midCredentialsType, paymentType } from '../../types/Types';
+import { MidCredentialsType, PaymentType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 import multiMid from '../../utils/config/MultiMid';
-const getPublicKeys = async (captureContext: string, paymentObj: paymentType): Promise<boolean> => {
+
+/**
+ * Retrieves public keys and verifies the capture context.
+ * @param {string} captureContext - The capture context.
+ * @param {PaymentType} paymentObj - The payment object.
+ * @returns {Promise<boolean>} A promise that resolves with a boolean indicating whether the capture context is valid.
+ */
+const getPublicKeys = async (captureContext: string, paymentObj: PaymentType): Promise<boolean> => {
   let decodedCaptureContext: string;
   let parsedValue: string;
   let publicKeyURL: string;
@@ -23,7 +30,7 @@ const getPublicKeys = async (captureContext: string, paymentObj: paymentType): P
   let pemPublicKey: string;
   let errorData: string;
   let mid: string;
-  let midCredentials: midCredentialsType = {
+  let midCredentials: MidCredentialsType = {
     merchantId: '',
     merchantKeyId: '',
     merchantSecretKey: '',

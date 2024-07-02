@@ -18,6 +18,19 @@ export const updateCardHandlerTokens = {
   addressId: 'gMgqUiw_',
 };
 
+export const updateCardHandlerInvalidTokens = {
+  alias: '&@Y&^&#*#',
+  value: '&@Y&^&#*#',
+  cardType: '&@Y&^&#*#',
+  cardName: '&@Y&^&#*#',
+  cardNumber: '&@Y&^&#*#',
+  cardExpiryMonth: '&@Y&^&#*#',
+  cardExpiryYear: '&@Y&^&#*#',
+  paymentToken: '&@Y&^&#*#',
+  instrumentIdentifier: '&@Y&^&#*#',
+  addressId: 'gMgqUiw_',
+};
+
 export const updateCardHandlerCustomerId = unit.customerId;
 
 export const updateCardHandlerCustomerObj = {
@@ -383,8 +396,16 @@ export const applePaySessionHandlerEmptyFields = {
   isv_userAgentHeader: '',
 };
 
+export const applePaySessionHandlerInvalidFields = {
+  isv_deviceFingerprintId: '$R!^&@UI(',
+  isv_applePayValidationUrl: '*@U*&@@&&*@U*@',
+  isv_acceptHeader: '*@&^@%',
+  isv_applePayDisplayName: '*&@&^@(@I(@',
+  isv_userAgentHeader: '(@*&@^%#^&@**@',
+};
+
 export const authorizationHandlerGPUpdatePaymentObject = {
-  id: '58a12619-a284-46cc-9376-e839f5eb8b41',
+  id: unit.paymentId,
   version: 2,
   lastMessageSequenceNumber: 2,
   createdAt: '2022-02-01T09:27:28.609Z',
@@ -454,7 +475,7 @@ export const authorizationHandlerUpdateTransactions = {
 };
 
 export const authorizationHandlerVSUpdatePaymentObject = {
-  id: 'e1389f95-b621-4d31-b865-defbe5d889c9',
+  id: unit.paymentId,
   version: 2,
   lastMessageSequenceNumber: 2,
   createdAt: '2022-01-10T08:46:10.728Z',
@@ -497,7 +518,7 @@ export const authorizationHandlerVSUpdatePaymentObject = {
 };
 
 export const authorizationHandlerCCUpdatePaymentObject = {
-  id: '2c89cf32-2846-4030-b256-ffdb442a18d6',
+  id: unit.paymentId,
   version: 12,
   lastMessageSequenceNumber: 2,
   createdAt: '2022-01-10T08:08:48.572Z',
@@ -548,7 +569,7 @@ export const authorizationHandlerCCUpdatePaymentObject = {
 };
 
 export const authorizationHandler3DSUpdatePaymentObject = {
-  id: 'd5dddb44-f941-4b9a-bb09-1c507088179c',
+  id: unit.paymentId,
   version: 17,
   lastMessageSequenceNumber: 2,
   createdAt: '2022-01-10T06:29:25.858Z',
@@ -603,7 +624,7 @@ export const authorizationHandler3DSUpdatePaymentObject = {
 };
 
 export const authorizationHandlerAPUpdatePaymentObject = {
-  id: '8efb864e-e0e9-4cd2-aebd-983ef3358633',
+  id: unit.paymentId,
   version: 15,
   lastMessageSequenceNumber: 4,
   createdAt: '2022-01-25T09:34:33.160Z',
@@ -665,7 +686,7 @@ export const authorizationHandlerAPUpdatePaymentObject = {
 };
 
 export const authorizationHandlerECUpdatePaymentObject = {
-  id: 'd48e2fbc-8ae8-4f5c-9050-aae5bf0d5fea',
+  id: unit.paymentId,
   version: 2,
   versionModifiedAt: '2023-01-06T09:47:40.393Z',
   lastMessageSequenceNumber: 2,

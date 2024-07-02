@@ -3,12 +3,17 @@ import path from 'path';
 import restApi from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { midCredentialsType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 import cybersourceApi from '../../utils/api/CybersourceApi';
 
-const getWebhookSubscriptionResponse = async (midCredentials: midCredentialsType) => {
+/**
+ * Retrieves webhook subscription details for a mid.
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @returns {Promise<unknown>} - A promise resolving to webhook subscription response.
+ */
+const getWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType): Promise<unknown> => {
   const subscriptionDetailResponse = {
     httpCode: 0,
     webhookId: '',
@@ -27,7 +32,9 @@ const getWebhookSubscriptionResponse = async (midCredentials: midCredentialsType
     if (midCredentials?.merchantId && midCredentials?.merchantKeyId && midCredentials?.merchantSecretKey) {
       const apiClient = new restApi.ApiClient();
       const configObject = await prepareFields.getConfigObject('FuncGetWebhookSubscriptionResponse', midCredentials, null, null);
-      requestObject.organizationId = configObject?.merchantID as string;
+      if(configObject?.merchantID){
+        requestObject.organizationId = configObject.merchantID;
+      }
       requestObject.productId = 'ctNetworkTokenSubscription';
       requestObject.eventType = 'tms.networktoken.updated';
       requestObject.status = 'active';

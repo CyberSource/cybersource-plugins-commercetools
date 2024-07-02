@@ -21,5 +21,10 @@ test.serial('Test get instrument id response with invalid instrument identifier'
 
 test.serial('Test get instrument id response without mid', async (t) => {
   let response = await getCardByInstrumentId.getCardByInstrumentResponse(processTokensInstrumentIdentifier, '');
-  t.is(response.httpCode, 200);
+  t.not(response.httpCode, 200);
+});
+
+test.serial('Test get instrument id response with empty instrument identifier', async (t) => {
+  let response = await getCardByInstrumentId.getCardByInstrumentResponse('', process.env.PAYMENT_GATEWAY_MERCHANT_ID as any);
+  t.not(response.httpCode, 200);
 });

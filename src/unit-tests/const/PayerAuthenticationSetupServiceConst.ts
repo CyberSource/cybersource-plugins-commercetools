@@ -113,7 +113,7 @@ export const paymentObject = {
   transactions: [],
   interfaceInteractions: [],
 };
-export const paymentSavedTokens = {
+export let paymentSavedTokens : any = {
   id: 'f421e2ca-de6a-4a5d-b2c0-1c9ccbd3cdc1',
   version: 14,
   lastMessageSequenceNumber: 1,

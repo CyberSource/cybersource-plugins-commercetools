@@ -30,6 +30,7 @@ After authentication is complete, authorization of the payment can then be tri
     | region                      | shipTo_state                | billTo_state               |                                                                                                                      |
     | country                     | shipTo_country              | billTo_country             |                                                                                                                      |
     | email                       | shipTo_email                | billTo_email               |                                                                                                                      |
+    | phone                       | shipTo_phone                | billTo_phone               |                                                                                                                      |
 
 2.  Tokenize Card details using Cybersource Flex
 
@@ -75,7 +76,7 @@ After authentication is complete, authorization of the payment can then be tri
 
     a. Also see [Decision Manager](Decision-Manager.md) for additional fields to populate if you are using Decision Manager
 
-    b. When the payment is being updated, the extension will do a Payer Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
+    b. When the payment is being updated, the extension will do a Payer Auth Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
 
         Skip this step for saved token and proceed to step c
 
@@ -89,9 +90,10 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_cardExpiryYear      | Card expiry year               | No        | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a `flexData.content.paymentInformation.card.expirationYear.value` field containing the card type <br><br> Not required by the extension but used for display                                                                                                                                                                                                                                                                                                                                                                                                                                           |
     | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | Yes       | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
     | custom.fields.isv_saleEnabled         | false                         | Yes       | Set the value to true if sale is enabled                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+    | custom.fields.isv_shippingMethod | Shipping method for the order                                                                                         | No    | Possible values: <ul> <li> `lowcost`: Lowest-cost service  </li> <li>`sameday`: Courier or same-day service </li> <li>`oneday`: Next-day or overnight service </li> <li>`twoday`: Two-day service </li> <li>`threeday`: Three-day service.</li> <li> `pickup`: Store pick-up </li> <li> `other`: Other shipping method </li> <li> `none`: No shipping method because product is a service or subscription </li>   |
 
 
-    c. For saved token, when the payment is being updated, the extension will do a Payer Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
+    c. For saved token, when the payment is being updated, the extension will do a Payer Auth Setup call to get reference_id for Digital Wallets to use in place of BIN number in Cardinal.
 
     | Property                              | Value                          | Required | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
     | ------------------------------------- | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -100,6 +102,7 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_cardExpiryMonth     | Card expiry month              | No       | custom.fields.isv_tokens's "cardExpiryMonth" value from Customer object <br>Not required by the extension but used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
     | custom.fields.isv_cardExpiryYear      | Card expiry year               | No       | custom.fields.isv_tokens's "cardExpiryYear" value from Customer object <br>Not required by the extension but used for display                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
     | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id | Yes      | Refer [Device Fingerprinting](./Decision-Manager.md#device-fingerprinting) to generate this value |
+    | custom.fields.isv_shippingMethod | Shipping method for the order                                                                                         | No    | Possible values: <ul> <li> `lowcost`: Lowest-cost service  </li> <li>`sameday`: Courier or same-day service </li> <li>`oneday`: Next-day or overnight service </li> <li>`twoday`: Two-day service </li> <li>`threeday`: Three-day service.</li> <li> `pickup`: Store pick-up </li> <li> `other`: Other shipping method </li> <li> `none`: No shipping method because product is a service or subscription </li> |
 
 
 6.  Wait for the event to return back the following fields, verify them from update response. If the data exists for below fields, submit the device data collection form using below data, else throw error to the user. See [Device Data Collection](https://developer.cybersource.com/docs/cybs/en-us/payer-authentication/developer/all/rest/payer-auth/pa2-ccdc-ddc-intro.html) to get more details about device data collection Iframe
@@ -115,6 +118,9 @@ After authentication is complete, authorization of the payment can then be tri
     | custom.fields.isv_acceptHeader      | Accept header from Customer browser     | Yes      | Used by 3DS process, populated from client-side libraries |
     | custom.fields.isv_userAgentHeader   | User agent header from Customer browser | Yes      | Used by 3DS process, populated from client-side libraries |
     | custom.fields.isv_customerIpAddress | Customer IP address                     | Yes      | Populated from client-side libraries                      |
+    | custom.fields.isv_screenWidth      | Screen width of Customer browser     | Yes      | Used by 3DS process, populated from client-side libraries |
+    | custom.fields.isv_screenHeight   | Screen height of Customer browser | Yes      | Used by 3DS process, populated from client-side libraries |
+
 
 8.  wait for the response from ddc form and if successful, then proceed with enrolment, verify the following fields from update response
 
@@ -124,7 +130,7 @@ After authentication is complete, authorization of the payment can then be tri
         isv_payerEnrollHttpCode
         isv_payerEnrollStatus
 
-9.  Check if the `isv_payerEnrollHttpCode` value is 201 and `isv_payerEnrollStatus` value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 6 else proceed to step 10
+9.  Check if the `isv_payerEnrollHttpCode` value is 201 and `isv_payerEnrollStatus` value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 5 else proceed to step 10. Refer the [DMPA](./Decision-Manager.md#payer-authentication-with-decision-manager) section to know more about the DMPA
 
 10. Check the value of the isv_payerAuthenticationRequired field on the
     updated payment. If the value is true, perform the following steps
@@ -146,7 +152,7 @@ After authentication is complete, authorization of the payment can then be tri
         isv_payerEnrollHttpCode
         isv_payerEnrollStatus
 
-    Check if the isv_payerEnrollHttpCode value is 201 and isv_payerEnrollStatus value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 6 else proceed to step 12.
+    Check if the isv_payerEnrollHttpCode value is 201 and isv_payerEnrollStatus value "CUSTOMER_AUTHENTICATION_REQUIRED" from the updated response. If yes, repeat the steps from 5 else proceed to step 12.
 
 12. Add a transaction to the payment 
 

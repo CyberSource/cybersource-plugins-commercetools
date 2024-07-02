@@ -5,14 +5,20 @@ import captureContext from './service/payment/CaptureContextService';
 import flexKeys from './service/payment/FlexKeys';
 import getCardByInstrument from './service/payment/GetCardByInstrumentId';
 import keyVerification from './service/payment/GetPublicKeys';
-import { actionResponseType, paymentTransactionType, paymentType } from './types/Types';
+import { ActionResponseType, PaymentTransactionType, PaymentType } from './types/Types';
 import paymentHandler from './utils/PaymentHandler';
 import paymentService from './utils/PaymentService';
 import paymentUtils from './utils/PaymentUtils';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
 
-const paymentCreateApi = async (paymentObj: paymentType) => {
-  let response: actionResponseType = paymentUtils.getEmptyResponse();
+/**
+ * Handles the creation of payment.
+ * 
+ * @param {PaymentType} paymentObj - The payment object containing payment information.
+ * @returns {Promise<ActionResponseType>} - A promise resolving to an action response type.
+ */
+const paymentCreateApi = async (paymentObj: PaymentType): Promise<ActionResponseType> => {
+  let response: ActionResponseType = paymentUtils.getEmptyResponse();
   try {
     if (paymentObj?.paymentMethodInfo?.method) {
       const paymentMethod = paymentObj.paymentMethodInfo.method;
@@ -54,8 +60,14 @@ const paymentCreateApi = async (paymentObj: paymentType) => {
   return response;
 };
 
-const paymentUpdateApi = async (paymentObj: paymentType) => {
-  let updateResponse: actionResponseType = paymentUtils.getEmptyResponse();
+/**
+ * Handles the update of a payment.
+ * 
+ * @param {PaymentType} paymentObj - The payment object containing payment information.
+ * @returns {Promise<ActionResponseType>} - A promise resolving to an action response type.
+ */
+const paymentUpdateApi = async (paymentObj: PaymentType): Promise<ActionResponseType> => {
+  let updateResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   const paymentResponse = {
     httpCode: 0,
     status: '',
@@ -120,8 +132,14 @@ const paymentUpdateApi = async (paymentObj: paymentType) => {
   return updateResponse;
 };
 
-const customerUpdateApi = async (customerObj: any) => {
-  let response: actionResponseType = paymentUtils.invalidInputResponse();
+/**
+ * Handles the update of a customer.
+ * 
+ * @param {any} customerObj - The customer object containing customer information.
+ * @returns {Promise<ActionResponseType>} - A promise resolving to an action response type.
+ */
+const customerUpdateApi = async (customerObj: any): Promise<ActionResponseType> => {
+  let response: ActionResponseType = paymentUtils.invalidInputResponse();
   try {
     if (customerObj) {
       if ('' === customerObj?.custom?.fields?.isv_tokenCaptureContextSignature) {
@@ -154,9 +172,25 @@ const customerUpdateApi = async (customerObj: any) => {
   return response;
 };
 
+/**
+ * Retrieves payment details and cart details via API.
+ * 
+ * @param {string} paymentId - The ID of the payment to retrieve details for.
+ * @returns {Promise<{
+*   paymentId: string;
+*   cartLocale: string;
+*   pendingAuthorizedAmount: number;
+*   pendingCaptureAmount: number;
+*   errorMessage: string;
+*   paymentDetails: PaymentType;
+*   cartData: any;
+*   orderNo: string;
+* }>} - A promise resolving to an object containing payment details.
+*/
+
 const paymentDetailsApi = async (paymentId: string) => {
-  let paymentDetails: paymentType | null = null;
-  let refundTransaction: readonly paymentTransactionType[];
+  let paymentDetails: PaymentType | null = null;
+  let refundTransaction: readonly PaymentTransactionType[];
   let isAuthReversed = false;
   const paymentDetailsResponse = {
     paymentId: '',
@@ -166,6 +200,7 @@ const paymentDetailsApi = async (paymentId: string) => {
     errorMessage: '',
     paymentDetails: {},
     cartData: {},
+    orderNo: ''
   };
   try {
     paymentDetailsResponse.errorMessage = Constants.ERROR_MSG_EMPTY_PAYMENT_DATA;
@@ -184,6 +219,7 @@ const paymentDetailsApi = async (paymentId: string) => {
       paymentDetails = await commercetoolsApi.retrievePayment(paymentDetailsResponse.paymentId);
       if (paymentDetails) {
         paymentDetailsResponse.errorMessage = '';
+        paymentDetailsResponse.orderNo = await paymentUtils.getOrderId(cartDetails?.results[0]?.id, paymentDetails?.id);
         if (paymentDetails?.transactions) {
           paymentDetailsResponse.paymentDetails = paymentDetails;
           refundTransaction = paymentDetails.transactions;
@@ -210,8 +246,22 @@ const paymentDetailsApi = async (paymentId: string) => {
   return paymentDetailsResponse;
 };
 
-const orderManagementApi = async (paymentId: string, transactionAmount: number | undefined, transactionType: string) => {
-  let paymentObject: paymentType | null = null;
+/**
+ * Handles the ordermanagement services for a payment.
+ * 
+ * @param {string} paymentId - The ID of the payment to manage transactions for.
+ * @param {number | undefined} transactionAmount - The amount of the transaction.
+ * @param {string} transactionType - The type of the transaction (charge, refund, or authorization reversal).
+ * @returns {Promise<{
+*   errorMessage: string;
+*   successMessage: string;
+* }>} - A promise resolving to an object containing the API response.
+*/
+const orderManagementApi = async (paymentId: string, transactionAmount: number | undefined, transactionType: string): Promise<{
+  errorMessage: string;
+  successMessage: string;
+}> => {
+  let paymentObject: PaymentType | null = null;
   const apiResponse = {
     errorMessage: '',
     successMessage: '',
@@ -267,7 +317,13 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
   return apiResponse;
 };
 
-const captureContextApi = async (requestObj: any) => {
+/**
+ * Handles generation of capture context.
+ * 
+ * @param {object} requestObj - The request object containing either cart details or country, locale, and currency information.
+ * @returns {Promise<string>} - A promise resolving to the capture context response.
+ */
+const captureContextApi = async (requestObj: any): Promise<string> => {
   let cartId = requestObj?.cartId || '';
   let response = '';
   try {
@@ -296,7 +352,19 @@ const captureContextApi = async (requestObj: any) => {
   return response;
 };
 
-const notificationApi = async (notification: any) => {
+/**
+ * Handles network token update notifications.
+ * 
+ * @param {object} notification - The notification object received.
+ * @returns {Promise<{
+*   errorMessage: string;
+*   successMessage: string;
+* }>} - A promise resolving to the notification API response.
+*/
+const notificationApi = async (notification: any): Promise<{
+  errorMessage: string;
+  successMessage: string;
+}> => {
   let instrumentIdResponse;
   let updateTokenResponse;
   let instrumentIdentifier = '';

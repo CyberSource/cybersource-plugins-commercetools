@@ -40,3 +40,14 @@ test.serial('Refunding an invalid payment and check http code', async (t: any) =
 test.serial('Check status for refunding an invalid payment', async (t: any) => {
   t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
 });
+
+test.serial('Refunding a payment- with empty capture id and check http code', async (t: any) => {
+  let result: any = await refund.refundResponse(paymentObject, '', updateTransaction, orderNo);
+  paymentResponse.httpCode = result.httpCode;
+  paymentResponse.status = result.status;
+  t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+});
+
+test.serial('Check status for refund when capture id is  empty', async (t: any) => {
+  t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
+});

@@ -53,10 +53,7 @@ export const payment = {
         fractionDigits: 2,
       },
       state: 'Success',
-    },
-    {
-      id: 'ecfb96db-05bf-4ecd-b900-fb4501b3b3bd',
-    },
+    }
   ],
   interfaceInteractions: [],
 };

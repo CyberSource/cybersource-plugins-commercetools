@@ -12,10 +12,10 @@ import { payment as authRevPayment } from '../const/CreditCard/PaymentAuthorizat
 import { cart, payment } from '../const/CreditCard/PaymentAuthorizationServiceConstCC';
 import { payment as capturePayment } from '../const/CreditCard/PaymentCaptureServiceConstCC';
 import { customerTokenObj } from '../const/DeleteTokenServiceConst';
-import { emptyMidCredentials } from '../const/DeleteWebhookSubscriptionConst';
-import { updateCardHandlerCustomerId, updateCardHandlerCustomerObj, updateCardHandlerTokens } from '../const/PaymentHandlerConst';
+import { emptyMidCredentials, invalidMidCredentials } from '../const/DeleteWebhookSubscriptionConst';
+import { updateCardHandlerCustomerId, updateCardHandlerCustomerObj, updateCardHandlerInvalidTokens, updateCardHandlerTokens } from '../const/PaymentHandlerConst';
 import { orderManagementHandlerPaymentId, orderManagementHandlerRefundUpdateTransactions, orderManagementHandlerUpdateTransactions } from '../const/PaymentHandlerConst';
-import { applePaySessionHandlerEmptyFields, applePaySessionHandlerFields } from '../const/PaymentHandlerConst';
+import { applePaySessionHandlerEmptyFields, applePaySessionHandlerFields, applePaySessionHandlerInvalidFields } from '../const/PaymentHandlerConst';
 import {
   authorizationHandler3DSUpdatePaymentObject,
   authorizationHandlerAPUpdatePaymentObject,
@@ -29,7 +29,7 @@ import {
   setTokenNullHandlerAuthResponse,
 } from '../const/PaymentHandlerConst';
 import { retrieveTokenDetailsResponse } from '../const/PaymentHandlerConst';
-import { checkAuthReversalTriggeredPaymentResponse, customerCardTokens, getAuthResponseTransactionDetail, processTokensCustomerCardTokensObject } from '../const/PaymentServiceConst';
+import { checkAuthReversalTriggeredPaymentResponse, customerCardTokens, getAuthResponseTransactionDetail, processTokensCustomerCardTokensObject, processTokensCustomerInvalidCardTokensObject } from '../const/PaymentServiceConst';
 
 test.serial('Check for report handler ', async (t: any) => {
   let result = await paymentHandler.reportHandler();
@@ -210,12 +210,16 @@ test.serial('get authorization handler for credit card', async (t: any) => {
 });
 
 test.serial('get authorization handler for payer auth', async (t: any) => {
-  let result = await paymentHandler.authorizationHandler(authorizationHandler3DSUpdatePaymentObject, authorizationHandlerUpdateTransactions);
-  if (result.actions[0] == undefined) {
+  let result: any = await paymentHandler.authorizationHandler(authorizationHandler3DSUpdatePaymentObject, authorizationHandlerUpdateTransactions);
+  if (0 === result.actions[0].length) {
     t.deepEqual(result.actions, []);
-  } else {
+    t.deepEqual(result.errors, []);
+  } else if ('changeTransactionInteractionId' === result.actions[0].action) {
     t.is(result.actions[0].action, 'changeTransactionInteractionId');
     t.is(result.actions[1].action, 'changeTransactionState');
+  } else if ('setCustomField' === result.actions[0].action) {
+    t.is(result.actions[0].action, 'setCustomField');
+    t.is(result.actions[0].name, 'isv_tokenCaptureContextSignature');
   }
 });
 
@@ -263,7 +267,6 @@ test.serial('set token null handler ', async (t) => {
 
 test.serial('payment auth handler', async (t) => {
   let result = await paymentHandler.paymentAuthHandler(payment.paymentMethodInfo.method, payment, null, cart, getAuthResponseTransactionDetail, customerCardTokens, '');
-  t.pass();
   t.is(typeof result.isError, 'boolean');
   let i = 0;
   if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
@@ -295,7 +298,6 @@ test.serial('Order management handler for charge', async (t) => {
 
 test.serial('Order management handler for auth reversal', async t => {
   let result = await paymentHandler.orderManagementAuthReversalHandler(authRevPayment, cart);
-  t.pass();
   if (201 == result.httpCode) {
     t.is(result.httpCode, 201);
     t.is(result.status, 'REVERSED');
@@ -339,7 +341,7 @@ test.serial('delete card handler', async (t) => {
     t.deepEqual(result.errors, []);
   }
 });
- 
+
 test.serial('delete card handler with customer id as null', async (t) => {
   let result = await paymentHandler.deleteCardHandler(customerTokenObj, '');
   if (1 < result?.actions.length) {
@@ -380,7 +382,7 @@ test.serial('Test Network Token Handler function with token id as null', async (
 test.serial('Test Webhook Subscription Creation', async (t) => {
   let midCredentials = await multiMid.getMidCredentials(merchantId);
   let result = await paymentHandler.webhookSubscriptionHandler(midCredentials);
-  if (201 == result.httpCode) {
+  if (201 === result.httpCode) {
     t.is(result.httpCode, 201);
     t.truthy(result.merchantId);
     t.truthy(result.key);
@@ -395,4 +397,65 @@ test.serial('Test Webhook Subscription Creation', async (t) => {
 test.serial('Test Webhook Subscription Creation without mid', async (t) => {
   let result = await paymentHandler.webhookSubscriptionHandler(emptyMidCredentials);
   t.is(result.httpCode, 0);
+});
+
+test.serial('Test Webhook Subscription Creation with invalid data', async (t) => {
+  let result = await paymentHandler.webhookSubscriptionHandler(invalidMidCredentials);
+  t.is(result.httpCode, 401);
+});
+
+test.serial('delete card handler with invalid customer id', async (t) => {
+  let result = await paymentHandler.deleteCardHandler(customerTokenObj, '@&^%@$%@^#%&*@');
+  if (1 === result?.actions.length) {
+    t.is(result.actions[0].action, 'setCustomField');
+    t.is(result.actions[0].name, 'isv_tokenAction');
+    t.is(result.actions[0].value, null)
+  } else {
+    t.deepEqual(result.actions, []);
+    t.deepEqual(result.errors, []);
+  }
+});
+
+test.serial('add card handler with invalid customer id', async (t) => {
+  let result = await paymentHandler.addCardHandler('$#$%^T&U*(I', addTokenResponseAddress, addTokenResponseCustomerObj);
+  t.is(result.actions[0].action, 'setCustomField');
+  t.is(result.actions[0].name, 'isv_tokens');
+  t.is(result.actions[1].action, 'setCustomField');
+  t.is(result.actions[1].name, 'isv_tokenUpdated');
+});
+
+test.serial('Test Network Token Handler function with invalid customer token id', async (t) => {
+  let result = await paymentHandler.networkTokenHandler(processTokensCustomerInvalidCardTokensObject.customerTokenId, retrieveTokenDetailsResponse);
+  t.falsy(result);
+});
+
+test.serial('payment auth handler- with invalid customer tokens', async (t) => {
+  let result = await paymentHandler.paymentAuthHandler(payment.paymentMethodInfo.method, payment, null, cart, getAuthResponseTransactionDetail, processTokensCustomerInvalidCardTokensObject, '');
+  t.is(typeof result.isError, 'boolean');
+  let i = 0;
+  if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
+    i++;
+  }
+  t.is(i, 1);
+});
+
+test.serial('set token null handler with payment method as empty string', async (t) => {
+  let result = await paymentHandler.setTokenNullHandler(payment.custom.fields, setTokenNullHandlerAuthResponse, '');
+  t.is(result.actions[0].action, 'changeTransactionInteractionId');
+  t.is(result.actions[1].action, 'changeTransactionState');
+  t.is(result.actions[2].action, 'setCustomField');
+  t.is(result.actions[2].name, 'isv_tokenCaptureContextSignature');
+});
+
+test.serial('Get apple Pay Session Handler response with invalid fields data', async (t: any) => {
+  let result = await paymentHandler.applePaySessionHandler(applePaySessionHandlerInvalidFields);
+  t.deepEqual(result.actions, []);
+  t.is(result.errors[0].code, 'InvalidInput');
+  t.is(result.errors[0].message, 'Cannot process the payment due to invalid input')
+});
+
+test.serial('Get update card handler data with invalid custome tokens', async (t: any) => {
+  let result = await paymentHandler.updateCardHandler(updateCardHandlerInvalidTokens, updateCardHandlerCustomerId, updateCardHandlerCustomerObj);
+ t.deepEqual(result.actions, [])
+ t.deepEqual(result.errors, [])
 });

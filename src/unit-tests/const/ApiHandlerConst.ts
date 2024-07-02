@@ -74,7 +74,7 @@ export const paymentObject = {
   transactions: [],
   interfaceInteractions: [],
 };
-export const applePayPaymentObject = {
+export let applePayPaymentObject = {
   id: '118887cc-bf41-46d4-a605-c5d4e6d0b117',
   version: 1,
   lastMessageSequenceNumber: 1,
@@ -230,7 +230,7 @@ export const payerAuthEnrollPaymentObj = {
   interfaceInteractions: [],
 };
 
-export const payerAuthSetupResponsePaymentObject = {
+export let payerAuthSetupResponsePaymentObject: any = {
   id: '4f829ba4-e487-4ad9-a6e5-4d81e0793213',
   version: 28,
   versionModifiedAt: '2024-02-27T12:34:58.665Z',
@@ -375,7 +375,7 @@ export const customerUpdateFlexKeysPaymentObj = {
   authenticationMode: 'Password',
 };
 
-export const customerUpdateAddCardPaymentObject = {
+export const customerUpdateAddCardPaymentObject : any = {
   id: '88c278f9-82d9-427c-96df-f98a4f23e543',
   version: 350,
   lastMessageSequenceNumber: 4,

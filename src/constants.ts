@@ -12,7 +12,6 @@ export abstract class Constants {
   static readonly TEST_ENVIRONMENT = 'TEST';
   static readonly LIVE_ENVIRONMENT = 'PRODUCTION';
   static readonly PAYMENT_GATEWAY_APPLE_PAY_DESCRIPTOR = 'RklEPUVNVi5QQVlNRU5ULkFQSQ==';
-  static readonly PAYMENT_GATEWAY_APPLE_PAY_ENCODING = 'Base64';
   static readonly PAYMENT_GATEWAY_APPLE_PAY_INITIATIVE = 'web';
   static readonly PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION = '001';
   static readonly PAYMENT_GATEWAY_AUTHENTICATION_TYPE = 'http_signature';
@@ -24,8 +23,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE = 'CHECK';
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
-  static readonly PAYMENT_GATEWAY_JWT_FORMAT = 'JWT';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'HXPKJ2ZG';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'SWPVTQA0';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
@@ -65,7 +63,6 @@ export abstract class Constants {
   static readonly APPLICATION_RFLAG = 'SOK';
   //Regex
   static readonly CLICK_TO_PAY_CARD_MASK = 'XXXXXX';
-  static readonly DOMAIN_REGEX = /^[^:/.]*[:/]+/i;
   static readonly FORMAT_PAYMENT_ID_REGEX = /\s+/g;
   static readonly REGEX_COMMA = ',';
   static readonly REGEX_DOUBLE_SLASH = '//';
@@ -75,7 +72,6 @@ export abstract class Constants {
   static readonly REGEX_UNDERSCORE = '_';
   static readonly STRING_FULL_COLON = ':';
   static readonly STRING_HYPHEN = ' - ';
-  static readonly STRING_SEMICOLON = ';';
 
   //Payment methods
   static readonly CREDIT_CARD = 'creditCard';
@@ -96,25 +92,15 @@ export abstract class Constants {
   static readonly DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss[Z]';
   static readonly DESC_ORDER = 'desc';
   static readonly LAST_MODIFIED_AT = 'lastModifiedAt';
-  static readonly PAYMENT_INSTRUMENT = 'paymentInstrument';
   static readonly SHIPPING_AND_HANDLING = 'shipping_and_handling';
   static readonly SHIPPING_MODE_MULTIPLE = 'Multiple';
   static readonly STRING_AND = ' AND ';
   static readonly STRING_CARD = 'card';
   static readonly STATUS_CODE = 'statusCode';
   static readonly STRING_CUSTOM = 'custom';
-  static readonly STRING_CUSTOMER = 'customer';
   static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
-  static readonly STRING_ERRORS = 'errors';
-  static readonly STRING_EXPIRATION_MONTH = 'expirationMonth';
-  static readonly STRING_EXPIRATION_YEAR = 'expirationYear';
   static readonly STRING_FALSE = 'false';
-  static readonly STRING_FIELDS = 'fields';
-  static readonly STRING_ID = 'id';
-  static readonly STRING_MY_REQUESTS = 'my-requests-';
-  static readonly STRING_ORDER_NUMBER = 'orderNumber';
-  static readonly STRING_REASON = 'reason';
   static readonly STRING_RESPONSE = 'response';
   static readonly STRING_RESPONSE_STATUS = 'status';
   static readonly STRING_SYNC_AUTH_NAME = 'ics_auth';
@@ -128,9 +114,7 @@ export abstract class Constants {
   static readonly STRING_SYNC_SORT = 'submitTimeUtc:desc';
   static readonly STRING_TRANSACTIONS = 'transactions';
   static readonly STRING_TRUE = 'true';
-  static readonly STRING_TEXT = 'text';
   static readonly STRING_DEFAULT = 'default';
-  static readonly STRING_PANENTRY = 'PANENTRY';
   static readonly CART_ID = 'cartId';
   static readonly PAYMENT_ID = 'paymentId';
   static readonly BASE_SIXTY_FOUR_ENCODING = 'Base64';
@@ -138,7 +122,6 @@ export abstract class Constants {
   static readonly CUSTOM_OBJECT_KEY = 'webHookSubscription';
   static readonly STRING_ACTIVE = 'ACTIVE';
 
-  static readonly CARD_FIELD_GROUP = 'cardFieldGroup';
   static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ENCODING_SHA_TWO_FIFTY_SIX = 'sha256';
   static readonly HEADER_ENCRYPTION_ALGORITHM = 'aes-256-gcm';
@@ -171,7 +154,6 @@ export abstract class Constants {
   static readonly INVALID_INPUT = 'InvalidInput';
   static readonly ISV_ADDRESS_ID = 'isv_addressId';
   static readonly ISV_FAILED_TOKENS = 'isv_failedTokens';
-  static readonly ISV_PAYER_AUTHENTICATION_ENROLL_STATUS = 'isv_payerEnrollStatus';
   static readonly ISV_SECURITY_CODE = 'isv_securityCode';
   static readonly ISV_TOKEN = 'isv_token';
   static readonly SET_CUSTOM_FIELD = 'setCustomField';
@@ -189,7 +171,6 @@ export abstract class Constants {
   static readonly SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS = 'Updated click to pay card details successfully';
   static readonly SUCCESS_MSG_UC_ADDRESS_DETAILS = 'Successfully updated cart address as the UC address';
   static readonly SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN = 'Successfully updated customer token through webhooks API';
-  static readonly SUCCESS_MSG_STORED_SUBSCRIPTION_DETAILS = 'Sucessfully stored subscription details';
   static readonly SUCCESS_MSG_FAV_ICON = 'Resolving favicon.io';
 
   //Exception messages
@@ -210,6 +191,7 @@ export abstract class Constants {
   static readonly EXCEPTION_MSG_ENV_VARIABLE_NOT_SET = 'Please configure the mid credentials in env file';
   static readonly EXCEPTION_MSG_FETCH_PAYMENT_DETAILS = 'An exception occurred while fetching payment details';
   static readonly EXCEPTION_MSG_FETCH_ORDER_DETAILS = 'An exception occurred while fetching order details';
+  static readonly EXCEPTION_MSG_FETCH_DISCOUNT_DETAILS = 'An exception occurred while fetching discount details';
   static readonly EXCEPTION_MSG_CHANGE_TRANSACTION_INTERACTION_ID = 'An exception occurred while changing the transaction interaction id';
   static readonly EXCEPTION_MSG_GET_MID_CREDENTIALS = 'An exception occurred while retrieving mid credentials';
   static readonly EXCEPTION_MERCHANT_KEY_ID_REQUIRED = 'MerchantKeyId is Mandatory';
@@ -222,7 +204,6 @@ export abstract class Constants {
   static readonly EXCEPTION_CREATE_PAYMENT_API = 'An exception occurred while creating a payment';
   static readonly EXCEPTION_UPDATE_PAYMENT_API = 'An exception occurred while updating a payment';
   static readonly EXCEPTION_UPDATE_CUSTOMER_API = 'An exception occurred while updating a Customer';
-  static readonly EXCEPTION_MSG_CREATE_SUBSCRIPTION = 'An exception occurred while creating subscription';
 
   //Error messages
   static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
@@ -231,11 +212,9 @@ export abstract class Constants {
   static readonly ERROR_MSG_ACCESSING_CERTIFICATES = 'An error occurred while accessing ApplePay Certificates';
   static readonly ERROR_MSG_ENV_VARIABLES_NOT_FOUND = 'Missing configurations for merchant id ';
   static readonly ERROR_MSG_EMPTY_PAYMENT_DATA = 'There was an error while fetching payment details';
-  static readonly ERROR_MSG_EMPTY_CUSTOMER_DATA = 'There was an error while fetching customer details';
   static readonly ERROR_MSG_EMPTY_TRANSACTION_DETAILS = 'There was an error while fetching transaction details, please try again';
   static readonly ERROR_MSG_ENABLE_SYNC = 'Please enable Run sync';
   static readonly ERROR_MSG_CART_DETAILS = 'Unable to fetch cart details';
-  static readonly ERROR_MSG_CART_LOCALE = 'There is no locale set for the cart';
   static readonly ERROR_MSG_CAPTURE_FAILURE = 'Cannot process the capture as there are no transaction id available';
   static readonly ERROR_MSG_CAPTURE_SERVICE = 'Error in triggering capture service, please try again';
   static readonly ERROR_MSG_CANNOT_PROCESS = 'Unable to process your transaction, please try again';
@@ -243,6 +222,7 @@ export abstract class Constants {
   static readonly ERROR_MSG_COMMERCETOOLS_CONNECT = 'There was an error connecting to Commercetools';
   static readonly ERROR_MSG_CREATE_CUSTOM_TYPE = 'There was an error creating custom type';
   static readonly ERROR_MSG_CUSTOMER_DETAILS = 'Unable to fetch customer details';
+  static readonly ERROR_MSG_DISCOUNT_DETAILS = 'Unable to fetch discount details'
   static readonly ERROR_MSG_CUSTOMER_UPDATE = 'Unable to update the customer with customer address';
   static readonly ERROR_MSG_EMPTY_CART = 'There is no cart available for the payment';
   static readonly ERROR_MSG_EMPTY_CUSTOM_FIELDS = 'There was an error processing your request';
@@ -259,19 +239,16 @@ export abstract class Constants {
   static readonly ERROR_MSG_INVALID_REQUEST = 'Cannot process the request due to invalid input';
   static readonly ERROR_MSG_MISSING_AUTHORIZATION_HEADER = 'Missing Authorization Header';
   static readonly ERROR_MSG_MERCHANT_ID_NOT_FOUND = ' is not found. Please configure it in the env variables';
-  static readonly ERROR_MSG_MULTI_MID_NOT_ENABLED = 'Multi mid not enabled. Using Default credentials for transaction';
   static readonly ERROR_MSG_NO_CARD_DETAILS = 'There are no card details available for the payment';
   static readonly ERROR_MSG_NO_ORDER_DETAILS = 'Unable to retrieve order details, please try again';
   static readonly ERROR_MSG_NO_PAYMENT_METHODS = 'There are no payment method available for the payment';
   static readonly ERROR_MSG_NO_SYNC_DETAILS = 'There were no payment details found to update';
   static readonly ERROR_MSG_NO_TOKENS_UPDATE = 'There are no tokens to update';
   static readonly ERROR_MSG_NO_TOKENS_DELETE = 'There are no tokens to delete';
-  static readonly ERROR_MSG_NO_TRANSACTION = 'There are no transactions created for the payment';
   static readonly ERROR_MSG_PAYMENT_DETAILS = 'Unable to fetch payment details';
   static readonly ERROR_MSG_PUBLIC_KEY_VERIFICATION = 'Failed to verify capture context';
   static readonly ERROR_MSG_INVALID_RATE_LIMITER_CONFIGURATIONS = 'Invalid configurations. Please configure the valid values for rate limiter in env file';
   static readonly ERROR_MSG_REFUND_EXCEEDS_CAPTURE_AMOUNT = 'Cannot perform refund as the entered amount exceeds captured amount';
-  static readonly ERROR_MSG_REFUND_FAILURE = 'Cannot process refund as there are no transaction id available';
   static readonly ERROR_MSG_REFUND_GREATER_THAN_ZERO = 'Refund amount should be greater than zero';
   static readonly ERROR_MSG_REFUND_SERVICE = 'Error in triggering refund service, please try again';
   static readonly ERROR_MSG_REFUND_AMOUNT = 'Refund amount must be a number and should be greater than zero';
@@ -293,7 +270,6 @@ export abstract class Constants {
   static readonly ERROR_MSG_CAPTURE_CONTEXT = 'Failed to generate capture context';
   static readonly ERROR_MSG_TRANSIENT_TOKEN_DATA = 'Unable to get transient token data';
   static readonly ERROR_MSG_INVALID_INSTRUMENT_ID_RESPONSE = 'Invalid instrument identifier response';
-  static readonly ERROR_MSG_INVALID_SIGNATURE_HEADERS = 'Invalid signature headers';
   static readonly ERROR_MSG_SIGNATURE_DOES_NOT_MATCH = 'Generated signature does not match with header signature';
   static readonly ERROR_MSG_UNHANDLED_REQUEST_METHOD = 'Unhandled request method';
   static readonly ERROR_MSG_NOT_FOUND = 'Not found';
@@ -318,6 +294,6 @@ export abstract class Constants {
 
   //HTMLContent
   static readonly HTML_PREFIX =
-    '<!DOCTYPE html> <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>ISV Commercetools Extension</title><script>if (top != self) {top.location = encodeURI(self.location);}</script><link rel="stylesheet" href="css/styles.css" /></head><body>';
+    '<!DOCTYPE html> <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Commercetools Cybersource Extension</title><script>if (top != self) {top.location = encodeURI(self.location);}</script><link rel="stylesheet" href="css/styles.css" /></head><body>';
   static readonly HTML_SUFFIX = '</body></html>';
 }

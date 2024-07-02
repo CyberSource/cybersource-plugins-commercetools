@@ -27,3 +27,5 @@ When creating a payment, the following fields are validated
 | payment.custom.isv_routingNumber           | Must exist                                  | If payment.paymentMethodInfo.method is eCheck                            |
 | payment.custom.isv_acceptHeader            | Must exist                                  | If payment.paymentMethodInfo.method is creditCardWithPayerAuthentication |
 | payment.custom.isv_userAgentHeader         | Must exist                                  | If payment.paymentMethodInfo.method is creditCardWithPayerAuthentication |
+| payment.custom.isv_screenWidth            | Must exist                                  | If payment.paymentMethodInfo.method is creditCardWithPayerAuthentication |
+| payment.custom.isv_screenHeight         | Must exist                                  | If payment.paymentMethodInfo.method is creditCardWithPayerAuthentication |

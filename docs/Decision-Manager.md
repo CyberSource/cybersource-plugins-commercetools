@@ -40,6 +40,23 @@ The Cybersource Extension has environment variable for decision manager as `PAYM
 
 > **_NOTE:_** Value for `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` is case sensitive without any spaces.
 
+### Payer Authentication with Decision Manager
+ 
+You can use Decision Manager with payer authentication services to allow the risk of an order to determine when you need to invoke payer authentication. 
+Merchant can choose to set the following rules in Decision Manager profile
+
+1. `PAYERAUTH_INVOKE` profile.
+
+   ![](./images/Payer_Auth_Invoke.png)
+2. `PAYERAUTH_EXTERNAL` profile.
+
+   ![](./images/Payer_Auth_External.png)
+3. `PAYERAUTH_SKIP` profile.
+
+   ![](./images/Payer_Auth_Skip.png)
+
+To see more about Payer Authentication with decision manager, refer [this](https://ebc.cybersource.com/content/ebc/docs/cybs/en-us/html/dm-develop/developer/all/so/oxy_ex-1/topics/c_Using_DM_With_Payer_Auth.html)
+
 ## Optional fields
 
 To pass additional data to Decision Manager, it is possible to customize the Commercetools resources to add extra fields. If these fields exist and there are values present for these, then the extension will pass the values on to Cybersource in the appropriate request

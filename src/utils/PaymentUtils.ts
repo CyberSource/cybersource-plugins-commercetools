@@ -1,7 +1,9 @@
 import crypto from 'crypto';
 import path from 'path';
 
+
 import axios from 'axios';
+import { PtsV2PaymentsCapturesPost201Response, PtsV2PaymentsPost201Response, PtsV2PaymentsRefundPost201Response, PtsV2PaymentsReversalsPost201Response } from 'cybersource-rest-client';
 import createDOMPurify from 'dompurify';
 import { stringify } from 'flatted';
 import { JSDOM } from 'jsdom';
@@ -10,13 +12,27 @@ import { format } from 'winston';
 import 'winston-daily-rotate-file';
 
 import { Constants } from '../constants';
-import { actionType, addressType, amountPlannedType, certificateResponseType, customerCustomType, customerTokensType, customerType, paymentCustomFieldsType, paymentTransactionType, paymentType, transactionObjectType } from '../types/Types';
+import { ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, CustomerType, PaymentCustomFieldsType, PaymentTransactionType, PaymentType, ResponseType, TransactionObjectType } from '../types/Types';
 
 import commercetoolsApi from './../utils/api/CommercetoolsApi';
 
 const { combine, printf } = format;
 
-const logData = (fileName: string, methodName: string, type: string, id: string, message: string | unknown) => {
+type PtsV2PaymentsPost201Response = typeof PtsV2PaymentsPost201Response;
+type PtsV2PaymentsCapturesPost201Response = typeof PtsV2PaymentsCapturesPost201Response;
+type PtsV2PaymentsReversalsPost201Response = typeof PtsV2PaymentsReversalsPost201Response;
+type PtsV2PaymentsRefundPost201Response = typeof PtsV2PaymentsRefundPost201Response;
+
+/**
+* Handles logging info and errors.
+* 
+* @param {string} fileName - Name of the file.
+* @param {string} method - Name of the method.
+* @param {string} type - Log type (e.g., 'info', 'error').
+* @param {string} id - Identifier.
+* @param {string} logMessage - Log message.
+*/
+const logData = (fileName: string, method: string, type: string, id: string, logMessage: string): void => {
   let loggingFormat: winston.Logform.Format;
   let logger: winston.Logger;
   if (id) {
@@ -45,27 +61,33 @@ const logData = (fileName: string, methodName: string, type: string, id: string,
     if (id) {
       logger.log({
         label: fileName,
-        methodName: methodName,
+        methodName: method,
         level: type,
         id: id,
-        message: message as string,
+        message: logMessage,
       });
     } else {
       logger.log({
         label: fileName,
-        methodName: methodName,
+        methodName: method,
         level: type,
-        message: message as string,
+        message: logMessage,
       });
     }
   }
 };
 
-const getFileName = () => {
-  const date = new Date().toISOString().split('T')[0];
-  return Constants.STRING_MY_REQUESTS + date + '.log';
-};
-
+/**
+ * Log exceptions.
+ * 
+ * @param {string} fileName - Log file name.
+ * @param {string} functionName - Name of the function where the exception occurred.
+ * @param {string} exceptionMsg - Exception message.
+ * @param {any} exception - The exception object.
+ * @param {string} id - Resource ID.
+ * @param {string} resourceType - Type of the resource.
+ * @param {string} key - Key related to the exception (optional).
+ */
 const exceptionLog = (fileName: string, functionName: string, exceptionMsg: string, exception: string | Error | unknown, id: string, resourceType: string, key: string) => {
   let exceptionData: string;
   if (typeof exception === 'string') {
@@ -88,8 +110,14 @@ const exceptionLog = (fileName: string, functionName: string, exceptionMsg: stri
   id ? logData(fileName, functionName, Constants.LOG_ERROR, resourceType + id, exceptionData) : logData(fileName, functionName, Constants.LOG_ERROR, '', exceptionData);
 };
 
-const setCustomFieldMapper = (fields: paymentCustomFieldsType) => {
-  const actions: actionType[] = [];
+/**
+ * Set custom field mapper.
+ * 
+ * @param {PaymentCustomFieldsType} fields - Custom fields object.
+ * @returns {ActionType[]} - Array of actions.
+ */
+const setCustomFieldMapper = (fields: PaymentCustomFieldsType): ActionType[] => {
+  const actions: ActionType[] = [];
   let keys: readonly string[];
   try {
     keys = Object.keys(fields);
@@ -98,7 +126,7 @@ const setCustomFieldMapper = (fields: paymentCustomFieldsType) => {
         actions.push({
           action: Constants.SET_CUSTOM_FIELD,
           name: key,
-          value: fields[key as keyof paymentCustomFieldsType],
+          value: fields[key as keyof PaymentCustomFieldsType], 
         });
       });
     } else {
@@ -110,8 +138,14 @@ const setCustomFieldMapper = (fields: paymentCustomFieldsType) => {
   return actions;
 };
 
-const setCustomFieldToNull = (fields: paymentCustomFieldsType | customerCustomType) => {
-  const actions: actionType[] = [];
+/**
+ * Set custom fields to null.
+ * 
+ * @param {PaymentCustomFieldsType | CustomerCustomType} fields - Custom fields object.
+ * @returns {ActionType[]} - Array of actions.
+ */
+const setCustomFieldToNull = (fields: PaymentCustomFieldsType | CustomerCustomType): ActionType[] => {
+  const actions: ActionType[] = [];
   let keys: string[];
   try {
     keys = Object.keys(fields);
@@ -132,7 +166,14 @@ const setCustomFieldToNull = (fields: paymentCustomFieldsType | customerCustomTy
   return actions;
 };
 
-const setTransactionId = (paymentResponse: any, transactionDetail: paymentTransactionType) => {
+/**
+ * Set transaction ID for a payment.
+ * 
+ * @param {any} paymentResponse - Payment response object.
+ * @param {PaymentTransactionType} transactionDetail - Transaction details object.
+ * @returns {{ action: string, interactionId: string, transactionId: string }} - Transaction ID data.
+ */
+const setTransactionId = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2PaymentsCapturesPost201Response | PtsV2PaymentsReversalsPost201Response | PtsV2PaymentsRefundPost201Response, transactionDetail: PaymentTransactionType) => {
   const transactionIdData = {
     action: 'changeTransactionInteractionId',
     interactionId: '',
@@ -151,7 +192,14 @@ const setTransactionId = (paymentResponse: any, transactionDetail: paymentTransa
   return transactionIdData;
 };
 
-const changeState = (transactionDetail: paymentTransactionType, state: string) => {
+/**
+ * Change the state of a transaction.
+ * 
+ * @param {PaymentTransactionType} transactionDetail - Transaction details object.
+ * @param {string} state - New state to change to.
+ * @returns {{ action: string, state: string, transactionId: string }} - Change state data.
+ */
+const changeState = (transactionDetail: PaymentTransactionType, state: string) => {
   const changeStateData = {
     action: 'changeTransactionState',
     state: '',
@@ -170,7 +218,14 @@ const changeState = (transactionDetail: paymentTransactionType, state: string) =
   return changeStateData;
 };
 
-const failureResponse = (paymentResponse: any, transactionDetail: paymentTransactionType) => {
+/**
+ * Generate failure response data for a payment transaction.
+ * 
+ * @param {any} paymentResponse - Payment response object.
+ * @param {PaymentTransactionType} transactionDetail - Transaction details object.
+ * @returns {{ action: string, type: { key: string }, fields: { reasonCode: string, transactionId: string }}} - Failure response data.
+ */
+const failureResponse = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2PaymentsCapturesPost201Response | PtsV2PaymentsReversalsPost201Response | PtsV2PaymentsRefundPost201Response, transactionDetail: PaymentTransactionType): { action: string, type: { key: string }, fields: { reasonCode: string, transactionId: string } } => {
   const failureResponseData = {
     action: Constants.ADD_INTERFACE_INTERACTION,
     type: {
@@ -194,14 +249,28 @@ const failureResponse = (paymentResponse: any, transactionDetail: paymentTransac
   return failureResponseData;
 };
 
-const convertCentToAmount = (amount: number, fractionDigits: number) => {
+/**
+ * Convert cent amount to its corresponding amount with the specified fraction digits.
+ * 
+ * @param {number} amount - The cent amount to be converted.
+ * @param {number} fractionDigits - The number of fraction digits.
+ * @returns {number} - The converted amount.
+ */
+const convertCentToAmount = (amount: number, fractionDigits: number): number => {
   if (amount) {
     amount = Number((amount / Math.pow(10, fractionDigits)).toFixed(fractionDigits)) * 1;
   }
   return amount;
 };
 
-const convertAmountToCent = (amount: number, fractionDigits: number) => {
+/**
+ * Convert an amount to its corresponding cent value with the specified fraction digits.
+ * 
+ * @param {number} amount - The amount to be converted.
+ * @param {number} fractionDigits - The number of fraction digits.
+ * @returns {number} - The converted cent value.
+ */
+const convertAmountToCent = (amount: number, fractionDigits: number): number => {
   let cent = 0;
   if (amount) {
     const amountArray = amount.toString().split('.');
@@ -214,7 +283,14 @@ const convertAmountToCent = (amount: number, fractionDigits: number) => {
   return cent;
 };
 
-const roundOff = (amount: number, fractionDigits: number) => {
+/**
+ * Round off the amount to the specified number of fraction digits.
+ * 
+ * @param {number} amount - The amount to be rounded off.
+ * @param {number} fractionDigits - The number of fraction digits.
+ * @returns {number} - The rounded off value.
+ */
+const roundOff = (amount: number, fractionDigits: number): number => {
   let value = 0;
   if (amount) {
     value = Math.round(amount * Math.pow(10, fractionDigits)) / Math.pow(10, fractionDigits);
@@ -222,6 +298,14 @@ const roundOff = (amount: number, fractionDigits: number) => {
   return value;
 };
 
+/**
+ * Get an empty response object with empty actions and errors arrays.
+ * 
+ * @returns {{
+ *   actions: never[];
+ *   errors: never[];
+ *  }} - An empty response object.
+ */
 const getEmptyResponse = () => {
   return {
     actions: [],
@@ -229,6 +313,11 @@ const getEmptyResponse = () => {
   };
 };
 
+/**
+ * Get an invalid operation response object with an empty actions array and an error object indicating an invalid operation.
+ * 
+ * @returns {object} - An invalid operation response object.
+ */
 const invalidOperationResponse = () => {
   return {
     actions: [],
@@ -241,6 +330,11 @@ const invalidOperationResponse = () => {
   };
 };
 
+/**
+ * Get an invalid input response object with an empty actions array and an error object indicating invalid input.
+ * 
+ * @returns {object} - An invalid input response object.
+ */
 const invalidInputResponse = () => {
   return {
     actions: [],
@@ -253,7 +347,14 @@ const invalidInputResponse = () => {
   };
 };
 
-const getRefundResponseObject = async (transaction: paymentTransactionType, pendingTransactionAmount: number) => {
+/**
+ * Get a refund response object with details about the refund, including capture ID, transaction ID, and pending transaction amount.
+ * 
+ * @param {PaymentTransactionType} transaction - The transaction object.
+ * @param {number} pendingTransactionAmount - The pending transaction amount.
+ * @returns {Promise<Object>} - A refund response object.
+ */
+const getRefundResponseObject = async (transaction: PaymentTransactionType, pendingTransactionAmount: number): Promise<{ captureId: string, transactionId: string, pendingTransactionAmount: number }> => {
   const refundResponseAmountObject = {
     captureId: '',
     transactionId: '',
@@ -271,7 +372,14 @@ const getRefundResponseObject = async (transaction: paymentTransactionType, pend
   return refundResponseAmountObject;
 };
 
-const getOrderId = async (cartId: string, paymentId: string) => {
+/**
+ * Get the order ID based on either the cart ID or the payment ID.
+ * 
+ * @param {string} cartId - The cart ID.
+ * @param {string} paymentId - The payment ID.
+ * @returns {Promise<string>} - The order ID.
+ */
+const getOrderId = async (cartId: string, paymentId: string): Promise<string> => {
   let orderObj = null;
   let orderNo = '';
   if (cartId) {
@@ -289,7 +397,13 @@ const getOrderId = async (cartId: string, paymentId: string) => {
   return orderNo;
 };
 
-const encryption = (data: string) => {
+/**
+ * Encrypts the provided data using AES-GCM encryption.
+ * 
+ * @param {string} data - The data to be encrypted.
+ * @returns {string} - The encrypted data encoded in Base64.
+ */
+const encryption = (data: string): string => {
   let baseEncodedData = '';
   let encryptionInfo;
   try {
@@ -309,17 +423,23 @@ const encryption = (data: string) => {
   return baseEncodedData;
 };
 
-const decryption = (encodedCredentials: string) => {
+/**
+ * Decrypts the provided encoded credentials using AES-GCM decryption.
+ * 
+ * @param {string} encodedCredentials - The encoded credentials to be decrypted.
+ * @returns {string} - The decrypted data.
+ */
+const decryption = (encodedCredentials: string): string => {
   let decryptedData = '';
   let dataArray = [];
   try {
-    if (encodedCredentials) {
+    if (encodedCredentials && process.env.CT_CLIENT_SECRET) {
       const data = Buffer.from(encodedCredentials, Constants.ENCODING_BASE_SIXTY_FOUR).toString('ascii');
       dataArray = data.split(Constants.STRING_FULL_COLON);
       const ivBuff = Buffer.from(dataArray[0], Constants.HEX);
       const encryptedData = dataArray[1];
       const authTagBuff = Buffer.from(dataArray[2], Constants.HEX);
-      const decipher = crypto.createDecipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, process.env.CT_CLIENT_SECRET as string, ivBuff);
+      const decipher = crypto.createDecipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, process.env.CT_CLIENT_SECRET, ivBuff);
       decipher.setAuthTag(authTagBuff);
       decryptedData = decipher.update(encryptedData, Constants.ENCODING_BASE_SIXTY_FOUR, Constants.UNICODE_ENCODING_SYSTEM);
       decryptedData += decipher.final(Constants.UNICODE_ENCODING_SYSTEM);
@@ -330,7 +450,13 @@ const decryption = (encodedCredentials: string) => {
   return decryptedData;
 };
 
-const getCertificatesData = async (url: string) => {
+/**
+ * Retrieves data from the specified URL.
+ * 
+ * @param {string} url - The URL to fetch the data from.
+ * @returns {Promise<{ status: number; data: any }>} - A promise containing the status and data from the request.
+ */
+const getCertificatesData = async (url: string): Promise<{ status: number; data: any }> => {
   const certificateResponse = {
     status: 0,
     data: null,
@@ -339,7 +465,7 @@ const getCertificatesData = async (url: string) => {
     return new Promise<typeof certificateResponse>((resolve, reject) => {
       axios
         .get(url)
-        .then(function (response: certificateResponseType) {
+        .then(function (response: CertificateResponseType) {
           if (response.data) {
             certificateResponse.data = response.data;
             certificateResponse.status = response.status;
@@ -361,7 +487,13 @@ const getCertificatesData = async (url: string) => {
   return certificateResponse;
 };
 
-const getCartObject = async (paymentObj: paymentType) => {
+/**
+ * Retrieves the cart object associated with a payment.
+ * 
+ * @param {PaymentType} paymentObj - The payment object.
+ * @returns {Promise<any>} - A promise containing the cart object.
+ */
+const getCartObject = async (paymentObj: PaymentType): Promise<any> => {
   let cartObj = null;
   try {
     cartObj = await commercetoolsApi.queryCartById(paymentObj.id, Constants.PAYMENT_ID);
@@ -380,7 +512,18 @@ const getCartObject = async (paymentObj: paymentType) => {
   return cartObj;
 };
 
-const createTokenData = async (customFields: customerCustomType, customerObj: customerType, paymentInstrumentId: string, instrumentIdentifier: string, customerTokenId: string, billToFields: addressType | null) => {
+/**
+ * Creates token data based on the provided parameters.
+ * 
+ * @param {CustomerCustomType} customFields - Custom fields associated with the customer.
+ * @param {CustomerType} customerObj - The customer object.
+ * @param {string} paymentInstrumentId - The payment instrument ID.
+ * @param {string} instrumentIdentifier - The instrument identifier.
+ * @param {string} customerTokenId - The customer token ID.
+ * @param {AddressType | null} billToFields - The billing address fields.
+ * @returns {CustomerTokensType} - The token data.
+ */
+const createTokenData = async (customFields: CustomerCustomType, customerObj: CustomerType, paymentInstrumentId: string, instrumentIdentifier: string, customerTokenId: string, billToFields: AddressType | null) => {
   const address = Constants.UC_ADDRESS === customerObj.custom?.fields?.isv_addressId ? billToFields : {};
   return {
     alias: customFields.isv_tokenAlias,
@@ -395,10 +538,17 @@ const createTokenData = async (customFields: customerCustomType, customerObj: cu
     addressId: customFields.isv_addressId,
     address: address,
     timeStamp: new Date(Date.now()).toISOString(),
-  } as customerTokensType;
+  };
 };
 
-const createFailedTokenData = async (customFields: customerCustomType, addressId: string) => {
+/**
+ * Creates data for failed tokens based on the provided custom fields and address ID.
+ * 
+ * @param {CustomerCustomType} customFields - Custom fields associated with the customer.
+ * @param {string} addressId - The address ID.
+ * @returns {Promise<string[]>} - The updated list of failed tokens.
+ */
+const createFailedTokenData = async (customFields: CustomerCustomType, addressId: string): Promise<string[]> => {
   let existingFailedTokens: string[] = [];
   try {
     const failedTokens = {
@@ -410,7 +560,7 @@ const createFailedTokenData = async (customFields: customerCustomType, addressId
       cardExpiryYear: customFields.isv_cardExpiryYear,
       addressId: addressId,
       timeStamp: new Date(Date.now()).toISOString(),
-    } as customerTokensType;
+    };
     if (customFields?.isv_failedTokens && customFields?.isv_failedTokens.length) {
       existingFailedTokens = customFields.isv_failedTokens;
       const failedTokenLength = customFields.isv_failedTokens.length;
@@ -424,8 +574,19 @@ const createFailedTokenData = async (customFields: customerCustomType, addressId
   return existingFailedTokens;
 };
 
-const createTransactionObject = (version: number | undefined, amountPlanned: amountPlannedType, transactionType: string | undefined, transactionState: string, interactionId: string | undefined, timeStamp: string | undefined) => {
-  const transactionObject: transactionObjectType = {
+/**
+ * Creates a transaction object based on the provided parameters.
+ * 
+ * @param {number | undefined} version - The version of the transaction.
+ * @param {AmountPlannedType} amountPlanned - The planned amount for the transaction.
+ * @param {string | undefined} transactionType - The type of the transaction.
+ * @param {string} transactionState - The state of the transaction.
+ * @param {string | undefined} interactionId - The interaction ID associated with the transaction.
+ * @param {string | undefined} timeStamp - The timestamp of the transaction.
+ * @returns {TransactionObjectType} - The created transaction object.
+ */
+const createTransactionObject = (version: number | undefined, amountPlanned: AmountPlannedType, transactionType: string | undefined, transactionState: string, interactionId: string | undefined, timeStamp: string | undefined) => {
+  const transactionObject: TransactionObjectType = {
     amount: amountPlanned,
     state: transactionState,
   };
@@ -444,6 +605,20 @@ const createTransactionObject = (version: number | undefined, amountPlanned: amo
   return transactionObject;
 };
 
+/**
+ * Prepares headers and parameters for making requests to the CyberSource API.
+ * 
+ * @param {any} pathParams - The path parameters.
+ * @param {any} headerParams - The header parameters.
+ * @param {any} queryParams - The query parameters.
+ * @param {any} postBody - The request body.
+ * @param {any} formParams - The form parameters.
+ * @param {any} returnType - The return type of the API call.
+ * @param {any[]} authNames - The authentication names.
+ * @param {string[]} contentTypes - The content types.
+ * @param {string[]} accepts - The accept types.
+ * @returns {object} - Headers and parameters for the API call.
+ */
 const prepareCybsApiHeaders = (pathParams: any, headerParams: any, queryParams: any, postBody: any, formParams: any, returnType: any, authNames: any[], contentTypes: string[], accepts: string[]) => {
   return {
     pathParams: pathParams,
@@ -458,7 +633,13 @@ const prepareCybsApiHeaders = (pathParams: any, headerParams: any, queryParams: 
   };
 };
 
-const collectRequestData = (request: any) => {
+/**
+ * Collects data from an incoming HTTP request.
+ * 
+ * @param {any} request - The incoming HTTP request object.
+ * @returns {Promise<string>} - A promise that resolves with the collected data from the request.
+ */
+const collectRequestData = (request: any): Promise<string> => {
   return new Promise((resolve) => {
     const data: any[] | Uint8Array[] = [];
 
@@ -472,7 +653,14 @@ const collectRequestData = (request: any) => {
   });
 };
 
-const authenticateNetToken = async (signature: any, notification: any) => {
+/**
+ * Validates the headers in network tokenization webhook notification.
+ * 
+ * @param {any} signature - The signature string.
+ * @param {any} notification - The notification object.
+ * @returns {Promise<boolean>} - A promise that resolves with a boolean indicating whether the notification is valid.
+ */
+const authenticateNetToken = async (signature: any, notification: any): Promise<boolean> => {
   let isValidNotification = false;
   try {
     if (notification && 'object' === typeof notification && signature && 'string' === typeof signature) {
@@ -503,7 +691,13 @@ const authenticateNetToken = async (signature: any, notification: any) => {
   return isValidNotification;
 };
 
-function sanitizeHtml(htmlData: string) {
+/**
+ * Sanitizes HTML content to prevent XSS attacks.
+ * 
+ * @param {string} htmlData - The HTML content to sanitize.
+ * @returns {string} - The sanitized HTML content.
+ */
+function sanitizeHtml(htmlData: string): string {
   const { window } = new JSDOM('');
   const DOMPurifyInstance = createDOMPurify(window);
   const config = {
@@ -517,7 +711,15 @@ function sanitizeHtml(htmlData: string) {
   return sanitizedBodyContent;
 }
 
-const tokenCountForInterval = (tokens: string[], startTime: string, endTime: string) => {
+/**
+ * Counts the number of tokens within a specified time interval.
+ * 
+ * @param {string[]} tokens - Array of token strings.
+ * @param {string} startTime - Start time of the interval.
+ * @param {string} endTime - End time of the interval.
+ * @returns {number} - Number of tokens within the interval.
+ */
+const tokenCountForInterval = (tokens: string[], startTime: string, endTime: string): number => {
   let count = 0;
   let tokenToCompare;
   tokens.forEach((token) => {
@@ -529,7 +731,13 @@ const tokenCountForInterval = (tokens: string[], startTime: string, endTime: str
   return count;
 };
 
-const getRequestObj = (body: any) => {
+/**
+ * Extracts the request object from the request body.
+ * 
+ * @param {any} body - The request body.
+ * @returns {any} - The request object.
+ */
+const getRequestObj = (body: any): any => {
   let requestObj;
   if (body) {
     const requestBody = JSON.parse(body.toString());
@@ -544,7 +752,13 @@ const getRequestObj = (body: any) => {
   return requestObj;
 };
 
-const extractTokenValue = (inputElement: any) => {
+/**
+ * Extracts the token ID from the input element.
+ * 
+ * @param {any} inputElement - The input element containing the token ID.
+ * @returns {string} - The extracted token ID.
+ */
+const extractTokenValue = (inputElement: any): string => {
   let tokenId = '';
   if (inputElement) {
     const tokenArray = inputElement.split('/');
@@ -553,8 +767,19 @@ const extractTokenValue = (inputElement: any) => {
   return tokenId;
 };
 
-const updateParsedToken = (token: string, customFields: customerCustomType, paymentInstrumentId: string, customerTokenId: string, addressId: string, billToFields?: addressType | null) => {
-  let parsedToken = {} as customerTokensType;
+/**
+ * Updates the parsed token object with new values.
+ * 
+ * @param {string} token - The token object in string format.
+ * @param {CustomerCustomType} customFields - Custom fields related to the token.
+ * @param {string} paymentInstrumentId - The payment instrument ID.
+ * @param {string} customerTokenId - The customer token ID.
+ * @param {string} addressId - The address ID.
+ * @param {AddressType | null} billToFields - Optional bill to fields.
+ * @returns {CustomerTokensType} - The updated parsed token object.
+ */
+const updateParsedToken = (token: string, customFields: CustomerCustomType, paymentInstrumentId: string, customerTokenId: string, addressId: string, billToFields?: AddressType | null): CustomerTokensType => {
+  let parsedToken = {} as CustomerTokensType;
   if (token && customFields?.isv_tokenAlias && customerTokenId && paymentInstrumentId && customFields.isv_cardExpiryMonth && customFields.isv_cardExpiryYear && addressId) {
     parsedToken = JSON.parse(token);
     parsedToken.alias = customFields.isv_tokenAlias;
@@ -570,7 +795,14 @@ const updateParsedToken = (token: string, customFields: customerCustomType, paym
   return parsedToken;
 };
 
-const handleOMErrorMessage = (errorCode: number, transactionType: string) => {
+/**
+ * Generates error messages based on the error code and transaction type.
+ * 
+ * @param {number} errorCode - The error code.
+ * @param {string} transactionType - The transaction type.
+ * @returns {string} - The error message.
+ */
+const handleOMErrorMessage = (errorCode: number, transactionType: string): string => {
   let errorMessage = '';
   if (0 === errorCode) {
     if (Constants.CT_TRANSACTION_TYPE_CHARGE === transactionType) {
@@ -596,9 +828,31 @@ const handleOMErrorMessage = (errorCode: number, transactionType: string) => {
   return errorMessage;
 };
 
+const validUpdateServiceResponse = (updateServiceResponse: any): boolean => {
+  let validUpdateServiceResponseObject = false;
+  if (updateServiceResponse && Constants.HTTP_OK_STATUS_CODE === updateServiceResponse?.httpCode && updateServiceResponse?.card && 0 < Object.keys(updateServiceResponse.card).length &&
+    updateServiceResponse?.card?.expirationMonth &&
+    updateServiceResponse?.card?.expirationYear) {
+      validUpdateServiceResponseObject = true;
+  }
+  return validUpdateServiceResponseObject;
+}
+
+const validAddTokenResponse = (addTokenResponse: ResponseType): boolean => {
+  let validAddTokenResponseObject = false;
+  if (Constants.HTTP_SUCCESS_STATUS_CODE === addTokenResponse.httpCode &&
+    Constants.API_STATUS_AUTHORIZED === addTokenResponse.status &&
+    addTokenResponse?.data?.tokenInformation &&
+    addTokenResponse?.data?.tokenInformation?.paymentInstrument &&
+    addTokenResponse?.data?.tokenInformation?.instrumentIdentifier &&
+    addTokenResponse?.data?.tokenInformation?.paymentInstrument?.id.length) {
+      validAddTokenResponseObject = true;
+  }
+  return validAddTokenResponseObject;
+}
+
 export default {
   logData,
-  getFileName,
   exceptionLog,
   setCustomFieldMapper,
   setCustomFieldToNull,
@@ -629,4 +883,6 @@ export default {
   extractTokenValue,
   updateParsedToken,
   handleOMErrorMessage,
+  validUpdateServiceResponse,
+  validAddTokenResponse
 };

@@ -3,11 +3,17 @@ import path from 'path';
 import restApi from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { instrumentIdResponse } from '../../types/Types';
+import { InstrumentIdResponse } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefined, merchantId: string): Promise<instrumentIdResponse> => {
+/**
+ * Retrieves card information by instrument identifier.
+ * @param {string} instrumentIdentifier - The instrument identifier.
+ * @param {string} merchantId - The merchant ID.
+ * @returns {Promise<InstrumentIdResponse>} A promise that resolves with instrument ID response.
+ */
+const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefined, merchantId: string): Promise<InstrumentIdResponse> => {
   const getCardResponse = {
     httpCode: 0,
     instrumentIdentifier: '',
@@ -24,7 +30,7 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
     if (instrumentIdentifier) {
       const apiClient = new restApi.ApiClient();
       const getCardApiInstance = new restApi.InstrumentIdentifierApi(configObject, apiClient);
-      return await new Promise<instrumentIdResponse>(function (resolve, reject) {
+      return await new Promise<InstrumentIdResponse>(function (resolve, reject) {
         getCardApiInstance.getInstrumentIdentifier(instrumentIdentifier, opts, (error: any, data: any, response: any) => {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetCardByInstrumentResponse', Constants.LOG_INFO, 'InstrumentId : ' + instrumentIdentifier, 'InstrumentIdResponse = ' + JSON.stringify(response));
           if (data) {

@@ -7,12 +7,18 @@ import { createHttpMiddleware } from '@commercetools/sdk-middleware-http';
 import fetch from 'node-fetch';
 
 import { Constants } from '../../constants';
-import { actionType, addressType, customerType, orderResultType, paymentTransactionType, paymentType, pgAddressGroupType, reportSyncType, visaUpdateType } from '../../types/Types';
+import { Address } from '../../models/AddressModel';
+import { ActionType, AddressType, CardAddressGroupType, CustomerType, PaymentTransactionType, PaymentType, ReportSyncType, VisaUpdateType } from '../../types/Types';
 
 import paymentUtils from './../PaymentUtils';
 type createClient = typeof createClient;
 type createHttpMiddleware = typeof createHttpMiddleware;
 
+/**
+ * Gets the CommerceTools client.
+ * 
+ * @returns {any} - The CommerceTools client.
+ */
 const getClient = () => {
   const projectKey = process.env.CT_PROJECT_KEY;
   let client: createClient;
@@ -43,7 +49,14 @@ const getClient = () => {
   return client;
 };
 
-const queryCartById = async (id: string, idType: string) => {
+/**
+ * Queries a cart by its ID.
+ * 
+ * @param {string} id - The ID of the cart.
+ * @param {string} idType - The type of ID.
+ * @returns {Promise<any>} - The cart details.
+ */
+const queryCartById = async (id: string, idType: string): Promise<any> => {
   let retrieveCartByIdResponse = null;
   let uri = '';
   let logIdType = '';
@@ -84,6 +97,13 @@ const queryCartById = async (id: string, idType: string) => {
   return retrieveCartByIdResponse;
 };
 
+/**
+ * Queries an order by its ID.
+ * 
+ * @param {string} id - The ID of the order.
+ * @param {string} idType - The type of ID.
+ * @returns {Promise<any>} - The order details.
+ */
 const queryOrderById = async (id: string, idType: string) => {
   let queryOrderByIdResponse = null;
   let uri = '';
@@ -101,6 +121,10 @@ const queryOrderById = async (id: string, idType: string) => {
         } else if (Constants.PAYMENT_ID === idType) {
           uri = requestBuilder.orders.parse({ where: [`paymentInfo(payments(id="${id}"))`] }).build();
           logIdType = 'PaymentId : ';
+        } else if (Constants.CUSTOMER_ID === idType) {
+          const filterDate = new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString();
+          uri = requestBuilder.orders.where(`customerId="${id}" and createdAt >= "${filterDate}"`).build();
+          logIdType = 'CustomerId : ';
         }
         const channelsRequest = {
           uri: uri,
@@ -122,8 +146,14 @@ const queryOrderById = async (id: string, idType: string) => {
   return queryOrderByIdResponse;
 };
 
-const retrievePayment = async (paymentId: string) => {
-  let retrievePaymentResponse: paymentType | null = null;
+/**
+ * Retrieves payment details by ID.
+ * 
+ * @param {string} paymentId - The ID of the payment.
+ * @returns {Promise<any>} - The payment details.
+ */
+const retrievePayment = async (paymentId: string): Promise<any> => {
+  let retrievePaymentResponse: PaymentType | null = null;
   try {
     const client = getClient();
     if (client) {
@@ -148,8 +178,15 @@ const retrievePayment = async (paymentId: string) => {
   return retrievePaymentResponse;
 };
 
-const addTransaction = async (transactionObject: paymentTransactionType, paymentId: string) => {
-  let addTransactionResponse: paymentType | null = null;
+/**
+ * Adds a transaction to a payment.
+ * 
+ * @param {PaymentTransactionType} transactionObject - The transaction object to add.
+ * @param {string} paymentId - The ID of the payment.
+ * @returns {Promise<PaymentType | null>} - The updated payment with the added transaction.
+ */
+const addTransaction = async (transactionObject: PaymentTransactionType, paymentId: string): Promise<PaymentType | null> => {
+  let addTransactionResponse: PaymentType | null = null;
   try {
     if (transactionObject && paymentId) {
       const client = getClient();
@@ -190,8 +227,13 @@ const addTransaction = async (transactionObject: paymentTransactionType, payment
   return addTransactionResponse;
 };
 
-const getOrders = async () => {
-  let getOrderResponse: orderResultType | null = null;
+/**
+ * Retrieves orders.
+ * 
+ * @returns {Promise<any>} - The response body containing orders.
+ */
+const getOrders = async (): Promise<any> => {
+  let getOrderResponse: any = null;
   let getOrderResponseBody = null;
   try {
     const client = getClient();
@@ -217,67 +259,41 @@ const getOrders = async () => {
   return getOrderResponseBody;
 };
 
-const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVersion: number, addressData: pgAddressGroupType) => {
+
+/**
+ * Updates cart by payment ID.
+ * 
+ * @param {string} cartId - The ID of the cart.
+ * @param {string} paymentId - The ID of the payment.
+ * @param {number} cartVersion - The version of the cart.
+ * @param {CardAddressGroupType} addressData - The address data.
+ * @returns {Promise<any>} - The response body containing updated cart data.
+ */
+const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVersion: number, addressData: CardAddressGroupType): Promise<any> => {
   let updateCartByPaymentIdResponse = null;
-  let shippingEmail: string;
-  const actions: actionType[] = [];
+  const actions: ActionType[] = [];
   try {
     if (cartId && 0 < cartVersion && addressData && Object.keys(addressData).length) {
       if (addressData?.billToFieldGroup && Object.keys(addressData.billToFieldGroup).length) {
         actions.push({
           action: 'setBillingAddress',
-          address: {
-            firstName: addressData.billToFieldGroup.firstName,
-            lastName: addressData.billToFieldGroup.lastName,
-            streetName: addressData.billToFieldGroup.address1,
-            streetNumber: addressData.billToFieldGroup.address2,
-            postalCode: addressData.billToFieldGroup.postalCode,
-            city: addressData.billToFieldGroup.locality,
-            region: addressData.billToFieldGroup.administrativeArea,
-            country: addressData.billToFieldGroup.country,
-            phone: addressData.billToFieldGroup.phoneNumber,
-            email: addressData.billToFieldGroup.email,
-          },
+          address: new Address(addressData.billToFieldGroup)
         });
       }
       if (addressData?.shipToFieldGroup && 0 !== Object.keys(addressData.shipToFieldGroup).length) {
-        if (addressData?.shipToFieldGroup?.email) {
-          shippingEmail = addressData.shipToFieldGroup.email;
-        } else {
+        if (!addressData?.shipToFieldGroup?.email) {
           const cartData = await queryCartById(paymentId, Constants.PAYMENT_ID);
-          shippingEmail = cartData?.results[0]?.shippingAddress?.email as string;
+          addressData.shipToFieldGroup.email = cartData?.results[0]?.shippingAddress?.email;
         }
         actions.push({
           action: 'setShippingAddress',
-          address: {
-            firstName: addressData.shipToFieldGroup.firstName,
-            lastName: addressData.shipToFieldGroup.lastName,
-            streetName: addressData.shipToFieldGroup.address1,
-            streetNumber: addressData.shipToFieldGroup.address2,
-            postalCode: addressData.shipToFieldGroup.postalCode,
-            city: addressData.shipToFieldGroup.locality,
-            region: addressData.shipToFieldGroup.administrativeArea,
-            country: addressData.shipToFieldGroup.country,
-            phone: addressData.shipToFieldGroup.phoneNumber,
-            email: shippingEmail,
-          },
+          address: new Address(addressData.shipToFieldGroup),
         });
       }
       if (addressData?.billTo && Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
         actions.push({
           action: 'setBillingAddress',
-          address: {
-            firstName: addressData.billTo.firstName,
-            lastName: addressData.billTo.lastName,
-            streetName: addressData.billTo.address1,
-            streetNumber: addressData.billTo.buildingNumber,
-            postalCode: addressData.billTo.postalCode,
-            city: addressData.billTo.locality,
-            region: addressData.billTo.administrativeArea,
-            country: addressData.billTo.country,
-            phone: addressData.billTo.phoneNumber,
-            email: addressData.billTo.email,
-          },
+          address: new Address(addressData.billTo),
         });
       }
       if (addressData?.shipTo && Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING) {
@@ -286,19 +302,8 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
           if ('Single' === cartDetail.shippingMode) {
             actions.push({
               action: 'setShippingAddress',
-              address: {
-                firstName: addressData.shipTo.firstName,
-                lastName: addressData.shipTo.lastName,
-                streetName: addressData.shipTo.address1,
-                streetNumber: addressData.shipTo.buildingNumber,
-                postalCode: addressData.shipTo.postalCode,
-                city: addressData.shipTo.locality,
-                region: addressData.shipTo.administrativeArea,
-                country: addressData.shipTo.country,
-                phone: addressData.shipTo.phoneNumber,
-                email: addressData.shipTo.email,
-              },
-            });
+              address: new Address(addressData.shipTo),
+            })
           }
         }
       }
@@ -336,7 +341,17 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
   return updateCartByPaymentIdResponse;
 };
 
-const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: string, instrumentIdentifier: string, updatePaymentObj: paymentType, addressId: string) => {
+/**
+ * Sets customer tokens.
+ * 
+ * @param {string} tokenCustomerId - The ID of the token customer.
+ * @param {string} paymentInstrumentId - The ID of the payment instrument.
+ * @param {string} instrumentIdentifier - The identifier of the instrument.
+ * @param {PaymentType} updatePaymentObj - The payment object to update.
+ * @param {string} addressId - The ID of the address.
+ * @returns {Promise<any>} - The response after setting customer tokens.
+ */
+const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: string, instrumentIdentifier: string, updatePaymentObj: PaymentType, addressId: string): Promise<any> => {
   let setCustomerTokensResponse = null;
   let failedTokens: string[] = [];
   let customTypePresent = false;
@@ -345,7 +360,7 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
       const customerId = updatePaymentObj.customer.id;
       const customFields = updatePaymentObj?.custom?.fields;
       const customerInfo = await getCustomer(customerId);
-      if(customerInfo){
+      if (customerInfo) {
         customTypePresent = (customerInfo?.custom?.type?.id) ? true : false;
         const tokenData = {
           alias: customFields.isv_tokenAlias,
@@ -370,17 +385,17 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
             const mappedTokens = isvTokens.map((item) => item);
             const length = mappedTokens.length;
             mappedTokens[length] = stringTokenData;
-            setCustomerTokensResponse = await updateCustomerToken(mappedTokens, customerInfo, failedTokens);
+            setCustomerTokensResponse = await updateCustomerToken(mappedTokens, customerInfo, failedTokens, tokenCustomerId);
           } else {
-            if (customerInfo && customerInfo.custom?.fields?.isv_failedTokens) {
+            if (customerInfo.custom?.fields?.isv_failedTokens) {
               failedTokens = customerInfo.custom.fields.isv_failedTokens;
             }
             const tokenArray = [stringTokenData];
-          setCustomerTokensResponse = await updateCustomerToken(tokenArray, customerInfo, failedTokens);
+            setCustomerTokensResponse = await updateCustomerToken(tokenArray, customerInfo, failedTokens, tokenCustomerId);
           }
         } else {
           const tokenArray = [stringTokenData];
-          setCustomerTokensResponse = await setCustomType(customerId, tokenArray, failedTokens);
+          setCustomerTokensResponse = await setCustomType(customerId, tokenArray, failedTokens, tokenCustomerId);
         }
       }
     } else {
@@ -393,8 +408,14 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
   return setCustomerTokensResponse;
 };
 
-const getCustomer = async (customerId: string) => {
-  let getCustomerResponse: customerType | null = null;
+/**
+ * Retrieves customer information by ID.
+ * 
+ * @param {string} customerId - The ID of the customer.
+ * @returns {Promise<CustomerType | null>} - The response containing customer information.
+ */
+const getCustomer = async (customerId: string): Promise<CustomerType | null> => {
+  let getCustomerResponse: CustomerType | null = null;
   try {
     if (customerId) {
       const client = getClient();
@@ -423,7 +444,14 @@ const getCustomer = async (customerId: string) => {
   return getCustomerResponse;
 };
 
-const updateDecisionSync = async (decisionUpdateObject: paymentTransactionType, transactionId: string) => {
+/**
+ * Updates a payment transaction's state synchronously.
+ * 
+ * @param {PaymentTransactionType} decisionUpdateObject - The object containing payment transaction details.
+ * @param {string} transactionId - The ID of the transaction to update.
+ * @returns {Promise<void>}
+ */
+const updateDecisionSync = async (decisionUpdateObject: PaymentTransactionType, transactionId: string) => {
   try {
     if (decisionUpdateObject) {
       const client = getClient();
@@ -458,8 +486,14 @@ const updateDecisionSync = async (decisionUpdateObject: paymentTransactionType, 
   }
 };
 
-const syncVisaCardDetails = async (visaUpdateObject: visaUpdateType) => {
-  let syncVisaCardDetailsResponse: paymentType | null = null;
+/**
+ * Syncs Visa card details for a payment.
+ * 
+ * @param {VisaUpdateType} visaUpdateObject - Object containing Visa card update details.
+ * @returns {Promise<PaymentType | null>} - Updated payment object.
+ */
+const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<PaymentType | null> => {
+  let syncVisaCardDetailsResponse: PaymentType | null = null;
   try {
     if (visaUpdateObject && visaUpdateObject?.id) {
       const client = getClient();
@@ -492,8 +526,14 @@ const syncVisaCardDetails = async (visaUpdateObject: visaUpdateType) => {
   return syncVisaCardDetailsResponse;
 };
 
-const syncAddTransaction = async (syncUpdateObject: reportSyncType) => {
-  let syncAddTransactionResponse: paymentType | null = null;
+/**
+ * Syncs additional transaction details for a payment.
+ * 
+ * @param {ReportSyncType} syncUpdateObject - Object containing transaction details to sync.
+ * @returns {Promise<PaymentType | null>} - Updated payment object.
+ */
+const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<PaymentType | null> => {
+  let syncAddTransactionResponse: PaymentType | null = null;
   let channelsRequest = null;
   try {
     if (syncUpdateObject) {
@@ -566,7 +606,13 @@ const syncAddTransaction = async (syncUpdateObject: reportSyncType) => {
   return syncAddTransactionResponse;
 };
 
-const addCustomTypes = async (customType: any) => {
+/**
+ * Adds custom types to the CommerceTools project.
+ * 
+ * @param {any} customType - Custom type object to add.
+ * @returns {Promise<any>} - Response of the add custom type operation.
+ */
+const addCustomTypes = async (customType: any): Promise<any> => {
   let addCustomTypeResponse;
   let data: any;
   try {
@@ -595,7 +641,13 @@ const addCustomTypes = async (customType: any) => {
   return addCustomTypeResponse;
 };
 
-const addExtensions = async (extension: any) => {
+/**
+ * Adds extensions to the CommerceTools project.
+ * 
+ * @param {any} extension - Extension object to add.
+ * @returns {Promise<any>} - Response of the add extension operation.
+ */
+const addExtensions = async (extension: any): Promise<any> => {
   let addExtensionsResponse;
   try {
     const client = getClient();
@@ -619,7 +671,13 @@ const addExtensions = async (extension: any) => {
   return addExtensionsResponse;
 };
 
-const getCustomType = async (key: string) => {
+/**
+ * Retrieves a custom type by its key.
+ * 
+ * @param {string} key - Key of the custom type to retrieve.
+ * @returns {Promise<any>} - Response of the get custom type operation.
+ */
+const getCustomType = async (key: string): Promise<any> => {
   let getCustomTypeResponse = null;
   try {
     if (key) {
@@ -645,8 +703,17 @@ const getCustomType = async (key: string) => {
   return getCustomTypeResponse;
 };
 
-const setCustomType = async (customerId: string | undefined, fieldsData: string[], failedTokenData: string[] | undefined, customerTokenId?: string) => {
-  let setCustomTypeResponse: customerType | null = null;
+/**
+ * Updates the custom type associated with a customer.
+ * 
+ * @param {string} customerId - ID of the customer.
+ * @param {string[]} fieldsData - Data to update the custom type fields.
+ * @param {string[]} failedTokenData - Array of failed token data.
+ * @param {string} [customerTokenId] - Customer token ID.
+ * @returns {Promise<CustomerType | null>} - Response of the set custom type operation.
+ */
+const setCustomType = async (customerId: string | undefined, fieldsData: string[], failedTokenData: string[] | undefined, customerTokenId?: string): Promise<CustomerType | null> => {
+  let setCustomTypeResponse: CustomerType | null = null;
   try {
     if (customerId) {
       const client = getClient();
@@ -694,8 +761,14 @@ const setCustomType = async (customerId: string | undefined, fieldsData: string[
   return setCustomTypeResponse;
 };
 
+/**
+ * Changes the interaction ID of a transaction.
+ * 
+ * @param {any} transactionObj - Object containing transaction details.
+ * @returns {Promise<PaymentType | null>} - Response of the change transaction interaction ID operation.
+ */
 const changeTransactionInteractionId = async (transactionObj: any) => {
-  let changeTransactionInteractionIdResponse: paymentType | null = null;
+  let changeTransactionInteractionIdResponse: PaymentType | null = null;
   try {
     if (transactionObj) {
       const client = getClient();
@@ -734,6 +807,14 @@ const changeTransactionInteractionId = async (transactionObj: any) => {
   return changeTransactionInteractionIdResponse;
 };
 
+/**
+ * Adds a custom field to a given type.
+ * 
+ * @param {string} typeId - The ID of the type to which the field will be added.
+ * @param {number} version - The version of the type.
+ * @param {any} fieldDefinition - The definition of the custom field to be added.
+ * @returns {Promise<any>} - Response of the add custom field operation.
+ */
 const addCustomField = async (typeId: string, version: number, fieldDefinition: any) => {
   let addCustomFieldResponse;
   try {
@@ -773,6 +854,15 @@ const addCustomField = async (typeId: string, version: number, fieldDefinition: 
   return addCustomFieldResponse;
 };
 
+/**
+ * Updates the available capture amount for a transaction.
+ * 
+ * @param {string} paymentId - The ID of the payment associated with the transaction.
+ * @param {number} version - The version of the payment.
+ * @param {string} transactionId - The ID of the transaction.
+ * @param {number} pendingAmount - The pending amount to be set as available capture amount.
+ * @returns {Promise<any>} - Response of the update available amount operation.
+ */
 const updateAvailableAmount = async (paymentId: string, version: number, transactionId: string, pendingAmount: number) => {
   let updateAvailableAmountResponse;
   try {
@@ -819,6 +909,12 @@ const updateAvailableAmount = async (paymentId: string, version: number, transac
   return updateAvailableAmountResponse;
 };
 
+/**
+ * Retrieves a cart by its ID.
+ * 
+ * @param {string} cartId - The ID of the cart to retrieve.
+ * @returns {Promise<any>} - Response containing the cart details.
+ */
 const getCartById = async (cartId: string) => {
   let getCartByIdResponse;
   try {
@@ -849,45 +945,25 @@ const getCartById = async (cartId: string) => {
   return getCartByIdResponse;
 };
 
-const addCustomerAddress = async (customerId: string, addressObj: addressType) => {
-  const actions: actionType[] = [];
-  let addCustomerAddressResponse: customerType | null = null;
-  let customerData: customerType | null = null;
+/**
+ * Adds a new address to a customer.
+ * 
+ * @param {string} customerId - The ID of the customer.
+ * @param {AddressType} addressObj - The address object to add.
+ * @returns {Promise<any>} - Response containing the updated customer details.
+ */
+const addCustomerAddress = async (customerId: string, addressObj: AddressType) => {
+  const actions: ActionType[] = [];
+  let addCustomerAddressResponse: CustomerType | null = null;
+  let customerData: CustomerType | null = null;
   try {
     if (customerId) {
       customerData = await getCustomer(customerId);
       if (customerData) {
-        if ('FULL' === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
-          actions.push({
-            action: 'addAddress',
-            address: {
-              firstName: addressObj.firstName,
-              lastName: addressObj.lastName,
-              streetName: addressObj.address1,
-              city: addressObj.locality,
-              postalCode: addressObj.postalCode,
-              region: addressObj.administrativeArea,
-              country: addressObj.country,
-              email: addressObj.email,
-              phone: addressObj.phoneNumber,
-            },
-          });
-        } else {
-          actions.push({
-            action: 'addAddress',
-            address: {
-              firstName: addressObj.firstName,
-              lastName: addressObj.lastName,
-              streetName: addressObj.streetName,
-              city: addressObj.city,
-              postalCode: addressObj.postalCode,
-              region: addressObj.buildingNumber,
-              country: addressObj.country,
-              email: addressObj.email,
-              phone: addressObj.phone,
-            },
-          });
-        }
+        actions.push({
+          action: 'addAddress',
+          address: new Address(addressObj)
+        });
         if (actions && 0 < actions.length) {
           const client = getClient();
           if (client) {
@@ -923,7 +999,13 @@ const addCustomerAddress = async (customerId: string, addressObj: addressType) =
   return addCustomerAddressResponse;
 };
 
-//Network Tokens
+//Network Tokenization
+/**
+ * Creates a custom object in the commercetools platform.
+ * 
+ * @param {any} customObjectData - Data for the custom object.
+ * @returns {Promise<any>} - Response containing the created custom object.
+ */
 const createCTCustomObject = async (customObjectData: any) => {
   let setCustomObjectResponse: any;
   try {
@@ -949,6 +1031,12 @@ const createCTCustomObject = async (customObjectData: any) => {
   return setCustomObjectResponse;
 };
 
+/**
+ * Retrieves custom objects from the commercetools platform by container.
+ * 
+ * @param {string} container - The container name.
+ * @returns {Promise<any>} - Response containing the retrieved custom objects.
+ */
 const retrieveCustomObjectByContainer = async (container: string) => {
   let getCustomObjectsResponse: any;
   try {
@@ -974,7 +1062,15 @@ const retrieveCustomObjectByContainer = async (container: string) => {
   return getCustomObjectsResponse;
 };
 
-const updateCustomerToken = async (updateObject: any, customerObject: customerType, failedTokens: any) => {
+/**
+ * Updates customer tokens.
+ * 
+ * @param {any} updateObject - Object containing the token to update.
+ * @param {CustomerType} customerObject - Customer object to update.
+ * @param {any} failedTokens - Failed tokens data.
+ * @returns {Promise<any>} - Response containing the result of the update.
+ */
+const updateCustomerToken = async (updateObject: any, customerObject: CustomerType, failedTokens: any, customerTokenId: string | null) => {
   let setCustomFieldResponse: any;
   let actions = [];
   try {
@@ -989,6 +1085,13 @@ const updateCustomerToken = async (updateObject: any, customerObject: customerTy
             action: 'setCustomField',
             name: 'isv_failedTokens',
             value: failedTokens,
+          });
+        }
+        if (customerTokenId) {
+          actions.push({
+            action: 'setCustomField',
+            name: 'isv_customerId',
+            value: customerTokenId
           });
         }
         if (updateObject) {
@@ -1040,6 +1143,13 @@ const updateCustomerToken = async (updateObject: any, customerObject: customerTy
   return setCustomFieldResponse;
 };
 
+/**
+ * Retrieves customer by custom field name and value.
+ * 
+ * @param {string} customFieldName - Name of the custom field.
+ * @param {string} customFieldValue - Value of the custom field.
+ * @returns {Promise<any>} - Response containing the customer object.
+ */
 const retrieveCustomerByCustomField = async (customFieldName: string, customFieldValue: string) => {
   let retrieveCustomerByCustomObjectResponse;
   try {
@@ -1070,6 +1180,42 @@ const retrieveCustomerByCustomField = async (customFieldName: string, customFiel
   return retrieveCustomerByCustomObjectResponse;
 };
 
+/**
+ * Retrieves discount by its ID.
+ * 
+ * @param {string} discountId - The ID of the discount.
+ * @returns {Promise<any>} - The response containing the discount information.
+ */
+const getDiscountCodes = async (discountId: string) => {
+  let getDiscountResponse = null;
+  try {
+    if (null !== discountId) {
+      const client = getClient();
+      if (null !== client) {
+        const requestBuilder = createRequestBuilder({
+          projectKey: process.env.CT_PROJECT_KEY,
+        });
+        const uri = requestBuilder.discountCodes.byId(discountId).build()
+        const channelsRequest = {
+          uri: uri,
+          method: 'GET',
+        };
+        const getDiscountResponseObject = await client.execute(channelsRequest);
+        if (getDiscountResponseObject?.body) {
+          getDiscountResponse = getDiscountResponseObject?.body;
+        }
+      } else {
+        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetDiscountCodes', Constants.LOG_INFO, 'DiscountCodeId : ' + discountId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      }
+    } else {
+      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetDiscountCodes', Constants.LOG_INFO, 'DiscountCodeId : ' + discountId, Constants.ERROR_MSG_DISCOUNT_DETAILS);
+    }
+  } catch (exception) {
+    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetDiscountCodes', Constants.EXCEPTION_MSG_FETCH_DISCOUNT_DETAILS, exception, discountId, 'DiscountCodeId : ', '');
+  }
+  return getDiscountResponse;
+};
+
 export default {
   queryCartById,
   queryOrderById,
@@ -1095,4 +1241,5 @@ export default {
   retrieveCustomObjectByContainer,
   updateCustomerToken,
   retrieveCustomerByCustomField,
+  getDiscountCodes
 };

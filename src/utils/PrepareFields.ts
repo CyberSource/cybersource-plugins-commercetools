@@ -4,18 +4,35 @@ import restApi from 'cybersource-rest-client';
 import { jwtDecode } from 'jwt-decode';
 
 import { Constants } from '../constants';
-import { addressType, customerType, customTokenType, midCredentialsType, orderInformationLineItemsType, orderInformationType, paymentTransactionType, paymentType } from '../types/Types';
+import { AddressType, CustomerType, CustomTokenType, MidCredentialsType, OrderInformationType, PaymentTransactionType, PaymentType } from '../types/Types';
 import multiMid from '../utils/config/MultiMid';
 
 import paymentUtils from './PaymentUtils';
+import commercetoolsApi from './api/CommercetoolsApi';
 
-const getConfigObject = async (functionName: string, midCredentials: midCredentialsType | null, resourceObj: paymentType | null, merchantId: string | null) => {
+/**
+ * Generates the configuration object based on the provided parameters.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @param {MidCredentialsType | null} midCredentials - MID credentials.
+ * @param {PaymentType | null} resourceObj - The payment object.
+ * @param {string | null} merchantId - The merchant ID.
+ * @returns {Promise<{
+*   authenticationType: string;
+*   runEnvironment: string;
+*   merchantID: string;
+*   merchantKeyId: string;
+*   merchantsecretKey: string;
+*   logConfiguration: { enableLog: boolean };
+* } | undefined>} - A promise resolving to the configuration object.
+*/
+const getConfigObject = async (functionName: string, midCredentials: MidCredentialsType | null, resourceObj: PaymentType | null, merchantId: string | null) => {
   let configObject;
-  let midCredentialsObject: midCredentialsType = {
+  let midCredentialsObject: MidCredentialsType = {
     merchantId: '',
     merchantKeyId: '',
     merchantSecretKey: '',
-  } as midCredentialsType;
+  };
   let mid = '';
   const getConfigObjectByPaymentObjectFunctions = ['FuncGetTransactionData', 'FuncKeys', 'FuncPayerAuthSetupResponse', 'FuncAuthReversalResponse', 'FuncAuthorizationResponse', 'FuncCaptureResponse', 'FuncRefundResponse'];
   const getConfigObjectByMidCredentialsFunctions = [
@@ -33,7 +50,7 @@ const getConfigObject = async (functionName: string, midCredentials: midCredenti
     mid = resourceObj?.custom?.fields?.isv_merchantId ? resourceObj.custom.fields.isv_merchantId : '';
     midCredentialsObject = await multiMid.getMidCredentials(mid);
   } else if (merchantId && ('FuncGenerateCaptureContext' === functionName || 'FuncGetCardByInstrumentResponse' === functionName)) {
-    if( process.env.PAYMENT_GATEWAY_MERCHANT_ID === merchantId){
+    if (process.env.PAYMENT_GATEWAY_MERCHANT_ID === merchantId) {
       merchantId = '';
     }
     midCredentialsObject = await multiMid.getMidCredentials(merchantId);
@@ -62,7 +79,18 @@ const getConfigObject = async (functionName: string, midCredentials: midCredenti
   return configObject;
 };
 
-const getProcessingInformation = async (functionName: string, resourceObj: paymentType | null, orderNo: string, service: string, cardTokens: customTokenType | null, notSaveToken: boolean | null) => {
+/**
+ * Generates processing information object based on the provided function name and payment scenario.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @param {PaymentType | null} resourceObj - The payment object containing custom fields.
+ * @param {string} orderNo - The order number associated with the payment.
+ * @param {string} service - The service type for the payment.
+ * @param {CustomTokenType | null} cardTokens - The card tokens associated with the payment.
+ * @param {boolean | null} notSaveToken - Specifies whether to save the token or not.
+ * @returns {Promise<restApi.Ptsv2paymentsProcessingInformation>} - The processing information object.
+ */
+const getProcessingInformation = async (functionName: string, resourceObj: PaymentType | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, notSaveToken: boolean | null) => {
   let processingInformation;
   const actionList = [];
   const customFields = resourceObj?.custom?.fields;
@@ -165,7 +193,16 @@ const getProcessingInformation = async (functionName: string, resourceObj: payme
   return processingInformation;
 };
 
-const getPaymentInformation = async (functionName: string, resourceObj: paymentType | null, cardTokens: customTokenType | null, customerTokenId: string | null) => {
+/**
+ * Generates payment information object based on the provided function name and payment scenario.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @param {PaymentType | null} resourceObj - The payment object containing custom fields.
+ * @param {CustomTokenType | null} cardTokens - The card tokens associated with the payment.
+ * @param {string | null} customerTokenId - The customer token ID associated with the payment.
+ * @returns {Promise<any>} - The payment information object.
+ */
+const getPaymentInformation = async (functionName: string, resourceObj: PaymentType | null, cardTokens: CustomTokenType | null, customerTokenId: string | null): Promise<any> => {
   let paymentInformation: any;
   if (('FuncAuthorizationResponse' === functionName || 'FuncRefundResponse' === functionName) && resourceObj?.paymentMethodInfo?.method) {
     if ('FuncAuthorizationResponse' === functionName) {
@@ -186,7 +223,7 @@ const getPaymentInformation = async (functionName: string, resourceObj: paymentT
           paymentInformationBank.routingNumber = resourceObj.custom.fields.isv_routingNumber;
           paymentInformation.bank = paymentInformationBank;
           paymentInformationPaymentType.name = Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE;
-          paymentInformation.paymentType = paymentInformationPaymentType;
+          paymentInformation.PaymentType = paymentInformationPaymentType;
         }
         break;
       }
@@ -253,14 +290,20 @@ const getPaymentInformation = async (functionName: string, resourceObj: paymentT
   return paymentInformation;
 };
 
-const getClientReferenceInformation = async (service: string, resourceId: string) => {
-  let clientReferenceInformationPartner = {
-    solutionId: '',
-  };
-  let clientReferenceInformation = {
-    code: '',
-    partner: clientReferenceInformationPartner,
-  };
+/**
+ * Generates client reference information based on the provided service and resource ID.
+ * 
+ * @param {string} service - The name of the service.
+ * @param {string} resourceId - The ID of the resource.
+ * @returns {Promise<any>} - The client reference information object.
+ */
+const getClientReferenceInformation = async (service: string, resourceId: string, payment?: PaymentType): Promise<any> => {
+  let clientReferenceInformationPartner;
+  let clientReferenceInformation: {
+    code: string,
+    pausedRequestId: string,
+    partner: typeof clientReferenceInformationPartner;
+  }
   if ('FuncPayerAuthSetupResponse' === service) {
     clientReferenceInformation = new restApi.Riskv1decisionsClientReferenceInformation();
     clientReferenceInformationPartner = new restApi.Riskv1decisionsClientReferenceInformationPartner();
@@ -272,25 +315,46 @@ const getClientReferenceInformation = async (service: string, resourceId: string
     clientReferenceInformationPartner = new restApi.Ptsv2paymentsidClientReferenceInformationPartner();
   }
   clientReferenceInformation.code = resourceId;
+  if (payment?.custom?.fields?.isv_dmpaFlag && payment.custom?.fields?.isv_payerEnrollTransactionId) {
+    clientReferenceInformation.pausedRequestId = payment.custom.fields.isv_payerEnrollTransactionId;
+  }
   clientReferenceInformationPartner.solutionId = Constants.PAYMENT_GATEWAY_PARTNER_SOLUTION_ID;
   clientReferenceInformation.partner = clientReferenceInformationPartner;
   return clientReferenceInformation;
 };
 
-const getOrderInformation = async (functionName: string, paymentObj: paymentType | null, updateTransactions: paymentTransactionType | null, cartObj: any, customerObj: customerType | null, address: addressType | null, service: string | null, currencyCode: string) => {
+/**
+ * Generates order information based on the provided parameters.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @param {PaymentType | null} paymentObj - The payment object.
+ * @param {PaymentTransactionType | null} updateTransactions - The updated transaction object.
+ * @param {any} cartObj - The cart object.
+ * @param {CustomerType | null} customerObj - The customer object.
+ * @param {AddressType | null} address - The address object.
+ * @param {string | null} service - The service name.
+ * @param {string} currencyCode - The currency code.
+ * @returns {Promise<OrderInformationType>} - The order information object.
+ */
+const getOrderInformation = async (functionName: string, paymentObj: PaymentType | null, updateTransactions: PaymentTransactionType | null, cartObj: any, customerObj: CustomerType | null, address: AddressType | null, service: string | null, currencyCode: string): Promise<OrderInformationType> => {
   let orderInformationLineItems = {};
   let cartLocale = '';
   let unitPrice: number | null;
   let shippingCost = 0;
   let j = 0;
-  let orderInformation: orderInformationType = {};
+  let orderInformation: OrderInformationType = {};
   let centAmount = 0.0;
   let captureAmount = 0.0;
   let fractionDigits = 0;
+  let lineItemTotalAmount = 0;
+  let shippingMethod = '';
   try {
     if (null !== updateTransactions && null !== paymentObj) {
       centAmount = updateTransactions?.amount?.centAmount ? updateTransactions.amount.centAmount : paymentObj?.amountPlanned?.centAmount;
       captureAmount = paymentUtils.convertCentToAmount(centAmount, paymentObj.amountPlanned.fractionDigits);
+    }
+    if (paymentObj?.custom?.fields?.isv_shippingMethod) {
+      shippingMethod = paymentObj.custom.fields.isv_shippingMethod;
     }
     if ('FuncCaptureResponse' === functionName) {
       orderInformation = new restApi.Ptsv2paymentsidcapturesOrderInformation();
@@ -301,7 +365,7 @@ const getOrderInformation = async (functionName: string, paymentObj: paymentType
       orderInformationLineItems = new restApi.Ptsv2paymentsidreversalsOrderInformationLineItems();
     } else if ('FuncAuthorizationResponse' === functionName && cartObj) {
       const orderInformationBillTo = await getOrderInformationBillTo('FuncAuthorizationResponse', cartObj, null, null);
-      const orderInformationShipTo = await getOrderInformationShipTo(cartObj);
+      const orderInformationShipTo = await getOrderInformationShipTo(cartObj, shippingMethod);
       orderInformation = new restApi.Ptsv2paymentsOrderInformation();
       orderInformation.billTo = orderInformationBillTo;
       orderInformation.shipTo = orderInformationShipTo;
@@ -323,9 +387,13 @@ const getOrderInformation = async (functionName: string, paymentObj: paymentType
           cartLocale = cartObj.locale;
           orderInformationLineItems = 'FuncAuthReversalResponse' === functionName ? new restApi.Ptsv2paymentsidreversalsOrderInformationLineItems() : new restApi.Ptsv2paymentsOrderInformationLineItems();
           cartObj.lineItems.forEach(async (lineItem: any) => {
+            lineItemTotalAmount = 0;
             if (lineItem?.discountedPricePerQuantity && 0 === lineItem.discountedPricePerQuantity.length) {
+              if (lineItem?.totalPrice?.centAmount) {
+                lineItemTotalAmount = paymentUtils.convertCentToAmount(lineItem?.totalPrice?.centAmount, fractionDigits);
+              }
               unitPrice = lineItem?.price?.discounted?.value?.centAmount ? paymentUtils.convertCentToAmount(lineItem.price.discounted.value.centAmount, fractionDigits) : paymentUtils.convertCentToAmount(lineItem.price.value.centAmount, fractionDigits);
-              orderInformationLineItems = await getLineItemDetails(lineItem, unitPrice, functionName, cartLocale, null, paymentObj, false, cartObj, false, false);
+              orderInformationLineItems = await getLineItemDetails(lineItem, unitPrice, functionName, cartLocale, null, paymentObj, false, cartObj, false, false, lineItemTotalAmount);
               if (orderInformationLineItems && orderInformation?.lineItems) {
                 orderInformation.lineItems[j] = orderInformationLineItems;
               }
@@ -333,9 +401,10 @@ const getOrderInformation = async (functionName: string, paymentObj: paymentType
             } else if (lineItem?.discountedPricePerQuantity && 0 < lineItem?.discountedPricePerQuantity.length) {
               lineItem.discountedPricePerQuantity.forEach(async (item: any) => {
                 unitPrice = paymentUtils.convertCentToAmount(item.discountedPrice.value.centAmount, fractionDigits);
-                orderInformationLineItems = await getLineItemDetails(lineItem, unitPrice, functionName, cartLocale, item, paymentObj, false, cartObj, false, false);
+                lineItemTotalAmount = unitPrice * (item.quantity);
+                orderInformationLineItems = await getLineItemDetails(lineItem, unitPrice, functionName, cartLocale, item, paymentObj, false, cartObj, false, false, lineItemTotalAmount);
                 if (orderInformationLineItems && orderInformation?.lineItems) {
-                  orderInformation.lineItems[j] = orderInformationLineItems as orderInformationLineItemsType;
+                  orderInformation.lineItems[j] = orderInformationLineItems;
                 }
                 j++;
               });
@@ -343,19 +412,24 @@ const getOrderInformation = async (functionName: string, paymentObj: paymentType
           });
           if (cartObj?.customLineItems && 0 < cartObj.customLineItems.length) {
             cartObj.customLineItems.forEach(async (customLineItem: any) => {
+              lineItemTotalAmount = 0;
               if (customLineItem?.discountedPricePerQuantity && 0 === customLineItem.discountedPricePerQuantity.length) {
+                if (customLineItem?.totalPrice?.centAmount) {
+                  lineItemTotalAmount = paymentUtils.convertCentToAmount(customLineItem?.totalPrice?.centAmount, fractionDigits);
+                }
                 unitPrice = paymentUtils.convertCentToAmount(customLineItem.money.centAmount, fractionDigits);
-                orderInformationLineItems = await getLineItemDetails(customLineItem, unitPrice, functionName, cartLocale, null, paymentObj, false, cartObj, true, false);
+                orderInformationLineItems = await getLineItemDetails(customLineItem, unitPrice, functionName, cartLocale, null, paymentObj, false, cartObj, true, false, lineItemTotalAmount);
                 if (orderInformationLineItems && orderInformation?.lineItems) {
-                  orderInformation.lineItems[j] = orderInformationLineItems as orderInformationLineItemsType;
+                  orderInformation.lineItems[j] = orderInformationLineItems;
                 }
                 j++;
               } else if (customLineItem?.discountedPricePerQuantity && 0 < customLineItem.discountedPricePerQuantity.length) {
                 customLineItem.discountedPricePerQuantity.forEach(async (customItem: any) => {
                   unitPrice = paymentUtils.convertCentToAmount(customItem.discountedPrice.value.centAmount, fractionDigits);
-                  orderInformationLineItems = await getLineItemDetails(customLineItem, unitPrice, functionName, cartLocale, customItem, paymentObj, false, cartObj, true, false);
+                  lineItemTotalAmount = unitPrice * customItem.quantity;
+                  orderInformationLineItems = await getLineItemDetails(customLineItem, unitPrice, functionName, cartLocale, customItem, paymentObj, false, cartObj, true, false, lineItemTotalAmount);
                   if (orderInformationLineItems && orderInformation?.lineItems) {
-                    orderInformation.lineItems[j] = orderInformationLineItems as orderInformationLineItemsType;
+                    orderInformation.lineItems[j] = orderInformationLineItems;
                   }
                   j++;
                 });
@@ -367,9 +441,9 @@ const getOrderInformation = async (functionName: string, paymentObj: paymentType
               shippingCost = shippingDetail?.shippingInfo?.discountedPrice?.value?.centAmount
                 ? paymentUtils.convertCentToAmount(shippingDetail.shippingInfo.discountedPrice.value.centAmount, fractionDigits)
                 : paymentUtils.convertCentToAmount(shippingDetail.shippingInfo.price.centAmount, fractionDigits);
-              orderInformationLineItems = await getLineItemDetails(shippingDetail, shippingCost, functionName, '', null, paymentObj, true, cartObj, false, false);
+              orderInformationLineItems = await getLineItemDetails(shippingDetail, shippingCost, functionName, '', null, paymentObj, true, cartObj, false, false, shippingCost);
               if (orderInformationLineItems && orderInformation?.lineItems) {
-                orderInformation.lineItems[j] = orderInformationLineItems as orderInformationLineItemsType;
+                orderInformation.lineItems[j] = orderInformationLineItems;
               }
               j++;
             });
@@ -379,25 +453,28 @@ const getOrderInformation = async (functionName: string, paymentObj: paymentType
             } else if (cartObj.shippingInfo?.price) {
               shippingCost = paymentUtils.convertCentToAmount(cartObj.shippingInfo.price.centAmount, fractionDigits);
             }
-            orderInformationLineItems = await getLineItemDetails(cartObj, shippingCost, functionName, '', null, paymentObj, true, cartObj, false, false);
+            orderInformationLineItems = await getLineItemDetails(cartObj, shippingCost, functionName, '', null, paymentObj, true, cartObj, false, false, shippingCost);
             if (orderInformationLineItems && orderInformation?.lineItems) {
-              orderInformation.lineItems[j] = orderInformationLineItems as orderInformationLineItemsType;
+              orderInformation.lineItems[j] = orderInformationLineItems;
             }
             j++;
           }
           if (cartObj?.discountOnTotalPrice) {
             unitPrice = paymentUtils.convertCentToAmount(cartObj?.discountOnTotalPrice.discountedAmount.centAmount, cartObj?.discountOnTotalPrice.discountedAmount?.fractionDigits);
-            orderInformationLineItems = await getLineItemDetails(cartObj, unitPrice, functionName, '', null, paymentObj, false, cartObj, false, true);
+            orderInformationLineItems = await getLineItemDetails(cartObj, unitPrice, functionName, '', null, paymentObj, false, cartObj, false, true, unitPrice);
             if (orderInformationLineItems) {
-              orderInformation.lineItems[j] = orderInformationLineItems as orderInformationLineItemsType;
+              orderInformation.lineItems[j] = orderInformationLineItems;
             }
             j++;
           }
         }
       }
     }
-    if ('FuncRefundResponse' === functionName || 'FuncAuthorizationResponse' === functionName || 'FuncCaptureResponse' === functionName || 'FuncAuthReversalResponse' === functionName) {
+    if ('FuncRefundResponse' === functionName || 'FuncCaptureResponse' === functionName || 'FuncAuthReversalResponse' === functionName) {
       const orderInformationAmountDetails = await getOrderInformationAmountDetails(functionName, captureAmount, paymentObj, null, null, null);
+      orderInformation.amountDetails = orderInformationAmountDetails;
+    } else if ('FuncAuthorizationResponse' === functionName) {
+      const orderInformationAmountDetails = await getOrderInformationAmountDetails(functionName, null, paymentObj, cartObj, null, null);
       orderInformation.amountDetails = orderInformationAmountDetails;
     } else if ('FuncGenerateCaptureContext' === functionName) {
       const orderInformationAmountDetails = await getOrderInformationAmountDetails(functionName, null, paymentObj, cartObj, currencyCode, service);
@@ -412,16 +489,25 @@ const getOrderInformation = async (functionName: string, paymentObj: paymentType
   return orderInformation;
 };
 
-const getOrderInformationAmountDetails = async (functionName: string, captureAmount: number | null, paymentObj: paymentType | null, cartObj: any, currencyCode: string | null, service: string | null) => {
+/**
+ * Generates order information amount details based on the provided parameters.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @param {number | null} captureAmount - The capture amount.
+ * @param {PaymentType | null} paymentObj - The payment object.
+ * @param {any} cartObj - The cart object.
+ * @param {string | null} currencyCode - The currency code.
+ * @param {string | null} service - The service type.
+ * @returns {Promise<any>} - The order information amount details.
+ */
+const getOrderInformationAmountDetails = async (functionName: string, captureAmount: number | null, paymentObj: PaymentType | null, cartObj: any, currencyCode: string | null, service: string | null) => {
   let orderInformationAmountDetails: any;
   let totalAmount = 0;
-  if ('FuncRefundResponse' === functionName || 'FuncAuthorizationResponse' === functionName || 'FuncCaptureResponse' === functionName || 'FuncAuthReversalResponse' === functionName) {
+  if ('FuncRefundResponse' === functionName || 'FuncCaptureResponse' === functionName || 'FuncAuthReversalResponse' === functionName) {
     if ('FuncCaptureResponse' === functionName) {
       orderInformationAmountDetails = new restApi.Ptsv2paymentsidcapturesOrderInformationAmountDetails();
     } else if ('FuncRefundResponse' === functionName) {
       orderInformationAmountDetails = new restApi.Ptsv2paymentsidcapturesOrderInformationAmountDetails();
-    } else if ('FuncAuthorizationResponse' === functionName) {
-      orderInformationAmountDetails = new restApi.Ptsv2paymentsOrderInformationAmountDetails();
     } else if ('FuncAuthReversalResponse' === functionName) {
       orderInformationAmountDetails = {
         totalAmount: 0,
@@ -430,6 +516,11 @@ const getOrderInformationAmountDetails = async (functionName: string, captureAmo
     }
     orderInformationAmountDetails.totalAmount = captureAmount;
     orderInformationAmountDetails.currency = paymentObj?.amountPlanned?.currencyCode;
+  } else if ('FuncAuthorizationResponse' === functionName) {
+    orderInformationAmountDetails = new restApi.Ptsv2paymentsOrderInformationAmountDetails();
+    totalAmount = paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits);
+    orderInformationAmountDetails.totalAmount = totalAmount;
+    orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
   } else if ('FuncGenerateCaptureContext' === functionName) {
     orderInformationAmountDetails = new restApi.Upv1capturecontextsOrderInformationAmountDetails();
     if ('payment' === service) {
@@ -449,7 +540,16 @@ const getOrderInformationAmountDetails = async (functionName: string, captureAmo
   return orderInformationAmountDetails;
 };
 
-const getOrderInformationBillTo = async (functionName: string, cartObj: any, address: addressType | null, customerObj: customerType | null) => {
+/**
+ * Generates order information bill-to details based on the provided parameters.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @param {any} cartObj - The cart object.
+ * @param {AddressType | null} address - The address object.
+ * @param {CustomerType | null} customerObj - The customer object.
+ * @returns {Promise<any>} - The order information bill-to details.
+ */
+const getOrderInformationBillTo = async (functionName: string, cartObj: any, address: AddressType | null, customerObj: CustomerType | null): Promise<any> => {
   let orderInformationBillTo = new restApi.Ptsv2paymentsOrderInformationBillTo();
   if ('FuncAuthorizationResponse' === functionName && cartObj) {
     orderInformationBillTo = new restApi.Ptsv2paymentsOrderInformationBillTo();
@@ -460,13 +560,19 @@ const getOrderInformationBillTo = async (functionName: string, cartObj: any, add
       orderInformationBillTo.address2 = cartObj.billingAddress?.additionalStreetInfo;
     } else if (cartObj?.billingAddress?.streetNumber) {
       orderInformationBillTo.address2 = cartObj.billingAddress.streetNumber;
+    } else {
+      orderInformationBillTo.address2 = "";
     }
     orderInformationBillTo.locality = cartObj.billingAddress?.city;
     orderInformationBillTo.administrativeArea = cartObj.billingAddress?.region;
     orderInformationBillTo.postalCode = cartObj.billingAddress?.postalCode;
     orderInformationBillTo.country = cartObj.billingAddress?.country;
     orderInformationBillTo.email = cartObj.billingAddress?.email;
-    orderInformationBillTo.phoneNumber = cartObj.billingAddress?.phone;
+    if (cartObj.billingAddress?.phone) {
+      orderInformationBillTo.phoneNumber = cartObj.billingAddress?.phone;
+    } else if (cartObj.billingAddress?.mobile) {
+      orderInformationBillTo.phoneNumber = cartObj.billingAddress?.mobile;
+    }
   } else if ('FuncAddTokenResponse' === functionName && address && customerObj) {
     orderInformationBillTo.firstName = address?.firstName;
     orderInformationBillTo.lastName = address?.lastName;
@@ -475,6 +581,8 @@ const getOrderInformationBillTo = async (functionName: string, cartObj: any, add
       orderInformationBillTo.address1 = address?.address1;
       if (address?.buildingNumber) {
         orderInformationBillTo.address2 = address.buildingNumber;
+      } else {
+        orderInformationBillTo.address2 = '';
       }
       orderInformationBillTo.locality = address?.locality;
     } else {
@@ -482,18 +590,30 @@ const getOrderInformationBillTo = async (functionName: string, cartObj: any, add
       orderInformationBillTo.address1 = address?.streetName;
       if (address?.additionalStreetInfo) {
         orderInformationBillTo.address2 = address.additionalStreetInfo;
+      } else {
+        orderInformationBillTo.address2 = '';
       }
       orderInformationBillTo.locality = address?.city;
     }
     orderInformationBillTo.postalCode = address?.postalCode;
     orderInformationBillTo.country = address?.country;
     orderInformationBillTo.email = address?.email;
-    orderInformationBillTo.phoneNumber = address?.phone;
+    if (address?.phone) {
+      orderInformationBillTo.phoneNumber = address.phone;
+    } else if (address?.mobile) {
+      orderInformationBillTo.phoneNumber = address.mobile
+    }
   }
   return orderInformationBillTo;
 };
 
-const getOrderInformationShipTo = async (cartObj: any) => {
+/**
+ * Generates order information ship-to details based on the provided cart object.
+ * 
+ * @param {any} cartObj - The cart object.
+ * @returns {Promise<any>} - The order information ship-to details.
+ */
+const getOrderInformationShipTo = async (cartObj: any, shippingMethod: string): Promise<any> => {
   const orderInformationShipTo = new restApi.Ptsv2paymentsOrderInformationShipTo();
   if (cartObj?.shippingMode && Constants.SHIPPING_MODE_MULTIPLE == cartObj?.shippingMode && 0 < cartObj.shipping?.length) {
     orderInformationShipTo.firstName = cartObj.shipping[0].shippingAddress.firstName;
@@ -503,13 +623,19 @@ const getOrderInformationShipTo = async (cartObj: any) => {
       orderInformationShipTo.address2 = cartObj?.shipping[0].shippingAddress.additionalStreetInfo;
     } else if (cartObj?.shipping[0]?.shippingAddress?.streetNumber) {
       orderInformationShipTo.address2 = cartObj.shipping[0].shippingAddress.streetNumber;
+    } else {
+      orderInformationShipTo.address2 = '';
     }
     orderInformationShipTo.locality = cartObj.shipping[0].shippingAddress.city;
     orderInformationShipTo.administrativeArea = cartObj.shipping[0].shippingAddress.region;
     orderInformationShipTo.postalCode = cartObj.shipping[0].shippingAddress.postalCode;
     orderInformationShipTo.country = cartObj.shipping[0].shippingAddress.country;
     orderInformationShipTo.email = cartObj.shipping[0].shippingAddress.email;
-    orderInformationShipTo.phoneNumber = cartObj.shipping[0].shippingAddress.phone;
+    if (cartObj?.shipping[0]?.shippingAddress?.phone) {
+      orderInformationShipTo.phoneNumber = cartObj.shipping[0].shippingAddress.phone;
+    } else if (cartObj?.shipping[0]?.shippingAddress?.mobile) {
+      orderInformationShipTo.phoneNumber = cartObj.shipping[0].shippingAddress.mobile;
+    }
   } else if (cartObj?.shippingAddress) {
     orderInformationShipTo.firstName = cartObj.shippingAddress.firstName;
     orderInformationShipTo.lastName = cartObj.shippingAddress.lastName;
@@ -518,18 +644,43 @@ const getOrderInformationShipTo = async (cartObj: any) => {
       orderInformationShipTo.address2 = cartObj.shippingAddress.additionalStreetInfo;
     } else if (cartObj?.shippingAddress?.streetNumber) {
       orderInformationShipTo.address2 = cartObj.shippingAddress.streetNumber;
+    } else {
+      orderInformationShipTo.address2 = '';
     }
     orderInformationShipTo.locality = cartObj.shippingAddress.city;
     orderInformationShipTo.administrativeArea = cartObj.shippingAddress.region;
     orderInformationShipTo.postalCode = cartObj.shippingAddress.postalCode;
     orderInformationShipTo.country = cartObj.shippingAddress.country;
     orderInformationShipTo.email = cartObj.shippingAddress.email;
-    orderInformationShipTo.phoneNumber = cartObj.shippingAddress.phone;
+    if (cartObj?.shippingAddress?.phone) {
+      orderInformationShipTo.phoneNumber = cartObj?.shippingAddress?.phone
+    } else if (cartObj?.shippingAddress?.mobile) {
+      orderInformationShipTo.phoneNumber = cartObj?.shippingAddress?.mobile
+    }
+  }
+  if (shippingMethod) {
+    orderInformationShipTo.method = shippingMethod;
   }
   return orderInformationShipTo;
 };
 
-const getLineItemDetails = async (lineItem: any, unitPrice: number, functionName: string, cartLocale: string, item: any, paymentObj: paymentType | null, shipping: boolean, cartObj: any, customLineItem: boolean, totalPriceDiscount: boolean) => {
+/**
+ * Generates line item details for order information based on the provided parameters.
+ * 
+ * @param {any} lineItem - The line item object.
+ * @param {number} unitPrice - The unit price of the line item.
+ * @param {string} functionName - The name of the function.
+ * @param {string} cartLocale - The locale of the cart.
+ * @param {any} item - The item object.
+ * @param {PaymentType | null} paymentObj - The payment object.
+ * @param {boolean} shipping - Indicates whether the line item is for shipping.
+ * @param {any} cartObj - The cart object.
+ * @param {boolean} customLineItem - Indicates whether the line item is a custom item.
+ * @param {boolean} totalPriceDiscount - Indicates whether the line item has a total price discount.
+ * @param {number} lineItemTotalAmount - The total amount of the line item.
+ * @returns {Promise<any>} - The line item details.
+ */
+const getLineItemDetails = async (lineItem: any, unitPrice: number, functionName: string, cartLocale: string, item: any, paymentObj: PaymentType | null, shipping: boolean, cartObj: any, customLineItem: boolean, totalPriceDiscount: boolean, lineItemTotalAmount: number): Promise<any> => {
   let orderInformationLineItems;
   let discountPrice = 0;
   let fractionDigits = 0;
@@ -541,6 +692,7 @@ const getLineItemDetails = async (lineItem: any, unitPrice: number, functionName
   if (paymentObj?.amountPlanned?.fractionDigits) {
     fractionDigits = paymentObj.amountPlanned.fractionDigits;
   }
+  orderInformationLineItems.totalAmount = lineItemTotalAmount;
   if (shipping) {
     orderInformationLineItems.productName = lineItem.shippingInfo.shippingMethodName;
     orderInformationLineItems.quantity = 1;
@@ -587,10 +739,18 @@ const getLineItemDetails = async (lineItem: any, unitPrice: number, functionName
   return orderInformationLineItems;
 };
 
-const getDeviceInformation = async (paymentObj: paymentType | null, customerObj: customerType | null) => {
+/**
+ * Generates device information for payment based on the provided parameters.
+ * 
+ * @param {PaymentType | null} paymentObj - The payment object.
+ * @param {CustomerType | null} customerObj - The customer object.
+ * @param {string} service - The name of the service.
+ * @returns {Promise<any>} - The device information.
+ */
+const getDeviceInformation = async (paymentObj: PaymentType | null, customerObj: CustomerType | null, service: string): Promise<any> => {
   const deviceInformation = new restApi.Ptsv2paymentsDeviceInformation();
   const customFields = paymentObj?.custom?.fields;
-  if(Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_DECISION_MANAGER){
+  if (Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_DECISION_MANAGER) {
     if (customFields?.isv_deviceFingerprintId) {
       deviceInformation.fingerprintSessionId = customFields?.isv_deviceFingerprintId;
     } else if (customerObj?.custom?.fields && customerObj.custom.fields.isv_deviceFingerprintId) {
@@ -606,10 +766,25 @@ const getDeviceInformation = async (paymentObj: paymentType | null, customerObj:
   if (customFields?.isv_userAgentHeader) {
     deviceInformation.userAgentBrowserValue = customFields?.isv_userAgentHeader;
   }
+  if (Constants.STRING_ENROLL_CHECK === service && customFields?.isv_screenHeight) {
+    deviceInformation.httpBrowserScreenHeight = customFields?.isv_screenHeight;
+  }
+  if (Constants.STRING_ENROLL_CHECK === service && customFields?.isv_screenWidth) {
+    deviceInformation.httpBrowserScreenWidth = customFields?.isv_screenWidth;
+  }
   return deviceInformation;
 };
 
-const getConsumerAuthenticationInformation = async (resourceObj: paymentType, service: string, notSaveToken: boolean, payerAuthMandateFlag: boolean) => {
+/**
+ * Generates consumer authentication information for payment based on the provided parameters.
+ * 
+ * @param {PaymentType} resourceObj - The payment object.
+ * @param {string} service - The name of the service.
+ * @param {boolean} notSaveToken - Flag indicating whether to save the token.
+ * @param {boolean} payerAuthMandateFlag - Flag indicating whether payer authentication is mandated.
+ * @returns {Promise<any>} - The consumer authentication information.
+ */
+const getConsumerAuthenticationInformation = async (resourceObj: PaymentType, service: string, notSaveToken: boolean, payerAuthMandateFlag: boolean): Promise<any> => {
   const customFields = resourceObj?.custom?.fields;
   const consumerAuthenticationInformation = new restApi.Ptsv2paymentsConsumerAuthenticationInformation();
   if (Constants.VALIDATION === service) {
@@ -619,14 +794,20 @@ const getConsumerAuthenticationInformation = async (resourceObj: paymentType, se
     consumerAuthenticationInformation.referenceId = customFields?.isv_cardinalReferenceId;
     consumerAuthenticationInformation.acsWindowSize = Constants.PAYMENT_GATEWAY_ACS_WINDOW_SIZE;
     consumerAuthenticationInformation.returnUrl = process.env.PAYMENT_GATEWAY_3DS_RETURN_URL;
-    if (payerAuthMandateFlag || (Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_SCA_CHALLENGE && (undefined === customFields?.isv_savedToken || null === customFields?.isv_savedToken || '' === customFields?.isv_savedToken) && customFields?.isv_tokenAlias && !notSaveToken)) {
+    if (payerAuthMandateFlag || (Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_SCA_CHALLENGE && !customFields?.isv_savedToken && customFields?.isv_tokenAlias && !notSaveToken)) {
       consumerAuthenticationInformation.challengeCode = Constants.PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE;
     }
   }
   return consumerAuthenticationInformation;
 };
 
-const getTargetOrigins = async (functionName: string) => {
+/**
+ * Generates target origins based on the provided function name.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @returns {Promise<string[]>} - An array of target origins.
+ */
+const getTargetOrigins = async (functionName: string): Promise<string[]> => {
   let targetOriginArray: string[] = [];
   if ('FuncKeys' === functionName || 'FuncGenerateCaptureContext' === functionName) {
     if (process.env.PAYMENT_GATEWAY_TARGET_ORIGINS) {
@@ -637,7 +818,12 @@ const getTargetOrigins = async (functionName: string) => {
   return targetOriginArray;
 };
 
-const getAllowedPaymentMethods = async () => {
+/**
+ * Generates allowed payment methods from environment variables.
+ * 
+ * @returns {Promise<string[]>} - An array of allowed payment methods.
+ */
+const getAllowedPaymentMethods = async (): Promise<string[]> => {
   let allowedPaymentTypesArray = ['PANENTRY', 'SRC', 'GOOGLEPAY'];
   if (process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS) {
     const allowedPaymentTypes = process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS;
@@ -646,7 +832,13 @@ const getAllowedPaymentMethods = async () => {
   return allowedPaymentTypesArray;
 };
 
-const getAllowedCardNetworks = async (functionName: string) => {
+/**
+ * Generates allowed card networks based on the function name from environment variables.
+ * 
+ * @param {string} functionName - The name of the function.
+ * @returns {Promise< Promise<string[] | undefined>>} - An array of allowed card networks.
+ */
+const getAllowedCardNetworks = async (functionName: string): Promise<string[] | undefined> => {
   let allowedCardNetworksArray;
   if ('FuncKeys' === functionName) {
     allowedCardNetworksArray = ['VISA', 'MASTERCARD', 'AMEX', 'MAESTRO', 'CARTESBANCAIRES', 'CUP', 'JCB', 'DINERSCLUB', 'DISCOVER'];
@@ -664,7 +856,14 @@ const getAllowedCardNetworks = async (functionName: string) => {
   return allowedCardNetworksArray;
 };
 
-const getTokenInformation = async (payment: paymentType, functionName: string) => {
+/**
+ * Generates token information based on the payment and function name.
+ * 
+ * @param {PaymentType} payment - The payment object.
+ * @param {string} functionName - The name of the function.
+ * @returns {Promise<any>} - Token information.
+ */
+const getTokenInformation = async (payment: PaymentType, functionName: string): Promise<any> => {
   let jtiToken = {
     jti: '',
   };
@@ -688,7 +887,13 @@ const getTokenInformation = async (payment: paymentType, functionName: string) =
   return tokenInformation;
 };
 
-const getCaptureMandate = async (service: string) => {
+/**
+ * Generates capture mandate based on the service.
+ * 
+ * @param {string} service - The service type.
+ * @returns {Promise<any>} - Capture mandate information.
+ */
+const getCaptureMandate = async (service: string): Promise<any> => {
   const captureMandate = new restApi.Upv1capturecontextsCaptureMandate();
   if ('Payments' === service) {
     captureMandate.billingType = process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE;
@@ -718,7 +923,13 @@ const getCaptureMandate = async (service: string) => {
   return captureMandate;
 };
 
-const getUpdateTokenBillTo = async (addressData: addressType | null) => {
+/**
+ * Generates bill-to information for updating a token.
+ * 
+ * @param {AddressType | null} addressData - The address data.
+ * @returns {Promise<any>} - Bill-to information.
+ */
+const getUpdateTokenBillTo = async (addressData: AddressType | null): Promise<any> => {
   let billTo;
   if (addressData) {
     billTo = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo();
@@ -730,10 +941,83 @@ const getUpdateTokenBillTo = async (addressData: addressType | null) => {
     billTo.postalCode = addressData.postalCode;
     billTo.country = addressData.country;
     billTo.email = addressData.email;
-    billTo.phoneNumber = addressData.phone;
+    if (addressData.phone) {
+      billTo.phoneNumber = addressData.phone;
+    } else if (addressData.mobile) {
+      billTo.phoneNumber = addressData.mobile;
+    }
   }
   return billTo;
 };
+
+/**
+ * Generates risk information for a payment.
+ * 
+ * @param {PaymentType} payment - The payment object.
+ * @returns {Promise<any>} - Risk information.
+ */
+const getRiskInformation = async (payment: PaymentType) => {
+  let purchaseCount = 0;
+  let orderDetails;
+  let riskInformation = new restApi.Riskv1authenticationsRiskInformation();
+  let riskInformationBuyerHistory = new restApi.Ptsv2paymentsRiskInformationBuyerHistory();
+  let riskInformationBuyerHistoryCustomerAccount = new restApi.Ptsv2paymentsRiskInformationBuyerHistoryCustomerAccount();
+  if (payment?.customer?.id) {
+    const customer = await commercetoolsApi.getCustomer(payment.customer.id);
+    if (customer) {
+      orderDetails = await commercetoolsApi.queryOrderById(customer.id, Constants.CUSTOMER_ID);
+      if (orderDetails) {
+        purchaseCount = orderDetails.total;
+      }
+      if (undefined !== purchaseCount && null !== purchaseCount) {
+        if (purchaseCount) {
+          riskInformationBuyerHistoryCustomerAccount.creationHistory = 'EXISTING_ACCOUNT';
+          if (customer?.createdAt) {
+            riskInformationBuyerHistoryCustomerAccount.createDate = customer.createdAt.split('T')[0];
+          }
+          riskInformationBuyerHistory.accountPurchases = purchaseCount;
+        } else {
+          riskInformationBuyerHistoryCustomerAccount.creationHistory = 'NEW_ACCOUNT';
+        }
+      }
+    }
+  } else {
+    riskInformationBuyerHistoryCustomerAccount.creationHistory = 'GUEST';
+  }
+  riskInformationBuyerHistory.customerAccount = riskInformationBuyerHistoryCustomerAccount;
+  riskInformation.buyerHistory = riskInformationBuyerHistory;
+  return riskInformation;
+}
+
+/**
+ * Generates buyer information based on the provided card tokens.
+ * 
+ * @param {object} paymentObj - The payment object.
+ * @returns {Promise<any>} - The buyer information object.
+ */
+const getBuyerInformation = async (paymentObj: PaymentType): Promise<any> => {
+  let buyerInformation = new restApi.Tmsv2customersBuyerInformation();
+  if (paymentObj?.customer?.id) {
+    buyerInformation.merchantCustomerID = paymentObj?.customer?.id;
+  } else {
+    buyerInformation.merchantCustomerID = paymentObj?.anonymousId;
+  }
+  return buyerInformation;
+}
+
+/**
+ * Generates promotion information based on the provided cart object.
+ * 
+ * @param {any} cartObject - The card tokens.
+ * @returns {Promise<any>} - The buyer information object.
+ */
+const getPromotionInformation = async (cartObject: any): Promise<any> => {
+  let discountObject = null;
+  let promotionInformation = new restApi.Ptsv2paymentsPromotionInformation();
+  discountObject = await commercetoolsApi.getDiscountCodes(cartObject?.discountCodes[0]?.discountCode?.id);
+  promotionInformation.code = discountObject?.code;
+  return promotionInformation;
+}
 
 export default {
   getProcessingInformation,
@@ -749,4 +1033,7 @@ export default {
   getCaptureMandate,
   getAllowedPaymentMethods,
   getConfigObject,
+  getBuyerInformation,
+  getRiskInformation,
+  getPromotionInformation
 };

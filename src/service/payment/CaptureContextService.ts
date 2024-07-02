@@ -5,6 +5,17 @@ import restApi from 'cybersource-rest-client';
 import { Constants } from '../../constants';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
+
+/**
+ * Generates the capture context.
+ * @param {any} cartObj - The cart object for payment.
+ * @param {string} country - The country of the customer.
+ * @param {string} locale - The locale of the customer.
+ * @param {string} currencyCode - The currency code.
+ * @param {string} merchantId - The merchant ID.
+ * @param {string} service - The service type ('Payments' or 'MyAccounts').
+ * @returns {Promise<string>} A promise that resolves with the generated capture context signature.
+ */
 const generateCaptureContext = async (cartObj: any, country: string, locale: string, currencyCode: string, merchantId: string, service: string): Promise<string> => {
   let isv_tokenCaptureContextSignature = '';
   let errorData: string;
