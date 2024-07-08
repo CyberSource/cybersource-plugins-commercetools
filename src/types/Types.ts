@@ -1,37 +1,37 @@
-export type paymentType = {
+export type PaymentType = {
   id: string;
   version: number;
-  amountPlanned: amountPlannedType;
+  amountPlanned: AmountPlannedType;
   paymentMethodInfo: {
     method: string;
   };
   custom?: {
-    fields: paymentCustomFieldsType;
+    fields: PaymentCustomFieldsType;
   };
-  transactions: paymentTransactionType[];
+  transactions: PaymentTransactionType[];
   customer?: {
     id: string;
   };
   anonymousId?: string;
 };
 
-export type amountPlannedType = {
+export type AmountPlannedType = {
   type: string;
   currencyCode: string;
   centAmount: number;
   fractionDigits: number;
 };
 
-export type transactionObjectType = {
+export type TransactionObjectType = {
   version?: number;
-  amount: amountPlannedType;
+  amount: AmountPlannedType;
   type?: string;
   state: string;
   interactionId?: string;
   timestamp?: string;
 };
 
-export type paymentCustomFieldsType = {
+export type PaymentCustomFieldsType = {
   isv_token?: string;
   isv_tokenAlias?: string;
   isv_savedToken?: string;
@@ -70,9 +70,20 @@ export type paymentCustomFieldsType = {
   isv_securityCode?: number;
   isv_transientToken?: string;
   isv_customerId?: string;
+  isv_screenHeight?: number,
+  isv_screenWidth?: number,
+  isv_responseDateAndTime?: string,
+  isv_authorizationStatus?: string,
+  isv_authorizationReasonCode?: string,
+  isv_ECI?: string,
+  isv_AVSResponse?: string,
+  isv_CVVResponse?: string,
+  isv_responseCode?: string,
+  isv_dmpaFlag?: boolean;
+  isv_shippingMethod?: string
 };
 
-export type paymentTransactionType = {
+export type PaymentTransactionType = {
   id?: string;
   timestamp?: string;
   type?: string;
@@ -93,24 +104,24 @@ export type paymentTransactionType = {
 };
 
 //Order results Type
-export type orderResultType = {
+export type OrderResultType = {
   body: {
     limit: number;
     offset: number;
     count: number;
     total: number;
-    results: paymentType[];
+    results: PaymentType[];
   };
   statusCode: number;
 };
 
 //Ct response type
-export type actionResponseType = {
-  actions: actionType[];
-  errors: errorType[];
+export type ActionResponseType = {
+  actions: ActionType[];
+  errors: ErrorType[];
 };
 
-export type actionType = {
+export type ActionType = {
   action?: string;
   name?: string;
   value?: string | boolean | number | string[] | null;
@@ -118,20 +129,20 @@ export type actionType = {
     key?: string;
     typeId?: string;
   };
-  fields?: consumerAuthenticationInformationType;
-  address?: addressType;
+  fields?: ConsumerAuthenticationInformationType;
+  address?: AddressType;
   state?: string;
   interactionId?: string;
   transactionId?: string;
 };
 
-export type errorType = {
+export type ErrorType = {
   code: string;
   message: string;
 };
 
 //Cutsomer Object
-export type customerType = {
+export type CustomerType = {
   id: string;
   version: number;
   lastMessageSequenceNumber?: number;
@@ -157,12 +168,12 @@ export type customerType = {
   firstName: string;
   lastName: string;
   password?: string;
-  addresses?: addressType[];
+  addresses?: AddressType[];
   shippingAddressIds?: string[];
   billingAddressIds?: string[];
   isEmailVerified?: boolean;
   custom?: {
-    fields?: customerCustomType;
+    fields?: CustomerCustomType;
     type?: {
       typeId: string;
       id: string;
@@ -171,7 +182,7 @@ export type customerType = {
   authenticationMode?: string;
 };
 
-export type addressType = {
+export type AddressType = {
   id?: string;
   firstName?: string;
   lastName?: string;
@@ -190,9 +201,10 @@ export type addressType = {
   phoneNumber?: string;
   email?: string;
   additionalStreetInfo?: string;
+  mobile?: string;
 };
 
-export type customerCustomType = {
+export type CustomerCustomType = {
   isv_tokens?: string[];
   isv_token?: string;
   isv_tokenAlias?: string;
@@ -213,7 +225,7 @@ export type customerCustomType = {
   isv_failedTokens?: string[];
 };
 
-export type customerTokensType = {
+export type CustomerTokensType = {
   alias: string;
   value?: string;
   paymentToken?: string;
@@ -225,31 +237,31 @@ export type customerTokensType = {
   cardExpiryYear: string;
   addressId?: string;
   timeStamp?: string;
-  address?: addressType;
+  address?: AddressType;
 };
 
 //Mid credentials object
-export type midCredentialsType = {
+export type MidCredentialsType = {
   merchantId: string | undefined;
   merchantKeyId: string | undefined;
   merchantSecretKey: string | undefined;
 };
 
-export type customTokenType = {
+export type CustomTokenType = {
   customerTokenId: string;
   paymentInstrumentId: string;
 };
 
-export type pgAddressGroupType = {
+export type CardAddressGroupType = {
   httpCode?: number;
-  billToFieldGroup?: addressType;
-  shipToFieldGroup?: addressType;
-  billTo?: addressType;
-  shipTo?: addressType;
-  cardFieldGroup?: cardFieldGroupType;
+  billToFieldGroup?: AddressType;
+  shipToFieldGroup?: AddressType;
+  billTo?: AddressType;
+  shipTo?: AddressType;
+  cardFieldGroup?: CardFieldGroupType;
 };
 
-export type cardFieldGroupType = {
+export type CardFieldGroupType = {
   prefix: string;
   suffix: string;
   expirationMonth: string;
@@ -257,12 +269,12 @@ export type cardFieldGroupType = {
   type: string;
 };
 
-export type reportResponseType = {
+export type ReportResponseType = {
   message: string;
   error: string;
 };
 
-export type securityCodeType = {
+export type SecurityCodeType = {
   securityCodePresent: boolean;
   transactionId: string;
   amountPlanned: {
@@ -271,15 +283,15 @@ export type securityCodeType = {
   };
 };
 
-export type reportSyncType = securityCodeType & paymentTransactionType;
+export type ReportSyncType = SecurityCodeType & PaymentTransactionType;
 
-export type visaUpdateType = {
+export type VisaUpdateType = {
   id: string;
   version: number;
-  actions: actionType[];
+  actions: ActionType[];
 };
 
-export type consumerAuthenticationInformationType = {
+export type ConsumerAuthenticationInformationType = {
   cavv?: string;
   eciRaw?: string;
   paresStatus?: string;
@@ -316,18 +328,18 @@ export type consumerAuthenticationInformationType = {
   isv_failedTokens?: string[];
 };
 
-export type addTransactionType = {
+export type AddTransActionType = {
   action: string;
   transaction: {
     type: string;
     timestamp: string;
-    amount: amountPlannedType;
+    amount: AmountPlannedType;
     state: string;
     interactionId: string;
   };
 };
 
-export type applicationsType = {
+export type ApplicationsType = {
   [x: string]: any;
   name?: string;
   reasonCode?: string;
@@ -338,22 +350,22 @@ export type applicationsType = {
   returnCode?: number;
 };
 
-export type certificateResponseType = {
+export type CertificateResponseType = {
   data: null;
   status: number;
 };
 
-export type orderInformationType = {
-  lineItems?: orderInformationLineItemsType[];
+export type OrderInformationType = {
+  lineItems?: OrderInformationLineItemsType[];
   amountDetails?: {
     totalAmount: number;
     currency: string;
   };
-  billTo?: cybsAddressType;
-  shipTo?: cybsAddressType;
+  billTo?: CybsAddressType;
+  shipTo?: CybsAddressType;
 };
 
-export type cybsAddressType = {
+export type CybsAddressType = {
   firstName: string;
   lastName: string;
   address1: string;
@@ -366,7 +378,7 @@ export type cybsAddressType = {
   phoneNumber: string;
 };
 
-export type orderInformationLineItemsType = {
+export type OrderInformationLineItemsType = {
   productName?: string;
   quantity?: number;
   productSku?: string;
@@ -375,7 +387,7 @@ export type orderInformationLineItemsType = {
   unitPrice?: number;
 };
 
-export type responseType = {
+export type ResponseType = {
   httpCode?: number;
   transactionId?: string;
   status?: string;
@@ -391,12 +403,12 @@ export type responseType = {
   deviceDataCollectionUrl?: string;
 };
 
-export type paymentResponse = {
+export type PaymentResponse = {
   httpCode?: number;
   status?: string;
 };
 
-export type instrumentIdResponse = {
+export type InstrumentIdResponse = {
   httpCode: number;
   instrumentIdentifier: string;
   state: string;
@@ -406,7 +418,7 @@ export type instrumentIdResponse = {
   expirationYear: string;
 };
 
-export type subscriptionInformationType = {
+export type SubscriptionInformationType = {
   merchantId: string;
   key: string;
   keyId: string;
@@ -414,7 +426,19 @@ export type subscriptionInformationType = {
   subscriptionId: string;
 };
 
-export type tokenCreateFlagType = {
+export type TokenCreateFlagType = {
   notSaveToken: boolean;
   isError: boolean;
 };
+
+export interface CommercetoolsError {
+  statusCode: number;
+  message: string;
+  errors: { code: string; message: string }[];
+}
+
+export type CommercetoolsErrorResponse = {
+  statusCode: number;
+  message: string;
+  body: { errors: { code: string; message: string }[] };
+}

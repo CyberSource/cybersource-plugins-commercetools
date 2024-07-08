@@ -64,3 +64,14 @@ test.serial('Check status for payment capture with reconciliation Id', async (t:
     t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
   }
 });
+
+test.serial('Capturing a payment with empty auth id and check http code', async (t: any) => {
+  let result: any = await capture.captureResponse(payment, updateTransactions, '', orderNo);
+  paymentResponseObject.httpCode = result.httpCode;
+  paymentResponseObject.status = result.status;
+  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+});
+
+test('Check status for a capture with empty auth id', async (t: any) => {
+  t.not(paymentResponseObject.status, Constants.API_STATUS_PENDING);
+});

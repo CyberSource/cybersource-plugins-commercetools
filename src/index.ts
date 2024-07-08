@@ -12,7 +12,7 @@ import apiHandler from './apiHandler';
 import { AppHandler } from './app/AppHandler';
 import { RouterHandler } from './app/RouterHandler';
 import { Constants } from './constants';
-import { paymentType } from './types/Types';
+import { PaymentType } from './types/Types';
 import paymentHandler from './utils/PaymentHandler';
 import paymentService from './utils/PaymentService';
 import paymentUtils from './utils/PaymentUtils';
@@ -44,14 +44,24 @@ app.listen(port, (err: any) => {
   }
 });
 
-async function authentication(req: http.IncomingMessage, res: http.ServerResponse) {
+/**
+ * Authentication function for handling incoming HTTP requests.
+ * 
+ * @param {http.IncomingMessage} req - The incoming HTTP request object.
+ * @param {http.ServerResponse} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+async function authentication(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   let notificationBody: any;
   let isWhitelisted = false;
   let isValidNotification = false;
-  const authHeader: string = req?.headers['authorization'] as string;
-  const whitelistUrls: string | undefined = process.env.PAYMENT_GATEWAY_WHITELIST_URLS;
-  const requestUrl = req.url as string;
-  const parsedUrl = url.parse(requestUrl, true);
+  const authHeader = req?.headers['authorization'];
+  let parsedUrl;
+  const whitelistUrls = process.env.PAYMENT_GATEWAY_WHITELIST_URLS;
+  const requestUrl = req.url;
+  if (requestUrl) {
+    parsedUrl = url.parse(requestUrl, true);
+  }
   let whitelistUrlArray: string[] = [];
   if ('/netTokenNotification' === parsedUrl?.pathname) {
     if ('GET' === req.method) {
@@ -64,7 +74,7 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
       });
       req.on('end', async () => {
         notificationBody = JSON.parse(body);
-        const vcSignature = req?.headers['v-c-signature'] as string;
+        const vcSignature = req?.headers['v-c-signature'];
         if (vcSignature && notificationBody) {
           isValidNotification = await paymentUtils.authenticateNetToken(vcSignature, notificationBody);
           if (isValidNotification) {
@@ -86,7 +96,7 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
     if (whitelistUrls) {
       whitelistUrlArray = whitelistUrls.split(Constants.REGEX_COMMA);
       for (let element of whitelistUrlArray) {
-        if (parsedUrl?.pathname === Constants.REGEX_SINGLE_SLASH + element || parsedUrl.pathname?.includes(Constants.REGEX_SINGLE_SLASH + element + '?')) {
+        if (parsedUrl?.pathname === Constants.REGEX_SINGLE_SLASH + element || (parsedUrl && parsedUrl.pathname?.includes(Constants.REGEX_SINGLE_SLASH + element + '?'))) {
           isWhitelisted = true;
           break;
         }
@@ -97,16 +107,16 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
       return;
     }
     if (!authHeader) {
-      const pathName = parsedUrl?.pathname as string;
-      if (Constants.EXTENSION_SERVICE_END_POINTS.includes(pathName)) {
+      const pathName = parsedUrl?.pathname;
+      if (pathName && Constants.EXTENSION_SERVICE_END_POINTS.includes(pathName)) {
         res.setHeader('WWW-Authenticate', Constants.AUTHENTICATION_SCHEME);
         route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       } else {
         route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       }
     } else {
-      const pathName = parsedUrl?.pathname as string;
-      if (authHeader && Constants.EXTENSION_SERVICE_END_POINTS.includes(pathName)) {
+      const pathName = parsedUrl?.pathname;
+      if (authHeader && pathName && Constants.EXTENSION_SERVICE_END_POINTS.includes(pathName)) {
         const base64Credentials = authHeader.split(' ')[1];
         base64Credentials === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE
           ? requestHandler(req, res)
@@ -122,7 +132,14 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
   }
 }
 
-const requestHandler = async (req: any, res: any) => {
+/**
+ * Handles incoming HTTP requests based on their method and URL path.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const requestHandler = async (req: any, res: any): Promise<void> => {
   const parsedUrl = url.parse(req.url, true);
   const pathName = parsedUrl.pathname;
   if ('GET' === req.method) {
@@ -203,7 +220,14 @@ const requestHandler = async (req: any, res: any) => {
   }
 };
 
-const handlePaymentDetails = async (_req: any, res: any) => {
+/**
+ * handles payment details view.
+ * 
+ * @param {any} _req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handlePaymentDetails = async (_req: any, res: any): Promise<void> => {
   const htmlData = fs.readFileSync(path.join(__dirname, '/views/paymentDetails.html'), 'utf8');
   const doc = new JSDOM(htmlData);
   const bodyContent = doc.window.document.body.innerHTML;
@@ -213,7 +237,14 @@ const handlePaymentDetails = async (_req: any, res: any) => {
   route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'text/html', sanitizedHtmlData);
 };
 
-const handlePaymentsData = async (req: any, res: any) => {
+/**
+ * Retrieves and handles payment data.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handlePaymentsData = async (req: any, res: any): Promise<void> => {
   orderErrorMessage = '';
   orderSuccessMessage = '';
   let paymentDetailsApiResponse = {
@@ -224,6 +255,7 @@ const handlePaymentsData = async (req: any, res: any) => {
     errorMessage: '',
     paymentDetails: {},
     cartData: {},
+    orderNo: ''
   };
   try {
     const requestId = req?.query?.id;
@@ -254,12 +286,20 @@ const handlePaymentsData = async (req: any, res: any) => {
     successMessage: successMessage,
     refundErrorMessage: Constants.ERROR_MSG_REFUND_AMOUNT,
     captureErrorMessage: Constants.ERROR_MSG_CAPTURE_AMOUNT,
+    orderNo: paymentDetailsApiResponse.orderNo
   };
   const response = JSON.stringify(paymentDetailsPage);
   route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'application/json', response);
 };
 
-const handleOrders = async (_req: any, res: any) => {
+/**
+ *  handles orders view.
+ * 
+ * @param {any} _req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleOrders = async (_req: any, res: any): Promise<void> => {
   const htmlData = fs.readFileSync(path.join(__dirname, '/views/orders.html'), 'utf8');
   const doc = new JSDOM(htmlData);
   const bodyContent = doc.window.document.body.innerHTML;
@@ -269,10 +309,17 @@ const handleOrders = async (_req: any, res: any) => {
   route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'text/html', sanitizedHtmlData);
 };
 
-const handleOrdersData = async (_req: any, res: any) => {
+/**
+ * Retrieves and handles orders data.
+ * 
+ * @param {any} _req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleOrdersData = async (_req: any, res: any): Promise<void> => {
   errorMessage = '';
   successMessage = '';
-  const orderPage: { count: number; orderList: paymentType[]; total: number; moment: any; amountConversion: any; orderErrorMessage: string; orderSuccessMessage: string } = {
+  const orderPage: { count: number; orderList: PaymentType[]; total: number; moment: any; amountConversion: any; orderErrorMessage: string; orderSuccessMessage: string } = {
     count: 0,
     orderList: [],
     total: 0,
@@ -291,8 +338,7 @@ const handleOrdersData = async (_req: any, res: any) => {
       orderErrorMessage = Constants.ERROR_MSG_NO_ORDER_DETAILS;
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncHandleOrdersData', '', exception, '', '', '');
-    orderErrorMessage = Constants.ERROR_MSG_NO_ORDER_DETAILS;
+        orderErrorMessage = Constants.ERROR_MSG_NO_ORDER_DETAILS;
   }
   orderPage.orderErrorMessage = orderErrorMessage;
   orderPage.orderSuccessMessage = orderSuccessMessage;
@@ -300,7 +346,14 @@ const handleOrdersData = async (_req: any, res: any) => {
   route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'application/json', response);
 };
 
-const handlePaymentCreate = async (req: any, res: any) => {
+/**
+ * Handles the payment create endpoint.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handlePaymentCreate = async (req: any, res: any): Promise<void> => {
   let response;
   try {
     const body = await paymentUtils.collectRequestData(req);
@@ -321,7 +374,14 @@ const handlePaymentCreate = async (req: any, res: any) => {
   res.end(paymentCreateResponse);
 };
 
-const handlePaymentUpdate = async (req: any, res: any) => {
+/**
+ * Handles the payment update endpoint.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handlePaymentUpdate = async (req: any, res: any): Promise<void> => {
   let updateResponse: any = paymentUtils.getEmptyResponse();
   try {
     const body = await paymentUtils.collectRequestData(req);
@@ -339,7 +399,14 @@ const handlePaymentUpdate = async (req: any, res: any) => {
   res.end(paymentUpdateResponse);
 };
 
-const handleCustomerUpdate = async (req: any, res: any) => {
+/**
+ * Handles the payment create endpoint.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleCustomerUpdate = async (req: any, res: any): Promise<void> => {
   let response: any = paymentUtils.invalidInputResponse();
   const body = await paymentUtils.collectRequestData(req);
   const requestObj = await paymentUtils.getRequestObj(body);
@@ -366,7 +433,14 @@ const handleCustomerUpdate = async (req: any, res: any) => {
   res.end(customerUpdateResponse);
 };
 
-const handleAuthReversal = async (req: any, res: any) => {
+/**
+ * Handles the authorization reversal endpoint.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleAuthReversal = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
   let authReverseApiResponse = {
     errorMessage: '',
@@ -394,7 +468,14 @@ const handleAuthReversal = async (req: any, res: any) => {
   res.end();
 };
 
-const handleCapture = async (req: any, res: any) => {
+/**
+ * Handles the capture endpoint.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleCapture = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
   let captureApiResponse = {
     errorMessage: '',
@@ -424,7 +505,14 @@ const handleCapture = async (req: any, res: any) => {
   res.end();
 };
 
-const handleRefund = async (req: any, res: any) => {
+/**
+ * Handles the refund endpoint.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleRefund = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
   let refundApiResponse = {
     errorMessage: '',
@@ -454,7 +542,14 @@ const handleRefund = async (req: any, res: any) => {
   res.end();
 };
 
-const handlePostNetTokenNotification = async (req: any, res: any) => {
+/**
+ * Handles network tokenization post endpoint.
+ * 
+ * @param {any} req - The incoming HTTP request object.
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handlePostNetTokenNotification = async (req: any, res: any): Promise<void> => {
   let response = {
     errorMessage: '',
     successMessage: '',
@@ -478,7 +573,14 @@ const handlePostNetTokenNotification = async (req: any, res: any) => {
   res.end();
 };
 
-const handleDecisionSync = async (_req: any, res: any) => {
+/**
+ * Handles the decision synchronization endpoint.
+ * 
+ * @param {any} _req - The incoming HTTP request object (not used).
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleDecisionSync = async (_req: any, res: any): Promise<void> => {
   const decisionSyncResponse = await paymentHandler.reportHandler();
   orderSuccessMessage = decisionSyncResponse.message;
   orderErrorMessage = decisionSyncResponse.error;
@@ -486,7 +588,14 @@ const handleDecisionSync = async (_req: any, res: any) => {
   res.end();
 };
 
-const handleSync = async (_req: any, res: any) => {
+/**
+ * Handles the runsync endpoint.
+ * 
+ * @param {any} _req - The incoming HTTP request object (not used).
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleSync = async (_req: any, res: any): Promise<void> => {
   const syncResponse = await paymentHandler.syncHandler();
   orderSuccessMessage = syncResponse.message;
   orderErrorMessage = syncResponse.error;
@@ -494,7 +603,14 @@ const handleSync = async (_req: any, res: any) => {
   await res.end();
 };
 
-const handleConfigureExtensions = async (_req: any, res: any) => {
+/**
+ * Handles the configuration of extensions endpoint.
+ * 
+ * @param {any} _req - The incoming HTTP request object (not used).
+ * @param {any} res - The server response object.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+const handleConfigureExtensions = async (_req: any, res: any): Promise<void> => {
   await resourceHandler.ensureExtension();
   await resourceHandler.ensureCustomTypes();
   orderSuccessMessage = Constants.SUCCESS_MSG_EXTENSION_CREATION;
@@ -502,7 +618,7 @@ const handleConfigureExtensions = async (_req: any, res: any) => {
   await res.end();
 };
 
-if(Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT){
+if (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
   exports.handler = serverless(app.server);
 }
 

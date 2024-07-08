@@ -3,6 +3,9 @@ import _path from 'path';
 
 import { Constants } from '../constants';
 
+/**
+ * Handles routing and serving static files.
+ */
 export class RouterHandler {
   staticFiles: any;
   routes: any;
@@ -10,6 +13,9 @@ export class RouterHandler {
   server: any;
   mimeType: any;
 
+  /**
+  * Creates an instance of RouterHandler.
+  */
   constructor() {
     this.staticFiles = [];
     this.port = 3000;
@@ -20,6 +26,14 @@ export class RouterHandler {
       '.png': 'image/png',
     };
   }
+
+  /**
+   * Serves a static file.
+   * @param {string} url - The URL of the requested file.
+   * @param {string} path - The path of the requested file.
+   * @param {string} folderPath - The folder path where the file is located.
+   * @param {http.ServerResponse} response - The HTTP response object.
+   */
   _serveStaticFile(url: string, path: string, folderPath: any, response: any) {
     if (null !== url && '' !== url && null !== path && '' !== path && null !== folderPath && '' !== folderPath) {
       const indexOfPath = url.indexOf(path);
@@ -45,20 +59,32 @@ export class RouterHandler {
     }
   }
 
+  /**
+   * Sends an HTTP response.
+   * @param {http.ServerResponse} res - The HTTP response object.
+   * @param {number} statusCode - The status code of the response.
+   * @param {string} contentType - The content type of the response.
+   * @param {any} content - The content of the response.
+   */
   sendResponse(res: any, statusCode: number, contentType: string, content: any) {
     res.statusCode = statusCode;
     res.setHeader('Content-Type', contentType);
     res.end(content);
   }
 
-    listen(port: number, cb = (err: any) => { console.log("error : ", err) }) {
-        try {
-            this.port = port || 3000;
-            this.server.listen(this.port);
-            cb('');
-        } catch (err) {
-            cb(err);
-        }
-
+  /**
+   * Starts listening on the specified port.
+   * @param {number} port - The port number to listen on.
+   * @param {Function} cb - The callback function to be called after listening.
+   */
+  listen(port: number, cb = (err: any) => { console.log("error : ", err) }) {
+    try {
+      this.port = port || 3000;
+      this.server.listen(this.port);
+      cb('');
+    } catch (err) {
+      cb(err);
     }
+
+  }
 }

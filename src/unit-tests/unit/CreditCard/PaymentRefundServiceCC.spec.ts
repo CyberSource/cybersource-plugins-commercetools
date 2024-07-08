@@ -64,3 +64,14 @@ test.serial('Check status for payment refund with reconciliation Id', async (t: 
     t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
   }
 });
+
+test.serial('Refunding a payment with empty capture id and check http code', async (t: any) => {
+  let result: any = await refund.refundResponse(payment, '', updateTransaction, orderNo);
+  paymentResponseObject.httpCode = result.httpCode;
+  paymentResponseObject.status = result.status;
+  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+});
+
+test.serial('Check status of a refund with empty capture id', async (t: any) => {
+  t.not(paymentResponseObject.status, Constants.API_STATUS_PENDING);
+});

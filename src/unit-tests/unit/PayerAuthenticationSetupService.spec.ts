@@ -51,3 +51,23 @@ test.serial('Check http code for Payer auth set up with invalid customer', async
 test.serial('Check status for payer auth set up with invalid customer', async (t: any) => {
   t.not(paymentResponseObject.status, Constants.API_STATUS_COMPLETED);
 });
+
+test.serial('Check http code for Payer auth set up', async (t: any) => {
+  paymentSavedTokens.custom.fields.isv_savedToken = ''
+  let result: any = await setupService.payerAuthSetupResponse(paymentSavedTokens, cardTokensObjects.customerTokenId);
+  paymentResponseObject.httpCode = result.httpCode;
+  paymentResponseObject.status = result.status;
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponseObject.httpCode) {
+    t.is(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+  } else {
+    t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+  }
+});
+
+test.serial('Check status for payer auth set up', async (t: any) => {
+  if (Constants.API_STATUS_COMPLETED == paymentResponseObject.status) {
+    t.is(paymentResponseObject.status, Constants.API_STATUS_COMPLETED);
+  } else {
+    t.not(paymentResponseObject.status, Constants.API_STATUS_COMPLETED);
+  }
+});

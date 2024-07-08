@@ -1,11 +1,18 @@
 import path from 'path';
 
 import { Constants } from '../../constants';
-import { midCredentialsType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../PaymentUtils';
 
-const getMidCredentials = async (merchantId: string) => {
-  let midData: midCredentialsType = {
+/**
+ * Retrieves merchant credentials for a given merchant ID.
+ * If no merchant ID is provided, it retrieves credentials from environment variables.
+ * @param {string} merchantId - The ID of the merchant.
+ * @returns {Promise<MidCredentialsType>} A promise that resolves with the merchant credentials.
+ */
+const getMidCredentials = async (merchantId: string): Promise<MidCredentialsType> => {
+
+  let midData: MidCredentialsType = {
     merchantId: '',
     merchantKeyId: '',
     merchantSecretKey: '',
@@ -32,8 +39,12 @@ const getMidCredentials = async (merchantId: string) => {
   return midData;
 };
 
-const getAllMidDetails = async () => {
-  const midArray: midCredentialsType[] = [];
+/**
+ * Retrieves details of all merchant IDs and their corresponding credentials.
+ * @returns {Promise<MidCredentialsType[]>} A promise that resolves with an array of merchant credentials.
+ */
+const getAllMidDetails = async (): Promise<MidCredentialsType[]> => {
+  const midArray: MidCredentialsType[] = [];
   let secretKeyIndex: number;
   let secretKeyPrefix: string;
   let keyId: string;

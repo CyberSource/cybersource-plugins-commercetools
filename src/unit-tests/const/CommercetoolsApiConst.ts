@@ -1,4 +1,5 @@
-import { reportSyncType } from '../../types/Types';
+import { ReportSyncType } from '../../types/Types';
+import creditCard from '../JSON/creditCard.json';
 import unit from '../JSON/unit.json';
 
 export const customerId = unit.customerId;
@@ -81,7 +82,7 @@ export const visaCheckoutData = {
   },
 };
 
-export const syncAddTransactionObject: reportSyncType = {
+export const syncAddTransactionObject: ReportSyncType = {
   id: 'dcf01a63-85eb-42d5-a367-cd832932ed1b',
   transactionId: '',
   version: 12,
@@ -149,3 +150,10 @@ export const customFieldName = 'isv_cybersource_customer_id';
 export const customFieldValue = '11B5C4B5776C40FCE063AF598E0AEC59';
 
 export const customObjectContainer = 'ctWebHookSubscription';
+
+export let changeTransactionInteractionIdTransactionObject : any = {
+  paymentId: unit.paymentId,
+  version: '',
+  transactionId: creditCard.authId,
+  interactionId: '0346f3bf-beb7-4b99-acdc-b1360504b58c',
+}

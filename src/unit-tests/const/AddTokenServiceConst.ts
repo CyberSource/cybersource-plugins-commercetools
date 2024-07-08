@@ -1,4 +1,4 @@
-import { addressType } from '../../types/Types';
+import { AddressType } from '../../types/Types';
 import creditCard from '../JSON/creditCard.json';
 export const addTokenResponseCustomerId = '88c278f9-82d9-427c-96df-f98a4f23e543';
 
@@ -148,7 +148,7 @@ export const addInvalidTokenResponseCustomerObj = {
   authenticationMode: 'Password',
 };
 
-export const addTokenResponseAddress: readonly addressType[] = [
+export const addTokenResponseAddress: readonly AddressType[] = [
   {
     id: 'Gu_fd8_a',
     firstName: 'shakshi',
@@ -164,7 +164,7 @@ export const addTokenResponseAddress: readonly addressType[] = [
   },
 ];
 
-export const addTokenAddress: addressType = {
+export const addTokenAddress: AddressType = {
   id: 'Gu_fd8_a',
   firstName: 'shakshi',
   lastName: 'poddar',

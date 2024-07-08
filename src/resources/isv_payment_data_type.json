@@ -413,6 +413,128 @@
         "name": "String"
       },
       "inputHint": "SingleLine"
+    },
+    { 
+      "name": "isv_screenWidth",
+      "label": {
+        "en": "Total width of the Cardholder's screen in pixels"
+      },
+      "required": false,
+      "type": {
+        "name": "Number"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_screenHeight",
+      "label": {
+        "en": "Total height of the Cardholder's screen in pixels"
+      },
+      "required": false,
+      "type": {
+        "name": "Number"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_responseDateAndTime",
+      "label": {
+        "en": "Date and time of Payment Gateway Response"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_authorizationStatus",
+      "label": {
+        "en": "Authorization or Sale status from Payment Gateway"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_authorizationReasonCode",
+      "label": {
+        "en": "Reason code of Authorization"
+      },
+      "required": false,
+      "type": {
+        "name": "Number"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_ECI",
+      "label": {
+        "en": "Electronic commerce indicator for Payer Authentication"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_AVSResponse",
+      "label": {
+        "en": "AVS response codes"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    
+    {
+      "name": "isv_CVVResponse",
+      "label": {
+        "en": "CVV response codes"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_responseCode",
+      "label": {
+        "en": "Response Code for Authorization"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_dmpaFlag",
+      "label": {
+        "en": "Flag indicating dmpa scenario"
+      },
+      "required": false,
+      "type": {
+        "name": "Boolean"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_shippingMethod",
+      "label": {
+        "en": "Shipping method selected by the customer"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
     }
   ]
 }

@@ -1,12 +1,22 @@
 import path from 'path';
 
 import restApi from 'cybersource-rest-client';
+import { TssV2TransactionsPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { midCredentialsType, responseType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
-const getTransactionSearchResponse = async (query: string, sort: string, midCredentials: midCredentialsType) => {
+
+/**
+ * Retrieves transaction search response.
+ * @param {string} query - The query string.
+ * @param {string} sort - The sort order.
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @returns {Promise<TssV2TransactionsPost201Response>} A promise that resolves with the transaction search response.
+ */
+type TssV2TransactionsPost201Response = typeof TssV2TransactionsPost201Response;
+const getTransactionSearchResponse = async (query: string, sort: string, midCredentials: MidCredentialsType): Promise<any> => {
   let errorData: string;
   const searchResponse = {
     httpCode: 0,
@@ -28,7 +38,7 @@ const getTransactionSearchResponse = async (query: string, sort: string, midCred
         paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetTransactionSearchResponse', Constants.LOG_INFO, '', 'Create Transaction Search Request = ' + JSON.stringify(requestObj));
       }
       const searchTransactionsApiInstance = new restApi.SearchTransactionsApi(configObject, apiClient);
-      return await new Promise<responseType>((resolve, reject) => {
+      return await new Promise<TssV2TransactionsPost201Response>((resolve, reject) => {
         searchTransactionsApiInstance.createSearch(requestObj, function (error: any, data: any, response: any) {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetTransactionSearchResponse', Constants.LOG_INFO, '', 'Create Transaction Search Response = ' + JSON.stringify(response));
           if (data) {

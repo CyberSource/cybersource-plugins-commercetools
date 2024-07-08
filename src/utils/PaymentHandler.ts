@@ -3,6 +3,7 @@ import https from 'https';
 import path from 'path';
 
 import axios from 'axios';
+import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../constants';
 import addTokenService from '../service/payment/AddTokenService';
@@ -15,7 +16,7 @@ import getTransientTokenData from '../service/payment/GetTransientTokenData';
 import getWebhookSubscriptionDetails from '../service/payment/GetWebhookSubscriptionDetails';
 import keyGeneration from '../service/payment/KeyGeneration';
 import updateToken from '../service/payment/UpdateTokenService';
-import { actionResponseType, addressType, customerTokensType, customerType, customTokenType, instrumentIdResponse, midCredentialsType, paymentCustomFieldsType, paymentTransactionType, paymentType, reportResponseType } from '../types/Types';
+import { ActionResponseType, AddressType, CustomerTokensType, CustomerType, CustomTokenType, InstrumentIdResponse, MidCredentialsType, PaymentCustomFieldsType, PaymentTransactionType, PaymentType, ReportResponseType } from '../types/Types';
 
 import paymentAuthReversal from './../service/payment/PaymentAuthorizationReversal';
 import paymentCapture from './../service/payment/PaymentCaptureService';
@@ -24,51 +25,57 @@ import paymentUtils from './../utils/PaymentUtils';
 import commercetoolsApi from './../utils/api/CommercetoolsApi';
 import multiMid from './config/MultiMid';
 
-const authorizationHandler = async (updatePaymentObj: paymentType, updateTransactions: paymentTransactionType) => {
-  let authResponse: actionResponseType = paymentUtils.getEmptyResponse();
-  let cardTokens: customTokenType = {
+type PtsV2PaymentsPost201Response = typeof PtsV2PaymentsPost201Response;
+/**
+ * Handles the authorization process for a payment.
+ * 
+ * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {PaymentTransactionType} updateTransactions - The updated transaction object.
+ * @returns {Promise<ActionResponseType>} - The authorization response.
+ */
+
+const authorizationHandler = async (updatePaymentObj: PaymentType, updateTransactions: PaymentTransactionType): Promise<ActionResponseType> => {
+  let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
+  let cardTokens: CustomTokenType = {
     customerTokenId: '',
     paymentInstrumentId: '',
   };
-  let customerInfo: customerType | null = null;
+  let customerInfo: CustomerType | null = null;
   let paymentInstrumentToken = '';
   let isError = false;
   let cartObj;
   try {
-    if (updatePaymentObj && updateTransactions) {
-      cartObj = await paymentUtils.getCartObject(updatePaymentObj);
-      if (cartObj && cartObj?.count && 0 < cartObj.count && cartObj?.results) {
-        if (updatePaymentObj?.customer?.id) {
-          customerInfo = await commercetoolsApi.getCustomer(updatePaymentObj.customer.id);
-          if (updatePaymentObj.custom?.fields?.isv_savedToken) {
-            paymentInstrumentToken = updatePaymentObj.custom.fields.isv_savedToken;
-          }
-          cardTokens = await paymentService.getCardTokens(customerInfo, paymentInstrumentToken);
-        }
-        const orderNo = await paymentUtils.getOrderId(cartObj?.results[0]?.id, updatePaymentObj?.id);
-        const paymentMethod = updatePaymentObj.paymentMethodInfo.method;
-        const serviceResponse = await paymentAuthHandler(paymentMethod, updatePaymentObj, customerInfo, cartObj.results[0], updateTransactions, cardTokens, orderNo);
-        if (serviceResponse?.authResponse) {
-          authResponse = serviceResponse.authResponse;
-          isError = serviceResponse.isError;
-        }
-        const paymentResponse = serviceResponse.paymentResponse;
-        if (Constants.CREDIT_CARD === paymentMethod) {
-          authResponse = await paymentService.setCustomerTokenData(cardTokens, paymentResponse, authResponse, isError, updatePaymentObj, cartObj.results[0]);
-        }
-        const customFields = updatePaymentObj?.custom?.fields;
-        authResponse = await setTokenNullHandler(customFields, authResponse, paymentMethod);
-        if (paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
-          authResponse = await paymentService.checkAuthReversalTriggered(updatePaymentObj, cartObj.results[0], paymentResponse, authResponse);
-        }
-      } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAuthorizationHandler', Constants.LOG_INFO, 'PaymentId : ' + updatePaymentObj.id, Constants.ERROR_MSG_EMPTY_CART);
-        isError = true;
-      }
-    } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAuthorizationHandler', Constants.LOG_INFO, 'PaymentId : ' + updatePaymentObj.id, Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
-      isError = true;
+    if (!updatePaymentObj && !updateTransactions) {
+      throw new Error(Constants.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
     }
+    cartObj = await paymentUtils.getCartObject(updatePaymentObj);
+    if (!cartObj && !cartObj?.count && !cartObj?.results) {
+      throw new Error(Constants.ERROR_MSG_EMPTY_CART);
+    }
+    if (updatePaymentObj?.customer?.id) {
+      customerInfo = await commercetoolsApi.getCustomer(updatePaymentObj.customer.id);
+      if (updatePaymentObj.custom?.fields?.isv_savedToken) {
+        paymentInstrumentToken = updatePaymentObj.custom.fields.isv_savedToken;
+      }
+      cardTokens = await paymentService.getCardTokens(customerInfo, paymentInstrumentToken);
+    }
+    const orderNo = await paymentUtils.getOrderId(cartObj?.results[0]?.id, updatePaymentObj?.id);
+    const paymentMethod = updatePaymentObj.paymentMethodInfo.method;
+    const serviceResponse = await paymentAuthHandler(paymentMethod, updatePaymentObj, customerInfo, cartObj.results[0], updateTransactions, cardTokens, orderNo);
+    if (serviceResponse?.authResponse) {
+      authResponse = serviceResponse.authResponse;
+      isError = serviceResponse.isError;
+    }
+    const paymentResponse = serviceResponse.paymentResponse;
+    if (Constants.CREDIT_CARD === paymentMethod) {
+      authResponse = await paymentService.setCustomerTokenData(cardTokens, paymentResponse, authResponse, isError, updatePaymentObj, cartObj.results[0]);
+    }
+    const customFields = updatePaymentObj?.custom?.fields;
+    authResponse = await setTokenNullHandler(customFields, authResponse, paymentMethod);
+    if (paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
+      authResponse = await paymentService.checkAuthReversalTriggered(updatePaymentObj, cartObj.results[0], paymentResponse, authResponse);
+    }
+
   } catch (exception) {
     paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncAuthorizationHandler', Constants.EXCEPTION_MSG_AUTHORIZING_PAYMENT, exception, updatePaymentObj.id, 'PaymentId : ', '');
     isError = true;
@@ -79,7 +86,15 @@ const authorizationHandler = async (updatePaymentObj: paymentType, updateTransac
   return authResponse;
 };
 
-const setTokenNullHandler = async (customFields: paymentCustomFieldsType | undefined, authResponse: actionResponseType, paymentMethod: string) => {
+/**
+ * Handles setting certain custom fields to null.
+ * 
+ * @param {PaymentCustomFieldsType | undefined} customFields - The custom fields of the payment.
+ * @param {ActionResponseType} authResponse - The authorization response.
+ * @param {string} paymentMethod - The payment method.
+ * @returns {Promise<ActionResponseType>} - The updated authorization response.
+ */
+const setTokenNullHandler = async (customFields: PaymentCustomFieldsType | undefined, authResponse: ActionResponseType, paymentMethod: string): Promise<ActionResponseType> => {
   const isv_tokenVerificationContext = '';
   const isv_tokenCaptureContextSignature = '';
   const isv_securityCode = 0;
@@ -95,8 +110,20 @@ const setTokenNullHandler = async (customFields: paymentCustomFieldsType | undef
   return authResponse;
 };
 
-const paymentAuthHandler = async (paymentMethod: string, updatePaymentObj: paymentType, customerInfo: customerType | null, cartInfo: any, updateTransactions: paymentTransactionType, cardTokens: customTokenType, orderNo: string) => {
-  let serviceResponse: { readonly isError: boolean; readonly paymentResponse: any; readonly authResponse: actionResponseType };
+/**
+ * Handles authorization for different payment methods.
+ * 
+ * @param {string} paymentMethod - The payment method.
+ * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {CustomerType | null} customerInfo - Information about the customer.
+ * @param {any} cartInfo - Information about the cart.
+ * @param {PaymentTransactionType} updateTransactions - The updated transaction object.
+ * @param {CustomTokenType} cardTokens - Card tokens associated with the customer.
+ * @param {string} orderNo - The order number.
+ * @returns {Promise<{ isError: boolean; paymentResponse: any; authResponse: ActionResponseType }>} - The service response.
+ */
+const paymentAuthHandler = async (paymentMethod: string, updatePaymentObj: PaymentType, customerInfo: CustomerType | null, cartInfo: any, updateTransactions: PaymentTransactionType, cardTokens: CustomTokenType, orderNo: string) => {
+  let serviceResponse: { readonly isError: boolean; readonly paymentResponse: any; readonly authResponse: ActionResponseType };
   switch (paymentMethod) {
     case Constants.CREDIT_CARD: {
       serviceResponse = await paymentService.getCreditCardResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
@@ -126,7 +153,15 @@ const paymentAuthHandler = async (paymentMethod: string, updatePaymentObj: payme
   return serviceResponse;
 };
 
-const payerAuthReversalHandler = async (updatePaymentObj: paymentType, paymentResponse: any, updateActions: actionResponseType) => {
+/**
+ * Handles payer authentication reversal.
+ * 
+ * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {any} paymentResponse - The payment response.
+ * @param {ActionResponseType} updateActions - The updated actions response.
+ * @returns {Promise<ActionResponseType>} - The updated actions response.
+ */
+const payerAuthReversalHandler = async (updatePaymentObj: PaymentType, paymentResponse: PtsV2PaymentsPost201Response, updateActions: ActionResponseType): Promise<ActionResponseType> => {
   let cartObj;
   if (updatePaymentObj && updateActions && paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
     cartObj = await paymentUtils.getCartObject(updatePaymentObj);
@@ -139,8 +174,14 @@ const payerAuthReversalHandler = async (updatePaymentObj: paymentType, paymentRe
   return updateActions;
 };
 
-const applePaySessionHandler = async (fields: paymentCustomFieldsType) => {
-  let serviceResponse: actionResponseType = paymentUtils.getEmptyResponse();
+/**
+ * Handles Apple Pay session.
+ * 
+ * @param {PaymentCustomFieldsType} fields - The payment custom fields.
+ * @returns {Promise<ActionResponseType>} - The service response.
+ */
+const applePaySessionHandler = async (fields: PaymentCustomFieldsType): Promise<ActionResponseType> => {
+  let serviceResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   let httpsAgent: https.Agent = new https.Agent({
     rejectUnauthorized: true,
     cert: '',
@@ -198,7 +239,15 @@ const applePaySessionHandler = async (fields: paymentCustomFieldsType) => {
   return serviceResponse;
 };
 
-const orderManagementChargeHandler = async (updatePaymentObj: paymentType, orderNo: string, updateTransactions: paymentTransactionType) => {
+/**
+ * Handles charge operation for order management.
+ * 
+ * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {string} orderNo - The order number.
+ * @param {PaymentTransactionType} updateTransactions - The updated payment transactions.
+ * @returns {Promise<any>} - The order response.
+ */
+const orderManagementChargeHandler = async (updatePaymentObj: PaymentType, orderNo: string, updateTransactions: PaymentTransactionType) => {
   let authId = '';
   let orderResponse;
   try {
@@ -217,7 +266,14 @@ const orderManagementChargeHandler = async (updatePaymentObj: paymentType, order
   return orderResponse;
 };
 
-const orderManagementAuthReversalHandler = async (updatePaymentObj: paymentType, cartObj: any) => {
+/**
+ * Handles authorization reversal operation for order management.
+ * 
+ * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {any} cartObj - The cart object.
+ * @returns {Promise<any>} - The order response.
+ */
+const orderManagementAuthReversalHandler = async (updatePaymentObj: PaymentType, cartObj: any): Promise<any> => {
   let authReversalId = '';
   let orderResponse;
   try {
@@ -236,9 +292,17 @@ const orderManagementAuthReversalHandler = async (updatePaymentObj: paymentType,
   return orderResponse;
 };
 
-const orderManagementHandler = async (paymentId: string, updatePaymentObj: paymentType, updateTransactions: paymentTransactionType) => {
+/**
+ * Handles order management operations.
+ * 
+ * @param {string} paymentId - The ID of the payment.
+ * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {PaymentTransactionType} updateTransactions - The updated transaction object.
+ * @returns {Promise<ActionResponseType>} - The action response.
+ */
+const orderManagementHandler = async (paymentId: string, updatePaymentObj: PaymentType, updateTransactions: PaymentTransactionType): Promise<ActionResponseType> => {
   let orderResponse;
-  let serviceResponse: actionResponseType = paymentUtils.getEmptyResponse();
+  let serviceResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   let isError = false;
   let cartObj;
   try {
@@ -275,60 +339,59 @@ const orderManagementHandler = async (paymentId: string, updatePaymentObj: payme
   return serviceResponse;
 };
 
-const updateCardHandler = async (tokens: customerTokensType, customerId: string, customerObj: customerType) => {
-  let returnResponse: actionResponseType = paymentUtils.getEmptyResponse();
-  let parsedTokens: customerTokensType;
-  let addressData: addressType | null = null;
+/**
+ * Handles the update of card details.
+ * 
+ * @param {CustomerTokensType} tokens - The tokens associated with the customer.
+ * @param {string} customerId - The ID of the customer.
+ * @param {CustomerType} customerObj - The customer object.
+ * @returns {Promise<ActionResponseType>} - The action response.
+ */
+const updateCardHandler = async (tokens: CustomerTokensType, customerId: string, customerObj: CustomerType): Promise<ActionResponseType> => {
+  let returnResponse: ActionResponseType = paymentUtils.getEmptyResponse();
+  let parsedTokens: CustomerTokensType;
+  let addressData: AddressType | null = null;
   const isError = false;
   let finalTokenIndex = -1;
   let updateServiceResponse: any;
   try {
-    if (customerId) {
-      const customerInfo = await commercetoolsApi.getCustomer(customerId);
-      if (customerObj?.addresses && 0 < customerObj?.addresses.length) {
-        customerObj.addresses.forEach((address) => {
-          if (tokens.addressId === address.id) {
-            addressData = address;
-          }
-        });
-      }
-      if (customerObj?.custom?.fields?.isv_cardNewExpiryMonth && customerObj?.custom?.fields?.isv_cardNewExpiryYear) {
-        updateServiceResponse = await updateToken.updateTokenResponse(tokens, customerObj?.custom?.fields?.isv_cardNewExpiryMonth, customerObj?.custom?.fields?.isv_cardNewExpiryYear, addressData);
-        if (
-          updateServiceResponse &&
-          Constants.HTTP_OK_STATUS_CODE === updateServiceResponse?.httpCode &&
-          updateServiceResponse?.card &&
-          0 < Object.keys(updateServiceResponse.card).length &&
-          updateServiceResponse?.card?.expirationMonth &&
-          updateServiceResponse?.card?.expirationYear
-        ) {
-          if (customerInfo && customerInfo?.custom?.fields?.isv_tokens && customerInfo.custom.fields?.isv_tokens?.length) {
-            const existingTokens = customerInfo.custom.fields.isv_tokens;
-            existingTokens.forEach((token, tokenIndex) => {
-              const newToken = JSON.parse(token);
-              if (newToken.paymentToken === tokens.paymentToken) {
-                finalTokenIndex = tokenIndex;
-              }
-            });
-            if (-1 < finalTokenIndex) {
-              parsedTokens = JSON.parse(existingTokens[finalTokenIndex]);
-              parsedTokens.cardExpiryMonth = updateServiceResponse?.card.expirationMonth;
-              parsedTokens.cardExpiryYear = updateServiceResponse?.card.expirationYear;
-              parsedTokens.addressId = tokens.addressId;
-              existingTokens[finalTokenIndex] = JSON.stringify(parsedTokens);
-              returnResponse = paymentService.getUpdateTokenActions(existingTokens, customerObj?.custom?.fields?.isv_failedTokens, isError, customerObj, null);
-            } else {
-              paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_NO_TOKENS_UPDATE);
-            }
-          } else {
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_NO_TOKENS_UPDATE);
-          }
-        } else {
-          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_SERVICE_PROCESS);
+    if (!customerId) {
+      throw new Error(Constants.ERROR_MSG_CUSTOMER_DETAILS);
+    }
+    const customerInfo = await commercetoolsApi.getCustomer(customerId);
+    if (customerObj?.addresses && 0 < customerObj?.addresses.length) {
+      customerObj.addresses.forEach((address) => {
+        if (tokens.addressId === address.id) {
+          addressData = address;
         }
+      });
+    }
+    const { isv_cardNewExpiryMonth, isv_cardNewExpiryYear } = customerObj?.custom?.fields || {};
+    if (isv_cardNewExpiryMonth && isv_cardNewExpiryYear) {
+      updateServiceResponse = await updateToken.updateTokenResponse(tokens, isv_cardNewExpiryMonth, isv_cardNewExpiryYear, addressData);
+      const validUpdateResponse = paymentUtils.validUpdateServiceResponse(updateServiceResponse);
+      if (!validUpdateResponse) {
+        throw new Error(Constants.ERROR_MSG_SERVICE_PROCESS)
       }
-    } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      if(!customerInfo?.custom?.fields?.isv_tokens?.length) {
+        throw new Error(Constants.ERROR_MSG_NO_TOKENS_UPDATE);
+      }
+      const existingTokens = customerInfo?.custom?.fields?.isv_tokens as string[];
+      existingTokens.forEach((token, tokenIndex) => {
+        const newToken = JSON.parse(token);
+        if (newToken.paymentToken === tokens.paymentToken) {
+          finalTokenIndex = tokenIndex;
+        }
+      });
+      if (-1 === finalTokenIndex) {
+        throw new Error(Constants.ERROR_MSG_NO_TOKENS_UPDATE)
+      }
+      parsedTokens = JSON.parse(existingTokens[finalTokenIndex]);
+      parsedTokens.cardExpiryMonth = updateServiceResponse?.card.expirationMonth;
+      parsedTokens.cardExpiryYear = updateServiceResponse?.card.expirationYear;
+      parsedTokens.addressId = tokens.addressId;
+      existingTokens[finalTokenIndex] = JSON.stringify(parsedTokens);
+      returnResponse = paymentService.getUpdateTokenActions(existingTokens, customerObj?.custom?.fields?.isv_failedTokens, isError, customerObj, null);
     }
   } catch (exception) {
     paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncUpdateCardHandler', Constants.EXCEPTION_MSG_CUSTOMER_UPDATE, exception, customerId, 'CustomerId : ', '');
@@ -336,46 +399,63 @@ const updateCardHandler = async (tokens: customerTokensType, customerId: string,
   return returnResponse;
 };
 
-const deleteCardHandler = async (updateCustomerObj: customerTokensType, customerId: string) => {
-  let customerTokenHandlerResponse: actionResponseType = paymentUtils.getEmptyResponse();
+
+/**
+ * Handles the deletion of a card.
+ * 
+ * @param {CustomerTokensType} updateCustomerObj - The tokens associated with the customer.
+ * @param {string} customerId - The ID of the customer.
+ * @returns {Promise<ActionResponseType>} - The action response.
+ */
+const deleteCardHandler = async (updateCustomerObj: CustomerTokensType, customerId: string): Promise<ActionResponseType> => {
+  let customerTokenHandlerResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   let deletedTokenIndex = -1;
-  if (customerId && updateCustomerObj) {
-    const customerObj = await commercetoolsApi.getCustomer(customerId);
-    const tokenManagementResponse = await deleteToken.deleteCustomerToken(updateCustomerObj);
-    if (tokenManagementResponse && Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE === tokenManagementResponse.httpCode) {
-      if (customerObj && customerObj?.custom?.fields?.isv_tokens && customerObj?.custom?.fields?.isv_tokens?.length) {
-        const existingTokensMap = customerObj.custom.fields.isv_tokens.map((item: any) => item);
-        existingTokensMap.forEach((token: any, tokenIndex: number) => {
-          const parsedToken = JSON.parse(token);
-          if (tokenManagementResponse.deletedToken === parsedToken.paymentToken) {
-            deletedTokenIndex = tokenIndex;
-          }
-        });
-        if (-1 < deletedTokenIndex) {
-          existingTokensMap.splice(deletedTokenIndex, 1);
-          customerTokenHandlerResponse = paymentService.getUpdateTokenActions(existingTokensMap, customerObj?.custom?.fields?.isv_failedTokens, true, customerObj, null);
-        } else {
-          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_NO_TOKENS_DELETE);
-        }
-      } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_NO_TOKENS_DELETE);
-      }
-    } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_SERVICE_PROCESS);
-    }
-  } else {
+  if (!customerId || !updateCustomerObj) {
     paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_CUSTOMER_DETAILS);
+    return paymentUtils.getEmptyResponse();
   }
-  const isv_tokenAction = ''
+  const customerObj = await commercetoolsApi.getCustomer(customerId);
+  const tokenManagementResponse = await deleteToken.deleteCustomerToken(updateCustomerObj);
+
+  if (!tokenManagementResponse || Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE !== tokenManagementResponse.httpCode) {
+    paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_SERVICE_PROCESS);
+    return paymentUtils.getEmptyResponse();
+  }
+  if (!customerObj?.custom?.fields?.isv_tokens && !customerObj?.custom?.fields?.isv_tokens?.length) {
+    paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_NO_TOKENS_DELETE);
+    return paymentUtils.getEmptyResponse();
+  }
+  const existingTokensMap = customerObj.custom.fields.isv_tokens.map((item: any) => item);
+  existingTokensMap.forEach((token: any, tokenIndex: number) => {
+    const parsedToken = JSON.parse(token);
+    if (tokenManagementResponse.deletedToken === parsedToken.paymentToken) {
+      deletedTokenIndex = tokenIndex;
+    }
+  })
+  if (-1 === deletedTokenIndex) {
+    paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteCardHandler', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_NO_TOKENS_DELETE);
+    return paymentUtils.getEmptyResponse();
+  }
+  existingTokensMap.splice(deletedTokenIndex, 1);
+  customerTokenHandlerResponse = paymentService.getUpdateTokenActions(existingTokensMap, customerObj?.custom?.fields?.isv_failedTokens, true, customerObj, null);
+  const isv_tokenAction = '';
   customerTokenHandlerResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenAction }));
   return customerTokenHandlerResponse;
-};
+}
 
-const addCardHandler = async (customerId: string, addressObj: readonly addressType[], customerObj: customerType) => {
-  let customerTokenResponse: actionResponseType = paymentUtils.getEmptyResponse();
-  let parsedTokens: customerTokensType;
+/**
+ * Handles the addition of a card.
+ * 
+ * @param {string} customerId - The ID of the customer.
+ * @param {readonly AddressType[]} addressObj - The array of addresses associated with the customer.
+ * @param {CustomerType} customerObj - The customer object.
+ * @returns {Promise<ActionResponseType>} - The action response.
+ */
+const addCardHandler = async (customerId: string, addressObj: readonly AddressType[], customerObj: CustomerType): Promise<ActionResponseType> => {
+  let customerTokenResponse: ActionResponseType = paymentUtils.getEmptyResponse();
+  let parsedTokens: CustomerTokensType;
   let notSaveToken = false;
-  let billToFields: addressType | null = null;
+  let billToFields: AddressType | null = null;
   let existingTokens: string[] = [];
   let existingFailedTokens: string[] = [];
   let newTokenFlag = false;
@@ -402,14 +482,8 @@ const addCardHandler = async (customerId: string, addressObj: readonly addressTy
           });
         }
         const cardResponse = await addTokenService.addTokenResponse(customerId, customerObj, billToFields, cardTokens);
-        if (
-          Constants.HTTP_SUCCESS_STATUS_CODE === cardResponse.httpCode &&
-          Constants.API_STATUS_AUTHORIZED === cardResponse.status &&
-          cardResponse?.data?.tokenInformation &&
-          cardResponse?.data?.tokenInformation?.paymentInstrument &&
-          cardResponse?.data?.tokenInformation?.instrumentIdentifier &&
-          cardResponse?.data?.tokenInformation?.paymentInstrument?.id.length
-        ) {
+        const validAddTokenResponse = paymentUtils.validAddTokenResponse(cardResponse);
+        if (validAddTokenResponse) {
           const customerTokenId = cardResponse?.data?.tokenInformation?.customer && cardTokens && 0 < cardResponse?.data?.tokenInformation?.customer?.id?.length ? cardResponse.data.tokenInformation.customer.id : cardTokens.customerTokenId;
           const paymentInstrumentId = cardResponse.data.tokenInformation.paymentInstrument.id;
           const instrumentIdentifier = cardResponse.data.tokenInformation.instrumentIdentifier.id;
@@ -470,12 +544,17 @@ const addCardHandler = async (customerId: string, addressObj: readonly addressTy
   return customerTokenResponse;
 };
 
-const reportHandler = async () => {
+/**
+ * Handles the decision sync process.
+ * 
+ * @returns {Promise<ReportResponseType>} - The report response.
+ */
+const reportHandler = async (): Promise<ReportResponseType> => {
   let conversionDetails;
   let conversionDetailsData;
   let isDecisionSynced = false;
   let isConversionPresent = false;
-  const decisionSyncResponse: reportResponseType = {
+  const decisionSyncResponse: ReportResponseType = {
     message: '',
     error: '',
   };
@@ -518,10 +597,15 @@ const reportHandler = async () => {
   return decisionSyncResponse;
 };
 
-const syncHandler = async () => {
+/**
+ * Handles the synchronization process.
+ * 
+ * @returns {Promise<{ message: string, error: string }>} - The sync response.
+ */
+const syncHandler = async (): Promise<{ message: string, error: string }> => {
   let createSearchResponse;
   let transactionSummaries;
-  let paymentDetails: paymentType | null;
+  let paymentDetails: PaymentType | null;
   let updateSyncResponse;
   let syncPresent = false;
   const syncResponse = {
@@ -564,7 +648,14 @@ const syncHandler = async () => {
   return syncResponse;
 };
 
-const networkTokenHandler = async (customerTokenId: string, retrieveTokenDetailsResponse: instrumentIdResponse) => {
+/**
+ * Handles the network token update process.
+ * 
+ * @param {string} customerTokenId - The customer token ID.
+ * @param {InstrumentIdResponse} retrieveTokenDetailsResponse - The response containing token details.
+ * @returns {Promise<any>} - The response of the token update process.
+ */
+const networkTokenHandler = async (customerTokenId: string, retrieveTokenDetailsResponse: InstrumentIdResponse): Promise<any> => {
   let parsedTokens = [];
   let response;
   let stringifiedTokens = [];
@@ -584,7 +675,7 @@ const networkTokenHandler = async (customerTokenId: string, retrieveTokenDetails
         stringifiedTokens = parsedTokens.map((token: any) => {
           return JSON.stringify(token);
         });
-        response = await commercetoolsApi.updateCustomerToken(stringifiedTokens, customerObj, null);
+        response = await commercetoolsApi.updateCustomerToken(stringifiedTokens, customerObj, null, null);
       }
     } else {
       paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncNetworkTokenHandler', Constants.LOG_INFO, 'CustomerId : ' + '', Constants.ERROR_MSG_CUSTOMER_WITH_INSTRUMENT_ID_NOT_FOUND);
@@ -596,7 +687,13 @@ const networkTokenHandler = async (customerTokenId: string, retrieveTokenDetails
   return response;
 };
 
-const webhookSubscriptionHandler = async (midCredentials: midCredentialsType) => {
+/**
+ * Handles the webhook subscription process.
+ * 
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @returns {Promise<any>} - The response of the webhook subscription process.
+ */
+const webhookSubscriptionHandler = async (midCredentials: MidCredentialsType): Promise<any> => {
   const createSubscriptionResponseObject = {
     httpCode: 0,
     merchantId: '',
@@ -669,6 +766,7 @@ const webhookSubscriptionHandler = async (midCredentials: midCredentialsType) =>
   }
   return createSubscriptionResponseObject;
 };
+
 export default {
   authorizationHandler,
   payerAuthReversalHandler,

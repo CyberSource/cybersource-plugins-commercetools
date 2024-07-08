@@ -1,10 +1,10 @@
-import { customerType, paymentType, reportSyncType } from '../../types/Types';
+import { CustomerType, PaymentType, ReportSyncType } from '../../types/Types';
 import clickToPay from '../JSON/clickToPay.json';
 import creditCard from '../JSON/creditCard.json';
 import googlePay from '../JSON/googlePay.json';
 import unit from '../JSON/unit.json';
 
-export const visaCardDetailsActionVisaCheckoutData = {
+export let visaCardDetailsActionVisaCheckoutData : any= {
   httpCode: 200,
   billToFieldGroup: {
     firstName: 'SHAKSHI',
@@ -466,6 +466,105 @@ export const getCapturedAmountRefundPaymentObj = {
   ],
 };
 
+export const getCapturedZeroAmountRefundPaymentObj = {
+  id: '5bfd0e66-7243-4359-9891-7fce264aaa30',
+  version: 33,
+  lastMessageSequenceNumber: 7,
+  createdAt: '2022-02-02T11:28:03.285Z',
+  lastModifiedAt: '2022-02-02T12:12:31.722Z',
+  lastModifiedBy: { clientId: 'iFOAd29Lew5ADrpakIhQkz_N', isPlatformClient: false },
+  createdBy: {
+    clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
+    isPlatformClient: false,
+    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+  },
+  customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 6970,
+    fractionDigits: 2,
+  },
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'creditCardWithPayerAuthentication',
+    name: { en: 'Credit Card Payer Authentication' },
+  },
+  custom: {
+    type: { typeId: 'type', id: '87b9d9db-74a3-45d7-8e60-dde669866808' },
+    fields: {
+      isv_requestJwt:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiOWM3YzZmNC0xZTliLTRlMTItOGFkNC0yOTIzNWUyY2U1ZTAiLCJpYXQiOjE2NDM4MDEzMDAsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY0MzgwNDkwMCwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiI4ZjBkNzI2Yy0zYzIxLTQ0N2UtYTkzNi1kOWE1ZGZjNWU1N2IifQ.wEXK-GCJc62oqrrhAYOca3kuqN1A4dNQh8OmHkSkILc',
+      isv_deviceFingerprintId: '9703373f-4385-4f5c-9fa7-de89e7f8e469',
+      isv_cardExpiryYear: '2025',
+      isv_token:
+        'eyJraWQiOiIwOFlZeFh4dVl4Y1pvUlA0dEl5MHE0ck5IU28yTjlrNSIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAyNSIsIm51bWJlciI6IjQwMDAwMFhYWFhYWDEwOTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wNyIsImV4cCI6MTY0MzgwMjE5OCwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTY0MzgwMTI5OCwianRpIjoiMUUyQzVCR1pYSllISjA2S1k2TU1GWE5CVVdVU05IUDhTRzM3SDFTTVdPMzAwQTJQU0JPRDYxRkE2RTU2MTVDQiIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDI1In0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDEwOTEiLCJiaW4iOiI0MDAwMDAifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.feBSpCU9jvQAV9y_hOkXb3o4EJN8OvTRXZIXrpuse9iWeRAMrfVAXHYiIeQ5o0mTIqwuLxikGUlVY0Cug3UwvU4zD9fPklDZhE8vApElrkKDbceH2lvAHLswz97IF04PicPqmKbs5vYQ36d-UM0VJo4iQF6vMRN1upfGWU07aaE2sOfK7CAEyQjVD_PoLzRMKobyvBdykq7HfGpEI3hLSPARDd-ZVWpyxTIdHXFHnzQ9vfmCQd1ZMK4FoWk2Rlwqd-_wnIHebFHwzkaNkT31aO4M9HKzNYfISjPGROFwT9L5j9UUfluYmWH2oc0hLy794Hw4KxlyLPokJQgz_s9czA',
+      isv_payerAuthenticationPaReq:
+        'eyJtZXNzYWdlVHlwZSI6IkNSZXEiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI4M2U5MmM3OS02NDY2LTRmMjMtODFmMy0wMDg5YmZiNzgyZmUiLCJhY3NUcmFuc0lEIjoiN2I0MmZmYjItYzA1NC00NDYxLWIwNTMtZmVkNDNkMjkyOTkwIiwiY2hhbGxlbmdlV2luZG93U2l6ZSI6IjAyIn0',
+      isv_maskedPan: '400000XXXXXX1091',
+      isv_payerAuthenticationTransactionId: 'NsuSvxr0fOA2eL4b9Uj0',
+      isv_payerAuthenticationRequired: true,
+      isv_acceptHeader: '*/*',
+      isv_cardType: '001',
+      isv_cardExpiryMonth: '01',
+      isv_payerAuthenticationAcsUrl: 'https://0merchantacsstag.cardinalcommerce.com/MerchantACSWeb/creq.jsp',
+      isv_responseJwt:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNzU5ZTkwYy1hMTU1LTRlYTYtYWUzYy1hMmI1NTRkM2E4NDEiLCJpYXQiOjE2NDM4MDEzMDUsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY0MzgwNDkwNSwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUGF5bG9hZCI6eyJBQ1NVcmwiOiJodHRwczovLzBtZXJjaGFudGFjc3N0YWcuY2FyZGluYWxjb21tZXJjZS5jb20vTWVyY2hhbnRBQ1NXZWIvY3JlcS5qc3AiLCJQYXlsb2FkIjoiZXlKdFpYTnpZV2RsVkhsd1pTSTZJa05TWlhFaUxDSnRaWE56WVdkbFZtVnljMmx2YmlJNklqSXVNUzR3SWl3aWRHaHlaV1ZFVTFObGNuWmxjbFJ5WVc1elNVUWlPaUk0TTJVNU1tTTNPUzAyTkRZMkxUUm1Nak10T0RGbU15MHdNRGc1WW1aaU56Z3labVVpTENKaFkzTlVjbUZ1YzBsRUlqb2lOMkkwTW1abVlqSXRZekExTkMwME5EWXhMV0l3TlRNdFptVmtORE5rTWpreU9Ua3dJaXdpWTJoaGJHeGxibWRsVjJsdVpHOTNVMmw2WlNJNklqQXlJbjAiLCJUcmFuc2FjdGlvbklkIjoiTnN1U3Z4cjBmT0EyZUw0YjlVajAifSwiT2JqZWN0aWZ5UGF5bG9hZCI6dHJ1ZSwiUmV0dXJuVXJsIjoiaHR0cHM6Ly95b3V0aGZ1bC1maWVsZC02NDgxMy5wa3RyaW90Lm5ldC9zdW5yaXNlU3BhIn0.jkDqtsLs3oMkRoaJh2Vw5qsTbkk9CEVGOu5g0xGT4bI',
+      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36',
+      isv_tokenVerificationContext:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiI3Q0svYUpYR3BlSmNCOXZzUkxlRmVoQUFFQVptdk9JaVorOTlQZTN2MXBqUGdEM3R5VVNnRHdRa2NWZEpBSUs2dmNwUm5QcGVjY3dmbm9pSXlZQ28xZHZuRTQzakF2d2oxcFZTQmtBNVhGbzNQempJcWRnQXE0WlFIQXdwZWVnNnMxSmsiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiIzYnZ5VjZoUGdzQzlxNGdSRUhwa1ZhSlVFNy1nQkl6YjNOcExFeDlHXzRJMWNsSmhac05DanFiTWVXTUVIbC1iZlNfRk9GVVV1TzhqSnRPdDJud09nN1BtX3R0VEFCMlExUS1nTHlocEF4UmM5ZUYzci1KVzZDS2syUmhTNDZiSlBRc3ZiYm1XaUpkVG96SUhUaFZ3cHhnMHdBVDFhdWhUMWtsTHptSWMtY3AyeWNuRThpZGVLcW92QXNCSDhsZ3k0T2FoWWtmMmM4Y1BCN3owYnFLaVVzcHFHcTBNWExEcEtDaU1xdi1nUmN1MFoxejVLb2RvZlUwTmVvTDJINWNPVjFWMi1jaUdnSHhHVDh6UEpWVU1RX2dKRzNhRTBfUm40ZkR4YjIxeHo4M3V0TDR4c2tDZ29kYjdDU0E3cVVOZGZfQmRzd01TelJXbWxObEdzaVVPOXciLCJraWQiOiIwOFlZeFh4dVl4Y1pvUlA0dEl5MHE0ck5IU28yTjlrNSJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NDM4MDIxODIsImlhdCI6MTY0MzgwMTI4MiwianRpIjoiZHB0OXd4ejVOWGxyaUd1eSJ9.6Rx1nETbPUWLXZfaDCCTgfZ_Y1SulD56u3gi9a8_TGA',
+    },
+  },
+  paymentStatus: {},
+  transactions: [
+    {
+      id: 'a66038fa-48ac-49af-ab99-909144d037b0',
+      timestamp: '2022-02-02T11:28:37.126Z',
+      type: 'Authorization',
+      amount: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 6970,
+        fractionDigits: 2,
+      },
+      interactionId: '6438013202686533603954',
+      state: 'Success',
+    },
+    {
+      id: '0847f181-5631-4d02-b414-40e4f29b7f74',
+      timestamp: '2022-02-02T12:12:27.562Z',
+      type: 'Charge',
+      amount: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 0,
+        fractionDigits: 2,
+      },
+      interactionId: '6438039510446950603955',
+      state: 'Success',
+    },
+  ],
+  interfaceInteractions: [
+    {
+      type: {
+        typeId: 'type',
+        id: '0fe48d4b-5696-4b68-9725-c6d9b94a32cd',
+      },
+      fields: {
+        specificationVersion: '2.1.0',
+        authorizationAllowed: true,
+        cardinalReferenceId: '09e3092e-829e-4166-a31b-d86fbd42637a',
+        acsUrl: 'https://0merchantacsstag.cardinalcommerce.com/MerchantACSWeb/creq.jsp',
+        veresEnrolled: 'Y',
+        authenticationRequired: true,
+        directoryServerTransactionId: '8285ab73-81c2-4d25-b298-075a40f60a4e',
+        paReq: 'eyJtZXNzYWdlVHlwZSI6IkNSZXEiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMS4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiJmOTMzMWZmOS1jYzQ4LTQ3YTMtODU2Mi0yOTM4ZTM3ODI0ZTMiLCJhY3NUcmFuc0lEIjoiNjZhYWJkMWUtN2NjOS00NTFhLThjOTYtNzQ3NmM2Mjc2ZTFhIiwiY2hhbGxlbmdlV2luZG93U2l6ZSI6IjAxIn0',
+        authenticationTransactionId: '8G2TD6BEkp9pQ8i2pfO0',
+      },
+    },
+  ],
+};
+
 export const payerAuthActionsResponse = {
   isv_payerAuthenticationPaReq:
     'eNpVUV1vgjAUfe+vMGbP9APEaa5NdGyZZhhl6p5ZaSaJfFhgiL9+LcLc+nTP7bntOefC7qik9N6lqJTk4MuiCL/kII5mw2bxZgdXetqNndJbsf12Q8iQw2YeyDOHb6mKOEs5tYjFAPcQ6SeUOIZpySEU58VyzR13wqgLuIMIEqmWHrcd6jDmMHI7gG9tBGmYSF7HucpOZQS4hQhEVqWlavijo6k9QFCpEz+WZV5MMa7r2hLNp1aSVUpIS2QJYENAgO+qNpWpCm32Ekdc7le+T1eu/3HZr68BCZ6z5nB42frefAbYMBBEYSk5I4wR2yYDSqcOmRpDbR9BmBg1/MGdWGOtrYMIcvPR/Ibcibn629GOKqVkKnpLPUIgL3mWSs3Ruf7W2sNd+dOrSVeUOq8Rc1w6GZt4W9yOxzobNiK0nY/boLCZwd3ycLdnXf3b/w9MkKjU',
@@ -617,13 +716,18 @@ export const getUpdateTokenActionsActions = [
   '{"alias":"1091card","value":"DB0B315B52BABC38E053AF598E0A8268","paymentToken":"DB476FB611F49979E053AF598E0A0DE1","instrumentIdentifier":"7020000000005531091","cardType":"001","cardName":"001","cardNumber":"400000XXXXXX1091","cardExpiryMonth":"01","cardExpiryYear":"2026","flag":"updated"}',
 ];
 
+export const getUpdateInvalidTokenActionsActions = [
+'*@&*&*(*(&^%^',
+'%^&(&*&^%&((('
+];
+
 export const deleteTokenResponse = {
   httpCode: 204,
   message: '',
   deletedToken: 'DC2417E36C42D8ADE053AF598E0A1705',
 };
 
-export const deleteTokenCustomerObj: customerType = {
+export const deleteTokenCustomerObj: CustomerType = {
   id: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
   version: 6,
   lastMessageSequenceNumber: 1,
@@ -747,6 +851,100 @@ export const getAuthorizedAmountCapturePaymentObj = {
         type: 'centPrecision',
         currencyCode: 'USD',
         centAmount: 200,
+        fractionDigits: 2,
+      },
+      interactionId: '6805298545496228003954',
+      state: 'Success',
+    },
+  ],
+  interfaceInteractions: [],
+  anonymousId: 'baaf0387-930b-440d-be81-2ef80e23e251',
+};
+
+export const getAuthorizedZeroAmountCapturePaymentObj = {
+  id: '14666485-c56b-4fa8-9ec7-668dc4141245',
+  version: 21,
+  versionModifiedAt: '2023-04-03T13:50:54.890Z',
+  lastMessageSequenceNumber: 7,
+  createdAt: '2023-04-03T10:53:56.281Z',
+  lastModifiedAt: '2023-04-03T13:50:54.890Z',
+  lastModifiedBy: {
+    clientId: '5VRvbanr0X61yFLI3xiRqYZI',
+    isPlatformClient: false,
+  },
+  createdBy: {
+    clientId: 'C0f71msxpiTpAB0OiOaItOs8',
+    isPlatformClient: false,
+    anonymousId: 'baaf0387-930b-440d-be81-2ef80e23e251',
+  },
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 0,
+    fractionDigits: 2,
+  },
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'creditCard',
+    name: {
+      en: 'Credit Card',
+    },
+  },
+  custom: {
+    type: {
+      typeId: 'type',
+      id: '4efe4b9b-c264-475d-b8ae-add573cd1800',
+    },
+    fields: {
+      isv_deviceFingerprintId: 'a9d85a92-e44f-4e7b-ac28-5f9ef297990d',
+      isv_cardExpiryYear: '2027',
+      isv_token:
+        'eyJraWQiOiIwOG5QcmMzOXduMHZBZzFjcXBwazRXUnVqb2RtaWhFSSIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAyNyIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTY4MDUyMDE1OSwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTY4MDUxOTI1OSwianRpIjoiMUU0TFFCRDQ4UzYzSko5WkdZQzFBVUpNN0w1VjhOMThQUllSWkowMTdMTjY4TTFGRlNWTzY0MkFCM0RGNjlBMSIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDI3In0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.g0_ajMJx8_U4bZ1B8RQAXTSrC-b0kTFTPmm_DGBJa7NaCQm5P0ACQIjdDLj533mxwUOQxwQZ_4-HFIW9KONCL6Idw3SanfB7QsAsjVBNePE8491GxuR8xjGQ72TVDOX_OR93jTttJiHa7Cn_BgrmqUQPd_N0x-JvqWUUR5kdZCBFycu7D2et0nl2MMbb31SMDIk6mW38EUeuCIQzZW2jJeS9ASuo9rMkNEOLFy8F5tMZuuQupxOMgqRvCqe5q8uY5vUz3weBEcmxbQciY8SRlgVLpQX8ASgc2g1COCheqxEMKMMQwW9eVJ3kg8R-CJLzuvvAMv1Sl1T4e5Ps57xh_A',
+      isv_saleEnabled: false,
+      isv_cardType: '001',
+      isv_customerIpAddress: '171.79.66.179',
+      isv_maskedPan: '411111XXXXXX1111',
+      isv_cardExpiryMonth: '01',
+      isv_tokenVerificationContext:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJBMHR3czlsV2hpMk5yU1ZreHhVdGRSQUFFTjRDTTNVSE10VjdEYVlVc1k5Y0FWcnE0WHFvQ0tDaUhic0FwMzRZVTA1dHRwUVppemR6SWV5Y2dqdERvYXRicXN2TFM0Q3JSYmoyWDhxbDlOQnZDQm9ibVRUcHFYWjZqKzlOTUlqSWZRYysiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJoUFhpQTE0ek11WDFLa2xpeWRlSExhWks3YmVVZl9kRWlaQkhxcW41NXRNSDg5QnBOX0xqcTFzcGloaTVCSm1yMHpSMmFxTGt4N1RTcE1HZGNUQV83ak04bXptX3BlNDVGYjRmMkw5TElRSmdlSGpQVU51SnpJQ2VVTEpmX3JtbVZWckM3TXVxamxQRjFXUWV5bnhJYlNhSnZ1YjIyeFpJbk54bks3Nkg2amtndlQxS0p2aXFSa0JuR2FPZGtyT1JVWGdUQUN3T1JjQ2JVNUhKeUZBZmgtSHBhcU9ncHlsZ3dlTkJ5TGJScUVJQVZvM2xKMmVrd1lDenZ2SVQ0UFNibXRfSlRrVzFYQmdFUzFoNm9PM2ZNRWRlaTQtS1pTTzk5ZzBkS3dWNlpDQ29Qb1dXWnFnTlJnc1p1Nl9LRldqTDlUaDh3MFp5cjdtaWhWWU9FX01iYlEiLCJraWQiOiIwOG5QcmMzOXduMHZBZzFjcXBwazRXUnVqb2RtaWhFSSJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgyIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2ODA1MjAxMzYsImlhdCI6MTY4MDUxOTIzNiwianRpIjoiVlFheGNTQlFoVUw1T1dmNyJ9.u9-2VZPJkNS0iGCChVvhaz4ccf1BpmehNZsNJG6-JwQ',
+    },
+  },
+  paymentStatus: {},
+  transactions: [
+    {
+      id: '6d6b8091-b1ae-4cae-8fd1-add0b1d71b61',
+      timestamp: '2023-04-03T10:54:23.070Z',
+      type: 'Authorization',
+      amount: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 40,
+        fractionDigits: 2,
+      },
+      interactionId: '6805192636456088103954',
+      state: 'Success',
+    },
+    {
+      id: '8be78c9a-4653-49ba-94e1-e0888b40858c',
+      timestamp: '2023-04-03T13:50:42.196Z',
+      type: 'Charge',
+      amount: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 0,
+        fractionDigits: 2,
+      },
+      interactionId: '6805298432786349303955',
+      state: 'Success',
+    },
+    {
+      id: 'f6800138-1f32-4b4b-b7e9-a1f9089da74e',
+      timestamp: '2023-04-03T13:50:53.384Z',
+      type: 'Charge',
+      amount: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 0,
         fractionDigits: 2,
       },
       interactionId: '6805298545496228003954',
@@ -885,6 +1083,13 @@ export const addRefundActionAmount = {
   type: 'centPrecision',
   currencyCode: 'USD',
   centAmount: 100,
+  fractionDigits: 2,
+};
+
+export const addRefundActionZeroAmount = {
+  type: 'centPrecision',
+  currencyCode: 'USD',
+  centAmount: 0,
   fractionDigits: 2,
 };
 
@@ -1389,7 +1594,7 @@ export const tokenCreateFlagCustomerInfo = {
   authenticationMode: 'Password',
 };
 
-export const tokenCreateFlagPaymentObj: paymentType = {
+export const tokenCreateFlagPaymentObj: PaymentType = {
   id: 'a16d2aa2-4e89-404d-ac45-2c048e4e8cda',
   version: 14,
   customer: { id: '19357cc7-8edf-4e19-ad10-37d9ecd26398' },
@@ -1445,6 +1650,12 @@ export const createResponseSetTransaction = {
 export const createTransactionSetCustomField = {
   action: 'changeTransactionState',
   state: 'Success',
+  transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
+};
+
+export const createTransactionSetFailedCustomField = {
+  action: 'changeTransactionState',
+  state: 'Failure',
   transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
 };
 
@@ -1622,7 +1833,7 @@ export const checkAuthReversalTriggeredUpdateActions = {
   errors: [],
 };
 
-export let runSyncAddTransactionSyncUpdateObject: reportSyncType = {
+export let runSyncAddTransactionSyncUpdateObject: ReportSyncType = {
   id: unit.paymentId,
   transactionId: '',
   version: 32,
@@ -1636,7 +1847,7 @@ export let runSyncAddTransactionSyncUpdateObject: reportSyncType = {
   securityCodePresent: false,
 };
 
-export let runSyncAddTransactionSyncUpdateEmptyObject: reportSyncType = {
+export let runSyncAddTransactionSyncUpdateEmptyObject: ReportSyncType = {
   id: unit.paymentId,
   transactionId: '',
   version: 32,
@@ -2195,7 +2406,12 @@ export const processTokensCustomerCardTokensObject = {
   paymentInstrumentId: '116C475A535C411BE063AF598E0A3DC8',
 };
 
-export const processTokensInstrumentIdentifier = '7030000000026601088';
+export const processTokensCustomerInvalidCardTokensObject = {
+  customerTokenId: '@#%^@RW^Y&',
+  paymentInstrumentId: '&YY#&DBGV(I',
+};
+
+export const processTokensInstrumentIdentifier = '703000000002660108812';
 
 export const searchSubscriptionResponse = {
   httpCode: 200,
@@ -2208,3 +2424,32 @@ export const invalidSearchSubscriptionResponse = {
   webhookId: '',
   webhookUrl: '',
 };
+
+export const invalidSubscriptionResponse = {
+  httpCode: 0,
+  webhookId: '@*&^@&*U@*',
+  webhookUrl: '(@*^&(!@&^',
+};
+
+export const createTransactionPaymentFailure = {
+  action: 'addInterfaceInteraction',
+  type: { 
+    key: 'isv_payment_failure' 
+  },
+  fields: {
+    reasonCode: '400',
+    transactionId: 'fada81af-f217-4279-ab08-1bd1300c19d8'
+  }
+} 
+
+export const createTransactionSetCustomType = {
+  action: 'setTransactionCustomType',
+  type: { 
+    key: 'isv_transaction_data', 
+    typeId: 'type' 
+  },
+  fields: { 
+    isv_availableCaptureAmount: 0 
+  },
+  transactionId: '1e53fc0c-1109-4850-bd75-41da1b1108a5'
+}

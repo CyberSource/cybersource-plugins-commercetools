@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { Constants } from '../../constants';
 import sync from '../../service/payment/DecisionSyncService';
-import { emptyMidCredentials } from '../const/DeleteWebhookSubscriptionConst';
+import { emptyMidCredentials, invalidMidCredentials } from '../const/DeleteWebhookSubscriptionConst';
 
 test('Check http code for decision sync', async (t: any) => {
   let midCredentials = {
@@ -23,4 +23,9 @@ test('Check http code for decision sync', async (t: any) => {
 test('Check http code for decision sync without mid credentials', async (t: any) => {
   let result: any = await sync.conversionDetails(emptyMidCredentials);
   t.is(result.httpCode, 0);
+});
+
+test('Check http code for decision sync with invalid mid credentials', async (t: any) => {
+  let result: any = await sync.conversionDetails(invalidMidCredentials);
+  t.is(result.httpCode, 401);
 });

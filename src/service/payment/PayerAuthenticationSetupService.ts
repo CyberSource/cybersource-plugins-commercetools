@@ -1,13 +1,21 @@
 import path from 'path';
 
 import restApi from 'cybersource-rest-client';
+import { RiskV1AuthenticationSetupsPost201Response} from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { paymentType, responseType } from '../../types/Types';
+import { PaymentType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const payerAuthSetupResponse = async (payment: paymentType, customerTokenId: string) => {
+/**
+ * Performs payer authentication setup and returns the response.
+ * @param {PaymentType} payment - The payment object.
+ * @param {string} customerTokenId - The customer token ID.
+ * @returns {Promise<RiskV1AuthenticationSetupsPost201Response>} - The payer authentication setup response.
+*/
+type RiskV1AuthenticationSetupsPost201Response = typeof RiskV1AuthenticationSetupsPost201Response;
+const payerAuthSetupResponse = async (payment: PaymentType, customerTokenId: string): Promise<any> => {
   const paymentResponse = {
     accessToken: '',
     referenceId: '',
@@ -39,7 +47,7 @@ const payerAuthSetupResponse = async (payment: paymentType, customerTokenId: str
         paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Payer Authentication Setup Request = ' + JSON.stringify(requestObj));
       }
       const payerAuthenticationApiInstance = new restApi.PayerAuthenticationApi(configObject, apiClient);
-      return await new Promise<responseType>(function (resolve, reject) {
+      return await new Promise<RiskV1AuthenticationSetupsPost201Response>(function (resolve, reject) {
         payerAuthenticationApiInstance.payerAuthSetup(requestObj, function (error: any, data: any, response: any) {
           paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncPayerAuthSetupResponse', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Payer Authentication Setup Response = ' + JSON.stringify(response));
           if (data) {

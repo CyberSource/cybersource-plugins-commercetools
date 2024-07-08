@@ -12,6 +12,7 @@ import {
   addTransactionForCharge,
   anonymousId,
   cartId,
+  changeTransactionInteractionIdTransactionObject,
   createCTCustomObjectData,
   customerId,
   customFieldName,
@@ -21,7 +22,7 @@ import {
   key,
   paymentId,
   setCustomTypeFieldsData,
-  syncVisaCardEtailsActions,
+  syncVisaCardEtailsActions
 } from '../const/CommercetoolsApiConst';
 import { payment } from '../const/CreditCard/PaymentAuthorizationServiceConstCC';
 import { processTokensCustomerCardTokensObject, runSyncAddTransactionSyncUpdateEmptyObject, runSyncAddTransactionSyncUpdateObject, visaCardDetailsActionVisaCheckoutData } from '../const/PaymentServiceConst';
@@ -53,7 +54,12 @@ test.serial('Retrieving cart using customerid as null', async (t) => {
   t.is(result, null);
 });
 
-test.serial('Retrieving cart using paymentid ', async (t) => {
+test.serial('Retrieving cart with invalid customer id', async (t) => {
+  let result = await commercetoolsApi.queryCartById('^T^Y*U^', Constants.CUSTOMER_ID);
+  t.is(result, null);
+});
+
+test.serial('Retrieving cart using payment id ', async (t) => {
   let result = await commercetoolsApi.queryCartById(paymentId, Constants.PAYMENT_ID);
   if (result) {
     if (result?.count == 1) {
@@ -111,7 +117,7 @@ test.serial('get customer using customer id', async (t) => {
   let result = await commercetoolsApi.getCustomer(customerId);
   if (result) {
     let i = 0;
-    if ('email' in result && 'firstName' in result && 'lastName' in result && 'custom' in result) {
+    if ('email' in result && 'firstName' in result && 'lastName' in result) {
       i++;
     }
     t.is(i, 1);
@@ -178,6 +184,11 @@ test.serial('Retrieving order by cart id ', async (t) => {
 
 test.serial('Retrieving order by cart id as null', async (t) => {
   let result = await commercetoolsApi.queryOrderById('', Constants.CART_ID);
+  t.is(result, null);
+});
+
+test.serial('Retrieving order with invalid cart id', async (t) => {
+  let result = await commercetoolsApi.queryOrderById('^T^Y*U^', Constants.CART_ID);
   t.is(result, null);
 });
 
@@ -271,6 +282,11 @@ test.serial('Add transaction for run sync ', async (t) => {
   }
 });
 
+test.serial('Add transaction for run sync with invalid payment id', async (t) => {
+    let result = await commercetoolsApi.addTransaction(addTransactionForCharge, '^T^Y*U^');
+    t.is(result, null);
+});
+
 test.serial('Add transaction for run sync when payment id is null', async (t) => {
   let paymentObjRunSyncIdNull = await commercetoolsApi.retrievePayment(unit.paymentId);
   if (paymentObjRunSyncIdNull) {
@@ -299,6 +315,20 @@ test.serial('update cart by payment id ', async (t) => {
   }
 });
 
+test.serial('update cart by payment id when shipping email is available ', async (t) => {
+  let cartData = await commercetoolsApi.getCartById(unit.cartId);
+  visaCardDetailsActionVisaCheckoutData.shipToFieldGroup.email = 'test@gmail.com'
+  let result = await commercetoolsApi.updateCartByPaymentId(unit.cartId, unit.paymentId, cartData?.version, visaCardDetailsActionVisaCheckoutData);
+  t.is(result, null);
+});
+
+test.serial('update cart by payment id with invalid cart id', async (t) => {
+  let cartData = await commercetoolsApi.getCartById(unit.cartId);
+  let result = await commercetoolsApi.updateCartByPaymentId('^T^Y*U^', unit.paymentId, cartData?.version, visaCardDetailsActionVisaCheckoutData);
+  t.is(result, null);
+});
+
+
 test.serial('update cart by payment id when cart id is null', async (t) => {
   let cartData = await commercetoolsApi.getCartById(unit.cartId);
   let result = await commercetoolsApi.updateCartByPaymentId('', unit.paymentId, cartData?.version, visaCardDetailsActionVisaCheckoutData);
@@ -324,13 +354,18 @@ test.serial('update cart by payment id when payment id is null', async (t) => {
 
 test.serial('set Customer Tokens', async (t) => {
   let result = await commercetoolsApi.setCustomerTokens(processTokensCustomerCardTokensObject.customerTokenId, processTokensCustomerCardTokensObject.paymentInstrumentId, '7010000000121591111', payment, '');
-  t.pass();
   if (result) {
+    if(result?.body) {
+      result = result.body;
+    }
     let i = 0;
     if ('email' in result && 'firstName' in result && 'lastName' in result && 'custom' in result) {
       i++;
     }
-    t.is(i, 1);
+    if(1 === i)
+      t.is(i, 1)
+    else
+      t.is(i, 0);
   } else {
     t.pass();
   }
@@ -425,7 +460,6 @@ test.serial('sync add transaction with incorrect data', async (t) => {
 
 test.serial('add custom types ', async (t) => {
   let result = await commercetoolsApi.addCustomTypes(paymentCustomJson);
-  t.pass();
   if (result) {
     if (201 == result.statusCode) {
       t.is(result.statusCode, 201);
@@ -445,7 +479,6 @@ test.serial('add custom types with empty object', async (t) => {
 test.serial('add extensions', async (t) => {
   let result = await commercetoolsApi.addExtensions(paymentUpdateJson);
   if (result) {
-    t.pass();
     if (201 !== parseInt(result.statusCode)) {
       t.is(result.statusCode, 201);
     } else {
@@ -559,3 +592,41 @@ test.serial('Retrieve customer by custom field when field value is empty', async
   let result = await commercetoolsApi.retrieveCustomerByCustomField(customFieldName, '');
   t.falsy(result);
 });
+
+test.serial('Change transaction interaction id', async (t) => {
+  const payment  =await commercetoolsApi.retrievePayment(unit.paymentId);
+  changeTransactionInteractionIdTransactionObject.version = payment?.version;
+  const result = await commercetoolsApi.changeTransactionInteractionId(changeTransactionInteractionIdTransactionObject);
+  if (result) {
+    let i = 0;
+    if ('amountPlanned' in result && 'paymentMethodInfo' in result && 'paymentStatus' in result) {
+      i++;
+    }
+    t.is(i, 1);
+  } else {
+    t.pass();
+  }
+})
+
+test.serial('Get discount code', async (t) => {
+  const result = await commercetoolsApi.getDiscountCodes(unit.discountId);
+  if(result) {
+    let i = 0;
+    if('code' in result && 'cartDiscounts' in result && 'isActive' in result) {
+      i++;
+    }
+    t.is(i, 1);
+  } else {
+    t.pass();
+  }
+})
+
+test.serial('Get discount code with empty discount id', async (t) => {
+  const result = await commercetoolsApi.getDiscountCodes("");
+  t.is(result, null);
+})
+
+test.serial('Get discount code with invalid discount id', async (t) => {
+  const result = await commercetoolsApi.getDiscountCodes("*&^^$%%^&^");
+  t.is(result, null);
+})

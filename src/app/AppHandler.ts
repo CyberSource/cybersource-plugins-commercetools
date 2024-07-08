@@ -9,8 +9,16 @@ import { RouterHandler } from './RouterHandler';
 
 type MiddlewareFunction = (req: any, res: any, next: () => void) => void;
 
+/**
+ * Handles incoming HTTP requests and applies middleware before processing.
+ */
 export class AppHandler extends RouterHandler {
   private middlewareFunction: MiddlewareFunction[];
+
+  /**
+   * Creates an instance of AppHandler.
+   * @param {MiddlewareFunction[]} middlewareFunction - An array of middleware functions to apply.
+   */
   constructor(middlewareFunction: MiddlewareFunction[]) {
     super();
     this.routes = [];
@@ -19,6 +27,12 @@ export class AppHandler extends RouterHandler {
     this.server = http.createServer();
     this.server.on('request', this.runMiddleware.bind(this));
   }
+
+  /**
+   * Runs middleware functions before processing the incoming request.
+   * @param {http.IncomingMessage} req - The HTTP request object.
+   * @param {http.ServerResponse} res - The HTTP response object.
+   */
   private runMiddleware(req: any, res: any): void {
     const rootDir = path.resolve(__dirname, '../');
     const requestUrl = req.url as string;
@@ -31,27 +45,37 @@ export class AppHandler extends RouterHandler {
             break;
           }
           case '/css/styles.css': {
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path as string, rootDir + '/views/css/styles.css', res);
+            if(parsedUrl.path){
+              this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/css/styles.css', res);
+            }
             break;
           }
           case '/javascript/paymentDetails.js': {
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path as string, rootDir + '/views/javascript/paymentDetails.js', res);
+            if(parsedUrl.path){
+            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/paymentDetails.js', res);
+            }
             break;
           }
           case '/javascript/orders.js': {
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path as string, rootDir + '/views/javascript/orders.js', res);
+            if(parsedUrl.path){
+            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/orders.js', res);
+            }
             break;
           }
           case '/javascript/utils.js': {
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path as string, rootDir + '/views/javascript/utils.js', res);
+            if(parsedUrl.path){
+            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/utils.js', res);
+            }
             break;
           }
           case '/billingImage.png': {
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path as string, rootDir + '/views/images/billingImage.png', res);
+            if(parsedUrl.path){
+            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/images/billingImage.png', res);
+            }
             break;
           }
           case '/shippingImage.png': {
-            this._serveStaticFile(parsedUrl.href, parsedUrl.pathname as string, rootDir + '/views/images/shippingImage.png', res);
+            this._serveStaticFile(parsedUrl.href, parsedUrl.pathname, rootDir + '/views/images/shippingImage.png', res);
             break;
           }
           case '/favicon.ico': {

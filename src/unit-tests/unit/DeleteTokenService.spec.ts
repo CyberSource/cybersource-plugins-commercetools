@@ -33,3 +33,11 @@ test.serial('Deleting a token with invalid payment token value and check http co
   result.httpCode = response.httpCode;
   t.not(result.httpCode, Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE);
 });
+
+test.serial('Deleting a token when token value and payment token is empty', async (t: any) => {
+  customerInvalidTokenObj.paymentToken = '';
+  customerInvalidPaymentTokenObj.value = '';
+  let response: any = await deleteToken.deleteCustomerToken(customerInvalidTokenObj);
+  result.httpCode = response.httpCode;
+  t.not(result.httpCode, Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE);
+});

@@ -3,11 +3,16 @@ import path from 'path';
 import restApi from 'cybersource-rest-client';
 
 import { Constants } from '../../constants';
-import { midCredentialsType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 import prepareFields from '../../utils/PrepareFields';
 
-const webhookSubscriptionResponse = async (midCredentials: midCredentialsType) => {
+/**
+ * Handles creating of  webhook subscription.
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @returns {Promise<unknown>} A promise that resolves with the webhook subscription response.
+ */
+const webhookSubscriptionResponse = async (midCredentials: MidCredentialsType): Promise<unknown> => {
   const webHookResponse = {
     httpCode: null,
     webhookId: null,
