@@ -1,49 +1,47 @@
-import path from 'path';
-
 import restApi from 'cybersource-rest-client';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
+import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
-import prepareFields from '../../utils/PrepareFields';
 
 /**
  * Deletes a webhook subscription.
  * @param {MidCredentialsType} midCredentials - The MID credentials.
- * @param {string | undefined} subscriptionId - The subscription ID.
+ * @param {string | undefined} webhookId - The subscription ID.
  * @returns {Promise<any>} A promise that resolves with the delete webhook subscription response.
  */
-const deleteWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType, subscriptionId: string | undefined): Promise<any> => {
+const deleteWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType, webhookId: string | undefined): Promise<any> => {
   const deleteResponse = {
     httpCode: 0,
   };
-  let errorData: string;
+  let id = webhookId || '';
   try {
     if (midCredentials?.merchantId && midCredentials?.merchantKeyId && midCredentials?.merchantSecretKey) {
-      const configObject = await prepareFields.getConfigObject('FuncDeleteWebhookSubscriptionResponse', midCredentials, null, null);
-      if (subscriptionId) {
+      if (webhookId) {
+        const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, midCredentials, null, null);
         const apiClient = new restApi.ApiClient();
-        const ManageWebhooksApiInstance = new restApi.ManageWebhooksApi(configObject, apiClient);
+        const manageWebhooksApiInstance = configObject && new restApi.ManageWebhooksApi(configObject, apiClient);
         return await new Promise<any>(function (resolve, reject) {
-          ManageWebhooksApiInstance.deleteWebhookSubscription(subscriptionId, (error: any, data: any, response: any) => {
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteWebhookSubscriptionResponse', Constants.LOG_INFO, 'SubscriptionId : ' + subscriptionId, 'deleteWebhookSubscriptionResponse = ' + JSON.stringify(response));
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteWebhookSubscriptionResponse', Constants.LOG_INFO, '', 'Delete subscription data = ' + JSON.stringify(data));
-            if (Constants.HTTP_OK_STATUS_CODE === response?.status) {
-              deleteResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
-              resolve(deleteResponse);
-            } else if (error) {
-              if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteWebhookSubscriptionResponse', Constants.LOG_ERROR, '', error.response.text);
+          if (manageWebhooksApiInstance) {
+            manageWebhooksApiInstance.deleteWebhookSubscription(id, (error: any, data: any, response: any) => {
+              paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_INFO, 'webhookId : ' + webhookId, 'deleteWebhookSubscriptionResponse = ' + JSON.stringify(response));
+              paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_INFO, '', 'Delete subscription data = ' + JSON.stringify(data));
+              if (Constants.HTTP_OK_STATUS_CODE === response?.status) {
+                deleteResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
+                resolve(deleteResponse);
+              } else if (error) {
+                deleteResponse.httpCode = error.status;
+                reject(deleteResponse);
               } else {
-                typeof error === 'object' ? (errorData = JSON.stringify(error)) : (errorData = error);
-                paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncDeleteWebhookSubscriptionResponse', Constants.LOG_ERROR, '', errorData);
+                reject(deleteResponse);
               }
-              deleteResponse.httpCode = error.status;
-              reject(deleteResponse);
-            } else {
-              reject(deleteResponse);
-            }
-          });
+            });
+          } else {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_INFO, 'webhookId : ' + webhookId, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
+          }
         }).catch((error: any) => {
           return error;
         });
@@ -54,11 +52,7 @@ const deleteWebhookSubscriptionResponse = async (midCredentials: MidCredentialsT
       return deleteResponse;
     }
   } catch (exception) {
-    let webhookId = '';
-    if (subscriptionId) {
-      webhookId = subscriptionId;
-    }
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncDeleteWebhookSubscriptionResponse', '', exception, webhookId, 'WebhookId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, '', exception, id, 'WebhookId : ', '');
     return deleteResponse;
   }
 };

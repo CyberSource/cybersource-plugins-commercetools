@@ -1,12 +1,12 @@
-import path from 'path';
-
 import restApi from 'cybersource-rest-client';
 import { TssV2TransactionsGet200Response } from 'cybersource-rest-client';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
+import prepareFields from '../../requestBuilder/PrepareFields';
 import { PaymentType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
-import prepareFields from '../../utils/PrepareFields';
 
 /**
  * Retrieves transaction data based on the payment response.
@@ -14,58 +14,54 @@ import prepareFields from '../../utils/PrepareFields';
  * @param {PaymentType} payment - The payment object.
  * @returns {Promise<TssV2TransactionsGet200Response>} - A promise resolving to Visa Checkout data.
  */
-type TssV2TransactionsGet200Response = typeof TssV2TransactionsGet200Response;
-
 const getTransactionData = async (paymentResponse: any, payment: PaymentType): Promise<any> => {
-  let errorData: string;
   const visaCheckoutData = {
     httpCode: 0,
     billToFieldGroup: '',
     shipToFieldGroup: '',
     cardFieldGroup: '',
   };
+  let paymentId = payment?.id || '';
   try {
     if (paymentResponse && payment) {
       const id = paymentResponse.transactionId;
       if (id) {
-        const configObject = await prepareFields.getConfigObject('FuncGetTransactionData', null, payment, null);
+        const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_TRANSACTION_DATA, null, payment, null);
         const apiClient = new restApi.ApiClient();
-        const transactionDetailsApiInstance = new restApi.TransactionDetailsApi(configObject, apiClient);
+        const transactionDetailsApiInstance = configObject && new restApi.TransactionDetailsApi(configObject, apiClient);
         return await new Promise<TssV2TransactionsGet200Response>((resolve, reject) => {
-          transactionDetailsApiInstance.getTransaction(id, function (error: any, data: any, response: any) {
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetTransactionData', Constants.LOG_INFO, 'PaymentId : ' + payment.id, 'Transaction Details Response = ' + JSON.stringify(response));
-            if (data) {
-              visaCheckoutData.httpCode = response[Constants.STRING_RESPONSE_STATUS];
-              visaCheckoutData.billToFieldGroup = data.orderInformation.billTo;
-              visaCheckoutData.shipToFieldGroup = data.orderInformation.shipTo;
-              visaCheckoutData.cardFieldGroup = data.paymentInformation.card;
-              resolve(visaCheckoutData);
-            } else if (error) {
-              if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetTransactionData', Constants.LOG_ERROR, 'PaymentId : ' + payment.id, error.response.text);
+          if (transactionDetailsApiInstance) {
+            transactionDetailsApiInstance.getTransaction(id, function (error: any, data: any, response: any) {
+              paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, 'Transaction Details Response = ' + JSON.stringify(response));
+              if (data) {
+                visaCheckoutData.httpCode = response[Constants.STRING_RESPONSE_STATUS];
+                visaCheckoutData.billToFieldGroup = data.orderInformation.billTo;
+                visaCheckoutData.shipToFieldGroup = data.orderInformation.shipTo;
+                visaCheckoutData.cardFieldGroup = data.paymentInformation.card;
+                resolve(visaCheckoutData);
+              } else if (error) {
+                visaCheckoutData.httpCode = error.status;
+                reject(visaCheckoutData);
               } else {
-                typeof error === 'object' ? (errorData = JSON.stringify(error)) : (errorData = error);
-                paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetTransactionData', Constants.LOG_ERROR, 'PaymentId : ' + payment.id, errorData);
+                reject(visaCheckoutData);
               }
-              visaCheckoutData.httpCode = error.status;
-              reject(visaCheckoutData);
-            } else {
-              reject(visaCheckoutData);
-            }
-          });
+            });
+          } else {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
+          }
         }).catch((error) => {
           return error;
         });
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetTransactionData', Constants.LOG_INFO, 'PaymentId : ' + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_INVALID_INPUT);
         return visaCheckoutData;
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetTransactionData', Constants.LOG_INFO, 'PaymentId : ' + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_INVALID_INPUT);
       return visaCheckoutData;
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetTransactionData', '', exception, payment.id, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, '', exception, paymentId, 'PaymentId : ', '');
     return visaCheckoutData;
   }
 };

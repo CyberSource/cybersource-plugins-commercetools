@@ -1,5 +1,5 @@
 import creditCard from '../../JSON/creditCard.json';
-export const payment = {
+const payment = {
   id: '56d9909e-7c0e-4315-b1ef-5788f7b1d33e',
   version: 16,
   lastMessageSequenceNumber: 6,
@@ -65,11 +65,11 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const captureId = creditCard.captureId;
+const captureId = creditCard.captureId;
 
-export const captureID = '63972375285265242';
+const captureID = '63972375285265242';
 
-export const updateTransaction = {
+const updateTransaction = {
   id: 'c812578f-493c-4535-970e-31c210e74420',
   timestamp: '2021-12-07T09:12:49.763Z',
   type: 'Refund',
@@ -82,6 +82,15 @@ export const updateTransaction = {
   state: 'Initial',
 };
 
-export const orderNo = '';
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
+
+export default {
+  payment,
+  captureId,
+  captureID,
+  updateTransaction,
+  orderNo,
+  orderNumber
+}

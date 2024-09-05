@@ -1,9 +1,8 @@
-import path from 'path';
-
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
 import { MidCredentialsType } from '../../types/Types';
-import paymentUtils from '../PaymentUtils';
-
+import paymentUtils from '../../utils/PaymentUtils';
 /**
  * Retrieves merchant credentials for a given merchant ID.
  * If no merchant ID is provided, it retrieves credentials from environment variables.
@@ -11,34 +10,26 @@ import paymentUtils from '../PaymentUtils';
  * @returns {Promise<MidCredentialsType>} A promise that resolves with the merchant credentials.
  */
 const getMidCredentials = async (merchantId: string): Promise<MidCredentialsType> => {
-
   let midData: MidCredentialsType = {
     merchantId: '',
     merchantKeyId: '',
     merchantSecretKey: '',
   };
   let allMidCredentials = [midData];
-  try {
-    if ('' === merchantId) {
-      midData = {
-        merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
-        merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
-        merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
-      };
-    } else {
-      allMidCredentials = await getAllMidDetails();
-      allMidCredentials.forEach((key) => {
-        if (merchantId == key?.merchantId) {
-          midData = key;
-        }
-      });
-    }
-  } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetMidCredentials', Constants.EXCEPTION_MSG_GET_MID_CREDENTIALS, exception, '', '', '');
+  if ('' === merchantId) {
+    midData = {
+      merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
+      merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
+      merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
+    };
+  } else {
+    allMidCredentials = await getAllMidDetails();
+    allMidCredentials.forEach((key) => {
+      if (merchantId == key?.merchantId) midData = key;
+    });
   }
   return midData;
 };
-
 /**
  * Retrieves details of all merchant IDs and their corresponding credentials.
  * @returns {Promise<MidCredentialsType[]>} A promise that resolves with an array of merchant credentials.
@@ -49,8 +40,8 @@ const getAllMidDetails = async (): Promise<MidCredentialsType[]> => {
   let secretKeyPrefix: string;
   let keyId: string;
   let secretKey: string;
+  const environment = process?.env;
   try {
-    const environment = process?.env;
     if (environment) {
       for (let variable in environment) {
         if (variable.includes(Constants.STRING_SECRET_KEY) && 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY' !== variable) {
@@ -64,14 +55,12 @@ const getAllMidDetails = async (): Promise<MidCredentialsType[]> => {
               merchantKeyId: keyId,
               merchantSecretKey: secretKey,
             });
-          } else {
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetAllMidDetails', Constants.LOG_ERROR, '', Constants.ERROR_MSG_ENV_VARIABLES_NOT_FOUND + secretKeyPrefix.toLowerCase());
-          }
+          } else paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ALL_MID_DETAILS, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_ENV_VARIABLES_NOT_FOUND + secretKeyPrefix.toLowerCase());
         }
       }
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetAllMidDetails', Constants.EXCEPTION_MSG_ALL_MID_DETAILS, exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_ALL_MID_DETAILS, CustomMessages.EXCEPTION_MSG_ALL_MID_DETAILS, exception, '', '', '');
   }
   return midArray;
 };

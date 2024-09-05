@@ -2,9 +2,9 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants';
+import { Constants } from '../../../constants/constants';
 import capture from '../../../service/payment/PaymentCaptureService';
-import { authID, authId, orderNo, payment, updateTransactions } from '../../const/ApplePay/PaymentCaptureServiceConstAP';
+import paymentCaptureConstAP from '../../const/ApplePay/PaymentCaptureServiceConstAP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -16,7 +16,7 @@ let paymentResponseObject: any = {
 };
 
 test.serial('Capturing a payment and check http code', async (t: any) => {
-  let result: any = await capture.captureResponse(payment, updateTransactions, authId, orderNo);
+  let result: any = await capture.getCaptureResponse(paymentCaptureConstAP.payment, paymentCaptureConstAP.updateTransactions, paymentCaptureConstAP.authId, paymentCaptureConstAP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -35,7 +35,7 @@ test.serial('Check status for payment capture ', async (t: any) => {
 });
 
 test.serial('Capturing an invalid payment and check http code', async (t: any) => {
-  let result: any = await capture.captureResponse(payment, updateTransactions, authID, orderNo);
+  let result: any = await capture.getCaptureResponse(paymentCaptureConstAP.payment, paymentCaptureConstAP.updateTransactions, paymentCaptureConstAP.authID, paymentCaptureConstAP.orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
@@ -46,7 +46,7 @@ test('Check status for an invalid capture ', async (t: any) => {
 });
 
 test.serial('Capturing a payment with empty auth id and check http code', async (t: any) => {
-  let result: any = await capture.captureResponse(payment, updateTransactions, '', orderNo);
+  let result: any = await capture.getCaptureResponse(paymentCaptureConstAP.payment, paymentCaptureConstAP.updateTransactions, '', paymentCaptureConstAP.orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);

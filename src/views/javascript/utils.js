@@ -1,4 +1,3 @@
-
 /**
  * Converts an amount to a specified number of decimal places.
  * 
@@ -12,7 +11,6 @@ export function amountConversion(amount, fractionDigits) {
   }
   return amount;
 }
-
 /**
  * Rounds off an amount to a specified number of decimal places.
  * 
@@ -27,7 +25,6 @@ export function roundOff(amount, fractionDigits) {
   }
   return value;
 }
-
 /**
  * Converts a date string to a readable date format.
  * 
@@ -42,37 +39,18 @@ export function dateConversion(dateString) {
     return readableDate.replace(/,/g, '');
   }
 }
-
 /**
  * Extracts the payment ID from the URL query parameters.
  * 
  * @returns {string|null} - The payment ID if found, otherwise null.
  */
 export function getPaymentId() {
-  const url = new URL(window.location.href);
-  const paymentId = url.searchParams.get('id');
+  let paymentId = '';
+  const urlInstance = new URL(window.location.href);
+  if (validateWhiteListEndPoints(urlInstance?.pathname)) {
+    paymentId = urlInstance.searchParams.get('id');
+  }
   return paymentId;
-}
-
-/**
- * Creates a new HTML element with optional content and class name.
- * 
- * @param {string} tag - The HTML tag name of the element to create.
- * @param {string} html - The HTML content to insert into the element (default is empty).
- * @param {string} className - The class name to assign to the element (default is empty).
- * @returns {HTMLElement} - The created HTML element.
- */
-export function createElement(tag, html = '', className = '') {
-  const element = document.createElement(tag);
-  if (className) {
-    element.className = className;
-  }
-  if (html) {
-    const range = document.createRange();
-    const documentFragment = range.createContextualFragment(html);
-    element.appendChild(documentFragment);
-  }
-  return element;
 }
 
 /**
@@ -92,7 +70,6 @@ export function createTableRow(tableBody, cellsData) {
     });
   }
 }
-
 export function createAndSetAttributes(type, attributes, textContent) {
   const element = document.createElement(type);
   for (const key in attributes) {
@@ -105,8 +82,6 @@ export function createAndSetAttributes(type, attributes, textContent) {
   }
   return element;
 }
-
-
 /**
  * Formats an amount with a currency code.
  * 
@@ -116,4 +91,33 @@ export function createAndSetAttributes(type, attributes, textContent) {
  */
 export function formatCurrency(amount, currencyCode) {
   return `${currencyCode} ${amount}`;
+}
+// Regular expression validation for validating paymentId
+export function validatePaymentId(paymentId) {
+  let validatedId = ''
+  const paymentIdRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (paymentIdRegex.test(paymentId)) {
+    validatedId = paymentId;
+  }
+  return validatedId;
+}
+
+export function validateAmountValue(amount) {
+  let validatedAmount;
+  if ('number' === typeof amount) {
+    validatedAmount = amount;
+  }
+  return validatedAmount;
+}
+
+export const validateWhiteListEndPoints = (url) => {
+  const whiteListEndpoints = ['/api/extension/payment/create', '/api/extension/payment/update',
+    '/api/extension/customer/update', '/netTokenNotification', '/captureContext', '/orders', '/orderData',
+    '/capture', '/refund', '/authReversal', '/paymentDetails', '/paymentData', '/payerAuthReturnUrl',
+    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico'];
+  let urlValidated = false;
+  if (whiteListEndpoints.includes(url)) {
+    urlValidated = true;
+  }
+  return urlValidated;
 }

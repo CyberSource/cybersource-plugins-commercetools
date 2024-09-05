@@ -1,5 +1,6 @@
+import { AddressType } from '../../types/Types';
 import updateToken from '../JSON/updateToken.json';
-export const tokens = {
+ const tokens = {
   alias: updateToken.alias,
   value: updateToken.value,
   cardType: updateToken.cardType,
@@ -12,14 +13,14 @@ export const tokens = {
   addressId: 'OKxBLnRJ',
 };
 
-export const newExpiryMonth = updateToken.cardExpiryMonth;
+ const newExpiryMonth = updateToken.cardExpiryMonth;
 
-export const newExpiryYear = updateToken.cardExpiryYear;
+ const newExpiryYear = updateToken.cardExpiryYear;
 
-export const addressData = {
+ const addressData : AddressType= {
   id: 'OKxBLnRJ',
-  firstName: 'shakshi',
-  lastName: 'poddar',
+  firstName: 'john',
+  lastName: 'doe',
   streetName: '1295 Charleston Road',
   additionalStreetInfo: '5th lane',
   postalCode: '94043',
@@ -27,13 +28,21 @@ export const addressData = {
   region: 'CA',
   country: 'US',
   phone: '+19876543210',
-  email: 'shakshi.poddar@wipro.com',
+  email: 'john.doe@wipro.com',
+  address1: '',
+  address2: '',
+  buildingNumber: '',
+  streetNumber: '',
+  locality: '',
+  administrativeArea: '',
+  phoneNumber: '',
+  mobile: ''
 };
 
-export const invalidAddressData = {
+ const invalidAddressData : AddressType= {
   id: 'OKxBLnRJ',
-  firstName: 'shakshi',
-  lastName: 'poddar',
+  firstName: 'john',
+  lastName: 'doe',
   streetName: '1295 Charleston Road',
   additionalStreetInfo: '5th lane',
   postalCode: '94043',
@@ -41,10 +50,18 @@ export const invalidAddressData = {
   region: 'California',
   country: 'US',
   phone: '+19876543210',
-  email: 'shakshi.poddar@wipro.com',
+  email: 'john.doe@wipro.com',
+  address1: '',
+  address2: '',
+  buildingNumber: '',
+  streetNumber: '',
+  locality: '',
+  administrativeArea: '',
+  phoneNumber: '',
+  mobile: ''
 };
 
-export const tokenObject = {
+ const tokenObject = {
   alias: 'card1',
   value: 'D3CF932491B77AE0E053AF598E0A79',
   cardType: '001',
@@ -57,3 +74,12 @@ export const tokenObject = {
   oldExpiryMonth: '03',
   oldExpiryYear: '2029',
 };
+
+export default{
+  tokens,
+  newExpiryMonth,
+  newExpiryYear,
+  addressData,
+  invalidAddressData,
+  tokenObject
+}

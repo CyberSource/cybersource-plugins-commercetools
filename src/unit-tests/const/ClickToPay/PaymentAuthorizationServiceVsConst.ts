@@ -1,6 +1,6 @@
 import clickToPay from '../../JSON/clickToPay.json';
 import creditCard from '../../JSON/creditCard.json';
-export const payment = {
+const payment = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -50,7 +50,7 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const guestPayment = {
+const guestPayment = {
   id: 'c91a109a-a766-4acf-8340-80b23340cd08',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -99,7 +99,7 @@ export const guestPayment = {
   anonymousId: 'b7037191-ed8f-4518-a66a-5b1efda2a2de',
 };
 
-export const payments = {
+const payments = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -143,7 +143,7 @@ export const payments = {
   interfaceInteractions: [],
 };
 
-export const cart = {
+const cart = {
   type: 'Cart',
   id: '3d09ed42-1b1b-450a-b670-269437683939',
   version: 10,
@@ -332,57 +332,57 @@ export const cart = {
   refusedGifts: [],
   origin: 'Customer',
   shippingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   billingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const service = 'visa';
+const service = 'visa';
 
-export const cardTokens = {
+const cardTokens = {
   customerTokenId: creditCard.savedTokenId,
   paymentInstrumentId: creditCard.savedToken,
 };
 
-export const guestCardTokens = {
+const guestCardTokens = {
   customerTokenId: '',
   paymentInstrumentId: '',
 };
 
-export const cardTokensObject = {
+const cardTokensObject = {
   customerTokenId: 'D605360941117CECE053AF598E0A6E',
   paymentInstrumentId: 'D7688E8C36CCE10FE053A2598D0AC0',
 };
 
-export const orderNo = '';
+const orderNo = '';
 
-export const notSaveToken = false;
+const notSaveToken = false;
 
-export const payerAuthMandateFlag = false;
+const payerAuthMandateFlag = false;
 
-export const orderNumber = '10';
+const orderNumber = '10';
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -661,21 +661,21 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const ucPayment = {
+const ucPayment = {
   id: '8e1d7b65-d653-4f39-82f4-86cf55df8b60',
   version: 2,
   versionModifiedAt: '2023-08-10T07:46:36.014Z',
@@ -713,7 +713,6 @@ export const ucPayment = {
     fields: {
       isv_transientToken: clickToPay.isv_transientToken,
       isv_deviceFingerprintId: 'a82beccd-0fc0-48f8-a84e-0151709df8c8',
-      isv_merchantId: 'visa_isv_opencart_pmt_101',
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '192.140.152.21',
@@ -739,7 +738,7 @@ export const ucPayment = {
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
-export const clickToPayPayment = {
+const clickToPayPayment = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -788,3 +787,21 @@ export const clickToPayPayment = {
   transactions: [],
   interfaceInteractions: [],
 };
+
+export default {
+  payment,
+  guestPayment,
+  payments,
+  cart,
+  service,
+  cardTokens,
+  guestCardTokens,
+  cardTokensObject,
+  orderNo,
+  notSaveToken,
+  payerAuthMandateFlag,
+  orderNumber,
+  shippingCart,
+  ucPayment,
+  clickToPayPayment
+}

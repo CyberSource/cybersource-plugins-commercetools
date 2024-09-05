@@ -1,11 +1,10 @@
-import path from 'path';
-
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
 import customerUpdateJson from '../../resources/customer_update_extension.json';
 import paymentCreateJson from '../../resources/payment_create_extension.json';
 import paymentUpdateJson from '../../resources/payment_update_extension.json';
-import paymentUtils from '../PaymentUtils';
-import commercetoolsApi from '../api/CommercetoolsApi';
+import paymentUtils from '../../utils/PaymentUtils';
+import commercetoolsApi from '../../utils/api/CommercetoolsApi';
 
 const ensurePaymentCreateExtension = async () => {
   return syncExtensions(paymentCreateJson);
@@ -21,15 +20,18 @@ const ensureCustomerUpdateExtension = async () => {
 
 const syncExtensions = async (extension: any) => {
   let url = '';
-  let syncedExtensions = false;
+  let isExtensionsSynced = false;
   try {
     if (extension) {
-      if ('isv_payment_create_extension' === extension.key) {
-        url = Constants.PAYMENT_CREATE_DESTINATION_URL;
-      } else if ('isv_payment_update_extension' === extension.key) {
-        url = Constants.PAYMENT_UPDATE_DESTINATION_URL;
-      } else if ('isv_customer_update_extension' === extension.key) {
-        url = Constants.CUSTOMER_CREATE_DESTINATION_URL;
+      switch (extension.key) {
+        case 'isv_payment_create_extension':
+          url = Constants.PAYMENT_CREATE_DESTINATION_URL;
+          break;
+        case 'isv_payment_update_extension':
+          url = Constants.PAYMENT_UPDATE_DESTINATION_URL;
+          break;
+        case 'isv_customer_update_extension':
+          url = Constants.CUSTOMER_UPDATE_DESTINATION_URL;
       }
       if (process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE && url) {
         const headerValue = paymentUtils.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
@@ -37,17 +39,17 @@ const syncExtensions = async (extension: any) => {
         extension.destination.authentication.headerValue = 'Bearer' + ' ' + headerValue;
         const scriptResponse = await commercetoolsApi.addExtensions(extension);
         if (scriptResponse && Constants.HTTP_SUCCESS_STATUS_CODE !== parseInt(scriptResponse.statusCode)) {
-          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncExtensions', Constants.LOG_INFO, '', Constants.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_FULL_COLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
+          paymentUtils.logData(__filename, 'FuncSyncExtensions', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_FULL_COLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
         }
-        syncedExtensions = true;
+        isExtensionsSynced = true;
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncExtensions', Constants.LOG_INFO, '', Constants.ERROR_MSG_MISSING_AUTHORIZATION_HEADER);
+        paymentUtils.logData(__filename, 'FuncSyncExtensions', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER);
       }
     }
   } catch (err) {
-    paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncExtensions', Constants.LOG_INFO, '', Constants.ERROR_MSG_CREATE_EXTENSION + Constants.REGEX_HYPHEN + extension.key);
+    paymentUtils.logData(__filename, 'FuncSyncExtensions', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.REGEX_HYPHEN + extension.key);
   }
-  return syncedExtensions;
+  return isExtensionsSynced;
 };
 
 export default {

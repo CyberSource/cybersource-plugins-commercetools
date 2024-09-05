@@ -1,6 +1,6 @@
 import creditCard from '../../JSON/creditCard.json';
 import eCheck from '../../JSON/eCheck.json';
-export let payment = {
+let payment = {
   id: 'f3215a29-1f08-4775-9006-22b84b55bae5',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -59,7 +59,7 @@ export let payment = {
   interfaceInteractions: [],
 };
 
-export let paymentGuest = {
+let paymentGuest = {
   id: 'b793821e-c364-4166-b47f-da3f181664ed',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -109,7 +109,7 @@ export let paymentGuest = {
   anonymousId: '137e1f96-4328-4fda-85f5-b039bb640fec',
 };
 
-export let cart = {
+let cart = {
   type: 'Cart',
   id: '3d09ed42-1b1b-450a-b670-269437683939',
   version: 10,
@@ -298,44 +298,44 @@ export let cart = {
   refusedGifts: [],
   origin: 'Customer',
   shippingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   billingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
-export const cardTokens = {
+const cardTokens = {
   customerTokenId: creditCard.savedToken,
   paymentInstrumentId: '',
 };
 
-export const service = 'card';
+const service = 'card';
 
-export const notSaveToken = false;
+const notSaveToken = false;
 
-export const payerAuthMandateFlag = false;
+const payerAuthMandateFlag = false;
 
-export const orderNo = '';
+const orderNo = '';
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -614,16 +614,28 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
+
+export default {
+  payment,
+  paymentGuest,
+  cart,
+  cardTokens,
+  service,
+  notSaveToken,
+  payerAuthMandateFlag,
+  orderNo,
+  shippingCart
+}

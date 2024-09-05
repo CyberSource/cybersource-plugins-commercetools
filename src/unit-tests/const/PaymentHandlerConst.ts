@@ -1,3 +1,4 @@
+import { CustomerType } from '../../types/Types';
 import applePay from '../JSON/applePay.json';
 import cpay from '../JSON/clickToPay.json';
 import creditCard from '../JSON/creditCard.json';
@@ -5,7 +6,7 @@ import googlePay from '../JSON/googlePay.json';
 import unit from '../JSON/unit.json';
 import updateToken from '../JSON/updateToken.json';
 
-export const updateCardHandlerTokens = {
+ const updateCardHandlerTokens = {
   alias: updateToken.alias,
   value: updateToken.value,
   cardType: updateToken.cardType,
@@ -18,7 +19,7 @@ export const updateCardHandlerTokens = {
   addressId: 'gMgqUiw_',
 };
 
-export const updateCardHandlerInvalidTokens = {
+ const updateCardHandlerInvalidTokens = {
   alias: '&@Y&^&#*#',
   value: '&@Y&^&#*#',
   cardType: '&@Y&^&#*#',
@@ -31,9 +32,9 @@ export const updateCardHandlerInvalidTokens = {
   addressId: 'gMgqUiw_',
 };
 
-export const updateCardHandlerCustomerId = unit.customerId;
+ const updateCardHandlerCustomerId = unit.customerId;
 
-export const updateCardHandlerCustomerObj = {
+ const updateCardHandlerCustomerObj : Partial<CustomerType>= {
   id: 'dc510eec-fc6f-48c3-a82a-098cf946f8e6',
   version: 533,
   lastMessageSequenceNumber: 23,
@@ -56,13 +57,13 @@ export const updateCardHandlerCustomerObj = {
     },
   },
   email: 'sp54@gmail.com',
-  firstName: 'shakshi',
+  firstName: 'john',
   lastName: 'p',
   addresses: [
     {
       id: 'OKxBLnRJ',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -70,7 +71,15 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'T3B6sKY0',
@@ -83,6 +92,15 @@ export const updateCardHandlerCustomerObj = {
       country: 'US',
       phone: '1234567890',
       email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: 'YibACEQy',
@@ -95,6 +113,15 @@ export const updateCardHandlerCustomerObj = {
       country: 'US',
       phone: '1234567890',
       email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: 'GSSbzroG',
@@ -107,7 +134,15 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '9876543210',
-      email: 'shakshi@wipro.com',
+      email: 'john@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'YZ1YBUgk',
@@ -120,15 +155,41 @@ export const updateCardHandlerCustomerObj = {
       country: 'US',
       phone: '1234567890',
       email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: 'fl7zvZpV',
       country: 'US',
+      firstName: '',
+      lastName: '',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetName: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      postalCode: '',
+      city: '',
+      region: '',
+      phone: '',
+      phoneNumber: '',
+      email: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: 'moF4Gsp5',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -136,12 +197,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: '1EFWu0fD',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -149,12 +218,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: '-nvm4elr',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -162,12 +239,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'z-uYYpuU',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -175,60 +260,104 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'DCuyWDtO',
-      firstName: 'Shakshi',
-      lastName: 'Poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: 'ABC Tech 1295 Chariston Road 5th Lane Mountain View',
       postalCode: '94043',
       city: 'Mountain View',
       region: 'CA',
       country: 'US',
       phone: '8808906634',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: '-2cxb12M',
-      firstName: 'Shakshi',
-      lastName: 'Poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: 'ABC Tech 1295 Chariston Road 5th Lane Mountain View',
       postalCode: '94043',
       city: 'Mountain View',
       region: 'CA',
       country: 'US',
       phone: '8808906634',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: 'wobmsm0R',
-      firstName: 'Shakshi',
-      lastName: 'Poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: 'ABC Tech 1295 Chariston Road 5th Lane Mountain View',
       postalCode: '94043',
       city: 'Mountain View',
       region: 'CA',
       country: 'US',
       phone: '8808906634',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: 'Ukrm2gw_',
-      firstName: 'Shakshi',
-      lastName: 'Poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: 'ABC Tech 1295 Chariston Road 5th Lane Mountain View',
       postalCode: '94043',
       city: 'Mountain View',
       region: 'CA',
       country: 'US',
       phone: '8808906634',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
     {
       id: 'xYBgkf8i',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -236,12 +365,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'rj44OsF_',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -249,12 +386,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: '8-KGRSU5',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -262,12 +407,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'qwwu3z3L',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -275,12 +428,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'UB3Tz9sn',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -288,12 +449,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'oFxMxbTn',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -301,12 +470,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'LnJXyyKz',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -314,12 +491,20 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
     {
       id: 'gMgqUiw_',
-      firstName: 'shakshi',
-      lastName: 'poddar',
+      firstName: 'john',
+      lastName: 'doe',
       streetName: '1295 Charleston Road',
       additionalStreetInfo: '5th lane',
       postalCode: '94043',
@@ -327,7 +512,15 @@ export const updateCardHandlerCustomerObj = {
       region: 'CA',
       country: 'US',
       phone: '+19876543210',
-      email: 'shakshi.poddar@wipro.com',
+      email: 'john.doe@wipro.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phoneNumber: '',
+      mobile: ''
     },
   ],
   shippingAddressIds: [],
@@ -346,15 +539,16 @@ export const updateCardHandlerCustomerObj = {
       isv_tokens: [
         '{"alias":"1111card","value":"DFD30371B90D8BE8E053AF598E0A30E8","cardType":"001","cardName":"001","cardNumber":"411111XXXXXX1111","cardExpiryMonth":"12","cardExpiryYear":"2031","paymentToken":"DFD30B1B1300A4DFE053AF598E0A076C","instrumentIdentifier":"7010000000121591111","addressId":"gMgqUiw_"}',
       ],
+      isv_failedTokens: [
+        '{"alias":"1111card","value":"DFD30371B90D8BE8E053AF598E0A30E8","cardType":"001","cardName":"001","cardNumber":"411111XXXXXX1111","cardExpiryMonth":"12","cardExpiryYear":"2031","paymentToken":"DFD30B1B1300A4DFE053AF598E0A076C","instrumentIdentifier":"7010000000121591111","addressId":"gMgqUiw_"}',
+      ],
     },
-  },
-  stores: [],
-  authenticationMode: 'Password',
+  }
 };
 
-export const orderManagementHandlerPaymentId = unit.paymentId;
+ const orderManagementHandlerPaymentId = unit.paymentId;
 
-export const orderManagementHandlerUpdateTransactions = {
+ const orderManagementHandlerUpdateTransactions = {
   id: '8d3dab83-6024-4c50-ba0e-c387a89762be',
   timestamp: '2022-01-11T06:37:11.153Z',
   type: 'Charge',
@@ -367,7 +561,7 @@ export const orderManagementHandlerUpdateTransactions = {
   state: 'Initial',
 };
 
-export const orderManagementHandlerRefundUpdateTransactions = {
+ const orderManagementHandlerRefundUpdateTransactions = {
   id: '6c0edcd0-c02b-4993-a08a-200124b6072a',
   timestamp: '2022-07-05T10:45:45.338Z',
   type: 'Refund',
@@ -380,7 +574,7 @@ export const orderManagementHandlerRefundUpdateTransactions = {
   state: 'Initial',
 };
 
-export const applePaySessionHandlerFields = {
+ const applePaySessionHandlerFields = {
   isv_deviceFingerprintId: '2cd0221d-e31e-42d3-9d6b-aaeedd0eb62c',
   isv_applePayValidationUrl: 'https://apple-pay-gateway-cert.apple.com/paymentservices/startSession',
   isv_acceptHeader: '*/*',
@@ -388,7 +582,7 @@ export const applePaySessionHandlerFields = {
   isv_userAgentHeader: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15',
 };
 
-export const applePaySessionHandlerEmptyFields = {
+ const applePaySessionHandlerEmptyFields = {
   isv_deviceFingerprintId: '',
   isv_applePayValidationUrl: '',
   isv_acceptHeader: '',
@@ -396,7 +590,7 @@ export const applePaySessionHandlerEmptyFields = {
   isv_userAgentHeader: '',
 };
 
-export const applePaySessionHandlerInvalidFields = {
+ const applePaySessionHandlerInvalidFields = {
   isv_deviceFingerprintId: '$R!^&@UI(',
   isv_applePayValidationUrl: '*@U*&@@&&*@U*@',
   isv_acceptHeader: '*@&^@%',
@@ -404,7 +598,7 @@ export const applePaySessionHandlerInvalidFields = {
   isv_userAgentHeader: '(@*&@^%#^&@**@',
 };
 
-export const authorizationHandlerGPUpdatePaymentObject = {
+ const authorizationHandlerGPUpdatePaymentObject = {
   id: unit.paymentId,
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -461,7 +655,7 @@ export const authorizationHandlerGPUpdatePaymentObject = {
   interfaceInteractions: [],
 };
 
-export const authorizationHandlerUpdateTransactions = {
+ const authorizationHandlerUpdateTransactions = {
   id: '6f2129cc-76fc-441f-a1ae-cfa940184f6d',
   timestamp: '2022-02-01T09:27:30.561Z',
   type: 'Authorization',
@@ -474,7 +668,7 @@ export const authorizationHandlerUpdateTransactions = {
   state: 'Initial',
 };
 
-export const authorizationHandlerVSUpdatePaymentObject = {
+ const authorizationHandlerVSUpdatePaymentObject = {
   id: unit.paymentId,
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -517,7 +711,7 @@ export const authorizationHandlerVSUpdatePaymentObject = {
   interfaceInteractions: [],
 };
 
-export const authorizationHandlerCCUpdatePaymentObject = {
+ const authorizationHandlerCCUpdatePaymentObject = {
   id: unit.paymentId,
   version: 12,
   lastMessageSequenceNumber: 2,
@@ -568,7 +762,7 @@ export const authorizationHandlerCCUpdatePaymentObject = {
   interfaceInteractions: [],
 };
 
-export const authorizationHandler3DSUpdatePaymentObject = {
+ const authorizationHandler3DSUpdatePaymentObject = {
   id: unit.paymentId,
   version: 17,
   lastMessageSequenceNumber: 2,
@@ -623,7 +817,7 @@ export const authorizationHandler3DSUpdatePaymentObject = {
   interfaceInteractions: [],
 };
 
-export const authorizationHandlerAPUpdatePaymentObject = {
+ const authorizationHandlerAPUpdatePaymentObject = {
   id: unit.paymentId,
   version: 15,
   lastMessageSequenceNumber: 4,
@@ -685,7 +879,7 @@ export const authorizationHandlerAPUpdatePaymentObject = {
   anonymousId: '033cd1c3-801d-4d2b-9729-fef0064dd3be',
 };
 
-export const authorizationHandlerECUpdatePaymentObject = {
+ const authorizationHandlerECUpdatePaymentObject = {
   id: unit.paymentId,
   version: 2,
   versionModifiedAt: '2023-01-06T09:47:40.393Z',
@@ -736,8 +930,8 @@ export const authorizationHandlerECUpdatePaymentObject = {
   anonymousId: 'e2738776-3238-4d9a-933f-6e41e6c0e941',
 };
 
-export const getPayerAuthEnrollResponseUpdatePaymentObj = {
-  id: '1a3878c8-2860-4475-adca-a1acc433fb9c',
+ const getPayerAuthEnrollResponseUpdatePaymentObj = {
+  id: unit.paymentId,
   version: 15,
   lastMessageSequenceNumber: 1,
   createdAt: '2022-03-29T11:27:40.206Z',
@@ -805,8 +999,8 @@ export const getPayerAuthEnrollResponseUpdatePaymentObj = {
   interfaceInteractions: [],
 };
 
-export const getPayerAuthValidateResponseUpdatePaymentObj = {
-  id: '4c91a542-b2fb-4bbc-b63f-5ed47ed67ec3',
+ const getPayerAuthValidateResponseUpdatePaymentObj = {
+  id: unit.paymentId,
   version: 27,
   lastMessageSequenceNumber: 2,
   createdAt: '2022-04-29T10:36:56.575Z',
@@ -901,7 +1095,7 @@ export const getPayerAuthValidateResponseUpdatePaymentObj = {
   ],
 };
 
-export const getPayerAuthValidateResponseUpdatePaymentObjGuest = {
+ const getPayerAuthValidateResponseUpdatePaymentObjGuest = {
   id: '95b4f7da-de4e-48c6-9928-940a30d0505a',
   version: 28,
   lastMessageSequenceNumber: 2,
@@ -987,14 +1181,14 @@ export const getPayerAuthValidateResponseUpdatePaymentObjGuest = {
         authenticationTransactionId: 'XWB1O3AaajCBLSjmvCi0',
         xid: 'WFdCMU8zQWFhakNCTFNqbXZDaTA=',
         proofXml:
-          '<AuthProof><Time>2022 Jun 22 07:22:08</Time><DSUrl>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/vereq.jsp?acqid=CYBS</DSUrl><VEReqProof><Message id="XWB1O3AaajCBLSjmvCi0"><VEReq><version>1.0.2</version><pan>XXXXXXXXXXXX1091</pan><Merchant><acqBIN>469216</acqBIN><merID>341422420000000</merID><password></password></Merchant><Browser><deviceCategory>0</deviceCategory><accept>*/*</accept><userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36</userAgent></Browser></VEReq></Message></VEReqProof><VEResProof><Message id="XWB1O3AaajCBLSjmvCi0"><VERes><version>1.0.2</version><CH><enrolled>Y</enrolled><acctID>5663039</acctID></CH><url>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&amp;gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</url><protocol>ThreeDSecure</protocol></VERes></Message></VEResProof></AuthProof>',
+          '<AuthProof><Time>2022 Jun 22 07:22:08</Time><DSUrl>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/vereq.jsp?acqid=CYBS</DSUrl><VEReqProof><Message id="XWB1O3AaajCBLSjmvCi0"><VEReq><version>1.0.2</version><pan>XXXXXXXXXXXX1091</pan><Merchant><acqBIN>469216</acqBIN><merID>341422420000000</merID></Merchant><Browser><deviceCategory>0</deviceCategory><accept>*/*</accept><userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36</userAgent></Browser></VEReq></Message></VEReqProof><VEResProof><Message id="XWB1O3AaajCBLSjmvCi0"><VERes><version>1.0.2</version><CH><enrolled>Y</enrolled><acctID>5663039</acctID></CH><url>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&amp;gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</url><protocol>ThreeDSecure</protocol></VERes></Message></VEResProof></AuthProof>',
       },
     },
   ],
   anonymousId: '710d994b-76e3-4873-b4c0-f584f60480a9',
 };
 
-export const setTokenNullHandlerAuthResponse = {
+ const setTokenNullHandlerAuthResponse = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -1010,7 +1204,7 @@ export const setTokenNullHandlerAuthResponse = {
   errors: [],
 };
 
-export const payerAuthPaymentObject = {
+ const payerAuthPaymentObject = {
   id: '94ef1ba1-36c6-41f7-9e83-9a91d9213e64',
   version: 22,
   versionModifiedAt: '2024-02-16T13:38:58.333Z',
@@ -1089,7 +1283,7 @@ export const payerAuthPaymentObject = {
   anonymousId: 'fd49b7dd-2bd9-46d4-bc9b-d06d81291f83',
 };
 
-export const payerAuthReversalHandlerUpdateActions = {
+ const payerAuthReversalHandlerUpdateActions = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -1105,7 +1299,7 @@ export const payerAuthReversalHandlerUpdateActions = {
   errors: [],
 };
 
-export const retrieveTokenDetailsResponse = {
+ const retrieveTokenDetailsResponse = {
   httpCode: 200,
   instrumentIdentifier: '7036349999987050572',
   state: 'ACTIVE',
@@ -1114,3 +1308,31 @@ export const retrieveTokenDetailsResponse = {
   expirationMonth: '07',
   expirationYear: '2100',
 };
+
+
+export default {
+  updateCardHandlerTokens,
+  updateCardHandlerInvalidTokens,
+  updateCardHandlerCustomerId,
+  updateCardHandlerCustomerObj,
+  orderManagementHandlerPaymentId,
+  orderManagementHandlerUpdateTransactions,
+  orderManagementHandlerRefundUpdateTransactions,
+  applePaySessionHandlerFields,
+  applePaySessionHandlerEmptyFields,
+  applePaySessionHandlerInvalidFields,
+  authorizationHandlerGPUpdatePaymentObject,
+  authorizationHandlerUpdateTransactions,
+  authorizationHandlerVSUpdatePaymentObject,
+  authorizationHandlerCCUpdatePaymentObject,
+  authorizationHandler3DSUpdatePaymentObject,
+  authorizationHandlerAPUpdatePaymentObject,
+  authorizationHandlerECUpdatePaymentObject,
+  getPayerAuthEnrollResponseUpdatePaymentObj,
+  getPayerAuthValidateResponseUpdatePaymentObj,
+  getPayerAuthValidateResponseUpdatePaymentObjGuest,
+  setTokenNullHandlerAuthResponse,
+  payerAuthPaymentObject,
+  payerAuthReversalHandlerUpdateActions,
+  retrieveTokenDetailsResponse
+}

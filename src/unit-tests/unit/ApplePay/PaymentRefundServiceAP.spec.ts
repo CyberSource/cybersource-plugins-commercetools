@@ -2,9 +2,9 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants';
+import { Constants } from '../../../constants/constants';
 import refundResponse from '../../../service/payment/PaymentRefundService';
-import { captureID, captureId, orderNo, payment, updateTransaction } from '../../const/ApplePay/PaymentRefundServiceConstAP';
+import paymentRefundConstAP from '../../const/ApplePay/PaymentRefundServiceConstAP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -17,7 +17,7 @@ let paymentResponseObject: any = {
 };
 
 test.serial('Refunding a payment and check http code', async (t: any) => {
-  let result: any = await refundResponse.refundResponse(payment, captureId, updateTransaction, orderNo);
+  let result: any = await refundResponse.getRefundData(paymentRefundConstAP.payment, paymentRefundConstAP.captureId, paymentRefundConstAP.updateTransaction, paymentRefundConstAP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -36,7 +36,7 @@ test.serial('Check status for payment refund ', async (t: any) => {
 });
 
 test.serial('Refunding an invalid payment and check http code', async (t: any) => {
-  let result: any = await refundResponse.refundResponse(payment, captureID, updateTransaction, orderNo);
+  let result: any = await refundResponse.getRefundData(paymentRefundConstAP.payment, paymentRefundConstAP.captureID, paymentRefundConstAP.updateTransaction, paymentRefundConstAP.orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
@@ -47,7 +47,7 @@ test.serial('Check status for invalid refund ', async (t: any) => {
 });
 
 test.serial('Refunding a payment with empty capture id and check http code', async (t: any) => {
-  let result: any = await refundResponse.refundResponse(payment, '', updateTransaction, orderNo);
+  let result: any = await refundResponse.getRefundData(paymentRefundConstAP.payment, '', paymentRefundConstAP.updateTransaction, paymentRefundConstAP.orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);

@@ -1,6 +1,5 @@
-import path from 'path';
-
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
 import paymentCustomJson from '../../resources/isv_payment_data_type.json';
 import paymentErrorJson from '../../resources/isv_payment_error_type.json';
 import paymentFailureJson from '../../resources/isv_payment_failure_type.json';
@@ -8,9 +7,9 @@ import customerTokensJson from '../../resources/isv_payments_customer_tokens_typ
 import enrollCheckJson from '../../resources/isv_payments_payer_authentication_enrolment_check_type.json';
 import enrollValidateJson from '../../resources/isv_payments_payer_authentication_validate_result_type.json';
 import transactionCustomJson from '../../resources/isv_transaction_data_type.json';
-import paymentService from '../PaymentService';
-import paymentUtils from '../PaymentUtils';
-import commercetoolsApi from '../api/CommercetoolsApi';
+import paymentService from '../../utils/PaymentService';
+import paymentUtils from '../../utils/PaymentUtils';
+import commercetoolsApi from '../../utils/api/CommercetoolsApi';
 
 const ensurePaymentCustomType = async () => {
   return syncCustomType(paymentCustomJson);
@@ -41,7 +40,7 @@ const ensureTransactionCustomType = async () => {
 };
 
 const syncCustomType = async (paymentCustomType: any) => {
-  let syncedCustomTypes = false;
+  let isCustomTypesSynced = false;
   let scriptResponse = {
     statusCode: 0,
     body: {
@@ -64,16 +63,16 @@ const syncCustomType = async (paymentCustomType: any) => {
             const typeObj = getCustomType.body;
             paymentService.updateCustomField(paymentCustomType.fieldDefinitions, typeObj.fieldDefinitions, typeObj.id, typeObj.version);
           }
-          syncedCustomTypes = true;
+          isCustomTypesSynced = true;
         } else {
-          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncCustomType', Constants.LOG_INFO, '', Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message);
+          paymentUtils.logData(__filename, 'FuncSyncCustomType', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message);
         }
       }
     }
   } catch (err) {
-    paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncCustomType', Constants.LOG_ERROR, '', Constants.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message);
+    paymentUtils.logData(__filename, 'FuncSyncCustomType', Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message);
   }
-  return syncedCustomTypes;
+  return isCustomTypesSynced;
 };
 
 export default {

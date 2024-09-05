@@ -1,11 +1,21 @@
-export const country = 'US';
 
-export const locale = 'us';
+ const country = 'US';
 
-export const currencyCode = 'USD';
+ const locale = 'us';
 
-export const merchantId: any = process.env.PAYMENT_GATEWAY_MERCHANT_ID;
+ const currencyCode = 'USD';
 
-export const service = 'Payments';
+ const merchantId: any = process.env.PAYMENT_GATEWAY_MERCHANT_ID;
 
-export const myAccount = 'MyAccounts';
+ const service = 'Payments';
+
+ const myAccount = 'MyAccounts';
+
+ export default {
+    country,
+    locale,
+    currencyCode,
+    merchantId,
+    service,
+    myAccount
+ }

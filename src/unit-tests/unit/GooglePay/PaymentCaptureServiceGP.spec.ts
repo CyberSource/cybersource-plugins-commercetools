@@ -2,9 +2,9 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants';
+import { Constants } from '../../../constants/constants';
 import captureResponse from '../../../service/payment/PaymentCaptureService';
-import { authId, authID, orderNo, orderNumber, payment, updateTransactions } from '../../const/GooglePay/PaymentCaptureServiceConstGP';
+import captureConstGP from '../../const/GooglePay/PaymentCaptureServiceConstGP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -17,7 +17,7 @@ let paymentResponseObject: any = {
 };
 
 test.serial('Capturing a payment and check http code', async (t: any) => {
-  let result: any = await captureResponse.captureResponse(payment, updateTransactions, authID, orderNo);
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, captureConstGP.authID, captureConstGP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -36,7 +36,7 @@ test.serial('Check status for payment capture', async (t: any) => {
 });
 
 test.serial('Capturing an invalid payment', async (t: any) => {
-  let result: any = await captureResponse.captureResponse(payment, updateTransactions, authId, orderNo);
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, captureConstGP.authId, captureConstGP.orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
@@ -47,7 +47,7 @@ test.serial('Check status for invalid capture ', async (t: any) => {
 });
 
 test.serial('Capturing a payment with reconciliation Id and check http code', async (t: any) => {
-  let result: any = await captureResponse.captureResponse(payment, updateTransactions, authID, orderNumber);
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, captureConstGP.authID, captureConstGP.orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -64,7 +64,7 @@ test.serial('Check status for payment capture with reconciliation Id', async (t:
     t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
   }
 });test.serial('Capturing a payment with empty auth id and check http code', async (t: any) => {
-  let result: any = await captureResponse.captureResponse(payment, updateTransactions, '', orderNo);
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, '', captureConstGP.orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);

@@ -1,5 +1,5 @@
 import deleteToken from '../JSON/deleteToken.json';
-export const customerTokenObj = {
+ const customerTokenObj = {
   alias: deleteToken.alias,
   value: deleteToken.value,
   paymentToken: deleteToken.paymentToken,
@@ -12,7 +12,7 @@ export const customerTokenObj = {
   addressId: 'OKxBLnRJ',
 };
 
-export const customerTokenObject = {
+ const customerTokenObject = {
   alias: 'sp2',
   value: 'D3CD8072D10089FEE053AF598E0AA',
   cardType: '001',
@@ -22,7 +22,7 @@ export const customerTokenObject = {
   cardExpiryYear: '2024',
 };
 
-export const customerInvalidTokenObj = {
+ const customerInvalidTokenObj = {
   alias: deleteToken.value,
   value: 'abc',
   paymentToken: deleteToken.paymentToken,
@@ -35,7 +35,7 @@ export const customerInvalidTokenObj = {
   addressId: 'OKxBLnRJ',
 };
 
-export const customerInvalidPaymentTokenObj = {
+ const customerInvalidPaymentTokenObj = {
   alias: deleteToken.alias,
   value: deleteToken.value,
   paymentToken: 'abc',
@@ -47,3 +47,10 @@ export const customerInvalidPaymentTokenObj = {
   cardExpiryYear: deleteToken.cardExpiryYear,
   addressId: 'OKxBLnRJ',
 };
+
+export default {
+  customerTokenObj,
+  customerTokenObject,
+  customerInvalidTokenObj,
+  customerInvalidPaymentTokenObj
+}

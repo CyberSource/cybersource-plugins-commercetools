@@ -2,10 +2,14 @@ import http from 'http';
 import path from 'path';
 import url from 'url';
 
-import { Constants } from '../constants';
+import cors from 'cors';
+
+import { Constants } from '../constants/constants';
+import { CustomMessages } from '../constants/customMessages';
 import paymentUtils from '../utils/PaymentUtils';
 
 import { RouterHandler } from './RouterHandler';
+
 
 type MiddlewareFunction = (req: any, res: any, next: () => void) => void;
 
@@ -36,71 +40,75 @@ export class AppHandler extends RouterHandler {
   private runMiddleware(req: any, res: any): void {
     const rootDir = path.resolve(__dirname, '../');
     const requestUrl = req.url as string;
-    if (requestUrl) {
-      const parsedUrl = url.parse(requestUrl, true);
-      if (parsedUrl?.pathname && parsedUrl?.href) {
-        switch (parsedUrl.pathname) {
-          case '/': {
-            res.end('navigate to /orders');
-            break;
-          }
-          case '/css/styles.css': {
-            if(parsedUrl.path){
-              this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/css/styles.css', res);
+    const corsMiddleWare = cors();
+    corsMiddleWare(req, res, () => {
+      if (requestUrl) {
+        const parsedUrl = url.parse(requestUrl, true);
+        if (parsedUrl?.pathname && parsedUrl?.href) {
+          switch (parsedUrl.pathname) {
+            case '/': {
+              res.end('navigate to /orders');
+              break;
             }
-            break;
-          }
-          case '/javascript/paymentDetails.js': {
-            if(parsedUrl.path){
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/paymentDetails.js', res);
+            case '/css/styles.css': {
+              if (parsedUrl.path) {
+                this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/css/styles.css', res);
+              }
+              break;
             }
-            break;
-          }
-          case '/javascript/orders.js': {
-            if(parsedUrl.path){
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/orders.js', res);
+            case '/javascript/paymentDetails.js': {
+              if (parsedUrl.path) {
+                this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/paymentDetails.js', res);
+              }
+              break;
             }
-            break;
-          }
-          case '/javascript/utils.js': {
-            if(parsedUrl.path){
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/utils.js', res);
+            case '/javascript/orders.js': {
+              if (parsedUrl.path) {
+                this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/orders.js', res);
+              }
+              break;
             }
-            break;
-          }
-          case '/billingImage.png': {
-            if(parsedUrl.path){
-            this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/images/billingImage.png', res);
+            case '/javascript/utils.js': {
+              if (parsedUrl.path) {
+                this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/javascript/utils.js', res);
+              }
+              break;
             }
-            break;
-          }
-          case '/shippingImage.png': {
-            this._serveStaticFile(parsedUrl.href, parsedUrl.pathname, rootDir + '/views/images/shippingImage.png', res);
-            break;
-          }
-          case '/favicon.ico': {
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncRequestHandler', Constants.LOG_INFO, '', Constants.SUCCESS_MSG_FAV_ICON);
-            res.writeHead(404);
-            res.end();
-            break;
-          }
-          default: {
-            if (this.middlewareFunction.length) {
-              const middlewareFunction = this.middlewareFunction[0];
-              middlewareFunction(req, res, () => {
-                this.runMiddleware(req, res);
-              });
-            } else {
-              res.writeHead(Constants.HTTP_NOT_FOUND_STATUS_CODE, { 'Content-type': 'text/plain' });
-              res.end(Constants.ERROR_MSG_NOT_FOUND);
+            case '/billingImage.png': {
+              if (parsedUrl.path) {
+                this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/images/billingImage.png', res);
+              }
+              break;
+            }
+            case '/shippingImage.png': {
+              this._serveStaticFile(parsedUrl.href, parsedUrl.pathname, rootDir + '/views/images/shippingImage.png', res);
+              break;
+            }
+            case '/favicon.ico': {
+              paymentUtils.logData(__filename, 'FuncRequestHandler', Constants.LOG_INFO, '', CustomMessages.SUCCESS_MSG_FAV_ICON);
+              res.statusCode = 400;
+              res.end();
+              break;
+            }
+            default: {
+              if (this.middlewareFunction.length) {
+                const middlewareFunction = this.middlewareFunction[0];
+                middlewareFunction(req, res, () => {
+                  this.runMiddleware(req, res);
+                });
+              } else {
+                res.statusCode = Constants.HTTP_NOT_FOUND_STATUS_CODE;
+                res.setHeader('Content-Type', 'text/plain');
+                res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
+              }
             }
           }
+        } else {
+          res.end();
         }
       } else {
         res.end();
       }
-    } else {
-      res.end();
-    }
+    })
   }
 }

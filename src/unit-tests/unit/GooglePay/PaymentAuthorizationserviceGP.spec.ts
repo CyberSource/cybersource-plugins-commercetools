@@ -2,9 +2,9 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants';
+import { Constants } from '../../../constants/constants';
 import authorizationResponse from '../../../service/payment/PaymentAuthorizationService';
-import { cardTokens, cart, guestCardTokens, guestPayment, notSaveToken, orderNo, orderNumber, payerAuthMandateFlag, payment, payments, service, shippingCart, ucPayment } from '../../const/GooglePay/PaymentAuthorizationServiceConstGP';
+import authServiceConstGP from '../../const/GooglePay/PaymentAuthorizationServiceConstGP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -15,7 +15,7 @@ let paymentResponse: any = {
 };
 
 test.serial('Authorizing a payment and check http code', async (t: any) => {
-  let result: any = await authorizationResponse.authorizationResponse(payment, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await authorizationResponse.getAuthorizationResponse(authServiceConstGP.payment, authServiceConstGP.cart, authServiceConstGP.service, authServiceConstGP.cardTokens, authServiceConstGP.notSaveToken, authServiceConstGP.payerAuthMandateFlag, authServiceConstGP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.transactionId = result.transactionId;
   paymentResponse.status = result.status;
@@ -45,7 +45,7 @@ test.serial('Check status of payment authorization', async (t: any) => {
 });
 
 test.serial('Authorizing a payment using invalid token and check http code', async (t: any) => {
-  let result: any = await authorizationResponse.authorizationResponse(payments, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await authorizationResponse.getAuthorizationResponse(authServiceConstGP.payments, authServiceConstGP.cart, authServiceConstGP.service, authServiceConstGP.cardTokens, authServiceConstGP.notSaveToken, authServiceConstGP.payerAuthMandateFlag, authServiceConstGP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.transactionId = result.transactionId;
   paymentResponse.status = result.status;
@@ -68,7 +68,7 @@ test.serial('Check status of payment authorization using invalid token', async (
 });
 
 test.serial('Authorizing a payment for guest user and check http code', async (t: any) => {
-  let result: any = await authorizationResponse.authorizationResponse(guestPayment, cart, service, guestCardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await authorizationResponse.getAuthorizationResponse(authServiceConstGP.guestPayment, authServiceConstGP.cart, authServiceConstGP.service, authServiceConstGP.guestCardTokens, authServiceConstGP.notSaveToken, authServiceConstGP.payerAuthMandateFlag, authServiceConstGP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.transactionId = result.transactionId;
   paymentResponse.status = result.status;
@@ -98,7 +98,7 @@ test.serial('Check status of payment authorization for guest user', async (t: an
 });
 
 test.serial('Authorizing a payment with reconciliation Id and check http code', async (t: any) => {
-  let result: any = await authorizationResponse.authorizationResponse(payment, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNumber);
+  let result: any = await authorizationResponse.getAuthorizationResponse(authServiceConstGP.payment, authServiceConstGP.cart, authServiceConstGP.service, authServiceConstGP.cardTokens, authServiceConstGP.notSaveToken, authServiceConstGP.payerAuthMandateFlag, authServiceConstGP.orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.transactionId = result.transactionId;
   paymentResponse.status = result.status;
@@ -128,7 +128,7 @@ test.serial('Check status of payment authorization with reconciliation Id', asyn
 });
 
 test.serial('Authorizing a payment with multiple shipping mode and check http code', async (t: any) => {
-  let result: any = await authorizationResponse.authorizationResponse(payment, shippingCart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNumber);
+  let result: any = await authorizationResponse.getAuthorizationResponse(authServiceConstGP.payment, authServiceConstGP.shippingCart, authServiceConstGP.service, authServiceConstGP.cardTokens, authServiceConstGP.notSaveToken, authServiceConstGP.payerAuthMandateFlag, authServiceConstGP.orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -155,7 +155,7 @@ test.serial('Check status of payment authorization with multiple shipping mode',
 });
 
 test.serial('Authorizing a payment for UC and check http code', async (t: any) => {
-  let result: any = await authorizationResponse.authorizationResponse(ucPayment, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await authorizationResponse.getAuthorizationResponse(authServiceConstGP.ucPayment, authServiceConstGP.cart, authServiceConstGP.service, authServiceConstGP.cardTokens, authServiceConstGP.notSaveToken, authServiceConstGP.payerAuthMandateFlag, authServiceConstGP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
