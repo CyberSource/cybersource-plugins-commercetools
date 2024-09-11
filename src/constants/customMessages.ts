@@ -15,7 +15,7 @@ export abstract class CustomMessages {
     static readonly EXCEPTION_MSG_ADDING_CUSTOM_FIELD = 'An exception occurred while adding custom field';
     static readonly EXCEPTION_MSG_ADD_EXTENSION = 'An exception occurred while adding extension to Commercetools';
     static readonly EXCEPTION_MSG_ADD_TRANSACTION = 'An exception occurred while adding transaction to the payment';
-    static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception ocurred while retrieving multi-mid details';
+    static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception occurred while retrieving multi-mid details';
     static readonly EXCEPTION_MSG_AUTHORIZING_PAYMENT = 'An exception occurred while authorizing the payment';
     static readonly EXCEPTION_MSG_ADDING_A_CARD = 'An exception occurred while adding a card token to customer';
     static readonly EXCEPTION_MSG_CART_UPDATE = 'An exception occurred while updating the cart';
@@ -36,7 +36,7 @@ export abstract class CustomMessages {
     static readonly EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED = 'MerchantseceretKey is Mandatory';
     static readonly EXCEPTION_MSG_PAYER_AUTH = 'An exception occurred while authenticating the payment';
     static readonly EXCEPTION_MSG_SERVICE_PROCESS = 'An exception occurred while processing your payment';
-    static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception ocurred while creating the extensions and custom fields = ';
+    static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception occurred while creating the extensions and custom fields = ';
     static readonly EXCEPTION_MSG_SYNC_DETAILS = 'An exception occurred while fetching sync conversion details';
     static readonly EXCEPTION_MSG_TRANSACTION_SEARCH = 'An exception occurred while retrieving the transaction details';
     static readonly EXCEPTION_CREATE_PAYMENT_API = 'An exception occurred while creating a payment';
