@@ -128,5 +128,4 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_SUBSCRIPTION_ALREADY_EXIST = 'Subscription Already Exists';
     static readonly ERROR_MSG_UNABLE_TO_UPDATE_CUSTOMER_TOKEN = 'An error occurred while updating the card from notification';
 
-
 }
