@@ -1,19 +1,18 @@
-import path from 'path';
-
 import { createRequestBuilder } from '@commercetools/api-request-builder';
 import { createClient } from '@commercetools/sdk-client';
 import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth';
 import { createHttpMiddleware } from '@commercetools/sdk-middleware-http';
 import fetch from 'node-fetch';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
 import { Address } from '../../models/AddressModel';
+import { Token } from '../../models/TokenModel';
 import { ActionType, AddressType, CardAddressGroupType, CustomerType, PaymentTransactionType, PaymentType, ReportSyncType, VisaUpdateType } from '../../types/Types';
-
-import paymentUtils from './../PaymentUtils';
+import paymentUtils from '../PaymentUtils';
 type createClient = typeof createClient;
 type createHttpMiddleware = typeof createHttpMiddleware;
-
 /**
  * Gets the CommerceTools client.
  * 
@@ -44,7 +43,7 @@ const getClient = () => {
       });
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetClient', Constants.EXCEPTION_MSG_COMMERCETOOLS_CONNECT, exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CLIENT, CustomMessages.EXCEPTION_MSG_COMMERCETOOLS_CONNECT, exception, '', '', '');
   }
   return client;
 };
@@ -67,15 +66,18 @@ const queryCartById = async (id: string, idType: string): Promise<any> => {
         const requestBuilder = createRequestBuilder({
           projectKey: process.env.CT_PROJECT_KEY,
         });
-        if (Constants.ANONYMOUS_ID === idType) {
-          uri = requestBuilder.carts.parse({ where: [`${Constants.ANONYMOUS_ID} = "${id}"`, `${Constants.ACTIVE_CART_STATE}`], sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build();
-          logIdType = 'Anonymous Id : ';
-        } else if (Constants.CUSTOMER_ID === idType) {
-          uri = requestBuilder.carts.parse({ where: [`${Constants.CUSTOMER_ID} = "${id}"`, `${Constants.ACTIVE_CART_STATE}`], sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build();
-          logIdType = 'Customer Id : ';
-        } else if (Constants.PAYMENT_ID === idType) {
-          uri = requestBuilder.carts.parse({ where: [`paymentInfo(payments(id="${id}"))`] }).build();
-          logIdType = 'Payment Id : ';
+        switch (idType) {
+          case Constants.ANONYMOUS_ID:
+            uri = requestBuilder.carts.parse({ where: [`${Constants.ANONYMOUS_ID} = "${id}"`, `${Constants.ACTIVE_CART_STATE}`], sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build();
+            logIdType = 'Anonymous Id : ';
+            break;
+          case Constants.CUSTOMER_ID:
+            uri = requestBuilder.carts.parse({ where: [`${Constants.CUSTOMER_ID} = "${id}"`, `${Constants.ACTIVE_CART_STATE}`], sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build();
+            logIdType = 'Customer Id : ';
+            break;
+          case Constants.PAYMENT_ID:
+            uri = requestBuilder.carts.parse({ where: [`paymentInfo(payments(id="${id}"))`] }).build();
+            logIdType = 'Payment Id : ';
         }
         const channelsRequest = {
           uri: uri,
@@ -86,13 +88,13 @@ const queryCartById = async (id: string, idType: string): Promise<any> => {
           retrieveCartByIdResponse = retrieveCartByIdResponseObject.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncQueryCartById', Constants.LOG_INFO, logIdType + id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_CART_BY_ID, Constants.LOG_INFO, logIdType + id || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncQueryCartById', Constants.LOG_INFO, logIdType + id, Constants.ERROR_MSG_CART_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_CART_BY_ID, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CART_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncQueryCartById', Constants.EXCEPTION_MSG_CART_DETAILS, exception, id, logIdType, '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_QUERY_CART_BY_ID, CustomMessages.EXCEPTION_MSG_CART_DETAILS, exception, id, logIdType, '');
   }
   return retrieveCartByIdResponse;
 };
@@ -115,16 +117,22 @@ const queryOrderById = async (id: string, idType: string) => {
         const requestBuilder = createRequestBuilder({
           projectKey: process.env.CT_PROJECT_KEY,
         });
-        if (Constants.CART_ID === idType) {
-          uri = requestBuilder.orders.parse({ where: [`cart(id="${id}")`] }).build();
-          logIdType = 'CartId : ';
-        } else if (Constants.PAYMENT_ID === idType) {
-          uri = requestBuilder.orders.parse({ where: [`paymentInfo(payments(id="${id}"))`] }).build();
-          logIdType = 'PaymentId : ';
-        } else if (Constants.CUSTOMER_ID === idType) {
-          const filterDate = new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString();
-          uri = requestBuilder.orders.where(`customerId="${id}" and createdAt >= "${filterDate}"`).build();
-          logIdType = 'CustomerId : ';
+        switch (idType) {
+          case Constants.CART_ID:
+            uri = requestBuilder.orders.parse({ where: [`cart(id="${id}")`] }).build();
+            logIdType = 'CartId : ';
+            break;
+          case Constants.PAYMENT_ID:
+            uri = requestBuilder.orders.parse({ where: [`paymentInfo(payments(id="${id}"))`] }).build();
+            logIdType = 'PaymentId : ';
+            break;
+          case Constants.CUSTOMER_ID: {
+            let newDate = paymentUtils.getDate(null, false, -6, null) as number;
+            let setDate = paymentUtils.getDate(null, false, null, newDate);
+            let filterDate = paymentUtils.getDate(setDate, true);
+            uri = requestBuilder.orders.where(`customerId="${id}" and createdAt >= "${filterDate}"`).build();
+            logIdType = 'CustomerId : ';
+          }
         }
         const channelsRequest = {
           uri: uri,
@@ -135,13 +143,13 @@ const queryOrderById = async (id: string, idType: string) => {
           queryOrderByIdResponse = queryOrderByIdResponse.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncQueryOrderById', Constants.LOG_INFO, logIdType + id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_ORDER_BY_ID, Constants.LOG_INFO, logIdType + id || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncQueryOrderById', Constants.LOG_INFO, logIdType + id, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_ORDER_BY_ID, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncQueryOrderById', Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS, exception, id, logIdType, '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_QUERY_ORDER_BY_ID, CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS, exception, id, logIdType, '');
   }
   return queryOrderByIdResponse;
 };
@@ -170,10 +178,10 @@ const retrievePayment = async (paymentId: string): Promise<any> => {
         retrievePaymentResponse = retrievePaymentResponseObject.body;
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncRetrievePayment', Constants.LOG_INFO, 'PaymentId : ' + paymentId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, 'PaymentId: ' + paymentId || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncRetrievePayment', Constants.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS, exception, paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS, exception, paymentId, 'PaymentId : ', '');
   }
   return retrievePaymentResponse;
 };
@@ -185,7 +193,7 @@ const retrievePayment = async (paymentId: string): Promise<any> => {
  * @param {string} paymentId - The ID of the payment.
  * @returns {Promise<PaymentType | null>} - The updated payment with the added transaction.
  */
-const addTransaction = async (transactionObject: PaymentTransactionType, paymentId: string): Promise<PaymentType | null> => {
+const addTransaction = async (transactionObject: Partial<PaymentTransactionType>, paymentId: string): Promise<PaymentType | null> => {
   let addTransactionResponse: PaymentType | null = null;
   try {
     if (transactionObject && paymentId) {
@@ -205,7 +213,7 @@ const addTransaction = async (transactionObject: PaymentTransactionType, payment
                 action: 'addTransaction',
                 transaction: {
                   type: transactionObject.type,
-                  timestamp: new Date(Date.now()).toISOString(),
+                  timestamp: paymentUtils.getDate(Date.now(), true),
                   amount: transactionObject.amount,
                   state: transactionObject.state,
                 },
@@ -218,11 +226,11 @@ const addTransaction = async (transactionObject: PaymentTransactionType, payment
           addTransactionResponse = addTransactionResponseObject.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddTransaction', Constants.LOG_INFO, 'PaymentId : ' + paymentId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_TRANSACTION, Constants.LOG_INFO, 'PaymentId: ' + paymentId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT)
       }
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncAddTransaction', Constants.EXCEPTION_MSG_ADD_TRANSACTION, exception, paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_TRANSACTION, CustomMessages.EXCEPTION_MSG_ADD_TRANSACTION, exception, paymentId, 'PaymentId : ', '');
   }
   return addTransactionResponse;
 };
@@ -248,10 +256,10 @@ const getOrders = async (): Promise<any> => {
       };
       getOrderResponse = await client.execute(channelsRequest);
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetOrders', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ORDERS, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT)
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetOrders', Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS, exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_ORDERS, CustomMessages.EXCEPTION_MSG_FETCH_ORDER_DETAILS, exception, '', '', '');
   }
   if (getOrderResponse?.body) {
     getOrderResponseBody = getOrderResponse.body;
@@ -269,11 +277,11 @@ const getOrders = async (): Promise<any> => {
  * @param {CardAddressGroupType} addressData - The address data.
  * @returns {Promise<any>} - The response body containing updated cart data.
  */
-const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVersion: number, addressData: CardAddressGroupType): Promise<any> => {
+const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVersion: number, addressData: Partial<CardAddressGroupType>): Promise<any> => {
   let updateCartByPaymentIdResponse = null;
-  const actions: ActionType[] = [];
+  const actions: Partial<ActionType>[] = [];
   try {
-    if (cartId && 0 < cartVersion && addressData && Object.keys(addressData).length) {
+    if (cartId && cartVersion && addressData && Object.keys(addressData).length) {
       if (addressData?.billToFieldGroup && Object.keys(addressData.billToFieldGroup).length) {
         actions.push({
           action: 'setBillingAddress',
@@ -296,7 +304,7 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
           address: new Address(addressData.billTo),
         });
       }
-      if (addressData?.shipTo && Constants.STRING_TRUE === process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING) {
+      if (addressData?.shipTo && paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING)) {
         const cartDetail = await getCartById(cartId);
         if (cartDetail) {
           if ('Single' === cartDetail.shippingMode) {
@@ -307,7 +315,7 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
           }
         }
       }
-      if (actions && 0 !== actions.length) {
+      if (actions && actions.length) {
         const client = getClient();
         if (client) {
           const requestBuilder = createRequestBuilder({
@@ -327,16 +335,14 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
             updateCartByPaymentIdResponse = updateCartByPaymentIdResponseObject.body;
           }
         } else {
-          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCartByPaymentId', Constants.LOG_INFO, 'PaymentId : ' + paymentId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, 'CartId: ' + cartId || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT)
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCartByPaymentId', Constants.LOG_INFO, 'PaymentId : ' + paymentId, Constants.ERROR_MSG_UPDATE_CART);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, 'CartId: ' + cartId || '', CustomMessages.ERROR_MSG_EMPTY_CART);
       }
-    } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCartByPaymentId', Constants.LOG_INFO, 'PaymentId : ' + paymentId, Constants.ERROR_MSG_EMPTY_CART);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncUpdateCartByPaymentId', Constants.EXCEPTION_MSG_CART_UPDATE, exception, paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_UPDATE_CART_BY_PAYMENT_ID, CustomMessages.EXCEPTION_MSG_CART_UPDATE, exception, paymentId, 'PaymentId : ', '');
   }
   return updateCartByPaymentIdResponse;
 };
@@ -354,29 +360,16 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
 const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: string, instrumentIdentifier: string, updatePaymentObj: PaymentType, addressId: string): Promise<any> => {
   let setCustomerTokensResponse = null;
   let failedTokens: string[] = [];
-  let customTypePresent = false;
+  let isCustomTypePresent = false;
   try {
     if (paymentInstrumentId && instrumentIdentifier && updatePaymentObj?.customer?.id && updatePaymentObj?.custom?.fields) {
       const customerId = updatePaymentObj.customer.id;
       const customFields = updatePaymentObj?.custom?.fields;
       const customerInfo = await getCustomer(customerId);
       if (customerInfo) {
-        customTypePresent = (customerInfo?.custom?.type?.id) ? true : false;
-        const tokenData = {
-          alias: customFields.isv_tokenAlias,
-          value: tokenCustomerId,
-          paymentToken: paymentInstrumentId,
-          instrumentIdentifier: instrumentIdentifier,
-          cardType: customFields.isv_cardType,
-          cardName: customFields.isv_cardType,
-          cardNumber: customFields.isv_maskedPan,
-          cardExpiryMonth: customFields.isv_cardExpiryMonth,
-          cardExpiryYear: customFields.isv_cardExpiryYear,
-          addressId: addressId,
-          timeStamp: new Date(Date.now()).toISOString(),
-        };
-        const stringTokenData = JSON.stringify(tokenData);
-        if (customTypePresent) {
+        isCustomTypePresent = (customerInfo?.custom?.type?.id) ? true : false;
+        const stringTokenData = JSON.stringify(new Token(customFields, tokenCustomerId, paymentInstrumentId, instrumentIdentifier, addressId, ''));
+        if (isCustomTypePresent) {
           if (customerInfo?.custom?.fields?.isv_tokens && 0 < customerInfo?.custom?.fields?.isv_tokens?.length) {
             if (customerInfo?.custom?.fields?.isv_failedTokens) {
               failedTokens = customerInfo.custom.fields.isv_failedTokens;
@@ -399,11 +392,11 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
         }
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSetCustomerTokens', Constants.LOG_INFO, 'CustomerId : ' + updatePaymentObj?.customer?.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOMER_TOKENS, Constants.LOG_INFO, 'CustomerId : ' + updatePaymentObj?.customer?.id, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
     let customerId = updatePaymentObj?.customer?.id ? updatePaymentObj?.customer?.id : '';
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncSetCustomerTokens', Constants.EXCEPTION_MSG_CUSTOMER_UPDATE, exception, customerId, 'CustomerId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_SET_CUSTOMER_TOKENS, CustomMessages.EXCEPTION_MSG_CUSTOMER_UPDATE, exception, customerId, 'CustomerId : ', '');
   }
   return setCustomerTokensResponse;
 };
@@ -414,8 +407,8 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
  * @param {string} customerId - The ID of the customer.
  * @returns {Promise<CustomerType | null>} - The response containing customer information.
  */
-const getCustomer = async (customerId: string): Promise<CustomerType | null> => {
-  let getCustomerResponse: CustomerType | null = null;
+const getCustomer = async (customerId: string): Promise<Partial<CustomerType> | null> => {
+  let getCustomerResponse: Partial<CustomerType> | null = null;
   try {
     if (customerId) {
       const client = getClient();
@@ -433,13 +426,13 @@ const getCustomer = async (customerId: string): Promise<CustomerType | null> => 
           getCustomerResponse = getCustomerResponseObject.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetCustomer', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOMER, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetCustomer', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_CUSTOMER_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOMER, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetCustomer', Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS, exception, customerId, 'CustomerId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CUSTOMER, CustomMessages.EXCEPTION_MSG_FETCH_ORDER_DETAILS, exception, customerId, 'CustomerId : ', '');
   }
   return getCustomerResponse;
 };
@@ -451,7 +444,7 @@ const getCustomer = async (customerId: string): Promise<CustomerType | null> => 
  * @param {string} transactionId - The ID of the transaction to update.
  * @returns {Promise<void>}
  */
-const updateDecisionSync = async (decisionUpdateObject: PaymentTransactionType, transactionId: string) => {
+const updateDecisionSync = async (decisionUpdateObject: Partial<PaymentTransactionType>, transactionId: string): Promise<void> => {
   try {
     if (decisionUpdateObject) {
       const client = getClient();
@@ -476,12 +469,12 @@ const updateDecisionSync = async (decisionUpdateObject: PaymentTransactionType, 
         };
         await client.execute(channelsRequest);
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateDecisionSync', Constants.LOG_INFO, 'PaymentId : ' + decisionUpdateObject?.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, 'PaymentId : ' + decisionUpdateObject?.id, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     }
   } catch (exception) {
     if (decisionUpdateObject?.id) {
-      paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncUpdateDecisionSync', Constants.EXCEPTION_MSG_DECISION_SYNC, exception, decisionUpdateObject?.id, 'PaymentId : ', '');
+      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, CustomMessages.EXCEPTION_MSG_DECISION_SYNC, exception, decisionUpdateObject?.id, 'PaymentId : ', '');
     }
   }
 };
@@ -498,6 +491,7 @@ const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<Pa
     if (visaUpdateObject && visaUpdateObject?.id) {
       const client = getClient();
       if (client) {
+
         const requestBuilder = createRequestBuilder({
           projectKey: process.env.CT_PROJECT_KEY,
         });
@@ -515,13 +509,13 @@ const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<Pa
           syncVisaCardDetailsResponse = syncVisaCardDetailsResponseObject.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncVisaCardDetails', Constants.LOG_INFO, 'PaymentId : ' + visaUpdateObject?.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, 'PaymentId : ' + visaUpdateObject?.id, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncVisaCardDetails', Constants.LOG_INFO, 'PaymentId : ' + visaUpdateObject?.id, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, 'PaymentId : ' + '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncSyncVisaCardDetails', Constants.EXCEPTION_MSG_SYNC_DETAILS, exception, visaUpdateObject?.id, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_SYNC_VISA_CARD_DETAILS, CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception, visaUpdateObject?.id, 'PaymentId : ', '');
   }
   return syncVisaCardDetailsResponse;
 };
@@ -554,7 +548,7 @@ const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<Pay
                   action: 'addTransaction',
                   transaction: {
                     type: syncUpdateObject.type,
-                    timestamp: new Date(Date.now()).toISOString(),
+                    timestamp: paymentUtils.getDate(Date.now(), true),
                     amount: syncUpdateObject.amountPlanned,
                     state: syncUpdateObject.state,
                     interactionId: syncUpdateObject.interactionId,
@@ -579,7 +573,7 @@ const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<Pay
                   action: 'addTransaction',
                   transaction: {
                     type: syncUpdateObject.type,
-                    timestamp: new Date(Date.now()).toISOString(),
+                    timestamp: paymentUtils.getDate(Date.now(), true),
                     amount: syncUpdateObject.amountPlanned,
                     state: syncUpdateObject.state,
                     interactionId: syncUpdateObject.interactionId,
@@ -594,14 +588,14 @@ const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<Pay
           syncAddTransactionResponse = syncAddTransactionResponseObject.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncAddTransaction', Constants.LOG_INFO, 'PaymentId : ' + syncUpdateObject.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, 'PaymentId : ' + syncUpdateObject?.id, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSyncAddTransaction', Constants.LOG_INFO, 'PaymentId : ', Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
     let paymentId = syncUpdateObject?.id ? syncUpdateObject?.id : '';
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncSyncAddTransaction', Constants.EXCEPTION_MSG_SYNC_DETAILS, exception, paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_SYNC_ADD_TRANSACTION, CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception, paymentId, 'PaymentId : ', '');
   }
   return syncAddTransactionResponse;
 };
@@ -629,10 +623,10 @@ const addCustomTypes = async (customType: any): Promise<any> => {
       };
       addCustomTypeResponse = await client.execute(channelsRequest);
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomTypes', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncAddCustomTypes', Constants.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', customType.key);
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPES, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', customType.key);
     data = exception;
     if (Constants.HTTP_BAD_REQUEST_STATUS_CODE === data.statusCode && Constants.HTTP_BAD_REQUEST_STATUS_CODE === data?.body?.statusCode && Constants.STRING_DUPLICATE_FIELD === data?.body?.errors[0]?.code) {
       addCustomTypeResponse = data;
@@ -663,10 +657,10 @@ const addExtensions = async (extension: any): Promise<any> => {
       };
       addExtensionsResponse = await client.execute(channelsRequest);
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddExtensions', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_EXTENSIONS, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncAddExtensions', Constants.EXCEPTION_MSG_ADD_EXTENSION, exception, '', '', extension.key);
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_EXTENSIONS, CustomMessages.EXCEPTION_MSG_ADD_EXTENSION, exception, '', '', extension.key);
   }
   return addExtensionsResponse;
 };
@@ -692,12 +686,12 @@ const getCustomType = async (key: string): Promise<any> => {
           method: 'GET',
         };
         getCustomTypeResponse = await client.execute(channelsRequest);
-      } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetCustomType', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
+    } else {
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOM_TYPE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CUSTOM_TYPE);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetCustomType', Constants.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', key);
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CUSTOM_TYPE, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', key);
     getCustomTypeResponse = exception;
   }
   return getCustomTypeResponse;
@@ -712,8 +706,8 @@ const getCustomType = async (key: string): Promise<any> => {
  * @param {string} [customerTokenId] - Customer token ID.
  * @returns {Promise<CustomerType | null>} - Response of the set custom type operation.
  */
-const setCustomType = async (customerId: string | undefined, fieldsData: string[], failedTokenData: string[] | undefined, customerTokenId?: string): Promise<CustomerType | null> => {
-  let setCustomTypeResponse: CustomerType | null = null;
+const setCustomType = async (customerId: string | undefined, fieldsData: string[], failedTokenData: string[] | undefined, customerTokenId?: string): Promise<Partial<CustomerType> | null> => {
+  let setCustomTypeResponse: Partial<CustomerType> | null = null;
   try {
     if (customerId) {
       const client = getClient();
@@ -750,13 +744,13 @@ const setCustomType = async (customerId: string | undefined, fieldsData: string[
           setCustomTypeResponse = setCustomTypeResponseObject.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSetCustomType', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, 'CustomerId: ' + customerId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncSetCustomType', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_CREATE_CUSTOM_TYPE);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncSetCustomType', Constants.EXCEPTION_MSG_FETCH_ORDER_DETAILS, exception, customerId || '', 'CustomerId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_SET_CUSTOM_TYPE, CustomMessages.EXCEPTION_MSG_FETCH_ORDER_DETAILS, exception, customerId || '', 'CustomerId : ', '');
   }
   return setCustomTypeResponse;
 };
@@ -771,12 +765,13 @@ const changeTransactionInteractionId = async (transactionObj: any) => {
   let changeTransactionInteractionIdResponse: PaymentType | null = null;
   try {
     if (transactionObj) {
+      let paymentId = transactionObj.paymentId;
       const client = getClient();
-      if (null != client) {
+      if (client) {
         const requestBuilder = createRequestBuilder({
           projectKey: process.env.CT_PROJECT_KEY,
         });
-        const uri = requestBuilder.payments.byId(transactionObj.paymentId).build();
+        const uri = requestBuilder.payments.byId(paymentId).build();
         const channelsRequest = {
           uri: uri,
           method: 'GET',
@@ -796,13 +791,13 @@ const changeTransactionInteractionId = async (transactionObj: any) => {
           changeTransactionInteractionIdResponse = changeTransactionInteractionIdResponseObject.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncChangeTransactionInteractionId', Constants.LOG_INFO, 'PaymentId : ' + transactionObj?.id, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_CHANGE_TRANSACTION_INTERACTION_ID, Constants.LOG_INFO, 'PaymentId: ' + paymentId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncChangeTransactionInteractionId', Constants.LOG_INFO, 'PaymentId : ' + transactionObj.id, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_CHANGE_TRANSACTION_INTERACTION_ID, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncChangeTransactionInteractionId', Constants.EXCEPTION_MSG_CHANGE_TRANSACTION_INTERACTION_ID, exception, transactionObj?.paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_CHANGE_TRANSACTION_INTERACTION_ID, CustomMessages.EXCEPTION_MSG_CHANGE_TRANSACTION_INTERACTION_ID, exception, transactionObj?.paymentId, 'PaymentId : ', '');
   }
   return changeTransactionInteractionIdResponse;
 };
@@ -840,13 +835,13 @@ const addCustomField = async (typeId: string, version: number, fieldDefinition: 
         };
         addCustomFieldResponse = await client.execute(channelsRequest);
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomField', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomField', Constants.LOG_INFO, '', Constants.ERROR_MSG_UPDATE_CUSTOM_TYPE);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_UPDATE_CUSTOM_TYPE);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncAddCustomField', Constants.EXCEPTION_MSG_ADDING_CUSTOM_FIELD, exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_FIELD, CustomMessages.EXCEPTION_MSG_ADDING_CUSTOM_FIELD, exception, '', '', '');
   }
   if (addCustomFieldResponse?.body) {
     addCustomFieldResponse = addCustomFieldResponse.body;
@@ -866,7 +861,7 @@ const addCustomField = async (typeId: string, version: number, fieldDefinition: 
 const updateAvailableAmount = async (paymentId: string, version: number, transactionId: string, pendingAmount: number) => {
   let updateAvailableAmountResponse;
   try {
-    if (paymentId && version && transactionId && 0 <= pendingAmount) {
+    if (paymentId && version && transactionId && 0 > pendingAmount) {
       const client = getClient();
       if (client) {
         const requestBuilder = createRequestBuilder({
@@ -895,13 +890,13 @@ const updateAvailableAmount = async (paymentId: string, version: number, transac
         };
         updateAvailableAmountResponse = await client.execute(channelsRequest);
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateAvailableAmount', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateAvailableAmount', Constants.LOG_INFO, 'PaymentId : ' + paymentId, Constants.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_INFO, 'PaymentId : ' + paymentId || '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncUpdateAvailableAmount', Constants.EXCEPTION_MSG_CUSTOM_TYPE, exception, paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_UPDATE_AVAILABLE_AMOUNT, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, paymentId, 'PaymentId : ', '');
   }
   if (updateAvailableAmountResponse?.body) {
     updateAvailableAmountResponse = updateAvailableAmountResponse.body;
@@ -931,13 +926,13 @@ const getCartById = async (cartId: string) => {
         };
         getCartByIdResponse = await client.execute(channelsRequest);
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncRetrieveCartByAnonymousId', Constants.LOG_INFO, 'CartId : ' + cartId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CART_BY_ID, Constants.LOG_INFO, 'CartId : ' + cartId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncRetrieveCartByAnonymousId', Constants.LOG_INFO, 'CartId : ' + cartId, Constants.ERROR_MSG_CART_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CART_BY_ID, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CART_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncRetrieveCartByAnonymousId', Constants.EXCEPTION_MSG_CART_DETAILS, exception, cartId, 'CartId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CART_BY_ID, CustomMessages.EXCEPTION_MSG_CART_DETAILS, exception, cartId, 'CartId : ', '');
   }
   if (getCartByIdResponse?.body) {
     getCartByIdResponse = getCartByIdResponse.body;
@@ -952,49 +947,45 @@ const getCartById = async (cartId: string) => {
  * @param {AddressType} addressObj - The address object to add.
  * @returns {Promise<any>} - Response containing the updated customer details.
  */
-const addCustomerAddress = async (customerId: string, addressObj: AddressType) => {
-  const actions: ActionType[] = [];
-  let addCustomerAddressResponse: CustomerType | null = null;
-  let customerData: CustomerType | null = null;
+const addCustomerAddress = async (customerId: string, addressObj: Partial<AddressType>) => {
+  const actions: Partial<ActionType>[] = [];
+  let addCustomerAddressResponse: Partial<CustomerType> | null = null;
+  let customerData: Partial<CustomerType> | null = null;
   try {
     if (customerId) {
       customerData = await getCustomer(customerId);
-      if (customerData) {
-        actions.push({
-          action: 'addAddress',
-          address: new Address(addressObj)
-        });
-        if (actions && 0 < actions.length) {
-          const client = getClient();
-          if (client) {
-            const requestBuilder = createRequestBuilder({
-              projectKey: process.env.CT_PROJECT_KEY,
-            });
-            const uri = requestBuilder.customers.byId(customerId).build();
-            const channelsRequest = {
-              uri: uri,
-              method: 'POST',
-              body: JSON.stringify({
-                version: customerData.version,
-                actions: actions,
-              }),
-            };
-            const customerResponseObject = await client.execute(channelsRequest);
-            if (customerResponseObject?.body) {
-              addCustomerAddressResponse = customerResponseObject;
-            }
-          } else {
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      actions.push({
+        action: 'addAddress',
+        address: new Address(addressObj)
+      });
+      if (actions && actions.length && customerData) {
+        const client = getClient();
+        if (client) {
+          const requestBuilder = createRequestBuilder({
+            projectKey: process.env.CT_PROJECT_KEY,
+          });
+          const uri = requestBuilder.customers.byId(customerId).build();
+          const channelsRequest = {
+            uri: uri,
+            method: 'POST',
+            body: JSON.stringify({
+              version: customerData.version,
+              actions: actions,
+            }),
+          };
+          const customerResponseObject = await client.execute(channelsRequest);
+          if (customerResponseObject?.body) {
+            addCustomerAddressResponse = customerResponseObject.body;
           }
         } else {
-          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_CUSTOMER_UPDATE);
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOMER_ADDRESS, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
         }
-      } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.LOG_INFO, 'CustomerId : ' + customerId, Constants.ERROR_MSG_CUSTOMER_DETAILS);
       }
+    } else {
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOMER_ADDRESS, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CUSTOMER_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncAddCustomerAddress', Constants.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS, exception, customerId, 'CustomerId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_CUSTOMER_ADDRESS, CustomMessages.EXCEPTION_MSG_CUSTOMER_UPDATE_ADDRESS, exception, customerId, 'CustomerId : ', '');
   }
   return addCustomerAddressResponse;
 };
@@ -1022,10 +1013,10 @@ const createCTCustomObject = async (customObjectData: any) => {
       };
       setCustomObjectResponse = await client.execute(channelsRequest);
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncCreateCTCustomObject', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_CREATE_CT_CUSTOM_OBJECT, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncCreateCTCustomObject', Constants.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_CREATE_CT_CUSTOM_OBJECT, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', '');
     setCustomObjectResponse = exception;
   }
   return setCustomObjectResponse;
@@ -1044,8 +1035,7 @@ const retrieveCustomObjectByContainer = async (container: string) => {
     if (client) {
       const requestBuilder = createRequestBuilder({
         projectKey: process.env.CT_PROJECT_KEY,
-      });
-
+      })
       const uri = requestBuilder.customObjects.where(`container="${container}"`).build();
       const channelsRequest = {
         uri: uri,
@@ -1070,11 +1060,12 @@ const retrieveCustomObjectByContainer = async (container: string) => {
  * @param {any} failedTokens - Failed tokens data.
  * @returns {Promise<any>} - Response containing the result of the update.
  */
-const updateCustomerToken = async (updateObject: any, customerObject: CustomerType, failedTokens: any, customerTokenId: string | null) => {
+const updateCustomerToken = async (updateObject: any, customerObject: Partial<CustomerType>, failedTokens: any, customerTokenId: string | null) => {
   let setCustomFieldResponse: any;
   let actions = [];
   try {
-    if (customerObject) {
+    if (customerObject && customerObject?.id) {
+      let customerId = customerObject.id;
       const client = getClient();
       if (client) {
         const requestBuilder = createRequestBuilder({
@@ -1087,18 +1078,18 @@ const updateCustomerToken = async (updateObject: any, customerObject: CustomerTy
             value: failedTokens,
           });
         }
-        if (customerTokenId) {
-          actions.push({
-            action: 'setCustomField',
-            name: 'isv_customerId',
-            value: customerTokenId
-          });
-        }
         if (updateObject) {
           actions.push({
             action: 'setCustomField',
             name: 'isv_tokens',
             value: updateObject,
+          });
+        }
+        if (customerTokenId) {
+          actions.push({
+            action: 'setCustomField',
+            name: 'isv_customerId',
+            value: customerTokenId
           });
         }
         if (customerObject?.custom?.fields?.isv_tokenAction) {
@@ -1122,7 +1113,7 @@ const updateCustomerToken = async (updateObject: any, customerObject: CustomerTy
             value: null,
           });
         }
-        const uri = requestBuilder.customers.byId(customerObject.id).build();
+        const uri = requestBuilder.customers.byId(customerId).build();
         const channelsRequest = {
           uri: uri,
           method: 'POST',
@@ -1133,11 +1124,11 @@ const updateCustomerToken = async (updateObject: any, customerObject: CustomerTy
         };
         setCustomFieldResponse = await client.execute(channelsRequest);
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncUpdateCustomerToken', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CUSTOMER_TOKEN, Constants.LOG_INFO, customerId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncUpdateCustomerToken', Constants.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_UPDATE_CUSTOMER_TOKEN, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', '');
     setCustomFieldResponse = exception;
   }
   return setCustomFieldResponse;
@@ -1171,10 +1162,10 @@ const retrieveCustomerByCustomField = async (customFieldName: string, customFiel
         }
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncRetrieveCustomerByCustomField', Constants.LOG_INFO, '', Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncRetrieveCustomerByCustomField', 'An exception occurred while fetching customer object', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, CustomMessages.EXCEPTION_MSG_CUSTOMER_OBJECT, exception, '', '', '');
     retrieveCustomerByCustomObjectResponse = exception;
   }
   return retrieveCustomerByCustomObjectResponse;
@@ -1189,9 +1180,9 @@ const retrieveCustomerByCustomField = async (customFieldName: string, customFiel
 const getDiscountCodes = async (discountId: string) => {
   let getDiscountResponse = null;
   try {
-    if (null !== discountId) {
+    if (discountId) {
       const client = getClient();
-      if (null !== client) {
+      if (client) {
         const requestBuilder = createRequestBuilder({
           projectKey: process.env.CT_PROJECT_KEY,
         });
@@ -1205,13 +1196,13 @@ const getDiscountCodes = async (discountId: string) => {
           getDiscountResponse = getDiscountResponseObject?.body;
         }
       } else {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetDiscountCodes', Constants.LOG_INFO, 'DiscountCodeId : ' + discountId, Constants.ERROR_MSG_COMMERCETOOLS_CONNECT);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_DISCOUNT_CODES, Constants.LOG_INFO, discountId || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
       }
     } else {
-      paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetDiscountCodes', Constants.LOG_INFO, 'DiscountCodeId : ' + discountId, Constants.ERROR_MSG_DISCOUNT_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_DISCOUNT_CODES, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_DISCOUNT_DETAILS);
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetDiscountCodes', Constants.EXCEPTION_MSG_FETCH_DISCOUNT_DETAILS, exception, discountId, 'DiscountCodeId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_DISCOUNT_CODES, CustomMessages.EXCEPTION_MSG_FETCH_DISCOUNT_DETAILS, exception, discountId, 'DiscountCodeId : ', '');
   }
   return getDiscountResponse;
 };

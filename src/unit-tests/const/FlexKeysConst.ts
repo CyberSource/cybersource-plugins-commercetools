@@ -1,4 +1,4 @@
-export const paymentObj = {
+const paymentObj = {
   id: '14666485-c56b-4fa8-9ec7-668dc4141245',
   version: 1,
   lastMessageSequenceNumber: 1,
@@ -39,3 +39,8 @@ export const paymentObj = {
   interfaceInteractions: [],
   anonymousId: 'baaf0387-930b-440d-be81-2ef80e23e251',
 };
+
+
+export default {
+ paymentObj
+}

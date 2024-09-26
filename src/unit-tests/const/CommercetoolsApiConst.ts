@@ -1,16 +1,16 @@
-import { ReportSyncType } from '../../types/Types';
+import { AddressType, ReportSyncType } from '../../types/Types';
 import creditCard from '../JSON/creditCard.json';
 import unit from '../JSON/unit.json';
 
-export const customerId = unit.customerId;
-export const paymentId = unit.paymentId;
-export const anonymousId = unit.anonymousId;
-export const cartId = unit.cartId;
-export const key = 'isv_payment_failure';
+ const customerId = unit.customerId;
+ const paymentId = unit.paymentId;
+ const anonymousId = unit.anonymousId;
+ const cartId = unit.cartId;
+ const key = 'isv_payment_failure';
 
-export const customerID = '950883c0-0bcd-41f3-bdc8-f7aa7f36cde4';
+ const customerID = '950883c0-0bcd-41f3-bdc8-f7aa7f36cde4';
 
-export const address = {
+ const address : AddressType = {
   firstName: 'Example',
   lastName: 'Person',
   streetName: 'Examplary Street',
@@ -19,16 +19,20 @@ export const address = {
   postalCode: '80933',
   city: 'Exemplary City',
   region: 'Exemplary Region',
-  state: 'Exemplary State',
   country: 'DE',
-  building: 'Hightower 1',
   phone: '+49 89 12345678',
   mobile: '+49 171 2345678',
   email: 'mail@mail.com',
-  additionalAddressInfo: 'no additional Info',
+  id: '',
+  address1: '',
+  address2: '',
+  buildingNumber: '',
+  locality: '',
+  administrativeArea: '',
+  phoneNumber: ''
 };
 
-export const emptyAddressField = {
+ const emptyAddressField : AddressType= {
   firstName: '',
   lastName: '',
   streetName: '',
@@ -37,16 +41,20 @@ export const emptyAddressField = {
   postalCode: '',
   city: '',
   region: '',
-  state: '',
   country: '',
-  building: '',
   phone: '',
   mobile: '',
   email: '',
-  additionalAddressInfo: '',
+  id: '',
+  address1: '',
+  address2: '',
+  buildingNumber: '',
+  locality: '',
+  administrativeArea: '',
+  phoneNumber: ''
 };
 
-export const addTransactionTransactionObject = {
+ const addTransactionTransactionObject = {
   paymentId: unit.paymentId,
   version: 15,
   amount: {
@@ -59,7 +67,7 @@ export const addTransactionTransactionObject = {
   state: 'Initial',
 };
 
-export const visaCheckoutData = {
+ const visaCheckoutData = {
   billToFieldGroup: {
     firstName: 'John',
     lastName: 'Doe',
@@ -82,21 +90,21 @@ export const visaCheckoutData = {
   },
 };
 
-export const syncAddTransactionObject: ReportSyncType = {
-  id: 'dcf01a63-85eb-42d5-a367-cd832932ed1b',
-  transactionId: '',
-  version: 12,
-  interactionId: '7029922746616511603954',
-  amountPlanned: {
-    currencyCode: 'USD',
-    centAmount: 3840,
+ let syncAddTransactionObject: ReportSyncType = {
+  "id":unit.paymentId,
+  "transactionId": "",
+  "version": 12,
+  "interactionId": "7223304358526864503955",
+  "amountPlanned": {
+    "currencyCode": "USD",
+    "centAmount": 49310
   },
-  type: 'Authorization',
-  state: 'Success',
-  securityCodePresent: false,
-};
+  "type": "Authorization",
+  "state": "",
+  "securityCodePresent": false
+}
 
-export let addTransactionForCharge = {
+ let addTransactionForCharge = {
   amount: {
     type: 'centPrecision',
     currencyCode: 'USD',
@@ -108,11 +116,11 @@ export let addTransactionForCharge = {
   type: 'Charge',
 };
 
-export let setCustomTypeFieldsData = [
+ let setCustomTypeFieldsData = [
   '{"alias":"1091 card","value":"11F5E62F2B492E0FE063AF598E0A35CB","paymentToken":"11F5E871374433B7E063AF598E0AE007","instrumentIdentifier":"7020000000005531091","cardType":"001","cardName":"001","cardNumber":"400000XXXXXXXXXXXX1091","cardExpiryMonth":"01","cardExpiryYear":"2032","addressId":"","timeStamp":"2024-02-22T09:20:23.405Z"}',
 ];
 
-export const syncVisaCardEtailsActions = [
+ const syncVisaCardEtailsActions = [
   {
     action: 'setCustomField',
     name: 'isv_maskedPan',
@@ -131,7 +139,7 @@ export const syncVisaCardEtailsActions = [
   { action: 'setCustomField', name: 'isv_cardType', value: '001' },
 ];
 
-export const createCTCustomObjectData = {
+ const createCTCustomObjectData = {
   container: 'ctWebHookSubscription',
   key: 'webHookSubscription',
   value: [
@@ -145,15 +153,38 @@ export const createCTCustomObjectData = {
   ],
 };
 
-export const customFieldName = 'isv_cybersource_customer_id';
+ const customFieldName = 'isv_cybersource_customer_id';
 
-export const customFieldValue = '11B5C4B5776C40FCE063AF598E0AEC59';
+ const customFieldValue = '11B5C4B5776C40FCE063AF598E0AEC59';
 
-export const customObjectContainer = 'ctWebHookSubscription';
+ const customObjectContainer = 'ctWebHookSubscription';
 
-export let changeTransactionInteractionIdTransactionObject : any = {
+ let changeTransactionInteractionIdTransactionObject : any = {
   paymentId: unit.paymentId,
   version: '',
   transactionId: creditCard.authId,
   interactionId: '0346f3bf-beb7-4b99-acdc-b1360504b58c',
+}
+
+export default {
+  customerId,
+  paymentId,
+  anonymousId,
+  cartId,
+  key,
+  customerID,
+  address,
+  emptyAddressField,
+  addTransactionTransactionObject,
+  visaCheckoutData,
+  syncAddTransactionObject,
+  addTransactionForCharge,
+  setCustomTypeFieldsData,
+  syncVisaCardEtailsActions,
+  createCTCustomObjectData,
+  customFieldName,
+  customFieldValue,
+  customObjectContainer,
+  changeTransactionInteractionIdTransactionObject,
+  
 }

@@ -1,5 +1,5 @@
 import creditCard from '../../JSON/creditCard.json';
-export let payment = {
+let payment = {
   id: 'd5c67aab-2880-4cba-8431-4cb90f9c6fd9',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -57,7 +57,7 @@ export let payment = {
   interfaceInteractions: [],
 };
 
-export let payments = {
+let payments = {
   id: 'd5c67aab-2880-4cba-8431-4cb90f9c6fd9',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -119,11 +119,11 @@ export let payments = {
   anonymousId: '47d6586f-6c7a-4d0e-93bb-344b25600a8a',
 };
 
-export const authId = creditCard.authReversalId;
+const authId = creditCard.authReversalId;
 
-export const authID = '639636095168688700';
+const authID = '639636095168688700';
 
-export const carts = {
+const carts = {
   limit: 20,
   offset: 0,
   count: 1,
@@ -418,8 +418,8 @@ export const carts = {
       refusedGifts: [],
       origin: 'Customer',
       shippingAddress: {
-        firstName: 'shakshi',
-        lastName: 'poddar',
+        firstName: 'john',
+        lastName: 'doe',
         streetName: '1295 Charleston Road',
         additionalStreetInfo: '5th lane',
         postalCode: '94043',
@@ -427,11 +427,11 @@ export const carts = {
         region: 'CA',
         country: 'US',
         phone: '9876543210',
-        email: 'shakshi.poddar@wipro.com',
+        email: 'john.doe@wipro.com',
       },
       billingAddress: {
-        firstName: 'shakshi',
-        lastName: 'poddar',
+        firstName: 'john',
+        lastName: 'doe',
         streetName: '1295 Charleston Road',
         additionalStreetInfo: '5th lane',
         postalCode: '94043',
@@ -439,7 +439,7 @@ export const carts = {
         region: 'CA',
         country: 'US',
         phone: '9876543210',
-        email: 'shakshi.poddar@wipro.com',
+        email: 'john.doe@wipro.com',
       },
       itemShippingAddresses: [],
       totalLineItemQuantity: 1,
@@ -447,7 +447,7 @@ export const carts = {
   ],
 };
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -726,21 +726,21 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export let multipleShippingPayment = {
+let multipleShippingPayment = {
   id: 'd5c67aab-2880-4cba-8431-4cb90f9c6fd9',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -798,4 +798,15 @@ export let multipleShippingPayment = {
   interfaceInteractions: [],
 };
 
-export const multipleShippingReversalId = creditCard.multipleShippingAuthReversalId;
+const multipleShippingReversalId = creditCard.multipleShippingAuthReversalId;
+
+export default {
+  payment,
+  payments,
+  authId,
+  authID,
+  carts,
+  shippingCart,
+  multipleShippingPayment,
+  multipleShippingReversalId
+}

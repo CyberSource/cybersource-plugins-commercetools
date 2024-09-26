@@ -1,28 +1,27 @@
-import path from 'path';
+import restApi, { InlineResponse2013 } from 'cybersource-rest-client';
 
-import restApi from 'cybersource-rest-client';
-
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
+import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
-import prepareFields from '../../utils/PrepareFields';
 
 /**
  * Handles creating of  webhook subscription.
  * @param {MidCredentialsType} midCredentials - The MID credentials.
  * @returns {Promise<unknown>} A promise that resolves with the webhook subscription response.
  */
-const webhookSubscriptionResponse = async (midCredentials: MidCredentialsType): Promise<unknown> => {
+const getCreateWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType): Promise<InlineResponse2013> => {
   const webHookResponse = {
-    httpCode: null,
-    webhookId: null,
+    httpCode: 0,
+    webhookId: '',
   };
-  let errorData: string;
   let opts: any;
   try {
     const apiClient = new restApi.ApiClient();
-    const configObject = await prepareFields.getConfigObject('FuncWebhookSubscriptionResponse', midCredentials, null, null);
-    if (undefined !== configObject) {
+    const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_CREATE_WEBHOOK_SUBSCRIPTION_RESPONSE, midCredentials, null, null);
+    if (configObject) {
       opts = {
         createWebhookRequest: {
           name: 'token update notification',
@@ -39,34 +38,32 @@ const webhookSubscriptionResponse = async (midCredentials: MidCredentialsType): 
         },
       };
     }
-    const createWebhookSubscriptionInstance = new restApi.CreateNewWebhooksApi(configObject, apiClient);
-    return await new Promise((resolve, reject) => {
-      createWebhookSubscriptionInstance.createWebhookSubscription(opts, (error: any, data: any, response: any) => {
-        paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncWebhookSubscriptionResponse', Constants.LOG_INFO, '', JSON.stringify(response));
-        if (data) {
-          webHookResponse.httpCode = response.status;
-          webHookResponse.webhookId = data.webhookId;
-          resolve(webHookResponse);
-        } else if (error) {
-          if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncWebhookSubscriptionResponse', Constants.LOG_ERROR, '', error.response.text);
+    const createWebhookSubscriptionInstance = configObject && new restApi.CreateNewWebhooksApi(configObject, apiClient);
+    return await new Promise<InlineResponse2013>((resolve, reject) => {
+      if (createWebhookSubscriptionInstance) {
+        createWebhookSubscriptionInstance.createWebhookSubscription(opts, (error: any, data: any, response: any) => {
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CREATE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_INFO, '', JSON.stringify(response));
+          if (data) {
+            webHookResponse.httpCode = response.status;
+            webHookResponse.webhookId = data.webhookId;
+            resolve(webHookResponse);
+          } else if (error) {
+            webHookResponse.httpCode = error.status;
+            reject(webHookResponse);
           } else {
-            typeof error === 'object' ? (errorData = JSON.stringify(error)) : (errorData = error);
-            paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncWebhookSubscriptionResponse', Constants.LOG_ERROR, '', errorData);
+            reject(webHookResponse);
           }
-          webHookResponse.httpCode = error.status;
-          reject(webHookResponse);
-        } else {
-          reject(webHookResponse);
-        }
-      });
+        });
+      } else {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CREATE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_SERVICE_PROCESS);
+      }
     }).catch((error) => {
       return error;
     });
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncWebhookSubscriptionResponse', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CREATE_WEBHOOK_SUBSCRIPTION_RESPONSE, '', exception, '', '', '');
     return webHookResponse;
   }
 };
 
-export default { webhookSubscriptionResponse };
+export default { getCreateWebhookSubscriptionResponse };

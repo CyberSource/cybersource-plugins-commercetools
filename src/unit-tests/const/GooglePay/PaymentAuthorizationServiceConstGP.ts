@@ -1,6 +1,6 @@
 import creditCard from '../../JSON/creditCard.json';
 import googlePay from '../../JSON/googlePay.json';
-export const payment = {
+const payment = {
   id: '33e68f3d-8143-4d07-ac13-2314c7039251',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -53,7 +53,7 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const guestPayment = {
+const guestPayment = {
   id: '5eef4795-60df-45cf-9fc7-be4500333b57',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -102,7 +102,7 @@ export const guestPayment = {
   anonymousId: 'b7037191-ed8f-4518-a66a-5b1efda2a2de',
 };
 
-export const cart = {
+const cart = {
   type: 'Cart',
   id: '3d09ed42-1b1b-450a-b670-269437683939',
   version: 10,
@@ -291,34 +291,34 @@ export const cart = {
   refusedGifts: [],
   origin: 'Customer',
   shippingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   billingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const service = 'google';
+const service = 'google';
 
-export const payments = {
+const payments = {
   id: '33e68f3d-8143-4d07-ac13-2314c7039251',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -366,25 +366,25 @@ export const payments = {
   interfaceInteractions: [],
 };
 
-export const cardTokens = {
+const cardTokens = {
   customerTokenId: creditCard.savedTokenId,
   paymentInstrumentId: creditCard.savedToken,
 };
 
-export const guestCardTokens = {
+const guestCardTokens = {
   customerTokenId: '',
   paymentInstrumentId: '',
 };
 
-export const notSaveToken = false;
+const notSaveToken = false;
 
-export const payerAuthMandateFlag = false;
+const payerAuthMandateFlag = false;
 
-export const orderNo = '';
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -663,21 +663,21 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const ucPayment = {
+const ucPayment = {
   id: '1fa9dc70-4007-4520-9268-a90992285a5c',
   version: 2,
   versionModifiedAt: '2023-08-10T07:52:49.107Z',
@@ -715,7 +715,6 @@ export const ucPayment = {
     fields: {
       isv_transientToken: googlePay.isv_transientToken,
       isv_deviceFingerprintId: 'a82beccd-0fc0-48f8-a84e-0151709df8c8',
-      isv_merchantId: 'visa_isv_opencart_pmt_101',
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '192.140.152.21',
@@ -740,3 +739,19 @@ export const ucPayment = {
   interfaceInteractions: [],
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
+
+export default {
+  payment,
+  guestPayment,
+  cart,
+  service,
+  payments,
+  cardTokens,
+  guestCardTokens,
+  notSaveToken,
+  payerAuthMandateFlag,
+  orderNo,
+  orderNumber,
+  shippingCart,
+  ucPayment
+}

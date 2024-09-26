@@ -1,5 +1,5 @@
 import googlePay from '../../JSON/googlePay.json';
-export const payment = {
+const payment = {
   id: '33e68f3d-8143-4d07-ac13-2314c7039251',
   version: 5,
   lastMessageSequenceNumber: 4,
@@ -65,7 +65,7 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const updateTransactions = {
+const updateTransactions = {
   id: '095def14-2513-4a80-8488-ea2d74c184c2',
   timestamp: '2023-03-31T11:22:27.157Z',
   type: 'Charge',
@@ -78,10 +78,19 @@ export const updateTransactions = {
   state: 'Initial',
 };
 
-export const authID = googlePay.authId;
+const authID = googlePay.authId;
 
-export const authId = '64008194644864627039';
+const authId = '64008194644864627039';
 
-export const orderNo = '';
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
+
+export default {
+  payment,
+  updateTransactions,
+  authID,
+  authId,
+  orderNo,
+  orderNumber
+}

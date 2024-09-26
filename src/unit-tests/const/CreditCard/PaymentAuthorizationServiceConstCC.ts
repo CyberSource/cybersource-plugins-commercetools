@@ -1,7 +1,7 @@
 import creditCard from '../../JSON/creditCard.json';
 import unit from '../../JSON/unit.json';
 
-export let payment = {
+let payment = {
   id: unit.paymentId,
   version: 13,
   lastMessageSequenceNumber: 2,
@@ -67,7 +67,7 @@ export let payment = {
   interfaceInteractions: [],
 };
 
-export const guestPayment = {
+const guestPayment = {
   id: 'd3bfe799-0869-476c-b745-5f5baa4b410f',
   version: 16,
   lastMessageSequenceNumber: 1,
@@ -128,7 +128,7 @@ export const guestPayment = {
   anonymousId: 'b7037191-ed8f-4518-a66a-5b1efda2a2de',
 };
 
-export let payments = {
+let payments = {
   id: 'a29b662f-49a8-49e7-a391-3d51bcb9fb26',
   version: 13,
   lastMessageSequenceNumber: 2,
@@ -180,6 +180,7 @@ export let payments = {
       isv_cardExpiryMonth: '01',
       isv_savedToken: creditCard.savedToken,
       isv_acceptHeader: '*/*',
+      isv_securityCode: 123,
       isv_cardType: '001',
       isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
     },
@@ -189,7 +190,7 @@ export let payments = {
   interfaceInteractions: [],
 };
 
-export let cart = {
+let cart = {
   type: 'Cart',
   id: '3d09ed42-1b1b-450a-b670-269437683939',
   version: 10,
@@ -517,54 +518,54 @@ export let cart = {
   refusedGifts: [],
   origin: 'Customer',
   shippingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   billingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const cardTokens = {
+const cardTokens = {
   customerTokenId: creditCard.savedToken,
   paymentInstrumentId: creditCard.savedTokenId,
 };
 
-export const guestCardTokens = {
+const guestCardTokens = {
   customerTokenId: '',
   paymentInstrumentId: '',
 };
 
-export const cardTokensObject = {
+const cardTokensObject = {
   customerTokenId: 'D605360941117CECE053AF598E0A6E',
   paymentInstrumentId: creditCard.savedToken,
 };
 
-export const cardTokenInvalidObject = {
+const cardTokenInvalidObject = {
   customerTokenId: creditCard.savedTokenId,
   paymentInstrumentId: 'D76C84878E06B607E053A2598D0AAC',
 };
 
-export const service = 'card';
+const service = 'card';
 
-export let paymentInvalidToken = {
+let paymentInvalidToken = {
   id: 'a29b662f-49a8-49e7-a391-3d51bcb9fb26',
   version: 13,
   lastMessageSequenceNumber: 2,
@@ -629,15 +630,15 @@ export let paymentInvalidToken = {
   interfaceInteractions: [],
 };
 
-export const notSaveToken = false;
+const notSaveToken = false;
 
-export const payerAuthMandateFlag = false;
+const payerAuthMandateFlag = false;
 
-export const orderNo = '';
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -916,21 +917,21 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const ucPayment = {
+const ucPayment = {
   id: '50d4bb1f-d322-406e-a3de-b559cc7ad0c2',
   version: 2,
   versionModifiedAt: '2023-08-10T07:29:16.868Z',
@@ -968,7 +969,6 @@ export const ucPayment = {
     fields: {
       isv_transientToken: creditCard.isv_transientToken,
       isv_deviceFingerprintId: '6e0a8cfe-f7de-48c7-ad22-ef9ef2b80774',
-      isv_merchantId: 'visa_isv_opencart_barc_dm',
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '192.140.152.71',
@@ -993,3 +993,22 @@ export const ucPayment = {
   interfaceInteractions: [],
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
+
+export default {
+  payment,
+  guestPayment,
+  payments,
+  cart,
+  cardTokens,
+  guestCardTokens,
+  cardTokensObject,
+  cardTokenInvalidObject,
+  service,
+  paymentInvalidToken,
+  notSaveToken,
+  payerAuthMandateFlag,
+  orderNo,
+  orderNumber,
+  shippingCart,
+  ucPayment
+}

@@ -1,5 +1,5 @@
 import applePay from '../../JSON/applePay.json';
-export const payment = {
+const payment = {
   id: '8efb864e-e0e9-4cd2-aebd-983ef3358633',
   version: 15,
   lastMessageSequenceNumber: 4,
@@ -64,7 +64,7 @@ export const payment = {
   anonymousId: '033cd1c3-801d-4d2b-9729-fef0064dd3be',
 };
 
-export const updateTransactions = {
+const updateTransactions = {
   id: '095def14-2513-4a80-8488-ea2d74c184c2',
   timestamp: '2023-03-31T11:22:27.157Z',
   type: 'Charge',
@@ -77,10 +77,19 @@ export const updateTransactions = {
   state: 'Initial',
 };
 
-export const authId = applePay.authId;
+const authId = applePay.authId;
 
-export const authID = '64311311155868791039';
+const authID = '64311311155868791039';
 
-export const orderNo = '';
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
+
+export default {
+  payment,
+  updateTransactions,
+  authId,
+  authID,
+  orderNo,
+  orderNumber
+}

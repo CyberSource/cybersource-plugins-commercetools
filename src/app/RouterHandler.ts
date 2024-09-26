@@ -1,7 +1,8 @@
 import fs from 'fs';
 import _path from 'path';
 
-import { Constants } from '../constants';
+import { Constants } from '../constants/constants';
+import { CustomMessages } from '../constants/customMessages';
 
 /**
  * Handles routing and serving static files.
@@ -18,7 +19,7 @@ export class RouterHandler {
   */
   constructor() {
     this.staticFiles = [];
-    this.port = 3000;
+    this.port = Constants.DEFAULT_PORT;
     this.mimeType = {
       '.html': 'text/html',
       '.js': 'application/javascript',
@@ -46,16 +47,18 @@ export class RouterHandler {
       const filePath = _path.join(folderPath, fileUrl);
       const mimePath = _path.extname(filePath);
       const mimeType = this.mimeType[mimePath];
-      if (!mimeType) return this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', Constants.ERROR_MSG_NOT_FOUND);
+      if (!mimeType) {
+        return this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_NOT_FOUND);
+      }
       fs.readFile(filePath, (err, data) => {
         if (err) {
-          'ENOENT' === err.code ? this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', Constants.ERROR_MSG_NOT_FOUND) : this.sendResponse(response, Constants.HTTP_SERVER_ERROR_STATUS_CODE, 'text/plain', Constants.ERROR_MSG_INTERNAL_SERVER_ERROR);
+          'ENOENT' === err.code ? this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_NOT_FOUND) : this.sendResponse(response, Constants.HTTP_SERVER_ERROR_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_INTERNAL_SERVER_ERROR);
           return;
         }
         return this.sendResponse(response, Constants.HTTP_OK_STATUS_CODE, mimeType, data);
       });
     } else {
-      this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', Constants.ERROR_MSG_NOT_FOUND);
+      this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_NOT_FOUND);
     }
   }
 
@@ -77,14 +80,13 @@ export class RouterHandler {
    * @param {number} port - The port number to listen on.
    * @param {Function} cb - The callback function to be called after listening.
    */
-  listen(port: number, cb = (err: any) => { console.log("error : ", err) }) {
+  listen(port: number, callback = (err: any) => { console.log("error : ", err) }) {
     try {
-      this.port = port || 3000;
+      this.port = port || Constants.DEFAULT_PORT;
       this.server.listen(this.port);
-      cb('');
+      callback('');
     } catch (err) {
-      cb(err);
+      callback(err);
     }
-
   }
 }

@@ -1,5 +1,5 @@
 import googlePay from '../../JSON/googlePay.json';
-export const payment = {
+const payment = {
   id: '6b3158a4-6c72-403e-bda1-48d95367cb02',
   version: 5,
   lastMessageSequenceNumber: 4,
@@ -75,7 +75,7 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const cart = {
+const cart = {
   limit: 20,
   offset: 0,
   count: 1,
@@ -370,8 +370,8 @@ export const cart = {
       refusedGifts: [],
       origin: 'Customer',
       shippingAddress: {
-        firstName: 'shakshi',
-        lastName: 'poddar',
+        firstName: 'john',
+        lastName: 'doe',
         streetName: '1295 Charleston Road',
         additionalStreetInfo: '5th lane',
         postalCode: '94043',
@@ -379,11 +379,11 @@ export const cart = {
         region: 'CA',
         country: 'US',
         phone: '9876543210',
-        email: 'shakshi.poddar@wipro.com',
+        email: 'john.doe@wipro.com',
       },
       billingAddress: {
-        firstName: 'shakshi',
-        lastName: 'poddar',
+        firstName: 'john',
+        lastName: 'doe',
         streetName: '1295 Charleston Road',
         additionalStreetInfo: '5th lane',
         postalCode: '94043',
@@ -391,7 +391,7 @@ export const cart = {
         region: 'CA',
         country: 'US',
         phone: '9876543210',
-        email: 'shakshi.poddar@wipro.com',
+        email: 'john.doe@wipro.com',
       },
       itemShippingAddresses: [],
       totalLineItemQuantity: 1,
@@ -399,11 +399,11 @@ export const cart = {
   ],
 };
 
-export const authReversalId = googlePay.authReversalId;
+const authReversalId = googlePay.authReversalId;
 
-export const authReversalID = '640159216998640950395';
+const authReversalID = '640159216998640950395';
 
-export const payments = {
+const payments = {
   id: '6b3158a4-6c72-403e-bda1-48d95367cb02',
   version: 5,
   lastMessageSequenceNumber: 4,
@@ -479,7 +479,7 @@ export const payments = {
   interfaceInteractions: [],
 };
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -758,21 +758,21 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const multipleShippingPayment = {
+const multipleShippingPayment = {
   id: 'd5c67aab-2880-4cba-8431-4cb90f9c6fd9',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -830,4 +830,15 @@ export const multipleShippingPayment = {
   interfaceInteractions: [],
 };
 
-export const multipleShippingReversalId = googlePay.multipleShippingAuthReversalId;
+const multipleShippingReversalId = googlePay.multipleShippingAuthReversalId;
+
+export default {
+  payment,
+  cart,
+  authReversalId,
+  authReversalID,
+  payments,
+  shippingCart,
+  multipleShippingPayment,
+  multipleShippingReversalId
+}

@@ -1,4 +1,4 @@
-import { amountConversion, roundOff, getPaymentId, createElement, formatCurrency, createTableRow, createAndSetAttributes } from './utils.js';
+import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, validateAmountValue } from './utils.js';
 
 if (window.location.pathname.includes('paymentDetails')) {
   document.addEventListener('DOMContentLoaded', async function () {
@@ -9,7 +9,7 @@ if (window.location.pathname.includes('paymentDetails')) {
     const paymentsData = await fetchPaymentsInfo();
     const payments = paymentsData?.payments;
     const cart = paymentsData?.cart;
-    const id = paymentsData?.id;
+    const id = validatePaymentId(paymentsData?.id);
     const locale = paymentsData.locale;
     const orderNo = paymentsData.orderNo;
     let contentDiv = document.getElementById('message');
@@ -29,23 +29,18 @@ if (window.location.pathname.includes('paymentDetails')) {
       var fractionDigits = payments?.amountPlanned?.fractionDigits;
       if (cart && 0 < Object.keys(cart).length) {
         const discountObject = verifyDiscountPresent(cart);
-        var customerDetailsContainer = document.createElement('div');
-
-        if (cart.shippingMode && 'Multiple' === cart.shippingMode && cart.shipping && cart.shipping.length > 0) {
-          customerDetailsContainer.appendChild(createAddressElement(cart.shipping[0].shippingAddress, 'shipping'));
-        } else if (cart?.shippingAddress) {
-          customerDetailsContainer.appendChild(createAddressElement(cart.shippingAddress, 'shipping'));
-        }
-        if (cart?.billingAddress) {
-          customerDetailsContainer.appendChild(createAddressElement(cart.billingAddress, 'billing'));
-        }
-        const customerDetails = document.getElementById('customerDetails');
-        if (customerDetails) {
-          customerDetails.appendChild(customerDetailsContainer);
-        }
         generateOrderItemsTable(cart, discountObject, locale, fractionDigits);
+      } else {
+        const removeElements = (ids) => {
+          ids.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+              element.remove();
+            }
+          });
+        };
+        removeElements(['productDetails']);
       }
-
       const paymentDetailsTableBody = document.getElementById('paymentDetailsTable').getElementsByTagName('tbody')[0];
 
       if (payments?.paymentMethodInfo && paymentDetailsTableBody) {
@@ -83,8 +78,8 @@ if (window.location.pathname.includes('paymentDetails')) {
       buttonsDiv.classList.add('div-padding');
       buttonsDiv.id = 'buttonsDiv';
 
-      const authorizedAmount = paymentsData?.authorizedAmount;
-      const captureAmount = paymentsData?.captureAmount;
+      const authorizedAmount = validateAmountValue(paymentsData?.authorizedAmount);
+      const captureAmount = validateAmountValue(paymentsData?.captureAmount);
       if (authPresent && !authReversalPresent && (!refundPresent || (refundPresent && authorizedAmount)) && ((capturePresent && authorizedAmount) || (!capturePresent && authorizedAmount))) {
         const captureMsgDiv = document.createElement('div');
         captureMsgDiv.classList.add('div-padding');
@@ -93,7 +88,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         partialCaptureForm.action = '/capture';
         partialCaptureForm.classList.add('div-padding');
         partialCaptureForm.id = 'partialCaptureForm';
-        renderPartialCaptureForm(partialCaptureForm, id);
+        renderPartialCaptureForm(partialCaptureForm, encodeURIComponent(id));
         buttonsDiv.appendChild(captureMsgDiv);
         buttonsDiv.appendChild(partialCaptureForm);
       }
@@ -101,7 +96,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         const authButton = document.createElement('a');
         authButton.classList.add('button');
         authButton.id = 'auth';
-        authButton.href = `/authReversal?id=${id}`;
+        authButton.href = `/authReversal?id=${encodeURIComponent(id)}`;
         authButton.role = 'button';
         authButton.textContent = 'Reverse';
 
@@ -116,7 +111,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         refundForm.action = '/refund';
         refundForm.classList.add('div-padding');
         refundForm.id = 'refundForm';
-        renderRefundForm(refundForm, id);
+        renderRefundForm(refundForm, encodeURIComponent(id));
         buttonsDiv.appendChild(refundMsgDiv);
         buttonsDiv.appendChild(refundForm);
       }
@@ -196,18 +191,22 @@ function appendSuccessMessage(contentDiv, successMessage) {
  */
 async function fetchPaymentsInfo() {
   const loadingIndicator = document.getElementById('loading');
-  const paymentId = getPaymentId();
-  try {
-    loadingIndicator.style.display = 'flex';
-    const response = await fetch(`/paymentData?id=${paymentId}`, { method: 'GET' });
-    const data = await response.text();
-    const jsonData = JSON.parse(data);
-    return jsonData;
-  } catch (error) {
-    console.error('Error in fetching Payment details:', error);
-    return null;
-  } finally {
-    loadingIndicator.style.display = 'none';
+  const paymentId = validatePaymentId(getPaymentId());
+  if (paymentId) {
+    try {
+      loadingIndicator.style.display = 'flex';
+      const response = await fetch(`/paymentData?id=${encodeURIComponent(paymentId)}`, { method: 'GET' });
+      const data = await response.text();
+      const jsonData = JSON.parse(data);
+      return jsonData;
+    } catch (error) {
+      console.error('Error in fetching Payment details:', error);
+      return null;
+    } finally {
+      loadingIndicator.style.display = 'none';
+    }
+  } else {
+    appendErrorMessage(contentDiv, 'Invalid Payment Id');
   }
 }
 
@@ -527,36 +526,6 @@ function showLoadingDiv() {
     loadingDiv.style.display = 'flex';
   }
 }
-
-/**
- * Creates an address element based on the given address object and type.
- * @param {Object} address - The address object containing address details.
- * @param {string} type - The type of address (e.g., 'Shipping', 'Billing').
- * @returns {HTMLElement} - The created address element.
- */
-function createAddressElement(address, type) {
-  const div = createElement('div', '', 'leftDiv');
-  if (div) {
-    const header = createElement('div', `<img src="${type}Image.png" /><b>${type} Address</b>`, 'div-font div-padding');
-    div.appendChild(header);
-    div.appendChild(createElement('br'));
-    const addressContainer = createElement('div', '', 'div-padding');
-    addressContainer.appendChild(createElement('div', `<b>Name: </b>${address.firstName || ''} ${address.lastName || ''}`));
-    addressContainer.appendChild(createElement('div', `<b>Address: </b>${address.streetName || ''}`));
-    if (address.additionalStreetInfo) {
-      addressContainer.appendChild(createElement('div', `<b>Additional Street Info: </b>${address.additionalStreetInfo || ''}`));
-    }
-    addressContainer.appendChild(createElement('div', `<b>PostalCode: </b>${address.postalCode || ''}`));
-    addressContainer.appendChild(createElement('div', `<b>City: </b>${address.city || ''}`));
-    addressContainer.appendChild(createElement('div', `<b>Region: </b>${address.region || ''}`));
-    addressContainer.appendChild(createElement('div', `<b>Country: </b>${address.country || ''}`));
-    addressContainer.appendChild(createElement('div', `<b>Phone: </b>${address.phone || ''}`));
-    addressContainer.appendChild(createElement('div', `<b>Email: </b>${address.email || ''}`));
-    div.appendChild(addressContainer);
-    return div;
-  }
-}
-
 /**
  * Generates the order items table based on the cart data and discount information.
  * @param {Object} cart - The cart object containing order details.
@@ -568,7 +537,9 @@ function generateOrderItemsTable(cart, discountObject, locale, fractionDigits) {
   const orderItemsTable = document.getElementById('orderItemsTable');
   if (cart && orderItemsTable) {
     const orderItemsTableBody = orderItemsTable.getElementsByTagName('tbody')[0];
-    if (!orderItemsTableBody) return;
+    if (!orderItemsTableBody) {
+      return;
+    }
     if (discountObject.customLineItemDiscount || discountObject.cartDiscount || discountObject.shippingDiscount || discountObject.totalPriceDiscount) {
       const tableHead = document.querySelector('#orderItemsTable thead');
       const discountAmountTh = document.createElement('th');
@@ -597,7 +568,9 @@ function generateOrderItemsTable(cart, discountObject, locale, fractionDigits) {
  * @param {number} fractionDigits - The number of fraction digits to display.
  */
 function generateLineItems(lineItems, orderItemsTableBody, discountObject, locale, fractionDigits) {
-  if (!lineItems || lineItems.length === 0) return;
+  if (!lineItems || 0 === lineItems.length) {
+    return;
+  }
   lineItems.forEach((item) => {
     if (item.discountedPricePerQuantity && 0 === item.discountedPricePerQuantity.length) {
       generateLineItemRow(item, orderItemsTableBody, discountObject, locale, fractionDigits);

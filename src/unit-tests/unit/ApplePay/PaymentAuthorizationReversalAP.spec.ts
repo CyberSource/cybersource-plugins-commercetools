@@ -2,9 +2,9 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants';
+import { Constants } from '../../../constants/constants';
 import authReversalResponse from '../../../service/payment/PaymentAuthorizationReversal';
-import { authReversalID, authReversalId, cart, multipleShippingPayment, multipleShippingReversalId, payment, payments, shippingCart } from '../../const/ApplePay/PaymentAuthorizationReversalConstAP';
+import paymentAuthReversalConstAP from '../../const/ApplePay/PaymentAuthorizationReversalConstAP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -22,7 +22,7 @@ let paymentResponseObjects: any = {
 };
 
 test.serial('Reversing a payment with invalid amount and check http code', async (t: any) => {
-  let result: any = await authReversalResponse.authReversalResponse(payments, cart, authReversalId);
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payments, paymentAuthReversalConstAP.cart, paymentAuthReversalConstAP.authReversalId);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
   t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
@@ -33,7 +33,7 @@ test.serial('Check status for auth reversal with invalid amount ', async (t: any
 });
 
 test.serial('Reversing a payment and check http code', async (t: any) => {
-  let result: any = await authReversalResponse.authReversalResponse(payment, cart, authReversalId);
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payment, paymentAuthReversalConstAP.cart, paymentAuthReversalConstAP.authReversalId);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -52,7 +52,7 @@ test.serial('Check status for auth reversal ', async (t: any) => {
 });
 
 test.serial('Reversing an invalid payment and check http code', async (t: any) => {
-  let result: any = await authReversalResponse.authReversalResponse(payment, cart, authReversalID);
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payment, paymentAuthReversalConstAP.cart, paymentAuthReversalConstAP.authReversalID);
   paymentResponseObjects.httpCode = result.httpCode;
   paymentResponseObjects.status = result.status;
   t.not(paymentResponseObjects.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
@@ -63,7 +63,7 @@ test.serial('Check status for  auth reversal for invalid payment ', async (t: an
 });
 
 test.serial('Reversing a payment with multiple shipping and check http code', async (t: any) => {
-  let result: any = await authReversalResponse.authReversalResponse(multipleShippingPayment, shippingCart, multipleShippingReversalId);
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.multipleShippingPayment, paymentAuthReversalConstAP.shippingCart, paymentAuthReversalConstAP.multipleShippingReversalId);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -82,7 +82,7 @@ test.serial('Check status of auth reversal  with multiple shipping', async (t: a
 });
 
 test.serial('Reversing a payment with empty auth reversal id and check http code', async (t: any) => {
-  let result: any = await authReversalResponse.authReversalResponse(payment, cart, '');
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payment, paymentAuthReversalConstAP.cart, '');
   paymentResponseObjects.httpCode = result.httpCode;
   paymentResponseObjects.status = result.status;
   t.not(paymentResponseObjects.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);

@@ -1,3 +1,5 @@
+import { Ptsv2creditsProcessingInformationBankTransferOptions, Ptsv2paymentsidcapturesOrderInformation, Ptsv2paymentsidrefundsOrderInformation, Ptsv2paymentsidrefundsProcessingInformation, Ptsv2paymentsidreversalsOrderInformation, Ptsv2paymentsidreversalsProcessingInformation, Ptsv2paymentsOrderInformation, Ptsv2paymentsProcessingInformation, Ptsv2paymentsProcessingInformationAuthorizationOptions, Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator, Upv1capturecontextsOrderInformation } from "cybersource-rest-client";
+
 export type PaymentType = {
   id: string;
   version: number;
@@ -6,9 +8,9 @@ export type PaymentType = {
     method: string;
   };
   custom?: {
-    fields: PaymentCustomFieldsType;
+    fields: Partial<PaymentCustomFieldsType>;
   };
-  transactions: PaymentTransactionType[];
+  transactions: Partial<PaymentTransactionType>[];
   customer?: {
     id: string;
   };
@@ -30,77 +32,75 @@ export type TransactionObjectType = {
   interactionId?: string;
   timestamp?: string;
 };
-
 export type PaymentCustomFieldsType = {
-  isv_token?: string;
-  isv_tokenAlias?: string;
-  isv_savedToken?: string;
-  isv_tokenVerificationContext?: string;
-  isv_tokenCaptureContextSignature?: string;
-  isv_cardType?: string;
-  isv_maskedPan?: string;
-  isv_cardExpiryMonth?: string;
-  isv_cardExpiryYear?: string;
-  isv_requestJwt?: string;
-  isv_responseJwt?: string;
-  isv_payerAuthenticationRequired?: boolean;
-  isv_payerAuthenticationTransactionId?: string;
-  isv_payerAuthenticationAcsUrl?: string;
-  isv_payerAuthenticationPaReq?: string;
-  isv_cardinalReferenceId?: string;
-  isv_deviceDataCollectionUrl?: string;
-  isv_stepUpUrl?: string;
-  isv_payerEnrollTransactionId?: string;
-  isv_payerEnrollStatus?: string;
-  isv_payerEnrollHttpCode?: number;
-  isv_acceptHeader?: string;
-  isv_userAgentHeader?: string;
-  isv_deviceFingerprintId?: string;
-  isv_customerIpAddress?: string;
-  isv_applePayValidationUrl?: string;
-  isv_applePayDisplayName?: string;
-  isv_applePaySessionData?: string;
-  isv_saleEnabled?: boolean;
-  isv_enabledMoto?: string;
-  isv_walletType?: string;
-  isv_accountNumber?: string;
-  isv_accountType?: string;
-  isv_routingNumber?: string;
-  isv_merchantId?: string;
-  isv_securityCode?: number;
-  isv_transientToken?: string;
-  isv_customerId?: string;
-  isv_screenHeight?: number,
-  isv_screenWidth?: number,
-  isv_responseDateAndTime?: string,
-  isv_authorizationStatus?: string,
-  isv_authorizationReasonCode?: string,
-  isv_ECI?: string,
-  isv_AVSResponse?: string,
-  isv_CVVResponse?: string,
-  isv_responseCode?: string,
-  isv_dmpaFlag?: boolean;
+  isv_token: string;
+  isv_tokenAlias: string;
+  isv_savedToken: string;
+  isv_tokenVerificationContext: string;
+  isv_tokenCaptureContextSignature: string;
+  isv_cardType: string;
+  isv_maskedPan: string;
+  isv_cardExpiryMonth: string;
+  isv_cardExpiryYear: string;
+  isv_requestJwt: string;
+  isv_responseJwt: string;
+  isv_payerAuthenticationRequired: boolean;
+  isv_payerAuthenticationTransactionId: string;
+  isv_payerAuthenticationAcsUrl: string;
+  isv_payerAuthenticationPaReq: string;
+  isv_cardinalReferenceId: string;
+  isv_deviceDataCollectionUrl: string;
+  isv_stepUpUrl: string;
+  isv_payerEnrollTransactionId: string;
+  isv_payerEnrollStatus: string;
+  isv_payerEnrollHttpCode: number;
+  isv_acceptHeader: string;
+  isv_userAgentHeader: string;
+  isv_deviceFingerprintId: string;
+  isv_customerIpAddress: string;
+  isv_applePayValidationUrl: string;
+  isv_applePayDisplayName: string;
+  isv_applePaySessionData: string;
+  isv_saleEnabled: boolean;
+  isv_enabledMoto: string;
+  isv_walletType: string;
+  isv_accountNumber: string;
+  isv_accountType: string;
+  isv_routingNumber: string;
+  isv_merchantId: string;
+  isv_securityCode: number;
+  isv_transientToken: string;
+  isv_customerId: string;
+  isv_screenHeight: number;
+  isv_screenWidth: number;
+  isv_responseDateAndTime: string;
+  isv_authorizationStatus: string;
+  isv_authorizationReasonCode: string;
+  isv_ECI: string;
+  isv_AVSResponse: string;
+  isv_CVVResponse: string;
+  isv_responseCode: string;
+  isv_dmpaFlag: boolean;
   isv_shippingMethod?: string
 };
-
 export type PaymentTransactionType = {
-  id?: string;
-  timestamp?: string;
-  type?: string;
-  amount?: {
-    type?: string;
+  id: string;
+  timestamp: string;
+  type: string;
+  amount: {
+    type: string;
     currencyCode: string;
     centAmount: number;
-    fractionDigits?: number;
+    fractionDigits: number;
   };
-  interactionId?: string;
-  state?: string;
-  custom?: {
+  interactionId: string;
+  state: string;
+  custom: {
     fields: {
       isv_availableCaptureAmount: number;
     };
   };
-  version?: number;
+  version: number;
 };
 
 //Order results Type
@@ -117,23 +117,22 @@ export type OrderResultType = {
 
 //Ct response type
 export type ActionResponseType = {
-  actions: ActionType[];
+  actions: Partial<ActionType>[];
   errors: ErrorType[];
 };
-
 export type ActionType = {
-  action?: string;
-  name?: string;
-  value?: string | boolean | number | string[] | null;
+  action: string;
+  name: string;
+  value: string | boolean | number | string[] | null;
   type?: {
     key?: string;
     typeId?: string;
   };
-  fields?: ConsumerAuthenticationInformationType;
-  address?: AddressType;
-  state?: string;
-  interactionId?: string;
-  transactionId?: string;
+  fields: Partial<ConsumerAuthenticationInformationType>;
+  address: Partial<AddressType>;
+  state: string;
+  interactionId: string;
+  transactionId: string;
 };
 
 export type ErrorType = {
@@ -145,10 +144,10 @@ export type ErrorType = {
 export type CustomerType = {
   id: string;
   version: number;
-  lastMessageSequenceNumber?: number;
-  createdAt?: string;
-  lastModifiedAt?: string;
-  lastModifiedBy?: {
+  lastMessageSequenceNumber: number;
+  createdAt: string;
+  lastModifiedAt: string;
+  lastModifiedBy: {
     clientId: string;
     isPlatformClient: boolean;
     customer: {
@@ -156,7 +155,7 @@ export type CustomerType = {
       id: string;
     };
   };
-  createdBy?: {
+  createdBy: {
     clientId: string;
     isPlatformClient: boolean;
     customer: {
@@ -167,77 +166,72 @@ export type CustomerType = {
   email: string;
   firstName: string;
   lastName: string;
-  password?: string;
-  addresses?: AddressType[];
-  shippingAddressIds?: string[];
-  billingAddressIds?: string[];
-  isEmailVerified?: boolean;
-  custom?: {
-    fields?: CustomerCustomType;
-    type?: {
+  addresses: AddressType[];
+  shippingAddressIds: string[];
+  billingAddressIds: string[];
+  isEmailVerified: boolean;
+  custom: {
+    fields: Partial<CustomerCustomType>;
+    type: {
       typeId: string;
       id: string;
     };
-  };
-  authenticationMode?: string;
+  }
 };
-
 export type AddressType = {
-  id?: string;
-  firstName?: string;
-  lastName?: string;
-  address1?: string;
-  address2?: string;
-  buildingNumber?: string;
-  streetName?: string;
-  streetNumber?: string;
-  locality?: string;
-  administrativeArea?: string;
-  postalCode?: string;
-  city?: string;
-  region?: string;
-  country?: string;
-  phone?: string;
-  phoneNumber?: string;
-  email?: string;
-  additionalStreetInfo?: string;
-  mobile?: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  address1: string;
+  address2: string;
+  buildingNumber: string;
+  streetName: string;
+  streetNumber: string;
+  locality: string;
+  administrativeArea: string;
+  postalCode: string;
+  city: string;
+  region: string;
+  country: string;
+  phone: string;
+  phoneNumber: string;
+  email: string;
+  additionalStreetInfo: string;
+  mobile: string;
 };
-
 export type CustomerCustomType = {
-  isv_tokens?: string[];
-  isv_token?: string;
-  isv_tokenAlias?: string;
-  isv_savedToken?: string;
-  isv_tokenVerificationContext?: string;
-  isv_tokenCaptureContextSignature?: string;
-  isv_cardType?: string;
-  isv_maskedPan?: string;
-  isv_cardExpiryMonth?: string;
-  isv_cardExpiryYear?: string;
-  isv_addressId?: string;
-  isv_currencyCode?: string;
-  isv_deviceFingerprintId?: string;
-  isv_cardNewExpiryMonth?: string;
-  isv_cardNewExpiryYear?: string;
-  isv_tokenUpdated?: boolean;
-  isv_tokenAction?: string | null;
-  isv_failedTokens?: string[];
+  isv_tokens: string[];
+  isv_token: string;
+  isv_tokenAlias: string;
+  isv_savedToken: string;
+  isv_tokenVerificationContext: string;
+  isv_tokenCaptureContextSignature: string;
+  isv_cardType: string;
+  isv_maskedPan: string;
+  isv_cardExpiryMonth: string;
+  isv_cardExpiryYear: string;
+  isv_addressId: string;
+  isv_currencyCode: string;
+  isv_deviceFingerprintId: string;
+  isv_cardNewExpiryMonth: string;
+  isv_cardNewExpiryYear: string;
+  isv_tokenUpdated: boolean;
+  isv_tokenAction: string | null;
+  isv_failedTokens: string[];
 };
-
 export type CustomerTokensType = {
   alias: string;
-  value?: string;
-  paymentToken?: string;
-  instrumentIdentifier?: string;
+  value: string;
+  paymentToken: string;
+  instrumentIdentifier: string;
   cardType: string;
   cardName: string;
   cardNumber: string;
   cardExpiryMonth: string;
   cardExpiryYear: string;
-  addressId?: string;
-  timeStamp?: string;
-  address?: AddressType;
+  addressId: string;
+  timeStamp: string;
+  address: Partial<AddressType>;
 };
 
 //Mid credentials object
@@ -282,53 +276,50 @@ export type SecurityCodeType = {
     centAmount: number;
   };
 };
-
-export type ReportSyncType = SecurityCodeType & PaymentTransactionType;
-
+export type ReportSyncType = SecurityCodeType & Partial<PaymentTransactionType>;
 export type VisaUpdateType = {
   id: string;
   version: number;
-  actions: ActionType[];
+  actions: Partial<ActionType>[];
 };
-
 export type ConsumerAuthenticationInformationType = {
-  cavv?: string;
-  eciRaw?: string;
-  paresStatus?: string;
-  indicator?: string | number;
-  commerceIndicator?: string;
-  authenticationResult?: string;
-  xid?: string;
-  cavvAlgorithm?: string;
-  authenticationStatusMessage?: string;
-  eci?: string;
-  specificationVersion?: string;
-  pareq?: string;
-  paReq?: string;
-  acsurl?: string;
-  acsUrl?: string;
-  authenticationTransactionId?: string;
-  veresEnrolled?: string;
-  cardinalId?: string;
-  cardinalReferenceId?: string;
-  proofXml?: string;
-  directoryServerTransactionId?: string;
-  isv_payerAuthenticationRequired?: boolean;
-  isv_payerAuthenticationTransactionId?: string;
-  isv_payerAuthenticationPaReq?: string;
-  stepUpUrl?: string;
-  isv_responseJwt?: string;
-  reasonCode?: string;
-  transactionId?: string;
-  isv_availableCaptureAmount?: number;
-  authorizationAllowed?: boolean;
-  authenticationRequired?: boolean;
-  isv_tokens?: string[];
-  isv_tokenUpdated?: boolean;
-  isv_failedTokens?: string[];
+  cavv: string;
+  eciRaw: string;
+  paresStatus: string;
+  indicator: string | number;
+  commerceIndicator: string;
+  authenticationResult: string;
+  xid: string;
+  cavvAlgorithm: string;
+  authenticationStatusMessage: string;
+  eci: string;
+  specificationVersion: string;
+  pareq: string;
+  paReq: string;
+  acsurl: string;
+  acsUrl: string;
+  authenticationTransactionId: string;
+  veresEnrolled: string;
+  cardinalId: string;
+  cardinalReferenceId: string;
+  proofXml: string;
+  directoryServerTransactionId: string;
+  isv_payerAuthenticationRequired: boolean;
+  isv_payerAuthenticationTransactionId: string;
+  isv_payerAuthenticationPaReq: string;
+  stepUpUrl: string;
+  isv_responseJwt: string;
+  reasonCode: string;
+  transactionId: string;
+  isv_availableCaptureAmount: number;
+  authorizationAllowed: boolean;
+  authenticationRequired: boolean;
+  isv_tokens: string[];
+  isv_tokenUpdated: boolean;
+  isv_failedTokens: string[];
 };
 
-export type AddTransActionType = {
+export type AddTransactionType = {
   action: string;
   transaction: {
     type: string;
@@ -341,13 +332,13 @@ export type AddTransActionType = {
 
 export type ApplicationsType = {
   [x: string]: any;
-  name?: string;
-  reasonCode?: string;
-  rCode?: string;
-  rFlag?: string;
-  reconciliationId?: string;
-  rMessage?: string;
-  returnCode?: number;
+  name: string;
+  reasonCode: string;
+  rCode: string;
+  rFlag: string;
+  reconciliationId: string;
+  rMessage: string;
+  returnCode: number;
 };
 
 export type CertificateResponseType = {
@@ -356,7 +347,7 @@ export type CertificateResponseType = {
 };
 
 export type OrderInformationType = {
-  lineItems?: OrderInformationLineItemsType[];
+  lineItems?: Partial<OrderInformationLineItemsType>[];
   amountDetails?: {
     totalAmount: number;
     currency: string;
@@ -377,37 +368,33 @@ export type CybsAddressType = {
   email: string;
   phoneNumber: string;
 };
-
 export type OrderInformationLineItemsType = {
-  productName?: string;
-  quantity?: number;
-  productSku?: string;
-  productCode?: string;
-  discountAmount?: number;
-  unitPrice?: number;
+  productName: string;
+  quantity: number;
+  productSku: string;
+  productCode: string;
+  discountAmount: number;
+  unitPrice: number;
 };
-
 export type ResponseType = {
-  httpCode?: number;
-  transactionId?: string;
-  status?: string;
-  data?: any;
-  deletedToken?: string;
-  billToFieldGroup?: any;
-  shipToFieldGroup?: any;
-  cardFieldGroup?: any;
-  isv_tokenCaptureContextSignature?: string;
-  isv_tokenVerificationContext?: string;
-  accessToken?: string;
-  referenceId?: string;
-  deviceDataCollectionUrl?: string;
+  httpCode: number;
+  transactionId: string;
+  status: string;
+  data: any;
+  deletedToken: string;
+  billToFieldGroup: any;
+  shipToFieldGroup: any;
+  cardFieldGroup: any;
+  isv_tokenCaptureContextSignature: string;
+  isv_tokenVerificationContext: string;
+  accessToken: string;
+  referenceId: string;
+  deviceDataCollectionUrl: string;
 };
-
 export type PaymentResponse = {
-  httpCode?: number;
-  status?: string;
+  httpCode: number;
+  status: string;
 };
-
 export type InstrumentIdResponse = {
   httpCode: number;
   instrumentIdentifier: string;
@@ -423,11 +410,11 @@ export type SubscriptionInformationType = {
   key: string;
   keyId: string;
   keyExpiration: string;
-  subscriptionId: string;
+  webhookId: string;
 };
 
 export type TokenCreateFlagType = {
-  notSaveToken: boolean;
+  isSaveToken: boolean;
   isError: boolean;
 };
 
@@ -442,3 +429,24 @@ export type CommercetoolsErrorResponse = {
   message: string;
   body: { errors: { code: string; message: string }[] };
 }
+
+export type KeyResponse = {
+  httpCode: number,
+  organizationId: null,
+  key: null,
+  keyId: null,
+  keyExpiration: null,
+};
+export type WebhookVerificationObject = {
+  isSubscribed: boolean,
+  presentInCustomObject: boolean,
+  urlVerified: boolean,
+  webhookId: string,
+  key: string,
+  keyId: string,
+  keyExpiration: string,
+  merchantId: string,
+};
+
+export type ProcessingInformationType = Ptsv2creditsProcessingInformationBankTransferOptions | Ptsv2paymentsidrefundsProcessingInformation | Ptsv2paymentsidreversalsProcessingInformation | Ptsv2paymentsProcessingInformation | Ptsv2paymentsProcessingInformationAuthorizationOptions | Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator;
+export type OrderInformation = Ptsv2paymentsidcapturesOrderInformation | Ptsv2paymentsidrefundsOrderInformation | Ptsv2paymentsidreversalsOrderInformation | Ptsv2paymentsOrderInformation | Upv1capturecontextsOrderInformation;

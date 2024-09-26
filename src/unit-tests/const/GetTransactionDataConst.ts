@@ -1,5 +1,5 @@
 import clickToPay from '../JSON/clickToPay.json';
-export const paymentResponse = {
+ const paymentResponse = {
   httpCode: 201,
   transactionId: clickToPay.authId,
   status: 'AUTHORIZED',
@@ -54,7 +54,7 @@ export const paymentResponse = {
   },
 };
 
-export const paymentResponses = {
+ const paymentResponses = {
   httpCode: 201,
   transactionId: '66624865970367991039',
   status: 'AUTHORIZED',
@@ -108,3 +108,8 @@ export const paymentResponses = {
     },
   },
 };
+
+export default {
+  paymentResponse,
+  paymentResponses
+}

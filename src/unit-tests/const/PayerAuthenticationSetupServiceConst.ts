@@ -1,5 +1,5 @@
 import creditCard from '../JSON/creditCard.json';
-export const payments = {
+ const payments = {
   id: 'f421e2ca-de6a-4a5d-b2c0-1c9ccbd3cdc1',
   version: 14,
   lastMessageSequenceNumber: 1,
@@ -49,21 +49,21 @@ export const payments = {
   interfaceInteractions: [],
 };
 
-export const cardTokensObject = {
+ const cardTokensObject = {
   customerTokenId: creditCard.savedTokenId,
   paymentInstrumentId: creditCard.savedToken,
 };
 
-export const cardTokensInvalidCustomerObject = {
+ const cardTokensInvalidCustomerObject = {
   customerTokenId: 'D605360941117CECE053AF598E0A6E',
   paymentInstrumentId: creditCard.savedToken,
 };
 
-export const cardTokenInvalidObject = {
+ const cardTokenInvalidObject = {
   customerTokenId: creditCard.savedTokenId,
   paymentInstrumentId: 'D76C84878E06B607E053A2598D0AAC',
 };
-export const paymentObject = {
+ const paymentObject = {
   id: 'f421e2ca-de6a-4a5d-b2c0-1c9ccbd3cdc1',
   version: 14,
   lastMessageSequenceNumber: 1,
@@ -113,7 +113,7 @@ export const paymentObject = {
   transactions: [],
   interfaceInteractions: [],
 };
-export let paymentSavedTokens : any = {
+ let paymentSavedTokens : any = {
   id: 'f421e2ca-de6a-4a5d-b2c0-1c9ccbd3cdc1',
   version: 14,
   lastMessageSequenceNumber: 1,
@@ -162,12 +162,23 @@ export let paymentSavedTokens : any = {
   transactions: [],
   interfaceInteractions: [],
 };
-export const cardTokensObjects = {
+ const cardTokensObjects = {
   customerTokenId: creditCard.savedTokenId,
   paymentInstrumentId: '',
 };
 
-export const cardTokensInvalidCustomerObjects = {
+ const cardTokensInvalidCustomerObjects = {
   customerTokenId: 'D605360941117CECE053AF598E0A6E',
   paymentInstrumentId: creditCard.savedToken,
 };
+
+export default {
+  payments,
+  cardTokensObject,
+  cardTokensInvalidCustomerObject,
+  cardTokenInvalidObject,
+  paymentObject,
+  paymentSavedTokens,
+  cardTokensObjects,
+  cardTokensInvalidCustomerObjects
+}

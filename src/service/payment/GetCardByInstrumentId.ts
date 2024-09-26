@@ -1,11 +1,11 @@
-import path from 'path';
-
 import restApi from 'cybersource-rest-client';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
+import prepareFields from '../../requestBuilder/PrepareFields';
 import { InstrumentIdResponse } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
-import prepareFields from '../../utils/PrepareFields';
 
 /**
  * Retrieves card information by instrument identifier.
@@ -24,37 +24,34 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
     expirationYear: '',
   };
   const opts: any = [];
-  let errorData: string;
   try {
-    const configObject = await prepareFields.getConfigObject('FuncGetCardByInstrumentResponse', null, null, merchantId);
     if (instrumentIdentifier) {
+      const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE, null, null, merchantId);
       const apiClient = new restApi.ApiClient();
-      const getCardApiInstance = new restApi.InstrumentIdentifierApi(configObject, apiClient);
+      const getCardApiInstance = configObject && new restApi.InstrumentIdentifierApi(configObject, apiClient);
       return await new Promise<InstrumentIdResponse>(function (resolve, reject) {
-        getCardApiInstance.getInstrumentIdentifier(instrumentIdentifier, opts, (error: any, data: any, response: any) => {
-          paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetCardByInstrumentResponse', Constants.LOG_INFO, 'InstrumentId : ' + instrumentIdentifier, 'InstrumentIdResponse = ' + JSON.stringify(response));
-          if (data) {
-            getCardResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
-            getCardResponse.instrumentIdentifier = data?.id;
-            getCardResponse.state = data?.tokenizedCard?.state;
-            getCardResponse.cardPrefix = data?.tokenizedCard?.number;
-            getCardResponse.cardSuffix = data?.tokenizedCard?.card?.suffix;
-            getCardResponse.expirationMonth = data.tokenizedCard?.card?.expirationMonth;
-            getCardResponse.expirationYear = data.tokenizedCard?.card?.expirationYear;
-            resolve(getCardResponse);
-          } else if (error) {
-            if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-              paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetCardByInstrumentResponse', Constants.LOG_ERROR, '', error.response.text);
+        if (getCardApiInstance) {
+          getCardApiInstance.getInstrumentIdentifier(instrumentIdentifier, opts, (error: any, data: any, response: any) => {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE, Constants.LOG_INFO, 'InstrumentId : ' + instrumentIdentifier, 'InstrumentIdResponse = ' + JSON.stringify(response));
+            if (data) {
+              getCardResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
+              getCardResponse.instrumentIdentifier = data?.id;
+              getCardResponse.state = data?.tokenizedCard?.state;
+              getCardResponse.cardPrefix = data?.tokenizedCard?.number;
+              getCardResponse.cardSuffix = data?.tokenizedCard?.card?.suffix;
+              getCardResponse.expirationMonth = data.tokenizedCard?.card?.expirationMonth;
+              getCardResponse.expirationYear = data.tokenizedCard?.card?.expirationYear;
+              resolve(getCardResponse);
+            } else if (error) {
+              getCardResponse.httpCode = error.status;
+              reject(getCardResponse);
             } else {
-              typeof error === 'object' ? (errorData = JSON.stringify(error)) : (errorData = error);
-              paymentUtils.logData(path.parse(path.basename(__filename)).name, 'FuncGetCardByInstrumentResponse', Constants.LOG_ERROR, '', errorData);
+              reject(getCardResponse);
             }
-            getCardResponse.httpCode = error.status;
-            reject(getCardResponse);
-          } else {
-            reject(getCardResponse);
-          }
-        });
+          });
+        } else {
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE, Constants.LOG_INFO, 'InstrumentId : ' + instrumentIdentifier, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
+        }
       }).catch((error: any) => {
         return error;
       });
@@ -62,7 +59,7 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
       return getCardResponse;
     }
   } catch (exception) {
-    paymentUtils.exceptionLog(path.parse(path.basename(__filename)).name, 'FuncGetCardByInstrumentResponse', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE, '', exception, '', '', '');
     return getCardResponse;
   }
 };

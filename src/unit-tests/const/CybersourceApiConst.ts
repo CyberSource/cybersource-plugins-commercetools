@@ -1,4 +1,4 @@
-export const configObject = {
+ const configObject = {
   authenticationType: 'http_signature',
   runEnvironment: 'apitest.cybersource.com',
   merchantID: 'visa_isv_commercetools_pmt',
@@ -8,7 +8,7 @@ export const configObject = {
     enableLog: false,
   },
 };
-export const requestObject = {
+ const requestObject = {
   organizationId: 'visa_isv_commercetools_pmt',
   productId: 'ctNetworkTokenSubscription',
   eventType: 'tms.networktoken.updated',
@@ -16,3 +16,8 @@ export const requestObject = {
   limit: 10,
   status: 'active',
 };
+
+export default {
+  configObject,
+  requestObject
+}

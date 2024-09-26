@@ -2,25 +2,9 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants';
+import { Constants } from '../../../constants/constants';
 import auth from '../../../service/payment/PaymentAuthorizationService';
-import {
-  cardTokenInvalidObject,
-  cardTokens,
-  cardTokensObject,
-  cart,
-  guestCardTokens,
-  guestPayment,
-  notSaveToken,
-  orderNo,
-  orderNumber,
-  payerAuthMandateFlag,
-  payment,
-  payments,
-  service,
-  shippingCart,
-  ucPayment,
-} from '../../const/CreditCard/PaymentAuthorizationServiceConstCC';
+import authServiceConstCC from '../../const/CreditCard/PaymentAuthorizationServiceConstCC';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -28,7 +12,7 @@ let paymentResponse: any = {
 };
 
 test.serial('Authorizing a payment and check http code', async (t: any) => {
-  let result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.payment, authServiceConstCC.cart, authServiceConstCC.service, authServiceConstCC.cardTokens, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -55,7 +39,7 @@ test.serial('Check status of payment authorization', async (t: any) => {
 });
 
 test.serial('Authorizing a payment using saved card and check http code', async (t: any) => {
-  let result: any = await auth.authorizationResponse(payments, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.payments, authServiceConstCC.cart, authServiceConstCC.service, authServiceConstCC.cardTokens, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -82,7 +66,7 @@ test.serial('Check status of payment authorization using saved card', async (t: 
 });
 
 test.serial('Authorizing a payment using saved card with invalid customer and check http code', async (t: any) => {
-  let result: any = await auth.authorizationResponse(payments, cart, service, cardTokensObject, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.payments, authServiceConstCC.cart, authServiceConstCC.service, authServiceConstCC.cardTokensObject, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
@@ -102,7 +86,7 @@ test.serial('Check status of payment authorization with invalid customer', async
 });
 
 test.serial('Authorizing a payment using invalid saved card ', async (t: any) => {
-  let result: any = await auth.authorizationResponse(payments, cart, service, cardTokenInvalidObject, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.payments, authServiceConstCC.cart, authServiceConstCC.service, authServiceConstCC.cardTokenInvalidObject, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
@@ -122,7 +106,7 @@ test.serial('Check status of payment authorization with invalid saved token', as
 });
 
 test.serial('Authorizing a payment for guest user and check http code', async (t: any) => {
-  let result: any = await auth.authorizationResponse(guestPayment, cart, service, guestCardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.guestPayment, authServiceConstCC.cart, authServiceConstCC.service, authServiceConstCC.guestCardTokens, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -149,7 +133,7 @@ test.serial('Check status of payment authorization for guest user', async (t: an
 });
 
 test.serial('Authorizing a payment with reconciliation Id and check http code', async (t: any) => {
-  let result: any = await auth.authorizationResponse(payment, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNumber);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.payment, authServiceConstCC.cart, authServiceConstCC.service, authServiceConstCC.cardTokens, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -176,7 +160,7 @@ test.serial('Check status of payment authorization with reconciliation Id', asyn
 });
 
 test.serial('Authorizing a payment with multiple shipping mode and check http code', async (t: any) => {
-  let result: any = await auth.authorizationResponse(payment, shippingCart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNumber);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.payment, authServiceConstCC.shippingCart, authServiceConstCC.service, authServiceConstCC.cardTokens, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
@@ -203,7 +187,7 @@ test.serial('Check status of payment authorization with multiple shipping mode',
 });
 
 test.serial('Authorizing a payment for UC and check http code', async (t: any) => {
-  let result: any = await auth.authorizationResponse(ucPayment, cart, service, cardTokens, notSaveToken, payerAuthMandateFlag, orderNo);
+  let result: any = await auth.getAuthorizationResponse(authServiceConstCC.ucPayment, authServiceConstCC.cart, authServiceConstCC.service, authServiceConstCC.cardTokens, authServiceConstCC.notSaveToken, authServiceConstCC.payerAuthMandateFlag, authServiceConstCC.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
   if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {

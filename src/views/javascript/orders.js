@@ -74,12 +74,11 @@ async function renderOrders(orderList) {
             order.paymentMethodInfo.name ? order?.paymentMethodInfo?.name?.en : order?.paymentMethodInfo?.method,
             dateConversion(order.createdAt),
             dateConversion(order.lastModifiedAt),
-            `/paymentDetails?id=${order.id}`);
+            `/paymentDetails?id=${encodeURIComponent(order.id)}`);
           newRow.addEventListener('click', () => {
             const url = newRow.getAttribute('data-href');
             window.location.href = url;
           });
-
           paymentDetailsBody.appendChild(newRow);
         }
       })

@@ -1,5 +1,5 @@
 import googlePay from '../../JSON/googlePay.json';
-export const payment = {
+const payment = {
   id: '33e68f3d-8143-4d07-ac13-2314c7039251',
   version: 8,
   lastMessageSequenceNumber: 6,
@@ -77,11 +77,11 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const captureId = googlePay.captureId;
+const captureId = googlePay.captureId;
 
-export const captureID = '64009063539269775034';
+const captureID = '64009063539269775034';
 
-export const updateTransaction = {
+const updateTransaction = {
   id: '05d19a9b-fcb7-4c0a-bef7-5ddf0e3afc8e',
   timestamp: '2021-12-22T05:34:24.008Z',
   type: 'Refund',
@@ -94,6 +94,15 @@ export const updateTransaction = {
   state: 'Initial',
 };
 
-export const orderNo = '';
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
+
+export default {
+  payment,
+  captureId,
+  captureID,
+  updateTransaction,
+  orderNo,
+  orderNumber
+}

@@ -1,6 +1,6 @@
 import { AddressType } from '../../types/Types';
 
-export const setTransactionIdPaymentResponse: any = {
+ const setTransactionIdPaymentResponse: any = {
   httpCode: 201,
   transactionId: '7017633839226148803955',
   status: 'AUTHORIZED',
@@ -90,7 +90,7 @@ export const setTransactionIdPaymentResponse: any = {
   },
 };
 
-export const setTransactionIdTransactionDetail = {
+ const setTransactionIdTransactionDetail = {
   id: '8a3e4e74-7599-45c9-9538-b76b73814f2a',
   timestamp: '2023-12-05T08:03:04.037Z',
   type: 'Authorization',
@@ -103,7 +103,7 @@ export const setTransactionIdTransactionDetail = {
   state: 'Initial',
 };
 
-export const failurePaymentResponse = {
+ const failurePaymentResponse = {
   httpCode: 201,
   transactionId: '6437973031316274803954',
   status: 'DECLINED',
@@ -149,7 +149,7 @@ export const failurePaymentResponse = {
   },
 };
 
-export const failureResponseTransactionDetail = {
+ const failureResponseTransactionDetail = {
   id: 'fa4185f4-3e11-49f8-bbbe-9982e1f7ab68',
   timestamp: '2022-01-17T07:13:19.814Z',
   type: 'Authorization',
@@ -162,7 +162,7 @@ export const failureResponseTransactionDetail = {
   state: 'Initial',
 };
 
-export const changeStateFailureTransactionDetail = {
+ const changeStateFailureTransactionDetail = {
   id: 'fa4185f4-3e11-49f8-bbbe-9982e1f7ab68',
   timestamp: '2022-01-17T07:13:19.814Z',
   type: 'Authorization',
@@ -175,9 +175,9 @@ export const changeStateFailureTransactionDetail = {
   state: 'Initial',
 };
 
-export const failureState = 'Failure';
+ const failureState = 'Failure';
 
-export const changeStateTransactionDetail = {
+ const changeStateTransactionDetail = {
   id: 'c36b4a64-f2da-4d31-9a98-41a9e82663af',
   timestamp: '2022-03-30T07:22:03.564Z',
   type: 'Charge',
@@ -190,29 +190,28 @@ export const changeStateTransactionDetail = {
   state: 'Initial',
 };
 
-export const successState = 'Success';
+ const successState = 'Success';
 
-export const setCustomFieldMapperFields = {
+ const setCustomFieldMapperFields = {
   isv_tokenCaptureContextSignature:
     'eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEihRVWpwa3g1RThRcFhCQUFFSFZpSXVyQjl3NW11ZXBhY0JtcG01UUlyWnNCR1NxQmhheVoyWXM4YS9NbXdTZDg1bEsxZ1g3VmY4Z2dPS1A2VStKU0Qxa3hHMW0vc0lHpXZG4wM2puaFNHaTVIcHpuWTQiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiYyIsIm4iOiIzNmJfcDhXZFR1ZVBOdk5jbVBMeGtaakdtUm1ReUFsN25CaU5DWXBBY0dBekZVcW90RU1ndjZfQXRpMDh6SW5fR3VmQ1F3X05kRnFaUXQtaGxoNy1uZ4NGFpMFdkYlY2eThUV0pzYkxhLXdiNWJYM0VKRWFkdjRkdnZGa0lQQ0lqUWV2R1lnUHdLMkI5cUVORUV2VlpCVTFvWXIxU0owbldUZW5RbTFsOXZsdlRDOUhWOWxGJEZjM2VFcxNGZMNlRWN3Rob08taWx4UUo1UFhRdzRyZExrbVl6d1E0VTFTZk96Sml0MW1MMi1RLXFMREFSS3JxRnQ1U1dCY0YtTm94ZXJIaVpHdllUU2xLYjFWcWwW0wZWs0eXRfU1czYXJTc3g1NmtnTFpnQWtLNTEwbjJqVU5BMVEiLCJraWQiOiIwODVQUzhhVkFXakJ5MEM3dEt2aTBQdkdMVUJxSGh2eSJ9fSwiY3R4IjpbeyJkYXdE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NDE4ODgzMTIsImlhdCI6MTY0MTg4NzQxMiwianRpIjoibFg5eFY5Z25kMTFIcHd4byJ9.DZpFRe8PnMd9WYgL_3419Q4cMkjf-up4teaYxk-xVBSXgo_K9DI7hbnZRFQGSU48NCpIz4MoAQvzjzEYIXIeUDrM5uItkIwYphDynq9vNRYcRmd-b5VYAm1QV5Jrn_gODZmIOV581MuoAZ-zZsYMwidUoPSDrUqAWuUB2KYV5im191t3kVauN_4cqyZM08VLOCjqzThNOq2eSKg95y62JKEP0GI-VnXNujieSBm8Qh1OIDgNym2IGnXBjCw5uD7XsgUwm8xSOPPuEuv4UgHLvxYVm1yqoGuPz7X8zrsZBUYg',
   isv_tokenVerificationContext:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJWpwa3g1RThRcFhCQUFFSFZpSXVyQjl3NW11ZXBhY0JtcG01UUlyWnNCR1NxQmhheVoyWXM4YS9NbXdTZDg1bEsxZ1g3VmY4Z2dPS1A2VStKU0Qxa3hHMW0vc0lFdVZG4wM2puaFNHaTVIcHpuWTQiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsIsIm4iOiIzNmJfcDhXZFR1ZVBOdk5jbVBMeGtaakdtUm1ReUFsN25CaU5DWXBBY0dBekZVcW90RU1ndjZfQXRpMDh6SW5fR3VmQ1F3X05kRnFaUXQtaGxoNy1uZnlRFpMFdkYlY2eThUV0pzYkxhLXdiNWJYM0VKRWFkdjRkdnZGa0lQQ0lqUWV2R1lnUHdLMkI5cUVORUV2VlpCVTFvWXIxU0owbldUZW5RbTFsOXZsdlRDOUhWOWxGVFljM2VFcxNGZMNlRWN3Rob08taWx4UUo1UFhRdzRyZExrbVl6d1E0VTFTZk96Sml0MW1MMi1RLXFMREFSS3JxRnQ1U1dCY0YtTm94ZXJIaVpHdllUU2xLYjFWcWwzYXZWs0eXRfU1czYXJTc3g1NmtnTFpnQWtLNTEwbjJqVU5BMVEiLCJraWQiOiIwODVQUzhhVkFXakJ5MEM3dEt2aTBQdkdMVUJxSGh2eSJ9fSwiY3R4IjpbeyJkYXRhIyaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuNzIjoiRmxleCBBUEkiLCJleHAiOjE2NDE4ODgzMTIsImlhdCI6MTY0MTg4NzQxMiwianRpIjoibFg5eFY5Z25kMTFIcHd4byJ9.6KZEcOTyFEI2sM_gShgzdX4C8Xbac',
 };
 
-export const setCustomFieldMapperFieldObject = {
+ const setCustomFieldMapperFieldObject = {
   isv_payerAuthenticationTransactionId: '3G3ZO8q9FwcuodU7LXH0',
   isv_payerAuthenticationRequired: false,
 };
 
-export const setCustomFieldMapperFieldEmptyObject = {
+ const setCustomFieldMapperFieldEmptyObject = {
   isv_payerAuthenticationTransactionId: '',
   isv_payerAuthenticationRequired: false,
 };
 
-export const createTokenDataCustomerObj = {
+ const createTokenDataCustomerObj : any = {
   id: 'dede3a3c-e241-43ed-b960-e3496a8a30ed',
   version: 14,
-  versionModifiedAt: '2024-02-20T06:03:29.889Z',
   lastMessageSequenceNumber: 14,
   createdAt: '2024-02-20T06:02:52.825Z',
   lastModifiedAt: '2024-02-20T06:03:29.889Z',
@@ -233,12 +232,12 @@ export const createTokenDataCustomerObj = {
     },
   },
   email: 'sp3@gmail.com',
-  firstName: 'shakshi',
+  firstName: 'john',
   lastName: 'p',
   addresses: [
     {
       id: '9_w7UQYD',
-      firstName: 'shakshi',
+      firstName: 'john',
       lastName: 'p',
       streetName: '1295 road',
       postalCode: '94043',
@@ -246,6 +245,16 @@ export const createTokenDataCustomerObj = {
       region: 'CA',
       country: 'US',
       email: 'sp@gmail.com',
+      address1: '',
+      address2: '',
+      buildingNumber: '',
+      streetNumber: '',
+      locality: '',
+      administrativeArea: '',
+      phone: '',
+      phoneNumber: '',
+      additionalStreetInfo: '',
+      mobile: ''
     },
   ],
   shippingAddressIds: [],
@@ -272,12 +281,10 @@ export const createTokenDataCustomerObj = {
       isv_addressId: '9_w7UQYD',
       isv_maskedPan: '411111XXXXXXXXXXXX1111',
     },
-  },
-  stores: [],
-  authenticationMode: 'Password',
+  }
 };
 
-export const createTokenDataEmptyCustomField =  {
+ const createTokenDataEmptyCustomField =  {
     isv_tokenCaptureContextSignature: '',
     isv_deviceFingerprintId: '',
     isv_cardExpiryYear: '',
@@ -291,10 +298,10 @@ export const createTokenDataEmptyCustomField =  {
     isv_maskedPan: '',
 }
 
-export const createTokenDataAddress: AddressType = {
+ const createTokenDataAddress: AddressType = {
   id: 'Gu_fd8_a',
-  firstName: 'shakshi',
-  lastName: 'poddar',
+  firstName: 'john',
+  lastName: 'doe',
   streetName: '1295 Charleston Road',
   additionalStreetInfo: '5th lane',
   postalCode: '94043',
@@ -302,10 +309,18 @@ export const createTokenDataAddress: AddressType = {
   region: 'CA',
   country: 'US',
   phone: '+19876543210',
-  email: 'shakshi.poddar@wipro.com',
+  email: 'john.doe@wipro.com',
+  address1: '',
+  address2: '',
+  buildingNumber: '',
+  streetNumber: '',
+  locality: '',
+  administrativeArea: '',
+  phoneNumber: '',
+  mobile: ''
 };
 
-export const createTokenEmptyDataAddress: AddressType = {
+ const createTokenEmptyDataAddress: AddressType = {
   id: '',
   firstName: '',
   lastName: '',
@@ -317,9 +332,17 @@ export const createTokenEmptyDataAddress: AddressType = {
   country: '',
   phone: '',
   email: '',
+  address1: '',
+  address2: '',
+  buildingNumber: '',
+  streetNumber: '',
+  locality: '',
+  administrativeArea: '',
+  phoneNumber: '',
+  mobile: ''
 };
 
-export let validAddTokenResponse = {
+ let validAddTokenResponse = {
   "httpCode": 201,
   "transactionId": "7163560946556935304951",
   "status": "AUTHORIZED",
@@ -391,7 +414,7 @@ export let validAddTokenResponse = {
   }
 }
 
-export let validUpdateServiceResponse : any = {
+ let validUpdateServiceResponse : any = {
   "httpCode": 200,
   "default": false,
   "card": {
@@ -400,3 +423,30 @@ export let validUpdateServiceResponse : any = {
     "type": "001"
   }
 }
+
+ const headerValue = "ZTRiNGU1MzY3MGM1M2QyZmQzZTVhMzIxOmtNajUzTWFDZmlUcUFCSnk5ZDJBSjQxeUdLZz06NWQ2NzRkYWEzYTc1Y2UyMmExMjc3MDIyNDg2NDU2NzM=";
+ const decodedValue = "c3VkaGFyc2FuOjEyMzQ=";
+ const invalidSignature = "t=1723628528708;keyId=1877d6c7-07f2-73f9-e063-5c588e0a2509;sig=tb3vxS/Zz9vAmNq5PhTbiOMY2GAmUYDK98ZmfubgGQU=";
+
+ export default {
+  setTransactionIdPaymentResponse,
+  setTransactionIdTransactionDetail,
+  failurePaymentResponse,
+  failureResponseTransactionDetail,
+  changeStateFailureTransactionDetail,
+  failureState,
+  changeStateTransactionDetail,
+  successState,
+  setCustomFieldMapperFields,
+  setCustomFieldMapperFieldObject,
+  setCustomFieldMapperFieldEmptyObject,
+  createTokenDataCustomerObj,
+  createTokenDataEmptyCustomField,
+  createTokenDataAddress,
+  createTokenEmptyDataAddress,
+  validAddTokenResponse,
+  validUpdateServiceResponse,
+  headerValue,
+  decodedValue,
+  invalidSignature
+ }

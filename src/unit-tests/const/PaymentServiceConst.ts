@@ -1,26 +1,26 @@
-import { CustomerType, PaymentType, ReportSyncType } from '../../types/Types';
+import { CardAddressGroupType, CustomerType, PaymentType, ReportSyncType } from '../../types/Types';
 import clickToPay from '../JSON/clickToPay.json';
 import creditCard from '../JSON/creditCard.json';
 import googlePay from '../JSON/googlePay.json';
 import unit from '../JSON/unit.json';
 
-export let visaCardDetailsActionVisaCheckoutData : any= {
+ let visaCardDetailsActionVisaCheckoutData : any= {
   httpCode: 200,
   billToFieldGroup: {
-    firstName: 'SHAKSHI',
-    lastName: 'PODDAR',
+    firstName: 'john',
+    lastName: 'doe',
     address1: '1295 Charleston Road',
     address2: '5th lane',
     locality: 'Mountain View',
     administrativeArea: 'CA',
     postalCode: '94043',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
     country: 'US',
     phoneNumber: '08808906634',
   },
   shipToFieldGroup: {
-    firstName: 'SHAKSHI',
-    lastName: 'PODDAR',
+    firstName: 'john',
+    lastName: 'doe',
     address1: '1295 Charleston Road',
     locality: 'Mountain View',
     administrativeArea: 'CA',
@@ -38,9 +38,10 @@ export let visaCardDetailsActionVisaCheckoutData : any= {
   message: null,
 };
 
-export const visaCardDetailsActionVisaCheckoutEmptyData = {
+ const visaCardDetailsActionVisaCheckoutEmptyData : Partial<CardAddressGroupType>= {
   httpCode: 200,
   billToFieldGroup: {
+    id: '',
     firstName: '',
     lastName: '',
     address1: '',
@@ -51,16 +52,35 @@ export const visaCardDetailsActionVisaCheckoutEmptyData = {
     email: '',
     country: '',
     phoneNumber: '',
+    city: '',
+    region: '',
+    phone: '',
+    additionalStreetInfo: '',
+    mobile: '',
+    buildingNumber: '',
+    streetName: '',
+    streetNumber: ''
   },
   shipToFieldGroup: {
+    id: '',
     firstName: '',
     lastName: '',
     address1: '',
+    address2: '',
     locality: '',
     administrativeArea: '',
     postalCode: '',
+    email: '',
     country: '',
     phoneNumber: '',
+    city: '',
+    region: '',
+    phone: '',
+    additionalStreetInfo: '',
+    mobile: '',
+    buildingNumber: '',
+    streetName: '',
+    streetNumber: ''
   },
   cardFieldGroup: {
     suffix: '',
@@ -69,24 +89,23 @@ export const visaCardDetailsActionVisaCheckoutEmptyData = {
     expirationYear: '',
     type: '',
   },
-  message: null,
 };
 
-export const getOMServiceResponsePaymentResponse = {
+ const getOMServiceResponsePaymentResponse = {
   httpCode: 201,
   transactionId: '6420561530596093703954',
   status: 'PENDING',
   message: undefined,
 };
 
-export const getOMServiceResponsePaymentResponseObject = {
+ const getOMServiceResponsePaymentResponseObject = {
   httpCode: 400,
   transactionId: null,
   status: 'INVALID_REQUEST',
   message: undefined,
 };
 
-export const getOMServiceResponseTransactionDetail = {
+ const getOMServiceResponseTransactionDetail = {
   id: 'bf72a390-77e6-4748-b099-f253ba0744d9',
   timestamp: '2022-01-13T06:42:30.259Z',
   type: 'Charge',
@@ -99,7 +118,7 @@ export const getOMServiceResponseTransactionDetail = {
   state: 'Initial',
 };
 
-export const getAuthResponsePaymentResponse = {
+ const getAuthResponsePaymentResponse = {
   httpCode: 201,
   transactionId: '6424036020586494403954',
   status: 'AUTHORIZED',
@@ -165,7 +184,7 @@ export const getAuthResponsePaymentResponse = {
   },
 };
 
-export const getAuthResponsePaymentResponseObject = {
+ const getAuthResponsePaymentResponseObject = {
   httpCode: 201,
   transactionId: '6424036020586494403954',
   status: 'AUTHORIZED_PENDING_REVIEW',
@@ -235,7 +254,7 @@ export const getAuthResponsePaymentResponseObject = {
   },
 };
 
-export const getAuthResponsePaymentDeclinedResponse = {
+ const getAuthResponsePaymentDeclinedResponse = {
   httpCode: 201,
   transactionId: '6437973031316274803954',
   status: 'DECLINED',
@@ -281,7 +300,7 @@ export const getAuthResponsePaymentDeclinedResponse = {
   },
 };
 
-export const getAuthResponseTransactionDetail = {
+ const getAuthResponseTransactionDetail = {
   id: 'fa4185f4-3e11-49f8-bbbe-9982e1f7ab68',
   timestamp: '2022-01-17T07:13:19.814Z',
   type: 'Authorization',
@@ -294,7 +313,7 @@ export const getAuthResponseTransactionDetail = {
   state: 'Initial',
 };
 
-export const getAuthResponsePaymentSuccessResponse = {
+ const getAuthResponsePaymentSuccessResponse = {
   httpCode: 201,
   transactionId: 'B4ZCm7bmq3v7RZ333Yj0',
   status: 'AUTHENTICATION_SUCCESSFUL',
@@ -305,7 +324,7 @@ export const getAuthResponsePaymentSuccessResponse = {
     clientReferenceInformation: {
       code: 'a9cf118c-8a3f-4225-8190-6d155d357b22',
       partner: {
-        solutionId: 'J88PJQQT',
+        solutionId: '42EA2Y58',
       },
     },
     consumerAuthenticationInformation: {
@@ -321,7 +340,7 @@ export const getAuthResponsePaymentSuccessResponse = {
   cardinalReferenceId: 'aa5120d4-d5f7-4b9d-bea2-1db7aaa6f07c',
 };
 
-export const getAuthResponsePaymentCompleteResponse = {
+ const getAuthResponsePaymentCompleteResponse = {
   accessToken:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmYzhhMzBmNy1jNGEyLTQ0M2YtYmJhNC0wNDQ1M2I3YzE2NmYiLCJpYXQiOjE2NDM3OTY5MTUsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY0MzgwMDUxNSwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiJhYTUxMjBkNC1kNWY3LTRiOWQtYmVhMi0xZGI3YWFhNmYwN2MifQ.U5MB8c1PMJRJEnYbY78pWg8Ky4XbPTlVSCUuzmV0r6M',
   referenceId: 'aa5120d4-d5f7-4b9d-bea2-1db7aaa6f07c',
@@ -331,7 +350,7 @@ export const getAuthResponsePaymentCompleteResponse = {
   status: 'COMPLETED',
 };
 
-export const getAuthResponsePaymentPendingResponse = {
+ const getAuthResponsePaymentPendingResponse = {
   httpCode: 201,
   transactionId: 'NsuSvxr0fOA2eL4b9Uj0',
   status: 'PENDING_AUTHENTICATION',
@@ -342,7 +361,7 @@ export const getAuthResponsePaymentPendingResponse = {
     clientReferenceInformation: {
       code: '5bfd0e66-7243-4359-9891-7fce264aaa30',
       partner: {
-        solutionId: 'J88PJQQT',
+        solutionId: '42EA2Y58',
       },
     },
     consumerAuthenticationInformation: {
@@ -367,7 +386,7 @@ export const getAuthResponsePaymentPendingResponse = {
   cardinalReferenceId: '8f0d726c-3c21-447e-a936-d9a5dfc5e57b',
 };
 
-export const getCapturedAmountRefundPaymentObj = {
+ const getCapturedAmountRefundPaymentObj = {
   id: '5bfd0e66-7243-4359-9891-7fce264aaa30',
   version: 33,
   lastMessageSequenceNumber: 7,
@@ -466,7 +485,7 @@ export const getCapturedAmountRefundPaymentObj = {
   ],
 };
 
-export const getCapturedZeroAmountRefundPaymentObj = {
+ const getCapturedZeroAmountRefundPaymentObj = {
   id: '5bfd0e66-7243-4359-9891-7fce264aaa30',
   version: 33,
   lastMessageSequenceNumber: 7,
@@ -565,7 +584,7 @@ export const getCapturedZeroAmountRefundPaymentObj = {
   ],
 };
 
-export const payerAuthActionsResponse = {
+ const payerAuthActionsResponse = {
   isv_payerAuthenticationPaReq:
     'eNpVUV1vgjAUfe+vMGbP9APEaa5NdGyZZhhl6p5ZaSaJfFhgiL9+LcLc+nTP7bntOefC7qik9N6lqJTk4MuiCL/kII5mw2bxZgdXetqNndJbsf12Q8iQw2YeyDOHb6mKOEs5tYjFAPcQ6SeUOIZpySEU58VyzR13wqgLuIMIEqmWHrcd6jDmMHI7gG9tBGmYSF7HucpOZQS4hQhEVqWlavijo6k9QFCpEz+WZV5MMa7r2hLNp1aSVUpIS2QJYENAgO+qNpWpCm32Ekdc7le+T1eu/3HZr68BCZ6z5nB42frefAbYMBBEYSk5I4wR2yYDSqcOmRpDbR9BmBg1/MGdWGOtrYMIcvPR/Ibcibn629GOKqVkKnpLPUIgL3mWSs3Ruf7W2sNd+dOrSVeUOq8Rc1w6GZt4W9yOxzobNiK0nY/boLCZwd3ycLdnXf3b/w9MkKjU',
   isv_payerAuthenticationTransactionId: 'yBL3Rz1lT74tDJ2UQP00',
@@ -578,7 +597,7 @@ export const payerAuthActionsResponse = {
     'eNpVUV1vgjAUfe+vMGbP9APEaa5NdGyZZhhl6p5ZaSaJfFhgiL9+LcLc+nTP7bntOefC7qik9N6lqJTk4MuiCL/kII5mw2bxZgdXetqNndJbsf12Q8iQw2YeyDOHb6mKOEs5tYjFAPcQ6SeUOIZpySEU58VyzR13wqgLuIMIEqmWHrcd6jDmMHI7gG9tBGmYSF7HucpOZQS4hQhEVqWlavijo6k9QFCpEz+WZV5MMa7r2hLNp1aSVUpIS2QJYENAgO+qNpWpCm32Ekdc7le+T1eu/3HZr68BCZ6z5nB42frefAbYMBBEYSk5I4wR2yYDSqcOmRpDbR9BmBg1/MGdWGOtrYMIcvPR/Ibcibn629GOKqVkKnpLPUIgL3mWSs3Ruf7W2sNd+dOrSVeUOq8Rc1w6GZt4W9yOxzobNiK0nY/boLCZwd3ycLdnXf3b/w9MkKjU',
   cardinalId: '6ab813c3-8edf-430f-8ec7-62b19209f78f',
   proofXml:
-    '<AuthProof><Time>2022 Mar 30 11:40:16</Time><DSUrl>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/vereq.jsp?acqid=CYBS</DSUrl><VEReqProof><Message id="yBL3Rz1lT74tDJ2UQP00"><VEReq><version>1.0.2</version><pan>XXXXXXXXXXXX1091</pan><Merchant><acqBIN>469216</acqBIN><merID>341422420000000</merID><password></password></Merchant><Browser><deviceCategory>0</deviceCategory><accept>*/*</accept><userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36</userAgent></Browser></VEReq></Message></VEReqProof><VEResProof><Message id="yBL3Rz1lT74tDJ2UQP00"><VERes><version>1.0.2</version><CH><enrolled>Y</enrolled><acctID>5246197</acctID></CH><url>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&amp;gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</url><protocol>ThreeDSecure</protocol></VERes></Message></VEResProof></AuthProof>',
+    '<AuthProof><Time>2022 Mar 30 11:40:16</Time><DSUrl>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/vereq.jsp?acqid=CYBS</DSUrl><VEReqProof><Message id="yBL3Rz1lT74tDJ2UQP00"><VEReq><version>1.0.2</version><pan>XXXXXXXXXXXX1091</pan><Merchant><acqBIN>469216</acqBIN><merID>341422420000000</merID></Merchant><Browser><deviceCategory>0</deviceCategory><accept>*/*</accept><userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36</userAgent></Browser></VEReq></Message></VEReqProof><VEResProof><Message id="yBL3Rz1lT74tDJ2UQP00"><VERes><version>1.0.2</version><CH><enrolled>Y</enrolled><acctID>5246197</acctID></CH><url>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&amp;gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</url><protocol>ThreeDSecure</protocol></VERes></Message></VEResProof></AuthProof>',
   veresEnrolled: 'Y',
   specificationVersion: '1.0.2',
   acsurl:
@@ -587,7 +606,7 @@ export const payerAuthActionsResponse = {
   directoryServerTransactionId: undefined,
 };
 
-export const payerAuthActionsEmptyResponse = {
+ const payerAuthActionsEmptyResponse = {
   isv_payerAuthenticationPaReq: '',
   isv_payerAuthenticationTransactionId: '',
   stepUpUrl: '',
@@ -604,7 +623,7 @@ export const payerAuthActionsEmptyResponse = {
   directoryServerTransactionId: undefined,
 };
 
-export const payerEnrollActionsResponse = {
+ const payerEnrollActionsResponse = {
   httpCode: 201,
   transactionId: '6486429828526882404951',
   status: 'PENDING_AUTHENTICATION',
@@ -644,7 +663,7 @@ export const payerEnrollActionsResponse = {
       pareq:
         'eNpVUctuwjAQvPsrEOo5dhwTCFosQVEFVCAEqKm4pY5VUvLCSXj062uHpLQ+7axn7ZlZ2B2UlNOtFJWSHJayKIJP2YnCUZf6/f023HuD3ebM1O2d7F9Jl8N6vJEnDmepiihLuW0RiwJuIdJPKHEI0pJDIE6T+Yoz16O2C7iBCBKp5lPuMJtRyii5H8D3NoI0SCS/RLnK4jIEXEMEIqvSUt34gGlqCxBUKuaHssyLIcaXy8UStw+tJKuUkJbIEsCGgAA/VK0rUxXa7DUK+TIWjh+vjv7Xkb29LOhqtuj500mw/R6PABsGgjAoJaeEUuI4pGPTIXWGRHuu+wiCxKjhT65n9bW2BiLIzUfjO3I9c/W3ox1VSslUtJZahEBe8yyVmqP/+K21h4fy55lJV5Q6rx5lru31Tbw1rscjnQ3tEbuej+qgsJnBzfJws2dd/dv/D9jcqR8=',
       proofXml:
-        '<AuthProof><Time>2022 Mar 30 12:23:02</Time><DSUrl>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/vereq.jsp?acqid=CYBS</DSUrl><VEReqProof><Message id="2W7ZSdZ98TRv4ryX0ZK0"><VEReq><version>1.0.2</version><pan>XXXXXXXXXXXX1091</pan><Merchant><acqBIN>469216</acqBIN><merID>341422420000000</merID><password></password></Merchant><Browser><deviceCategory>0</deviceCategory><accept>*/*</accept><userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36</userAgent></Browser></VEReq></Message></VEReqProof><VEResProof><Message id="2W7ZSdZ98TRv4ryX0ZK0"><VERes><version>1.0.2</version><CH><enrolled>Y</enrolled><acctID>5246197</acctID></CH><url>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&amp;gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</url><protocol>ThreeDSecure</protocol></VERes></Message></VEResProof></AuthProof>',
+        '<AuthProof><Time>2022 Mar 30 12:23:02</Time><DSUrl>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/vereq.jsp?acqid=CYBS</DSUrl><VEReqProof><Message id="2W7ZSdZ98TRv4ryX0ZK0"><VEReq><version>1.0.2</version><pan>XXXXXXXXXXXX1091</pan><Merchant><acqBIN>469216</acqBIN><merID>341422420000000</merID></Merchant><Browser><deviceCategory>0</deviceCategory><accept>*/*</accept><userAgent>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36</userAgent></Browser></VEReq></Message></VEReqProof><VEResProof><Message id="2W7ZSdZ98TRv4ryX0ZK0"><VERes><version>1.0.2</version><CH><enrolled>Y</enrolled><acctID>5246197</acctID></CH><url>https://merchantacsstag.cardinalcommerce.com/MerchantACSWeb/pareq.jsp?vaa=b&amp;gold=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</url><protocol>ThreeDSecure</protocol></VERes></Message></VEResProof></AuthProof>',
       proxyPan: '5246197',
       specificationVersion: '1.0.2',
       stepUpUrl: 'https://centinelapistag.cardinalcommerce.com/V2/Cruise/StepUp',
@@ -654,24 +673,10 @@ export const payerEnrollActionsResponse = {
   },
   cardinalReferenceId: 'b0c79f37-281e-4f09-a7a1-8ed01a459f20',
 };
-
-export const payerEnrollActionsUpdatePaymentObj = {
-  id: '5c162200-5e31-4857-9778-458b3efc9d77',
+ let payerEnrollActionsUpdatePaymentObj : PaymentType= {
+  id: unit.paymentId,
   version: 15,
-  lastMessageSequenceNumber: 1,
-  createdAt: '2022-03-30T12:22:40.466Z',
-  lastModifiedAt: '2022-03-30T12:22:57.080Z',
-  lastModifiedBy: {
-    clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
-    isPlatformClient: false,
-    customer: { typeId: 'customer', id: 'b0c50186-fc83-4a97-9ea3-47bab58b3cc6' },
-  },
-  createdBy: {
-    clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
-    isPlatformClient: false,
-    customer: { typeId: 'customer', id: 'b0c50186-fc83-4a97-9ea3-47bab58b3cc6' },
-  },
-  customer: { typeId: 'customer', id: 'b0c50186-fc83-4a97-9ea3-47bab58b3cc6' },
+  customer: { id: 'b0c50186-fc83-4a97-9ea3-47bab58b3cc6' },
   amountPlanned: {
     type: 'centPrecision',
     currencyCode: 'USD',
@@ -679,12 +684,9 @@ export const payerEnrollActionsUpdatePaymentObj = {
     fractionDigits: 2,
   },
   paymentMethodInfo: {
-    paymentInterface: 'cybersource',
     method: 'creditCardWithPayerAuthentication',
-    name: { en: 'Credit Card Payer Authentication' },
   },
   custom: {
-    type: { typeId: 'type', id: '87b9d9db-74a3-45d7-8e60-dde669866808' },
     fields: {
       isv_deviceFingerprintId: '5bb99fdb-9c2b-4606-a71c-c45d05a1b812',
       isv_cardExpiryYear: '2025',
@@ -706,28 +708,26 @@ export const payerEnrollActionsUpdatePaymentObj = {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJJVzh1U2NXT3dmbHZCS0s4aVRuRER4QUFFQS9rTVBkQStYd04yQmZBeEVLbHVtMXJiUEdUMkpNeFQvRk9lOC92V2VwNFlMYVJsUTFBUisrTVRlN0xPTU5kTmVVbUdDU0l6cFpPaTZ4UFdpb1dFdXhMaG9PWFgxWnVkVDhrMzNoK0RCL2oiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJrQWJ2M0ZNcFk5cHZxc1JZc1QyeU1PdkFoZUlkVi1VNm9WNDdqclJCRTd3dF93eGVJTzRqUzEyMUp2U0szMU5yeGVnWExTcWdFVUczSTFVUWRESGJONXlOYmJUMzluT2EzckxOT0g1di0yVEhpUGp3Y0RYX2ZBeW1CRG1QWnU2N0w1SDdCZXZYRXdnTk9tR1RXX3B6LUZKemRYVGh3MHV6QnZPRktNVXYtNXNoSm9nRjBrOEhMajdka1cyWG5nVUNJT1ZwNkJ1TDJmNW15bWhsUjhmSWF6Y3NIejlYLUVhRkVGUF9EWU9zVmFtNnRzc2s2TF8zdXpUOGNNckt1amRZVktnVWs0Ym5EdVBrQXFFSV81ay1IYnByQm43SUxJRGJ5MGJKa3E3NVY4Mm82TFhKVEc3cnpSQkhTVFU5T3haYmdaS0pZOWw4M1AyZjhKcERzNlJZNHciLCJraWQiOiIwODVJUUxGaENrVmFmcUxLa1RBNnBGMWdIZmNGZ1ROOCJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NDg2NDM4NjAsImlhdCI6MTY0ODY0Mjk2MCwianRpIjoiQmpvRDMwY2Y0WFBzV25rUSJ9.0rwH22Eb51O6y8W2EzRHGkEtR7kAEG2HMPAbSh0kYdM',
     },
   },
-  paymentStatus: {},
   transactions: [],
-  interfaceInteractions: [],
 };
 
-export const getUpdateTokenActionsActions = [
+ const getUpdateTokenActionsActions = [
   '{"alias":"4111card","value":"DB0B315B52BABC38E053AF598E0A8268","paymentToken":"DB0B3127886FBB46E053AF598E0AF2A5","instrumentIdentifier":"7010000000121591111","cardType":"001","cardName":"001","cardNumber":"411111XXXXXX1111","cardExpiryMonth":"01","cardExpiryYear":"2026","flag":"updated"}',
   '{"alias":"1091card","value":"DB0B315B52BABC38E053AF598E0A8268","paymentToken":"DB476FB611F49979E053AF598E0A0DE1","instrumentIdentifier":"7020000000005531091","cardType":"001","cardName":"001","cardNumber":"400000XXXXXX1091","cardExpiryMonth":"01","cardExpiryYear":"2026","flag":"updated"}',
 ];
 
-export const getUpdateInvalidTokenActionsActions = [
+ const getUpdateInvalidTokenActionsActions = [
 '*@&*&*(*(&^%^',
 '%^&(&*&^%&((('
 ];
 
-export const deleteTokenResponse = {
+ const deleteTokenResponse = {
   httpCode: 204,
   message: '',
   deletedToken: 'DC2417E36C42D8ADE053AF598E0A1705',
 };
 
-export const deleteTokenCustomerObj: CustomerType = {
+ const deleteTokenCustomerObj: CustomerType = {
   id: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
   version: 6,
   lastMessageSequenceNumber: 1,
@@ -750,8 +750,8 @@ export const deleteTokenCustomerObj: CustomerType = {
     },
   },
   email: 'sp@gmail.com',
-  firstName: 'Shakshi ',
-  lastName: 'Poddar',
+  firstName: 'john ',
+  lastName: 'doe',
   addresses: [],
   shippingAddressIds: [],
   billingAddressIds: [],
@@ -763,11 +763,14 @@ export const deleteTokenCustomerObj: CustomerType = {
         '{"alias":"1111 25card","value":"DC23E657AA7749A4E053AF598E0AF2E6","paymentToken":"DC2417E36C42D8ADE053AF598E0A1705","instrumentIdentifier":"7010000000121591111","cardType":"001","cardName":"001","cardNumber":"411111XXXXXX1111","cardExpiryMonth":"01","cardExpiryYear":"2025"}',
       ],
     },
-  },
-  authenticationMode: 'Password',
+    type: {
+      typeId: '',
+      id: ''
+    }
+  }
 };
 
-export const getAuthorizedAmountCapturePaymentObj = {
+ const getAuthorizedAmountCapturePaymentObj = {
   id: '14666485-c56b-4fa8-9ec7-668dc4141245',
   version: 21,
   versionModifiedAt: '2023-04-03T13:50:54.890Z',
@@ -861,7 +864,7 @@ export const getAuthorizedAmountCapturePaymentObj = {
   anonymousId: 'baaf0387-930b-440d-be81-2ef80e23e251',
 };
 
-export const getAuthorizedZeroAmountCapturePaymentObj = {
+ const getAuthorizedZeroAmountCapturePaymentObj = {
   id: '14666485-c56b-4fa8-9ec7-668dc4141245',
   version: 21,
   versionModifiedAt: '2023-04-03T13:50:54.890Z',
@@ -955,7 +958,7 @@ export const getAuthorizedZeroAmountCapturePaymentObj = {
   anonymousId: 'baaf0387-930b-440d-be81-2ef80e23e251',
 };
 
-export const getRefundResponseUpdatePaymentObj = {
+ const getRefundResponseUpdatePaymentObj = {
   id: 'e014e68a-c453-494e-9692-ed4daca9cf4d',
   version: 15,
   versionModifiedAt: '2023-08-11T08:57:47.643Z',
@@ -992,7 +995,6 @@ export const getRefundResponseUpdatePaymentObj = {
     fields: {
       isv_transientToken: creditCard.isv_transientToken,
       isv_deviceFingerprintId: 'a82beccd-0fc0-48f8-a84e-0151709df8c8',
-      isv_merchantId: 'visa_isv_opencart_pmt_101',
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '192.140.152.21',
@@ -1066,7 +1068,7 @@ export const getRefundResponseUpdatePaymentObj = {
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
-export const getRefundResponseUpdateTransactions = {
+ const getRefundResponseUpdateTransactions = {
   id: 'c68616f7-eaba-4307-9d5b-2117929be514',
   timestamp: '2023-08-11T08:57:50.043Z',
   type: 'Refund',
@@ -1079,29 +1081,29 @@ export const getRefundResponseUpdateTransactions = {
   state: 'Initial',
 };
 
-export const addRefundActionAmount = {
+ const addRefundActionAmount = {
   type: 'centPrecision',
   currencyCode: 'USD',
   centAmount: 100,
   fractionDigits: 2,
 };
 
-export const addRefundActionZeroAmount = {
+ const addRefundActionZeroAmount = {
   type: 'centPrecision',
   currencyCode: 'USD',
   centAmount: 0,
   fractionDigits: 2,
 };
 
-export const addRefundActionOrderResponse = {
+ const addRefundActionOrderResponse = {
   httpCode: 201,
   transactionId: creditCard.refundId,
   status: 'PENDING',
 };
 
-export const state = 'Success';
+ const state = 'Success';
 
-export const getCreditCardResponseUpdatePaymentObj: any = {
+ const getCreditCardResponseUpdatePaymentObj: any = {
   id: 'b18ec6af-6802-4638-8f75-d387d2977177',
   version: 12,
   versionModifiedAt: '2023-08-11T12:24:39.887Z',
@@ -1149,7 +1151,6 @@ export const getCreditCardResponseUpdatePaymentObj: any = {
       isv_tokenVerificationContext:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJHQ3k4SzBKbzJpNVRUdDVNSVcxSGxSQUFFS3AxeGMrSmtNa2ZFL2VvNWlraG91UU9hVk5pMXUyZWlwWkZaSFovd0tKWUlLakhoOXJ1M3V5aGcvU2tzc1dENWRkQVVTNXlKQ2JhcW5DSlJFYkhiVzVQRVg3VHlCOC9hOFF2L2cxYXluR2QiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiIzdzhia0lfbG1kaGx4Qzg2Nl82dktUQ1VkTzZzWUNvN2hsX0IzYlVmNk01YmRRbmhrTG14QUhLQ1R0alhWaE1TLVJDbTBJUmVOX2xCYnpzLVpMZU5PMHc5LVJKWW44WUlDcDdOeFV6MmRuRnpNMExpV21MUjhieV9CWEcxdnpMSDY5a3FGMjFiQ1h1NFVZV1ZtUEhzZno5QzJhdS1vTFc1X282b0x0VjgwU3U0QWoxaGVVdVJXSEpNcTUwem96Rm9LMldrRUp5dU5pclFVQzZSdVFFSmFtVTh2ekk5Sm1jVzRSUk84ZFJ4UmcydjhNd3RhWUgzYXN3dzNFQ1Z2bHItejV4TkstZkpTNHVXNzU1SWdJMWx4Ni1qTGNuQW5CcTRjdTVSMDdUVG5JcWZpelFYUUw5RUJPQnRxb1pfc09zZS1jNE0ydGR5TWpkaXc2YmFIeEVFdVEiLCJraWQiOiIwOHhnSzhGZGwxWDBPSUc3RHFCZjNJUnJpSXMzSm1RNiJ9fSwiY3R4IjpbeyJkYXRhIjp7ImNsaWVudExpYnJhcnkiOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbS9taWNyb2Zvcm0vYnVuZGxlL3YxL2ZsZXgtbWljcm9mb3JtLm1pbi5qcyIsInRhcmdldE9yaWdpbnMiOlsiaHR0cHM6Ly9sb2NhbGhvc3Q6ODA4MCJdLCJtZk9yaWdpbiI6Imh0dHBzOi8vdGVzdGZsZXguY3liZXJzb3VyY2UuY29tIn0sInR5cGUiOiJtZi0xLjAuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2OTE3NTc1MzgsImlhdCI6MTY5MTc1NjYzOCwianRpIjoiVHhMZThmTHlMejZvdG42RyJ9.HRrLioN2q7fbFKyHWiiLMriKcwkoVb4nwcu3UBpeYUw',
       isv_cardExpiryYear: '2026',
-      isv_merchantId: 'wiproltd',
     },
   },
   paymentStatus: {},
@@ -1171,7 +1172,7 @@ export const getCreditCardResponseUpdatePaymentObj: any = {
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
-export const getCreditCardResponseCartObj = {
+ const getCreditCardResponseCartObj = {
   type: 'Cart',
   id: '56414cc7-5e77-4fd9-9d6a-edad661dd95b',
   version: 12,
@@ -1394,15 +1395,15 @@ export const getCreditCardResponseCartObj = {
   country: 'US',
   shippingMode: 'Single',
   shippingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   shipping: [],
   customLineItems: [],
@@ -1424,21 +1425,21 @@ export const getCreditCardResponseCartObj = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const getGooglePayResponseUpdatePaymentObj = {
+ const getGooglePayResponseUpdatePaymentObj = {
   id: '9d727280-43f8-46cf-90dd-b2a4909b761f',
   version: 2,
   versionModifiedAt: '2023-08-11T13:30:01.153Z',
@@ -1475,7 +1476,6 @@ export const getGooglePayResponseUpdatePaymentObj = {
     },
     fields: {
       isv_deviceFingerprintId: '9ee1d36f-15b5-43e5-a41d-a4c9ea70e2b2',
-      isv_merchantId: 'wiproltd',
       isv_token: googlePay.isv_token,
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
@@ -1502,7 +1502,7 @@ export const getGooglePayResponseUpdatePaymentObj = {
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
-export const getClickToPayResponseUpdatePaymentObj = {
+ const getClickToPayResponseUpdatePaymentObj = {
   id: '6a29a73d-7ade-4d52-a0a3-3b52c15c59a0',
   version: 2,
   versionModifiedAt: '2023-08-11T13:52:25.234Z',
@@ -1539,7 +1539,6 @@ export const getClickToPayResponseUpdatePaymentObj = {
     },
     fields: {
       isv_deviceFingerprintId: '3d628d88-af91-4fb5-b498-e42a4484b65b',
-      isv_merchantId: 'wiproltd',
       isv_token: clickToPay.isv_token,
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
@@ -1566,7 +1565,7 @@ export const getClickToPayResponseUpdatePaymentObj = {
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
-export const tokenCreateFlagCustomerInfo = {
+ const tokenCreateFlagCustomerInfo = {
   id: '19357cc7-8edf-4e19-ad10-37d9ecd26398',
   version: 1,
   versionModifiedAt: '2023-10-06T06:41:47.315Z',
@@ -1590,11 +1589,10 @@ export const tokenCreateFlagCustomerInfo = {
   shippingAddressIds: [],
   billingAddressIds: [],
   isEmailVerified: false,
-  stores: [],
-  authenticationMode: 'Password',
+  stores: []
 };
 
-export const tokenCreateFlagPaymentObj: PaymentType = {
+ const tokenCreateFlagPaymentObj: PaymentType = {
   id: 'a16d2aa2-4e89-404d-ac45-2c048e4e8cda',
   version: 14,
   customer: { id: '19357cc7-8edf-4e19-ad10-37d9ecd26398' },
@@ -1618,7 +1616,6 @@ export const tokenCreateFlagPaymentObj: PaymentType = {
       isv_cardExpiryMonth: '01',
       isv_tokenVerificationContext: 's',
       isv_cardExpiryYear: '2026',
-      isv_merchantId: 'wipro_dm',
       isv_saleEnabled: false,
       isv_tokenAlias: 'card1',
     },
@@ -1639,27 +1636,27 @@ export const tokenCreateFlagPaymentObj: PaymentType = {
   ],
 };
 
-export const tokenCreateFlagFunctionName = 'FuncGetCreditCardResponse';
+ const tokenCreateFlagFunctionName = 'FuncGetCreditCardResponse';
 
-export const createResponseSetTransaction = {
+ const createResponseSetTransaction = {
   action: 'changeTransactionInteractionId',
   interactionId: '7017763034976210803954',
   transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
 };
 
-export const createTransactionSetCustomField = {
+ const createTransactionSetCustomField = {
   action: 'changeTransactionState',
   state: 'Success',
   transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
 };
 
-export const createTransactionSetFailedCustomField = {
+ const createTransactionSetFailedCustomField = {
   action: 'changeTransactionState',
   state: 'Failure',
   transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
 };
 
-export const getTransactionSummariesUpdatePaymentObj = {
+ const getTransactionSummariesUpdatePaymentObj = {
   id: '4cb11292-d00f-45db-8505-caa387cb1fdc',
   version: 12,
   versionModifiedAt: '2023-12-05T12:29:38.507Z',
@@ -1729,7 +1726,7 @@ export const getTransactionSummariesUpdatePaymentObj = {
   anonymousId: 'ad4acd03-8ada-4b90-9d2d-6eb7a611e213',
 };
 
-export const checkAuthReversalTriggeredPaymentResponse = {
+ const checkAuthReversalTriggeredPaymentResponse = {
   httpCode: 201,
   transactionId: '7018441973826257903954',
   status: 'AUTHORIZED_RISK_DECLINED',
@@ -1812,7 +1809,7 @@ export const checkAuthReversalTriggeredPaymentResponse = {
   },
 };
 
-export const checkAuthReversalTriggeredUpdateActions = {
+ const checkAuthReversalTriggeredUpdateActions = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -1833,7 +1830,7 @@ export const checkAuthReversalTriggeredUpdateActions = {
   errors: [],
 };
 
-export let runSyncAddTransactionSyncUpdateObject: ReportSyncType = {
+ let runSyncAddTransactionSyncUpdateObject: ReportSyncType = {
   id: unit.paymentId,
   transactionId: '',
   version: 32,
@@ -1847,7 +1844,7 @@ export let runSyncAddTransactionSyncUpdateObject: ReportSyncType = {
   securityCodePresent: false,
 };
 
-export let runSyncAddTransactionSyncUpdateEmptyObject: ReportSyncType = {
+ let runSyncAddTransactionSyncUpdateEmptyObject: ReportSyncType = {
   id: unit.paymentId,
   transactionId: '',
   version: 32,
@@ -1861,7 +1858,7 @@ export let runSyncAddTransactionSyncUpdateEmptyObject: ReportSyncType = {
   securityCodePresent: false,
 };
 
-export const runSyncUpdateCaptureAmountUpdatePaymentObj = {
+ const runSyncUpdateCaptureAmountUpdatePaymentObj = {
   id: unit.paymentId,
   version: 38,
   versionModifiedAt: '2023-12-07T06:33:01.682Z',
@@ -2108,12 +2105,12 @@ export const runSyncUpdateCaptureAmountUpdatePaymentObj = {
   anonymousId: 'ad4acd03-8ada-4b90-9d2d-6eb7a611e213',
 };
 
-export const customerCardTokens = {
+ const customerCardTokens = {
   customerTokenId: '',
   paymentInstrumentId: '',
 };
 
-export const retrieveSyncResponseTransactionElement: any = {
+ const retrieveSyncResponseTransactionElement: any = {
   id: '7077198716926378103955',
   submitTimeUtc: '2024-02-12T06:37:51Z',
   merchantId: 'visa_isv_opencart_pmt_dm',
@@ -2138,7 +2135,7 @@ export const retrieveSyncResponseTransactionElement: any = {
     code: '16ecff99-397e-4248-9776-fb34cd8c4e91',
     applicationName: 'REST API',
     partner: {
-      solutionId: 'HXPKJ2ZG',
+      solutionId: '42EA2Y58',
     },
   },
   consumerAuthenticationInformation: {
@@ -2154,14 +2151,14 @@ export const retrieveSyncResponseTransactionElement: any = {
   },
   orderInformation: {
     billTo: {
-      firstName: 'SHAKSHI',
+      firstName: 'john',
       lastName: 'P',
       address1: '1295 road',
       email: 'sp@gmail.com',
       country: 'US',
     },
     shipTo: {
-      firstName: 'SHAKSHI',
+      firstName: 'john',
       lastName: 'P',
       address1: '1295 road',
       country: 'US',
@@ -2209,7 +2206,7 @@ export const retrieveSyncResponseTransactionElement: any = {
   },
 };
 
-export const retrieveSyncAmountDetailsApplicationResponse = {
+ const retrieveSyncAmountDetailsApplicationResponse = {
   authPresent: true,
   authReasonCodePresent: true,
   capturePresent: false,
@@ -2218,7 +2215,7 @@ export const retrieveSyncAmountDetailsApplicationResponse = {
   refundPresent: false,
 };
 
-export const retrieveAddRefundResponseObjectTransaction = {
+ const retrieveAddRefundResponseObjectTransaction = {
   id: '21f9e6e5-4851-496d-ad9d-dc78f4d9645a',
   timestamp: '2024-02-12T12:11:52.422Z',
   type: 'Charge',
@@ -2241,7 +2238,7 @@ export const retrieveAddRefundResponseObjectTransaction = {
   },
 };
 
-export const retrieveAddRefundResponseObjectTransactionWithNoCustom = {
+ const retrieveAddRefundResponseObjectTransactionWithNoCustom = {
   id: '21f9e6e5-4851-496d-ad9d-dc78f4d9645a',
   timestamp: '2024-02-12T12:11:52.422Z',
   type: 'Charge',
@@ -2255,7 +2252,7 @@ export const retrieveAddRefundResponseObjectTransactionWithNoCustom = {
   state: 'Success',
 };
 
-export const captureResponse = {
+ const captureResponse = {
   id: '21f9e6e5-4851-496d-ad9d-dc78f4d9645a',
   timestamp: '2024-02-12T12:11:52.422Z',
   type: 'Charge',
@@ -2278,7 +2275,7 @@ export const captureResponse = {
   },
 };
 
-export const customFields = {
+ const customFields = {
   isv_deviceFingerprintId: 'acc334ea-a883-4280-98de-6be782780ae7',
   isv_token:
     'eyJraWQiOiIwOHZhTlBiWXRqTTNRTHhOUkxPU0Mzejc2bjhSUVFPbCIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzA4IiwiZXhwIjoxNzA3ODkxNjczLCJ0eXBlIjoibWYtMi4wLjAiLCJpYXQiOjE3MDc4OTA3NzMsImp0aSI6IjFFNFY2U05WN0JRRzNGNEJOVEo5VkE5QTVXNlFBWkxIOUNZUzVFR0JBMDVWVVFWWkJVNkE2NUNDNUJEOTE0NUUiLCJjb250ZW50Ijp7InBheW1lbnRJbmZvcm1hdGlvbiI6eyJjYXJkIjp7ImV4cGlyYXRpb25ZZWFyIjp7InZhbHVlIjoiMjAzMiJ9LCJudW1iZXIiOnsiZGV0ZWN0ZWRDYXJkVHlwZXMiOlsiMDAxIl0sIm1hc2tlZFZhbHVlIjoiWFhYWFhYWFhYWFhYMTExMSIsImJpbiI6IjQxMTExMSJ9LCJzZWN1cml0eUNvZGUiOnt9LCJleHBpcmF0aW9uTW9udGgiOnsidmFsdWUiOiIwMSJ9fX19fQ.MftUQ5bugFPilh3YLyHuPpuRhwdTRHt0C13gjNBwIRTe8s8CbS_lACIMdQycd8VB1gXfbnsuEbbWp_iUjjdOlrYb5fBI5ogLX1rcZGCagu-NUWcCm1AASOc43dJTdq3xYdAqgFaJ5LqjXQiHaofTtSgZjV-f-9VQ5JD5T9LUsEmkTgULY1fUrPjBd4_ZrQJDFX-rt3f3hD3DYclrgKfVD5MeCayvPQjQOlKoAX6UwJujC-7LQ65UVi-sCxiUNNSNvTNDPvrFnBD5VUYEIif986A2NryhJ6qC7yYGTL4y71589Qf5mjyqFsFWFzhRmjh9WnnftbxuU4PFFu9Qs030qQ',
@@ -2302,7 +2299,7 @@ export const customFields = {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiI2RVAzYldPTHdqMWUzM3h2WWpoeWVoQUFFRmo3Q1VJWkZ0cU1VZCtCazRLL3B0VFJiTmNJMmRLTld6TGJXWk42ZWt5dHRnUVVTbXMrZXB5MUpKNUpUQXpYUmFVeE1HSU00c01HUVBBM0dFRnBmNWw4U0hsa1o0V1Q1VldaN3JJeGFUWVIiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJsbFZrVEo2bEMwZW52Q24xNldQU21waXM2QU9pZ0pITVNBUGdyUnN1b1NGd0hKT2pkQU82dUNHaVRJSWJTdkt5aU9lR0tfUGo5c0JTdG9PZkx1Q0pUY2Z3X1pQa09sYWNPWUV5bkZBalRsY2txWmZhanBfWUdKbXhjRkQ5NWk5NTYxTXdhazhpeU43SlFkQks5Q3Y1bFNQSGVoVDJRYUdXVDN2ZWhpUk4zeEJlUEpUd1JELTluckozY0dLU0ZzM19kUWl3SmNnZUs4WFJPQ28xZlBmdVJCMjhhMkhDcmRLRHFWUE5NdVlKRk00QVpESjg4VjZaOFlXZnhBNTB2RFcyd2Vzc0NueDZHR2lDUjFORGJrYklKNGhyVVVxeFVEUGMzeE5vQlBuU0lEcUw3RjVzSWFMaGFLVUpQUlB1ZnNSbk1wbVBHRkczUnR2RzJ6czVtQjl4RHciLCJraWQiOiIwOHZhTlBiWXRqTTNRTHhOUkxPU0Mzejc2bjhSUVFPbCJ9fSwiY3R4IjpbeyJkYXRhIjp7ImNsaWVudExpYnJhcnkiOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbS9taWNyb2Zvcm0vYnVuZGxlL3YyLjAvZmxleC1taWNyb2Zvcm0ubWluLmpzIiwiYWxsb3dlZENhcmROZXR3b3JrcyI6WyJWSVNBIiwiTUFTVEVSQ0FSRCIsIkFNRVgiLCJNQUVTVFJPIiwiQ0FSVEVTQkFOQ0FJUkVTIiwiQ1VQIiwiSkNCIiwiRElORVJTQ0xVQiIsIkRJU0NPVkVSIl0sInRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgyIiwiaHR0cHM6Ly9ibzItY3QuaXN2cGx1Z2lucy5jb20iLCJodHRwOi8vbG9jYWxob3N0OjgwODAiXSwibWZPcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSJ9LCJ0eXBlIjoibWYtMi4wLjAifV0sImlzcyI6IkZsZXggQVBJIiwiZXhwIjoxNzA3ODkxNjU5LCJpYXQiOjE3MDc4OTA3NTksImp0aSI6IkNYTHNKbmh2MXBuc3QyRzgifQ.8JHhM4JcSmdPFQE87BdosLhqrC8PWB4aAOLpxXQekHM',
 };
 
-export const getPresentApplications = [
+ const getPresentApplications = [
   {
     name: 'ics_auth',
     reasonCode: '100',
@@ -2314,12 +2311,12 @@ export const getPresentApplications = [
   },
 ];
 
-export const tokenResponse = {
+ const tokenResponse = {
   notSaveToken: false,
   isError: false,
 };
 
-export const authResponse = {
+ const authResponse = {
   actions: [
     {
       action: 'setCustomField',
@@ -2355,7 +2352,7 @@ export const authResponse = {
   errors: [],
 };
 
-export const handleAuthApplication = {
+ const handleAuthApplication = {
   name: 'ics_auth',
   reasonCode: '100',
   rCode: '1',
@@ -2365,7 +2362,7 @@ export const handleAuthApplication = {
   returnCode: 1010000,
 };
 
-export const handleAuthReversalResponseUpdateActions = {
+ const handleAuthReversalResponseUpdateActions = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -2401,37 +2398,37 @@ export const handleAuthReversalResponseUpdateActions = {
   errors: [],
 };
 
-export const processTokensCustomerCardTokensObject = {
+ const processTokensCustomerCardTokensObject = {
   customerTokenId: '116C393967840ACDE063AF598E0ADE72',
   paymentInstrumentId: '116C475A535C411BE063AF598E0A3DC8',
 };
 
-export const processTokensCustomerInvalidCardTokensObject = {
+ const processTokensCustomerInvalidCardTokensObject = {
   customerTokenId: '@#%^@RW^Y&',
   paymentInstrumentId: '&YY#&DBGV(I',
 };
 
-export const processTokensInstrumentIdentifier = '703000000002660108812';
+ const processTokensInstrumentIdentifier = '703000000002660108812';
 
-export const searchSubscriptionResponse = {
+ const searchSubscriptionResponse = {
   httpCode: 200,
   webhookId: '1208e4c6-fb85-94d8-e063-9c588e0a4bf0',
   webhookUrl: 'https://iyi6rylvc8.execute-api.us-east-1.amazonaws.com/netTokenNotification',
 };
 
-export const invalidSearchSubscriptionResponse = {
+ const invalidSearchSubscriptionResponse = {
   httpCode: 404,
   webhookId: '',
   webhookUrl: '',
 };
 
-export const invalidSubscriptionResponse = {
+ const invalidSubscriptionResponse = {
   httpCode: 0,
   webhookId: '@*&^@&*U@*',
   webhookUrl: '(@*^&(!@&^',
 };
 
-export const createTransactionPaymentFailure = {
+ const createTransactionPaymentFailure = {
   action: 'addInterfaceInteraction',
   type: { 
     key: 'isv_payment_failure' 
@@ -2442,7 +2439,7 @@ export const createTransactionPaymentFailure = {
   }
 } 
 
-export const createTransactionSetCustomType = {
+ const createTransactionSetCustomType = {
   action: 'setTransactionCustomType',
   type: { 
     key: 'isv_transaction_data', 
@@ -2452,4 +2449,73 @@ export const createTransactionSetCustomType = {
     isv_availableCaptureAmount: 0 
   },
   transactionId: '1e53fc0c-1109-4850-bd75-41da1b1108a5'
+}
+
+export default {
+  visaCardDetailsActionVisaCheckoutData,
+  visaCardDetailsActionVisaCheckoutEmptyData,
+  getOMServiceResponsePaymentResponse,
+  getOMServiceResponsePaymentResponseObject,
+  getOMServiceResponseTransactionDetail,
+  getAuthResponsePaymentResponse,
+  getAuthResponsePaymentResponseObject,
+  getAuthResponsePaymentDeclinedResponse,
+  getAuthResponseTransactionDetail,
+  getAuthResponsePaymentSuccessResponse,
+  getAuthResponsePaymentCompleteResponse,
+  getAuthResponsePaymentPendingResponse,
+  getCapturedAmountRefundPaymentObj,
+  getCapturedZeroAmountRefundPaymentObj,
+  payerAuthActionsResponse,
+  payerAuthActionsEmptyResponse,
+  payerEnrollActionsResponse,
+  payerEnrollActionsUpdatePaymentObj,
+  getUpdateTokenActionsActions,
+  getUpdateInvalidTokenActionsActions,
+  deleteTokenResponse,
+  deleteTokenCustomerObj,
+  getAuthorizedAmountCapturePaymentObj,
+  getAuthorizedZeroAmountCapturePaymentObj,
+  getRefundResponseUpdatePaymentObj,
+  getRefundResponseUpdateTransactions,
+  addRefundActionAmount,
+  addRefundActionZeroAmount,
+  addRefundActionOrderResponse,
+  state,
+  getCreditCardResponseUpdatePaymentObj,
+  getCreditCardResponseCartObj,
+  getGooglePayResponseUpdatePaymentObj,
+  getClickToPayResponseUpdatePaymentObj,
+  tokenCreateFlagCustomerInfo,
+  tokenCreateFlagPaymentObj,
+  tokenCreateFlagFunctionName,
+  createResponseSetTransaction,
+  createTransactionSetCustomField,
+  createTransactionSetFailedCustomField,
+  getTransactionSummariesUpdatePaymentObj,
+  checkAuthReversalTriggeredPaymentResponse,
+  checkAuthReversalTriggeredUpdateActions,
+  runSyncAddTransactionSyncUpdateObject,
+  runSyncAddTransactionSyncUpdateEmptyObject,
+  runSyncUpdateCaptureAmountUpdatePaymentObj,
+  customerCardTokens,
+  retrieveSyncResponseTransactionElement,
+  retrieveSyncAmountDetailsApplicationResponse,
+  retrieveAddRefundResponseObjectTransaction,
+  retrieveAddRefundResponseObjectTransactionWithNoCustom,
+  captureResponse,
+  customFields,
+  getPresentApplications,
+  tokenResponse,
+  authResponse,
+  handleAuthApplication,
+  handleAuthReversalResponseUpdateActions,
+  processTokensCustomerCardTokensObject,
+  processTokensCustomerInvalidCardTokensObject,
+  processTokensInstrumentIdentifier,
+  searchSubscriptionResponse,
+  invalidSearchSubscriptionResponse,
+  invalidSubscriptionResponse,
+  createTransactionPaymentFailure,
+  createTransactionSetCustomType
 }

@@ -16,12 +16,11 @@ const ensureCustomTypes = async () => {
     customType.ensureTransactionCustomType(),
   ]);
 };
-
 /**
  * Ensures the existence of required extensions for the payment gateway.
  * @returns {Promise<Array>} A promise that resolves when all extensions are ensured.
  */
-const ensureExtension = async () => {
+const ensureExtension = async (): Promise<[boolean, boolean, boolean]> => {
   return Promise.all([customExtension.ensurePaymentCreateExtension(), customExtension.ensurePaymentUpdateExtension(), customExtension.ensureCustomerUpdateExtension()]);
 };
 

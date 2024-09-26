@@ -1,6 +1,6 @@
 import * as creditCard from '../../JSON/creditCard.json';
 
-export const payment = {
+const payment = {
   id: 'd5c67aab-2880-4cba-8431-4cb90f9c6fd9',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -58,11 +58,11 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const authId = creditCard.authId;
+const authId = creditCard.authId;
 
-export const authID = '6396510479606597503';
+const authID = '6396510479606597503';
 
-export const cart = {
+const cart = {
   limit: 20,
   offset: 0,
   count: 1,
@@ -265,8 +265,8 @@ export const cart = {
       refusedGifts: [],
       origin: 'Customer',
       shippingAddress: {
-        firstName: 'shakshi',
-        lastName: 'poddar',
+        firstName: 'john',
+        lastName: 'doe',
         streetName: '1295 Charleston Road',
         additionalStreetInfo: '5th lane',
         postalCode: '94043',
@@ -274,11 +274,11 @@ export const cart = {
         region: 'CA',
         country: 'US',
         phone: '9876543210',
-        email: 'shakshi.poddar@wipro.com',
+        email: 'john.doe@wipro.com',
       },
       billingAddress: {
-        firstName: 'shakshi',
-        lastName: 'poddar',
+        firstName: 'john',
+        lastName: 'doe',
         streetName: '1295 Charleston Road',
         additionalStreetInfo: '5th lane',
         postalCode: '94043',
@@ -286,7 +286,7 @@ export const cart = {
         region: 'CA',
         country: 'US',
         phone: '9876543210',
-        email: 'shakshi.poddar@wipro.com',
+        email: 'john.doe@wipro.com',
       },
       itemShippingAddresses: [],
       totalLineItemQuantity: 1,
@@ -294,11 +294,11 @@ export const cart = {
   ],
 };
 
-export const orderNo = '';
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
 
-export const updateTransactions = {
+const updateTransactions = {
   id: '095def14-2513-4a80-8488-ea2d74c184c2',
   timestamp: '2023-03-31T11:22:27.157Z',
   type: 'Charge',
@@ -310,3 +310,13 @@ export const updateTransactions = {
   },
   state: 'Initial',
 };
+
+export default {
+  payment,
+  authId,
+  authID,
+  cart,
+  orderNo,
+  orderNumber,
+  updateTransactions
+}
