@@ -1,89 +1,67 @@
-import restApi from 'cybersource-rest-client';
-import path from 'path';
-import { Constants } from '../../constants';
-import paymentService from '../../utils/PaymentService';
+import restApi, { CreateSearchRequest } from 'cybersource-rest-client';
+import { TssV2TransactionsPost201Response } from 'cybersource-rest-client';
 
-const getTransactionSearchResponse = async (query, sort, midCredentials) => {
-  let runEnvironment: any;
-  let errorData: any;
-  let exceptionData: any;
-  let searchResponse = {
-    httpCode: null,
-    data: null,
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
+import prepareFields from '../../requestBuilder/PrepareFields';
+import { MidCredentialsType } from '../../types/Types';
+import paymentUtils from '../../utils/PaymentUtils';
+
+/**
+ * Retrieves transaction search response.
+ * @param {string} query - The query string.
+ * @param {string} sort - The sort order.
+ * @param {MidCredentialsType} midCredentials - The MID credentials.
+ * @returns {Promise<TssV2TransactionsPost201Response>} A promise that resolves with the transaction search response.
+ */
+const getTransactionSearchResponse = async (query: string, sort: string, midCredentials: MidCredentialsType): Promise<any> => {
+  const searchResponse = {
+    httpCode: 0,
+    data: '',
   };
   try {
-    if (null != query && null != sort && null != midCredentials) {
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
-      const configObject = {
-        authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
-        runEnvironment: runEnvironment,
-        merchantID: midCredentials.merchantId,
-        merchantKeyId: midCredentials.merchantKeyId,
-        merchantsecretKey: midCredentials.merchantSecretKey,
-        logConfiguration: {
-          enableLog: false,
-        },
-      };
+    if (query && sort && midCredentials) {
+      const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, midCredentials, null, null);
       const apiClient = new restApi.ApiClient();
-      var requestObj = new restApi.CreateSearchRequest();
-      requestObj.save = false;
-      requestObj.query = query;
-      requestObj.limit = Constants.VAL_FIFTY;
-      requestObj.offset = Constants.VAL_ZERO;
-      requestObj.sort = sort;
-
-      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_REQUEST + JSON.stringify(requestObj));
+      const requestObj: CreateSearchRequest = {
+        save: false,
+        query: query,
+        limit: 50,
+        offset: 0,
+        sort: sort
       }
-
-      const searchTransactionsApiInstance = new restApi.SearchTransactionsApi(configObject, apiClient);
-      return await new Promise((resolve, reject) => {
-        searchTransactionsApiInstance.createSearch(requestObj, function (error, data, response) {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.CREATE_TRANSACTION_SEARCH_RESPONSE + JSON.stringify(response));
-          if (data) {
-            searchResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
-            searchResponse.data = data;
-            resolve(searchResponse);
-          } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, error.response.text);
+      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', 'Create Transaction Search Request = ' + JSON.stringify(requestObj));
+      }
+      const searchTransactionsApiInstance = configObject && new restApi.SearchTransactionsApi(configObject, apiClient);
+      return await new Promise<TssV2TransactionsPost201Response>((resolve, reject) => {
+        if(searchTransactionsApiInstance) {
+          searchTransactionsApiInstance.createSearch(requestObj, function (error: any, data: any, response: any) {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', 'Create Transaction Search Response = ' + JSON.stringify(response));
+            if (data) {
+              searchResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
+              searchResponse.data = data;
+              resolve(searchResponse);
+            } else if (error) {
+              searchResponse.httpCode = error.status;
+              reject(searchResponse);
             } else {
-              if (typeof error === 'object') {
-                errorData = JSON.stringify(error);
-              } else {
-                errorData = error;
-              }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, errorData);
+              reject(searchResponse);
             }
-            searchResponse.httpCode = error.status;
-            reject(searchResponse);
-          } else {
-            reject(searchResponse);
-          }
-        });
+          });
+        } else {
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_SERVICE_PROCESS);
+        }
       }).catch((error) => {
-        return searchResponse;
+        return error;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_INPUT);
       return searchResponse;
     }
   } catch (exception) {
-    if (typeof exception === 'string') {
-      exceptionData = exception.toUpperCase();
-    } else if (exception instanceof Error) {
-      exceptionData = exception.message;
-    } else {
-      exceptionData = exception;
-    }
-    if (Constants.EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED == exceptionData || Constants.EXCEPTION_MERCHANT_KEY_ID_REQUIRED == exceptionData) {
-      exceptionData = Constants.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET + midCredentials.merchantId;
-    }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, '', exception, '', '', '');
     return searchResponse;
   }
 };

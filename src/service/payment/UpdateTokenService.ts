@@ -1,108 +1,84 @@
-import restApi from 'cybersource-rest-client';
-import path from 'path';
-import paymentService from '../../utils/PaymentService';
-import { Constants } from '../../constants';
+import restApi, { PatchCustomerPaymentInstrumentRequest, Tmsv2customersEmbeddedDefaultPaymentInstrumentCard, Tmsv2customersEmbeddedDefaultPaymentInstrumentInstrumentIdentifier } from 'cybersource-rest-client';
 
-const updateTokenResponse = async (tokens, newExpiryMonth, newExpiryYear, addressData) => {
-  let runEnvironment: any;
-  let errorData: any;
-  let exceptionData: any;
-  let customerTokenId: null;
-  let paymentInstrumentTokenId: null;
-  let tokenResponse = {
-    httpCode: null,
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
+import prepareFields from '../../requestBuilder/PrepareFields';
+import { AddressType, CustomerTokensType } from '../../types/Types';
+import paymentUtils from '../../utils/PaymentUtils';
+
+
+
+/**
+ * Updates the token and returns the response.
+ * @param {CustomerTokensType} tokens - The customer tokens object.
+ * @param {string} newExpiryMonth - The new expiry month.
+ * @param {string} newExpiryYear - The new expiry year.
+ * @param {AddressType | null} addressData - The address data.
+ * @returns {Promise<unknown>} - The update token response.
+ */
+const getUpdateTokenResponse = async (tokens: Partial<CustomerTokensType>, newExpiryMonth: string, newExpiryYear: string, addressData: AddressType | null): Promise<unknown> => {
+  let customerTokenId: string;
+  let paymentInstrumentTokenId: string;
+  const tokenResponse = {
+    httpCode: 0,
     default: null,
     card: null,
   };
+  const opts = '';
   try {
-    if (null != tokens && Constants.STRING_VALUE in tokens && Constants.STRING_PAYMENT_TOKEN in tokens && Constants.STRING_CARD_EXPIRY_MONTH in tokens && Constants.STRING_CARD_EXPIRY_YEAR in tokens) {
+    if (tokens && tokens?.value && tokens?.paymentToken && tokens?.cardExpiryMonth && tokens?.cardExpiryYear) {
       customerTokenId = tokens.value;
       paymentInstrumentTokenId = tokens.paymentToken;
       const apiClient = new restApi.ApiClient();
-      var requestObj = new restApi.PatchCustomerPaymentInstrumentRequest();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
+      const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, null, null, null);
+      let billTo = await prepareFields.getUpdateTokenBillTo(addressData);
+      const card: Tmsv2customersEmbeddedDefaultPaymentInstrumentCard = {
+        expirationMonth: newExpiryMonth,
+        expirationYear: newExpiryYear
       }
-      const configObject = {
-        authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
-        runEnvironment: runEnvironment,
-        merchantID: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
-        merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
-        merchantsecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
-        logConfiguration: {
-          enableLog: false,
-        },
-      };
-      var card = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentCard();
-      card.expirationMonth = newExpiryMonth;
-      card.expirationYear = newExpiryYear;
-      requestObj.card = card;
-      var opts = [];
-      if (null != addressData) {
-        var billTo = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo();
-        billTo.firstName = addressData.firstName;
-        billTo.lastName = addressData.lastName;
-        billTo.address1 = addressData.streetName;
-        billTo.locality = addressData.city;
-        billTo.administrativeArea = addressData.region;
-        billTo.postalCode = addressData.postalCode;
-        billTo.country = addressData.country;
-        billTo.email = addressData.email;
-        billTo.phoneNumber = addressData.phone;
-        requestObj.billTo = billTo;
+      const instrumentIdentifier: Tmsv2customersEmbeddedDefaultPaymentInstrumentInstrumentIdentifier = {
+        id: tokens.instrumentIdentifier
       }
-      var instrumentIdentifier = new restApi.Tmsv2customersEmbeddedDefaultPaymentInstrumentInstrumentIdentifier();
-      instrumentIdentifier.id = tokens.instrumentIdentifier;
-      requestObj.instrumentIdentifier = instrumentIdentifier;
-      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.UPDATE_TOKEN_REQUEST + JSON.stringify(requestObj));
+      const requestObj: PatchCustomerPaymentInstrumentRequest = {
+        card: card,
+        billTo: billTo,
+        instrumentIdentifier: instrumentIdentifier
       }
-      const customerPaymentInstrumentApiInstance = new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);
+      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, '', 'Update Token Request = ' + JSON.stringify(requestObj));
+      }
+      const customerPaymentInstrumentApiInstance = configObject && new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {
-        customerPaymentInstrumentApiInstance.patchCustomersPaymentInstrument(customerTokenId, paymentInstrumentTokenId, requestObj, opts, function (error, data, response) {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.UPDATE_TOKEN_RESPONSE + JSON.stringify(response));
-          if (data) {
-            tokenResponse.httpCode = response[Constants.STATUS_CODE];
-            tokenResponse.default = data.default;
-            tokenResponse.card = data.card;
-            resolve(tokenResponse);
-          } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, null, error.response.text);
+        if(customerPaymentInstrumentApiInstance) {
+          customerPaymentInstrumentApiInstance.patchCustomersPaymentInstrument(customerTokenId, paymentInstrumentTokenId, requestObj, opts, function (error: any, data: any, response: any) {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, '', 'Update Token Response = ' + JSON.stringify(response));
+            if (data) {
+              tokenResponse.httpCode = response[Constants.STATUS_CODE] || response[Constants.STRING_RESPONSE_STATUS];
+              tokenResponse.default = data.default;
+              tokenResponse.card = data.card;
+              resolve(tokenResponse);
+            } else if (error) {
+              tokenResponse.httpCode = error.status;
+              reject(tokenResponse);
             } else {
-              if (typeof error === 'object') {
-                errorData = JSON.stringify(error);
-              } else {
-                errorData = error;
-              }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, null, errorData);
+              reject(tokenResponse);
             }
-            tokenResponse.httpCode = error.status;
-            reject(tokenResponse);
-          } else {
-            reject(tokenResponse);
-          }
-        });
+          });
+        } else {
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_SERVICE_PROCESS);
+        }
       }).catch((error) => {
-        return tokenResponse;
+        return error;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, null, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_INPUT);
       return tokenResponse;
     }
   } catch (exception) {
-    if (typeof exception === 'string') {
-      exceptionData = exception.toUpperCase();
-    } else if (exception instanceof Error) {
-      exceptionData = exception.message;
-    } else {
-      exceptionData = exception;
-    }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_UPDATE_TOKEN_RESPONSE, Constants.LOG_ERROR, null, exceptionData);
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, '', exception, '', '', '');
     return tokenResponse;
   }
 };
 
-export default { updateTokenResponse };
+export default { getUpdateTokenResponse };

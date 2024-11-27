@@ -1,0 +1,17 @@
+{
+    "version": "2.0",
+    "extensionBundle": {
+      "id": "Microsoft.Azure.Functions.ExtensionBundle",
+      "version": "[3.*, 4.0.0)"
+    },
+    "customHandler": {
+      "description": {
+        "defaultExecutablePath": "node",
+        "defaultWorkerPath": "build/main/index.js"
+        
+      },
+      "enableForwardingHttpRequest": true
+    },
+    "extensions": {"http": {"routePrefix": ""}}
+  }
+  

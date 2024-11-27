@@ -3,11 +3,12 @@
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/master/cspell.schema.json",
   "language": "en",
   "words": [
-    "bitjson",
     "bitauth",
+    "bitjson",
     "cimg",
     "circleci",
     "codecov",
+    "commercetools",
     "commitlint",
     "dependabot",
     "editorconfig",

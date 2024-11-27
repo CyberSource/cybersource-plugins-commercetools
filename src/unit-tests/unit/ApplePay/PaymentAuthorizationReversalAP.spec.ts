@@ -1,8 +1,10 @@
 import test from 'ava';
 import dotenv from 'dotenv';
+
 dotenv.config();
-import { authReversalId, authReversalID, cart, payment, payments, multipleShippingPayment, multipleShippingReversalId, shippingCart } from '../../const/ApplePay/PaymentAuthorizationReversalConstAP';
+import { Constants } from '../../../constants/constants';
 import authReversalResponse from '../../../service/payment/PaymentAuthorizationReversal';
+import paymentAuthReversalConstAP from '../../const/ApplePay/PaymentAuthorizationReversalConstAP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -19,62 +21,73 @@ let paymentResponseObjects: any = {
   status: null,
 };
 
-test.serial('Reversing a payment with invalid amount and check http code', async (t) => {
-  const result: any = await authReversalResponse.authReversalResponse(payments, cart, authReversalId);
+test.serial('Reversing a payment with invalid amount and check http code', async (t: any) => {
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payments, paymentAuthReversalConstAP.cart, paymentAuthReversalConstAP.authReversalId);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
-  t.not(paymentResponseObject.httpCode, 201);
+  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
 });
 
-test.serial('Check status for auth reversal with invalid amount ', async (t) => {
-  t.not(paymentResponseObject.status, 'REVERSED');
+test.serial('Check status for auth reversal with invalid amount ', async (t: any) => {
+  t.not(paymentResponseObject.status, Constants.API_STATUS_REVERSED);
 });
 
-test.serial('Reversing a payment and check http code', async (t) => {
-  const result: any = await authReversalResponse.authReversalResponse(payment, cart, authReversalId);
+test.serial('Reversing a payment and check http code', async (t: any) => {
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payment, paymentAuthReversalConstAP.cart, paymentAuthReversalConstAP.authReversalId);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.httpCode, 201);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, 201);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Check status for auth reversal ', async (t) => {
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.status, 'REVERSED');
+test.serial('Check status for auth reversal ', async (t: any) => {
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.status, Constants.API_STATUS_REVERSED);
   } else {
-    t.not(paymentResponse.status, 'REVERSED');
+    t.not(paymentResponse.status, Constants.API_STATUS_REVERSED);
   }
 });
 
-test.serial('Reversing an invalid payment and check http code', async (t) => {
-  const result: any = await authReversalResponse.authReversalResponse(payment, cart, authReversalID);
+test.serial('Reversing an invalid payment and check http code', async (t: any) => {
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payment, paymentAuthReversalConstAP.cart, paymentAuthReversalConstAP.authReversalID);
   paymentResponseObjects.httpCode = result.httpCode;
   paymentResponseObjects.status = result.status;
-  t.not(paymentResponseObjects.httpCode, 201);
+  t.not(paymentResponseObjects.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
 });
 
-test.serial('Check status for  auth reversal for invalid payment ', async (t) => {
-  t.not(paymentResponseObjects.status, 'REVERSED');
+test.serial('Check status for  auth reversal for invalid payment ', async (t: any) => {
+  t.not(paymentResponseObjects.status, Constants.API_STATUS_REVERSED);
 });
 
-test.serial('Reversing a payment with multiple shipping and check http code', async (t) => {
-  const result: any = await authReversalResponse.authReversalResponse(multipleShippingPayment, shippingCart, multipleShippingReversalId);
+test.serial('Reversing a payment with multiple shipping and check http code', async (t: any) => {
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.multipleShippingPayment, paymentAuthReversalConstAP.shippingCart, paymentAuthReversalConstAP.multipleShippingReversalId);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.httpCode, 201);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, 201);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Check status of auth reversal  with multiple shipping', async (t) => {
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.status, 'REVERSED');
+test.serial('Check status of auth reversal  with multiple shipping', async (t: any) => {
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.status, Constants.API_STATUS_REVERSED);
   } else {
-    t.not(paymentResponse.status, 'REVERSED');
+    t.not(paymentResponse.status, Constants.API_STATUS_REVERSED);
   }
+});
+
+test.serial('Reversing a payment with empty auth reversal id and check http code', async (t: any) => {
+  let result: any = await authReversalResponse.getAuthReversalResponse(paymentAuthReversalConstAP.payment, paymentAuthReversalConstAP.cart, '');
+  paymentResponseObjects.httpCode = result.httpCode;
+  paymentResponseObjects.status = result.status;
+  t.not(paymentResponseObjects.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+});
+
+test.serial('Check status for auth reversal with empty auth reversal id', async (t: any) => {
+  t.not(paymentResponseObjects.status, Constants.API_STATUS_REVERSED);
 });

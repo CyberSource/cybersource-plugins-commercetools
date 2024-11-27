@@ -1,8 +1,6 @@
-/* eslint-disable import/order */
-/* eslint-disable no-var */
-import eCheck from '../../JSON/eCheck.json';
 import creditCard from '../../JSON/creditCard.json';
-export var payment = {
+import eCheck from '../../JSON/eCheck.json';
+let payment = {
   id: 'f3215a29-1f08-4775-9006-22b84b55bae5',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -61,7 +59,7 @@ export var payment = {
   interfaceInteractions: [],
 };
 
-export var paymentGuest = {
+let paymentGuest = {
   id: 'b793821e-c364-4166-b47f-da3f181664ed',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -111,7 +109,7 @@ export var paymentGuest = {
   anonymousId: '137e1f96-4328-4fda-85f5-b039bb640fec',
 };
 
-export var cart = {
+let cart = {
   type: 'Cart',
   id: '3d09ed42-1b1b-450a-b670-269437683939',
   version: 10,
@@ -300,44 +298,44 @@ export var cart = {
   refusedGifts: [],
   origin: 'Customer',
   shippingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   billingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
-export const cardTokens = {
+const cardTokens = {
   customerTokenId: creditCard.savedToken,
-  paymentInstrumentId: null,
+  paymentInstrumentId: '',
 };
 
-export const service = 'card';
+const service = 'card';
 
-export const dontSaveTokenFlag = false;
+const notSaveToken = false;
 
-export const payerAuthMandateFlag = false;
+const payerAuthMandateFlag = false;
 
-export const orderNo = null;
+const orderNo = '';
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -361,11 +359,11 @@ export const shippingCart = {
     {
       id: '77197bf1-a747-499b-88e4-df16ff235f9f',
       productId: 'c28cfa09-801e-4309-8e2e-edf39f85ddf2',
-      "name": {
-        "en": "sandalen “Aubrey” Michael Kors brown",
-        "de": "sandalen “Aubrey” Michael Kors brown",
-        "en-US": "sandalen “Aubrey” Michael Kors brown",
-        "de-DE": "sandalen “Aubrey” Michael Kors brown"
+      name: {
+        en: 'sandalen Aubrey Michael Kors brown',
+        de: 'sandalen Aubrey Michael Kors brown',
+        'en-US': 'sandalen Aubrey Michael Kors brown',
+        'de-DE': 'sandalen Aubrey Michael Kors brown',
       },
       productType: {
         typeId: 'product-type',
@@ -373,8 +371,8 @@ export const shippingCart = {
         version: 1,
       },
       productSlug: {
-        'en': 'a5',
-        'de': 'a5',
+        en: 'a5',
+        de: 'a5',
         'en-US': 'a5',
         'de-DE': 'a5',
       },
@@ -616,16 +614,28 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
+
+export default {
+  payment,
+  paymentGuest,
+  cart,
+  cardTokens,
+  service,
+  notSaveToken,
+  payerAuthMandateFlag,
+  orderNo,
+  shippingCart
+}

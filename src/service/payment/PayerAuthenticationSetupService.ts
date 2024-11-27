@@ -1,121 +1,96 @@
-import restApi from 'cybersource-rest-client';
-import path from 'path';
-import jwtDecode from 'jwt-decode';
-import { Constants } from '../../constants';
-import paymentService from '../../utils/PaymentService';
-import multiMid from '../../utils/config/MultiMid';
+import restApi, { PayerAuthSetupRequest, Riskv1authenticationsetupsTokenInformation } from 'cybersource-rest-client';
+import { RiskV1AuthenticationSetupsPost201Response } from 'cybersource-rest-client';
 
-const payerAuthSetupResponse = async (payment, cardTokens) => {
-  let runEnvironment: any;
-  let jtiToken: any;
-  let errorData: any;
-  let exceptionData: any;
-  let paymentResponse = {
-    accessToken: null,
-    referenceId: null,
-    deviceDataCollectionUrl: null,
-    httpCode: null,
-    transactionId: null,
+import { Constants } from '../../constants/constants';
+import { CustomMessages } from '../../constants/customMessages';
+import { FunctionConstant } from '../../constants/functionConstant';
+import prepareFields from '../../requestBuilder/PrepareFields';
+import { PaymentType } from '../../types/Types';
+import paymentUtils from '../../utils/PaymentUtils';
+
+/**
+ * Performs payer authentication setup and returns the response.
+ * @param {PaymentType} payment - The payment object.
+ * @param {string} customerTokenId - The customer token ID.
+ * @returns {Promise<RiskV1AuthenticationSetupsPost201Response>} - The payer authentication setup response.
+*/
+const getPayerAuthSetupData = async (payment: PaymentType, customerTokenId: string): Promise<any> => {
+  const paymentResponse = {
+    accessToken: '',
+    referenceId: '',
+    deviceDataCollectionUrl: '',
+    httpCode: 0,
+    transactionId: '',
+    status: '',
+  };
+  let errorData = {
+    id: null,
     status: null,
   };
-  let midCredentials: any;
+  let paymentId = payment?.id || '';
   try {
-    if (null != payment) {
+    if (payment) {
       const apiClient = new restApi.ApiClient();
-      var requestObj = new restApi.PayerAuthSetupRequest();
-      if (Constants.TEST_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
-      } else if (Constants.LIVE_ENVIRONMENT == process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase()) {
-        runEnvironment = Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT;
-      }
-      midCredentials = await multiMid.getMidCredentials(payment);
-      const configObject = {
-        authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
-        runEnvironment: runEnvironment,
-        merchantID: midCredentials.merchantId,
-        merchantKeyId: midCredentials.merchantKeyId,
-        merchantsecretKey: midCredentials.merchantSecretKey,
-        logConfiguration: {
-          enableLog: false,
-        },
+      const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, null, payment, null);
+      let clientReferenceInformation = await prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, payment.id);
+      const tokenInformation: Riskv1authenticationsetupsTokenInformation = await prepareFields.getTokenInformation(payment, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA);
+      const requestObj: PayerAuthSetupRequest = {
+        clientReferenceInformation: clientReferenceInformation,
+        ...tokenInformation.transientToken && { tokenInformation }
       };
-      var clientReferenceInformation = new restApi.Riskv1decisionsClientReferenceInformation();
-      clientReferenceInformation.code = payment.id;
-      requestObj.clientReferenceInformation = clientReferenceInformation;
-
-      var clientReferenceInformationpartner = new restApi.Riskv1decisionsClientReferenceInformationPartner();
-      clientReferenceInformationpartner.solutionId = Constants.PAYMENT_GATEWAY_PARTNER_SOLUTION_ID;
-      clientReferenceInformation.partner = clientReferenceInformationpartner;
-      requestObj.clientReferenceInformation = clientReferenceInformation;
-
-      if (Constants.ISV_SAVED_TOKEN in payment.custom.fields && Constants.STRING_EMPTY != payment.custom.fields.isv_savedToken) {
-        var paymentInformation = new restApi.Riskv1authenticationsetupsPaymentInformation();
-        var paymentInformationCustomer = new restApi.Riskv1authenticationsetupsPaymentInformationCustomer();
-        paymentInformationCustomer.id = cardTokens.customerTokenId;
-        paymentInformation.customer = paymentInformationCustomer;
+      if (payment?.custom?.fields?.isv_savedToken) {
+        const paymentInformation = await prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, payment, null, customerTokenId);
         requestObj.paymentInformation = paymentInformation;
-      } else {
-        jtiToken = jwtDecode(payment.custom.fields.isv_token);
-        var tokenInformation = new restApi.Riskv1authenticationsetupsTokenInformation();
-        tokenInformation.transientToken = jtiToken.jti;
-        requestObj.tokenInformation = tokenInformation;
       }
-      if (Constants.STRING_TRUE == process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) {
-        paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_REQUEST + JSON.stringify(requestObj));
+      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, 'Payer Authentication Setup Request = ' + JSON.stringify(requestObj));
       }
-      const payerAuthenticationApiInstance = new restApi.PayerAuthenticationApi(configObject, apiClient);
-      return await new Promise(function (resolve, reject) {
-        payerAuthenticationApiInstance.payerAuthSetup(requestObj, function (error, data, response) {
-          paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.PAYER_AUTHENTICATION_SETUP_RESPONSE + JSON.stringify(response));
-          if (data) {
-            paymentResponse.httpCode = response[Constants.STATUS_CODE];
-            paymentResponse.transactionId = data.id;
-            paymentResponse.status = data.status;
-            paymentResponse.accessToken = data.consumerAuthenticationInformation.accessToken;
-            paymentResponse.referenceId = data.consumerAuthenticationInformation.referenceId;
-            paymentResponse.deviceDataCollectionUrl = data.consumerAuthenticationInformation.deviceDataCollectionUrl;
-            resolve(paymentResponse);
-          } else if (error) {
-            if (error.hasOwnProperty(Constants.STRING_RESPONSE) && null != error.response && Constants.VAL_ZERO < Object.keys(error.response).length && error.response.hasOwnProperty(Constants.STRING_TEXT) && null != error.response.text && Constants.VAL_ZERO < Object.keys(error.response.text).length) {
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, error.response.text);
-              errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, Constants.STRING_EMPTY));
-              paymentResponse.transactionId = errorData.id;
-              paymentResponse.status = errorData.status;
-            } else {
-              if (typeof error === 'object') {
-                errorData = JSON.stringify(error);
+      const payerAuthenticationApiInstance = configObject && new restApi.PayerAuthenticationApi(configObject, apiClient);
+      return await new Promise<RiskV1AuthenticationSetupsPost201Response>(function (resolve, reject) {
+        if (payerAuthenticationApiInstance) {
+          payerAuthenticationApiInstance.payerAuthSetup(requestObj, function (error: any, data: any, response: any) {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, 'Payer Authentication Setup Response = ' + JSON.stringify(response));
+            if (data) {
+              paymentResponse.httpCode = response[Constants.STATUS_CODE] || response[Constants.STRING_RESPONSE_STATUS];
+              paymentResponse.transactionId = data.id;
+              paymentResponse.status = data.status;
+              paymentResponse.accessToken = data.consumerAuthenticationInformation.accessToken;
+              paymentResponse.referenceId = data.consumerAuthenticationInformation.referenceId;
+              paymentResponse.deviceDataCollectionUrl = data.consumerAuthenticationInformation.deviceDataCollectionUrl;
+              resolve(paymentResponse);
+            } else if (error) {
+              if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
+                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, error.response.text);
+                errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
+                if (errorData?.id && errorData?.status) {
+                  paymentResponse.transactionId = errorData.id;
+                  paymentResponse.status = errorData.status;
+                }
               } else {
-                errorData = error;
+                let errorDataObj;
+                typeof error === Constants.STR_OBJECT ? (errorDataObj = JSON.stringify(error)) : (errorDataObj = error);
+                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, errorDataObj);
               }
-              paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, errorData);
+              paymentResponse.httpCode = error.status;
+              reject(paymentResponse);
+            } else {
+              reject(paymentResponse);
             }
-            paymentResponse.httpCode = error.status;
-            reject(paymentResponse);
-          } else {
-            reject(paymentResponse);
-          }
-        });
+          });
+        } else {
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_INFO, 'PaymentId : ', CustomMessages.ERROR_MSG_SERVICE_PROCESS);
+        }
       }).catch((error) => {
-        return paymentResponse;
+        return error;
       });
     } else {
-      paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_INFO, Constants.LOG_PAYMENT_ID + payment.id, Constants.ERROR_MSG_INVALID_INPUT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_INFO, 'PaymentId : ', CustomMessages.ERROR_MSG_INVALID_INPUT);
       return paymentResponse;
     }
   } catch (exception) {
-    if (typeof exception === 'string') {
-      exceptionData = exception.toUpperCase();
-    } else if (exception instanceof Error) {
-      exceptionData = exception.message;
-    } else {
-      exceptionData = exception;
-    }
-    if (Constants.EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED == exceptionData || Constants.EXCEPTION_MERCHANT_KEY_ID_REQUIRED == exceptionData) {
-      exceptionData = Constants.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET + midCredentials.merchantId;
-    }
-    paymentService.logData(path.parse(path.basename(__filename)).name, Constants.FUNC_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, Constants.LOG_PAYMENT_ID + payment.id, exceptionData);
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, '', exception, paymentId, 'PaymentId : ', '');
     return paymentResponse;
   }
 };
 
-export default { payerAuthSetupResponse };
+export default { getPayerAuthSetupData };
