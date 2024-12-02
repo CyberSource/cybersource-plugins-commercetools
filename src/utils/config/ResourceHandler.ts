@@ -1,6 +1,10 @@
-import customType from './CustomTypes';
 import customExtension from './CustomExtensions';
+import customType from './CustomTypes';
 
+/**
+ * Ensures the existence of custom types required for the payment gateway.
+ * @returns {Promise<Promise<[boolean, boolean, boolean, boolean, boolean, boolean, boolean]>>} A promise that resolves when all custom types are ensured.
+ */
 const ensureCustomTypes = async () => {
   return Promise.all([
     customType.ensurePaymentCustomType(),
@@ -12,8 +16,11 @@ const ensureCustomTypes = async () => {
     customType.ensureTransactionCustomType(),
   ]);
 };
-
-const ensureExtension = async () => {
+/**
+ * Ensures the existence of required extensions for the payment gateway.
+ * @returns {Promise<Array>} A promise that resolves when all extensions are ensured.
+ */
+const ensureExtension = async (): Promise<[boolean, boolean, boolean]> => {
   return Promise.all([customExtension.ensurePaymentCreateExtension(), customExtension.ensurePaymentUpdateExtension(), customExtension.ensureCustomerUpdateExtension()]);
 };
 

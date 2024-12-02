@@ -1,8 +1,10 @@
 import test from 'ava';
 import dotenv from 'dotenv';
+
 dotenv.config();
-import { authID, authId, payment, orderNo, orderNumber, updateTransactions } from '../../const/GooglePay/PaymentCaptureServiceConstGP';
+import { Constants } from '../../../constants/constants';
 import captureResponse from '../../../service/payment/PaymentCaptureService';
+import captureConstGP from '../../const/GooglePay/PaymentCaptureServiceConstGP';
 
 let paymentResponse: any = {
   httpCode: null,
@@ -14,51 +16,60 @@ let paymentResponseObject: any = {
   status: null,
 };
 
-test.serial('Capturing a payment and check http code', async (t) => {
-  const result: any = await captureResponse.captureResponse(payment, updateTransactions, authID, orderNo);
+test.serial('Capturing a payment and check http code', async (t: any) => {
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, captureConstGP.authID, captureConstGP.orderNo);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.httpCode, 201);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, 201);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Check status for payment capture', async (t) => {
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.status, 'PENDING');
+test.serial('Check status for payment capture', async (t: any) => {
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.status, Constants.API_STATUS_PENDING);
   } else {
-    t.not(paymentResponse.status, 'PENDING');
+    t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
   }
 });
 
-test.serial('Capturing an invalid payment', async (t) => {
-  const result: any = await captureResponse.captureResponse(payment, updateTransactions, authId, orderNo);
+test.serial('Capturing an invalid payment', async (t: any) => {
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, captureConstGP.authId, captureConstGP.orderNo);
   paymentResponseObject.httpCode = result.httpCode;
   paymentResponseObject.status = result.status;
-  t.not(paymentResponseObject.httpCode, 201);
+  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
 });
 
-test.serial('Check status for invalid capture ', async (t) => {
-  t.not(paymentResponseObject.status, 'PENDING');
+test.serial('Check status for invalid capture ', async (t: any) => {
+  t.not(paymentResponseObject.status, Constants.API_STATUS_PENDING);
 });
 
-test.serial('Capturing a payment with reconciliation Id and check http code', async (t) => {
-  const result: any = await captureResponse.captureResponse(payment, updateTransactions, authID, orderNumber);
+test.serial('Capturing a payment with reconciliation Id and check http code', async (t: any) => {
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, captureConstGP.authID, captureConstGP.orderNumber);
   paymentResponse.httpCode = result.httpCode;
   paymentResponse.status = result.status;
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.httpCode, 201);
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(paymentResponse.httpCode, 201);
+    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   }
 });
 
-test.serial('Check status for payment capture with reconciliation Id', async (t) => {
-  if (paymentResponse.httpCode == 201) {
-    t.is(paymentResponse.status, 'PENDING');
+test.serial('Check status for payment capture with reconciliation Id', async (t: any) => {
+  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
+    t.is(paymentResponse.status, Constants.API_STATUS_PENDING);
   } else {
-    t.not(paymentResponse.status, 'PENDING');
+    t.not(paymentResponse.status, Constants.API_STATUS_PENDING);
   }
+});test.serial('Capturing a payment with empty auth id and check http code', async (t: any) => {
+  let result: any = await captureResponse.getCaptureResponse(captureConstGP.payment, captureConstGP.updateTransactions, '', captureConstGP.orderNo);
+  paymentResponseObject.httpCode = result.httpCode;
+  paymentResponseObject.status = result.status;
+  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+});
+
+test('Check status for a capture with empty auth id', async (t: any) => {
+  t.not(paymentResponseObject.status, Constants.API_STATUS_PENDING);
 });

@@ -1,6 +1,6 @@
 import clickToPay from '../../JSON/clickToPay.json';
 import creditCard from '../../JSON/creditCard.json';
-export const payment = {
+const payment = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -50,7 +50,7 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const guestPayment = {
+const guestPayment = {
   id: 'c91a109a-a766-4acf-8340-80b23340cd08',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -99,7 +99,7 @@ export const guestPayment = {
   anonymousId: 'b7037191-ed8f-4518-a66a-5b1efda2a2de',
 };
 
-export const payments = {
+const payments = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -143,7 +143,7 @@ export const payments = {
   interfaceInteractions: [],
 };
 
-export const cart = {
+const cart = {
   type: 'Cart',
   id: '3d09ed42-1b1b-450a-b670-269437683939',
   version: 10,
@@ -332,54 +332,57 @@ export const cart = {
   refusedGifts: [],
   origin: 'Customer',
   shippingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   billingAddress: {
-    firstName: 'shakshi',
-    lastName: 'poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
 
-export const service = 'visa';
+const service = 'visa';
 
-export const cardTokens = {
+const cardTokens = {
   customerTokenId: creditCard.savedTokenId,
   paymentInstrumentId: creditCard.savedToken,
 };
 
-export const guestCardTokens = null;
+const guestCardTokens = {
+  customerTokenId: '',
+  paymentInstrumentId: '',
+};
 
-export const cardTokensObject = {
+const cardTokensObject = {
   customerTokenId: 'D605360941117CECE053AF598E0A6E',
   paymentInstrumentId: 'D7688E8C36CCE10FE053A2598D0AC0',
 };
 
-export const orderNo = null;
+const orderNo = '';
 
-export const dontSaveTokenFlag = false;
+const notSaveToken = false;
 
-export const payerAuthMandateFlag = false;
+const payerAuthMandateFlag = false;
 
-export const orderNumber = '10';
+const orderNumber = '10';
 
-export const shippingCart = {
+const shippingCart = {
   type: 'Cart',
   id: '26e44ca8-794f-4bc5-84db-4b476eb4fed1',
   version: 16,
@@ -403,11 +406,11 @@ export const shippingCart = {
     {
       id: '77197bf1-a747-499b-88e4-df16ff235f9f',
       productId: 'c28cfa09-801e-4309-8e2e-edf39f85ddf2',
-      "name": {
-        "en": "sandalen “Aubrey” Michael Kors brown",
-        "de": "sandalen “Aubrey” Michael Kors brown",
-        "en-US": "sandalen “Aubrey” Michael Kors brown",
-        "de-DE": "sandalen “Aubrey” Michael Kors brown"
+      name: {
+        en: 'sandalen Aubrey Michael Kors brown',
+        de: 'sandalen Aubrey Michael Kors brown',
+        'en-US': 'sandalen Aubrey Michael Kors brown',
+        'de-DE': 'sandalen Aubrey Michael Kors brown',
       },
       productType: {
         typeId: 'product-type',
@@ -415,8 +418,8 @@ export const shippingCart = {
         version: 1,
       },
       productSlug: {
-        'en': 'a5',
-        'de': 'a5',
+        en: 'a5',
+        de: 'a5',
         'en-US': 'a5',
         'de-DE': 'a5',
       },
@@ -658,16 +661,147 @@ export const shippingCart = {
   refusedGifts: [],
   origin: 'Customer',
   billingAddress: {
-    firstName: 'Shakshi',
-    lastName: 'Poddar',
+    firstName: 'john',
+    lastName: 'doe',
     streetName: '1295 Charleston Road',
     postalCode: '94043',
     city: 'Mountain View',
     region: 'CA',
     country: 'US',
     phone: '9876543210',
-    email: 'shakshi.poddar@wipro.com',
+    email: 'john.doe@wipro.com',
   },
   itemShippingAddresses: [],
   totalLineItemQuantity: 1,
 };
+
+const ucPayment = {
+  id: '8e1d7b65-d653-4f39-82f4-86cf55df8b60',
+  version: 2,
+  versionModifiedAt: '2023-08-10T07:46:36.014Z',
+  lastMessageSequenceNumber: 2,
+  createdAt: '2023-08-10T07:46:36.014Z',
+  lastModifiedAt: '2023-08-10T07:46:36.014Z',
+  lastModifiedBy: {
+    clientId: 'vjOtikmRR04ldgMx3H3Dgc63',
+    isPlatformClient: false,
+    anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
+  },
+  createdBy: {
+    clientId: 'vjOtikmRR04ldgMx3H3Dgc63',
+    isPlatformClient: false,
+    anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
+  },
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 5000,
+    fractionDigits: 2,
+  },
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'clickToPay',
+    name: {
+      en: 'Click to Pay',
+    },
+  },
+  custom: {
+    type: {
+      typeId: 'type',
+      id: '919acdd9-f671-4a83-ad81-2b01caa72250',
+    },
+    fields: {
+      isv_transientToken: clickToPay.isv_transientToken,
+      isv_deviceFingerprintId: 'a82beccd-0fc0-48f8-a84e-0151709df8c8',
+      isv_saleEnabled: false,
+      isv_acceptHeader: '*/*',
+      isv_customerIpAddress: '192.140.152.21',
+      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+    },
+  },
+  paymentStatus: {},
+  transactions: [
+    {
+      id: 'cc47dace-82d6-4ad1-9182-a3bb724596a4',
+      timestamp: '2023-08-10T07:46:38.255Z',
+      type: 'Authorization',
+      amount: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 5000,
+        fractionDigits: 2,
+      },
+      state: 'Initial',
+    },
+  ],
+  interfaceInteractions: [],
+  anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
+};
+
+const clickToPayPayment = {
+  id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
+  version: 2,
+  lastMessageSequenceNumber: 2,
+  createdAt: '2021-11-10T06:15:42.254Z',
+  lastModifiedAt: '2021-11-10T06:15:42.254Z',
+  lastModifiedBy: {
+    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
+    isPlatformClient: false,
+    customer: {
+      typeId: 'customer',
+      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+    },
+  },
+  createdBy: {
+    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
+    isPlatformClient: false,
+    customer: {
+      typeId: 'customer',
+      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+    },
+  },
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 6970,
+    fractionDigits: 2,
+  },
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'clickToPay',
+    name: {
+      en: 'Click to Pay',
+    },
+  },
+  custom: {
+    type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
+    fields: {
+      isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
+      isv_token: clickToPay.isv_token,
+      isv_acceptHeader: '*/*',
+      isv_customerIpAddress: '171.76.13.221',
+      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+    },
+  },
+  paymentStatus: {},
+  transactions: [],
+  interfaceInteractions: [],
+};
+
+export default {
+  payment,
+  guestPayment,
+  payments,
+  cart,
+  service,
+  cardTokens,
+  guestCardTokens,
+  cardTokensObject,
+  orderNo,
+  notSaveToken,
+  payerAuthMandateFlag,
+  orderNumber,
+  shippingCart,
+  ucPayment,
+  clickToPayPayment
+}

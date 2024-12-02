@@ -1,5 +1,5 @@
 import eCheck from '../../JSON/eCheck.json';
-export const payment = {
+const payment = {
   id: 'b793821e-c364-4166-b47f-da3f181664ed',
   version: 5,
   lastMessageSequenceNumber: 4,
@@ -63,7 +63,7 @@ export const payment = {
   anonymousId: '137e1f96-4328-4fda-85f5-b039bb640fec',
 };
 
-export const paymentObject = {
+const paymentObject = {
   id: 'b793821e-c364-4166-b47f-da3f181664ed',
   version: 5,
   lastMessageSequenceNumber: 4,
@@ -127,11 +127,11 @@ export const paymentObject = {
   anonymousId: '137e1f96-4328-4fda-85f5-b039bb640fec',
 };
 
-export const captureId = eCheck.captureId;
+const captureId = eCheck.captureId;
 
-export const captureID = '63972375285265242';
+const captureID = '63972375285265242';
 
-export const updateTransaction = {
+const updateTransaction = {
   id: 'c812578f-493c-4535-970e-31c210e74420',
   timestamp: '2021-12-07T09:12:49.763Z',
   type: 'Refund',
@@ -144,4 +144,13 @@ export const updateTransaction = {
   state: 'Initial',
 };
 
-export const orderNo = null;
+const orderNo = '';
+
+export default {
+  payment,
+  paymentObject,
+  captureId,
+  captureID,
+  updateTransaction, 
+  orderNo
+}

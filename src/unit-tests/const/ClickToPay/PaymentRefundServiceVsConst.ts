@@ -1,5 +1,5 @@
 import clickToPay from '../../JSON/clickToPay.json';
-export const payment = {
+const payment = {
   id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
   version: 12,
   lastMessageSequenceNumber: 6,
@@ -68,11 +68,11 @@ export const payment = {
   interfaceInteractions: [],
 };
 
-export const captureId = clickToPay.captureId;
+const captureId = clickToPay.captureId;
 
-export const captureID = '6397250673686731603';
+const captureID = '6397250673686731603';
 
-export const updateTransactions = {
+const updateTransactions = {
   id: '1aae9dec-d4bc-40d3-ba7e-3f187d381b99',
   type: 'Refund',
   amount: {
@@ -84,6 +84,15 @@ export const updateTransactions = {
   state: 'Initial',
 };
 
-export const orderNo = null;
+const orderNo = '';
 
-export const orderNumber = '10';
+const orderNumber = '10';
+
+export default {
+  payment,
+  captureId,
+  captureID,
+  updateTransactions,
+  orderNo,
+  orderNumber
+}
