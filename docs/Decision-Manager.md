@@ -19,7 +19,6 @@ Fields which are used by Decision Manager are mapped from Commercetools fields a
 | cart.lineItem[#] | variant.sku | item_#_productSKU    |  |
 | payment | isv_deviceFingerprintId | deviceInformation_fingerprintSessionId    |  |
 
-
 ### Device Fingerprinting
 
 Follow the appropriate Cybersource guide for device fingerprinting and add the session Id used for this to the Commercetools payment as a custom field called `isv_deviceFingerprintId`. 
@@ -29,20 +28,38 @@ You can use any unique string such as an order number or web session Id or Comme
 Replace sessionId with the unique Id generated in the URL "https://h.online-metrix.net/fp/tags.js?org_id={{org Id}}&session_id={{merchant Id}}{{session Id}}" and include the script wherever you want deviceFingerprint Id to be captured.
 
 Replace the below data:
-- {{org Id}} - To obtain this value, contact your Cybersource representative and specify to them whether it is for testing or production. 
-- {{merchant Id}} - Your unique Cybersource merchant Id. 
+- {{org Id}} - To obtain this value, contact the Cybersource representative and specify to them whether it is for testing or production. 
+- {{merchant Id}} - Unique Cybersource merchant Id. 
 - {{session Id}} - Value of unique Id generated above
 
+> **_NOTE:_** Extension will send value present in the field `isv_deviceFingerprintId` to Cybersource, only if `PAYMENT_GATEWAY_DECISION_MANAGER` is enabled from the .env file. 
 
-### Enabling/disabling decision manager for specific payments
+### Enabling/disabling Decision Manager for specific payments
 
-The Cybersource Plugin has environment variable for decision manager as PAYMENT_GATEWAY_DECISION_MANAGER, you can set the values to true or false to enable or disable decision manager. If set to true, PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID variable must be configured with comma separated values of different merchant Ids in which decision manager has to be executed.
+The Cybersource Extension has environment variable for decision manager as `PAYMENT_GATEWAY_DECISION_MANAGER`, you can set the values to true or false to enable or disable decision manager. If set to true, `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` variable must be configured with comma separated values of different merchant Ids in which decision manager has to be executed.
 
-> **_NOTE:_** This field is case sensitive
+> **_NOTE:_** Value for `PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID` is case sensitive without any spaces.
+
+### Payer Authentication with Decision Manager
+ 
+You can use Decision Manager with payer authentication services to allow the risk of an order to determine when you need to invoke payer authentication. 
+Merchant can choose to set the following rules in Decision Manager profile
+
+1. `PAYERAUTH_INVOKE` profile.
+
+   ![](./images/Payer_Auth_Invoke.png)
+2. `PAYERAUTH_EXTERNAL` profile.
+
+   ![](./images/Payer_Auth_External.png)
+3. `PAYERAUTH_SKIP` profile.
+
+   ![](./images/Payer_Auth_Skip.png)
+
+To see more about Payer Authentication with decision manager, refer [this](https://ebc.cybersource.com/content/ebc/docs/cybs/en-us/html/dm-develop/developer/all/so/oxy_ex-1/topics/c_Using_DM_With_Payer_Auth.html)
 
 ## Optional fields
 
-To pass additional data to Decision Manager it is possible to customize your Commercetools resources to add extra fields. If these fields exist and there are values present for these then the plugin will pass the values on to Cybersource in the appropriate request
+To pass additional data to Decision Manager, it is possible to customize the Commercetools resources to add extra fields. If these fields exist and there are values present for these, then the extension will pass the values on to Cybersource in the appropriate request
 
 | Resource          | Field name   | Cybersource field | 
 | ----------------- | ------------ | ----------------- |
@@ -78,14 +95,13 @@ The following is an example of field definitions for the customer IP address. Th
 
 ## Test settings
 
-To support testing Decision Manager responses it is necessary to configure Decision Manager in EBC. This allows triggering of particular responses by matching line 1 of the billing address
+To support testing Decision Manager responses, it is necessary to configure Decision Manager in Business Centre. This allows triggering of particular responses by matching line 1 of the billing address
 
-- In Decision Manager → Configuration → Extended Settings enable
+- In Decision Manager → Configuration → Extended Settings, enable
   Decision Manager for Authorization
   - Also ensure the reply flags are set to DREVIEW and DREJECT
-  - If you need EBC to trigger Authorization Reversal automatically during Reject After Auth cases, make sure that you check the checkbox under Decision Manager → Configuration → Extended Settings to enable it. Otherwise, plugin will automatically trigger Authorization Reversal
-  - When Sale transaction is in review state, before reviewing it navigate to Decision Manager → Configuration → Extended Settings and make sure to select the "Enable Settlement With Selected" for payment processing. And while accepting the order, always make sure that settle checkbox is checked and the amount being settled matches with the total authorization amount, as the plugin will not support the partial settlement
-
+  - If you need Business Centre to trigger Authorization Reversal automatically during Reject After Auth cases, make sure that you select the checkbox under Decision Manager → Configuration → Extended Settings to enable it. Otherwise, extension will automatically trigger Authorization Reversal
+  - When Sale transaction is in review state, before reviewing it navigate to Decision Manager → Configuration → Extended Settings and make sure to select the "Enable Settlement With Selected" for payment processing. Make sure the amount entered for settlement is same to the amount authorized in this case.
 
 - In Decision Manager → Configuration → Profiles create a new profile
   and set it as default

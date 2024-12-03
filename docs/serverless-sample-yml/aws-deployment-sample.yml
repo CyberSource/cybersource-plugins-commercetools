@@ -1,0 +1,42 @@
+service: <service-name>
+ 
+frameworkVersion: '3'
+ 
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: prod
+  region: <aws-region>
+  timeout: 20
+ 
+functions:
+  HandlerFunction:
+    handler: build/main/index.handler
+    events:
+      - httpApi:
+          path: /
+          method: ANY
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+
+package:
+  patterns:
+    - '!docs/**'
+    - '!README.md'
+    - '!src/unit-tests/**'
+    - '!ctExtension.zip'
+    - '!node_modules/@ava/**'
+    - '!node_modules/ava/**'
+    - '!node_modules/chai/**'
+    - '!node_modules/chai-as-promised/**'
+    - '!node_modules/chokidar/**'
+    - '!node_modules/dir-archiver/**'
+    - '!node_modules/pinkie/**'
+    - '!node_modules/pinkie-promise/**'
+    - '!node_modules/run-func/**'
+    - '!node_modules/serverless/**'
+    - '!node_modules/validate-npm-package-license/**'
+    - '!node_modules/validate-npm-package-name/**'
+    - '!node_modules/vscode-uri/**'
+    - '!node_modules/zip-stream/**'

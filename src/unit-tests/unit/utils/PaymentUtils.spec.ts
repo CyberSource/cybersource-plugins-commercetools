@@ -12,7 +12,6 @@ import PaymentCaptureServiceConstCC from '../../const/CreditCard/PaymentCaptureS
 import PaymentServiceConst from '../../const/PaymentServiceConst';
 import PaymentUtilsConst from '../../const/PaymentUtilsConst';
 
-
 test.serial('get the order id', async (t: any) => {
   let result: any = await paymentUtils.getOrderId(unit.cartId, unit.paymentId);
   if (result) {
