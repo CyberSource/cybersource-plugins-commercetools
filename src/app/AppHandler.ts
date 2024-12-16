@@ -6,10 +6,10 @@ import cors from 'cors';
 
 import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
+import { FunctionConstant } from '../constants/functionConstant';
 import paymentUtils from '../utils/PaymentUtils';
 
 import { RouterHandler } from './RouterHandler';
-
 
 type MiddlewareFunction = (req: any, res: any, next: () => void) => void;
 
@@ -85,7 +85,7 @@ export class AppHandler extends RouterHandler {
               break;
             }
             case '/favicon.ico': {
-              paymentUtils.logData(__filename, 'FuncRequestHandler', Constants.LOG_INFO, '', CustomMessages.SUCCESS_MSG_FAV_ICON);
+              paymentUtils.logData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, Constants.LOG_INFO, '', CustomMessages.SUCCESS_MSG_FAV_ICON);
               res.statusCode = 400;
               res.end();
               break;

@@ -19,6 +19,15 @@ export class PayerAuthData {
     authenticationTransactionId?: string;
     directoryServerTransactionId?: string;
 
+    /**
+     * Constructor for the PayerAuthData class.
+     * Maps values from the `consumerAuthenticationInformation` and `paymentResponse` objects to internal properties.
+     * The mapping uses `paymentValidator.setObjectValue` to ensure the correct mapping of data types and field values.
+     * 
+     * @param {PtsV2PaymentsPost201ResponseConsumerAuthenticationInformation} consumerAuthenticationInformation - 
+     * Consumer authentication information object returned in the response.
+     * @param {any} paymentResponse - The payment response object containing additional payer authentication information.
+     */
     constructor(consumerAuthenticationInformation: PtsV2PaymentsPost201ResponseConsumerAuthenticationInformation, paymentResponse: any) {
         const payerAuthenticationInformation = [
             { source: consumerAuthenticationInformation, srcKey: 'pareq', type: Constants.STR_STRING, targetKey: 'isv_payerAuthenticationPaReq' },

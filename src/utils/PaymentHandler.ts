@@ -11,19 +11,21 @@ import addTokenService from '../service/payment/AddTokenService';
 import createSearchRequest from '../service/payment/CreateTransactionSearchRequest';
 import conversion from '../service/payment/DecisionSyncService';
 import deleteToken from '../service/payment/DeleteTokenService';
+import paymentAuthReversal from '../service/payment/PaymentAuthorizationReversal';
+import paymentCapture from '../service/payment/PaymentCaptureService';
 import updateToken from '../service/payment/UpdateTokenService';
 import { ActionResponseType, AddressType, CustomerTokensType, CustomerType, CustomTokenType, InstrumentIdResponse, PaymentCustomFieldsType, PaymentTransactionType, PaymentType, ReportResponseType } from '../types/Types';
-import multiMid from '../utils/config/MultiMid';
-import syncHelper from '../utils/helpers/SyncHelper';
 
-import paymentAuthReversal from './../service/payment/PaymentAuthorizationReversal';
-import paymentCapture from './../service/payment/PaymentCaptureService';
-import paymentService from './../utils/PaymentService';
-import paymentUtils from './../utils/PaymentUtils';
-import commercetoolsApi from './../utils/api/CommercetoolsApi';
 import paymentActions from './PaymentActions';
+import paymentUtils from './PaymentUtils';
 import paymentValidator from './PaymentValidator';
+import commercetoolsApi from './api/CommercetoolsApi';
+import multiMid from './config/MultiMid';
+import orderManagementHelper from './helpers/OrderManagementHelper';
+import paymentHelper from './helpers/PaymentHelper';
+import syncHelper from './helpers/SyncHelper';
 import tokenHelper from './helpers/TokenHelper';
+
 /**
  * Handles the authorization process for a payment.
  * 
@@ -32,54 +34,49 @@ import tokenHelper from './helpers/TokenHelper';
  * @returns {Promise<ActionResponseType>} - The authorization response.
  */
 const handleAuthorization = async (updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>): Promise<ActionResponseType> => {
-  let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
+  let isError = false;
+  let paymentInstrumentToken = '';
+  let paymentId = updatePaymentObj?.id || '';
   let cardTokens: CustomTokenType = {
     customerTokenId: '',
     paymentInstrumentId: '',
   };
   let customerInfo: Partial<CustomerType> | null = null;
-  let paymentInstrumentToken = '';
-  let isError = false;
+  let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   let cartObj;
-  let paymentId = updatePaymentObj?.id || '';
-  try {
-    if (updatePaymentObj && updateTransactions) {
-      const { custom, customer, id, paymentMethodInfo } = updatePaymentObj;
-      cartObj = await paymentUtils.getCartObject(updatePaymentObj);
-      if (cartObj && cartObj?.count && cartObj?.results) {
-        if (customer?.id) {
-          customerInfo = await commercetoolsApi.getCustomer(customer.id);
-          paymentInstrumentToken = custom?.fields.isv_savedToken ? custom?.fields.isv_savedToken : '';
-          cardTokens = await paymentService.getCardTokens(customerInfo, paymentInstrumentToken);
-        }
-        let { results } = cartObj;
-        const orderNo = await paymentUtils.getOrderId(results[0]?.id, id);
-        const paymentMethod = paymentMethodInfo.method;
-        const serviceResponse = await handlePaymentAuth(paymentMethod, updatePaymentObj, customerInfo, results[0], updateTransactions, cardTokens, orderNo);
-        const authresponse = serviceResponse?.authResponse;
-        if (authresponse) {
-          authResponse = serviceResponse.authResponse;
-          isError = serviceResponse.isError;
-        }
-        const paymentResponse = serviceResponse.paymentResponse;
-        if (Constants.CREDIT_CARD === paymentMethod) {
-          authResponse = await paymentService.setCustomerTokenData(cardTokens, paymentResponse, authResponse, isError, updatePaymentObj, results[0]);
-        }
-        const customFields = updatePaymentObj?.custom?.fields;
-        authResponse = await handleSetTokenToNull(customFields, authResponse, paymentMethod);
-        if (paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
-          authResponse = await paymentService.checkAuthReversalTriggered(updatePaymentObj, results[0], paymentResponse, authResponse);
-        }
-      } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_AUTHORIZATION, Constants.LOG_INFO, paymentId, CustomMessages.ERROR_MSG_EMPTY_CART);
-        isError = true;
+  if (updatePaymentObj && updateTransactions) {
+    const { custom, customer, id, paymentMethodInfo } = updatePaymentObj;
+    cartObj = await paymentUtils.getCartObject(updatePaymentObj);
+    if (cartObj && cartObj?.count && cartObj?.results) {
+      if (customer?.id) {
+        customerInfo = await commercetoolsApi.getCustomer(customer.id);
+        paymentInstrumentToken = custom?.fields.isv_savedToken ? custom?.fields.isv_savedToken : '';
+        cardTokens = await tokenHelper.getCardTokens(customerInfo, paymentInstrumentToken);
+      }
+      let { results } = cartObj;
+      const orderNo = await paymentUtils.getOrderId(results[0]?.id, id);
+      const paymentMethod = paymentMethodInfo.method;
+      const serviceResponse = await handlePaymentAuth(paymentMethod, updatePaymentObj, customerInfo, results[0], updateTransactions, cardTokens, orderNo);
+      const authresponse = serviceResponse?.authResponse;
+      if (authresponse) {
+        authResponse = serviceResponse.authResponse;
+        isError = serviceResponse.isError;
+      }
+      const paymentResponse = serviceResponse.paymentResponse;
+      if (Constants.CREDIT_CARD === paymentMethod) {
+        authResponse = await tokenHelper.setCustomerTokenData(cardTokens, paymentResponse, authResponse, isError, updatePaymentObj, results[0]);
+      }
+      const customFields = updatePaymentObj?.custom?.fields;
+      authResponse = await handleSetTokenToNull(customFields, authResponse, paymentMethod);
+      if (paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
+        authResponse = await syncHelper.checkAuthReversalTriggered(updatePaymentObj, results[0], paymentResponse, authResponse);
       }
     } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_AUTHORIZATION, Constants.LOG_INFO, paymentId, CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_AUTHORIZATION, Constants.LOG_ERROR, paymentId, CustomMessages.ERROR_MSG_EMPTY_CART);
       isError = true;
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_AUTHORIZATION, CustomMessages.EXCEPTION_MSG_AUTHORIZING_PAYMENT, exception, paymentId, 'PaymentId : ', '');
+  } else {
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_AUTHORIZATION, Constants.LOG_ERROR, paymentId, CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
     isError = true;
   }
   if (isError) {
@@ -87,6 +84,7 @@ const handleAuthorization = async (updatePaymentObj: PaymentType, updateTransact
   }
   return authResponse;
 };
+
 /**
  * Handles setting certain custom fields to null.
  * 
@@ -110,6 +108,7 @@ const handleSetTokenToNull = async (customFields: Partial<PaymentCustomFieldsTyp
   }
   return authResponse;
 };
+
 /**
  * Handles authorization for different payment methods.
  * 
@@ -124,35 +123,34 @@ const handleSetTokenToNull = async (customFields: Partial<PaymentCustomFieldsTyp
  */
 const handlePaymentAuth = async (paymentMethod: string, updatePaymentObj: PaymentType, customerInfo: Partial<CustomerType> | null, cartInfo: any, updateTransactions: Partial<PaymentTransactionType>, cardTokens: CustomTokenType, orderNo: string) => {
   let serviceResponse: { isError: boolean; paymentResponse: any; authResponse: ActionResponseType };
-  let paymentId = updatePaymentObj?.id || '';
   switch (paymentMethod) {
     case Constants.CREDIT_CARD: {
-      serviceResponse = await paymentService.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
+      serviceResponse = await paymentHelper.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
       break;
     }
     case Constants.CLICK_TO_PAY: {
-      serviceResponse = await paymentService.getClickToPayResponse(updatePaymentObj, cartInfo, updateTransactions, cardTokens, orderNo);
+      serviceResponse = await paymentHelper.getClickToPayResponse(updatePaymentObj, cartInfo, updateTransactions, cardTokens, orderNo);
       break;
     }
     case Constants.GOOGLE_PAY: {
-      serviceResponse = await paymentService.getGooglePayResponse(updatePaymentObj, cartInfo, updateTransactions, cardTokens, orderNo);
+      serviceResponse = await paymentHelper.getGooglePayResponse(updatePaymentObj, cartInfo, updateTransactions, cardTokens, orderNo);
       break;
     }
     case Constants.APPLE_PAY: {
-      serviceResponse = await paymentService.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
+      serviceResponse = await paymentHelper.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
       break;
     }
     case Constants.ECHECK: {
-      serviceResponse = await paymentService.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
+      serviceResponse = await paymentHelper.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
       break;
     }
     default: {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_AUTH, Constants.LOG_INFO, paymentId, CustomMessages.ERROR_MSG_NO_PAYMENT_METHODS);
       return { paymentResponse: null, authResponse: null, isError: true };
     }
   }
   return serviceResponse;
 };
+
 /**
  * Handles payer authentication reversal.
  * 
@@ -163,17 +161,15 @@ const handlePaymentAuth = async (paymentMethod: string, updatePaymentObj: Paymen
  */
 const handlePayerAuthReversal = async (updatePaymentObj: PaymentType, paymentResponse: PtsV2PaymentsPost201Response, updateActions: ActionResponseType): Promise<ActionResponseType> => {
   let cartObj;
-  let paymentId = updatePaymentObj?.id || '';
   if (updatePaymentObj && updateActions && paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
     cartObj = await paymentUtils.getCartObject(updatePaymentObj);
     if (cartObj && cartObj?.results && 0 < cartObj?.results?.length) {
-      updateActions = await paymentService.checkAuthReversalTriggered(updatePaymentObj, cartObj?.results[0], paymentResponse, updateActions);
+      updateActions = await syncHelper.checkAuthReversalTriggered(updatePaymentObj, cartObj?.results[0], paymentResponse, updateActions);
     }
-  } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_PAYER_AUTH_REVERSAL, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
   }
   return updateActions;
 };
+
 /**
  * Handles Apple Pay session.
  * 
@@ -188,43 +184,39 @@ const handleApplePaySession = async (fields: Partial<PaymentCustomFieldsType>): 
     key: '',
   });
   const { PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH, PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH, PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME, PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID, PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT } = process.env || {};
-  try {
-    if (PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH && PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH && PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME && PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID) {
-      const certificateString = PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH;
-      const keyString = PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH;
-      if (Constants.STRING_AWS === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
-        const certData = await paymentUtils.getCertificatesData(certificateString);
-        const keyData = await paymentUtils.getCertificatesData(keyString);
-        if (Constants.HTTP_OK_STATUS_CODE === certData?.status && certData.data && Constants.HTTP_OK_STATUS_CODE === keyData.status && keyData.data) {
-          httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: certData.data, key: keyData.data });
-        } else {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_ACCESSING_CERTIFICATES);
-        }
+  if (PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH && PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH && PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME && PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID) {
+    const certificateString = PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH;
+    const keyString = PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH;
+    if (Constants.STRING_AWS === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
+      const certData = await paymentUtils.getCertificatesData(certificateString);
+      const keyData = await paymentUtils.getCertificatesData(keyString);
+      if (Constants.HTTP_OK_STATUS_CODE === certData?.status && certData.data && Constants.HTTP_OK_STATUS_CODE === keyData.status && keyData.data) {
+        httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: certData.data, key: keyData.data });
       } else {
-        httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: fs.readFileSync(certificateString), key: fs.readFileSync(keyString) });
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_ACCESSING_CERTIFICATES);
       }
-      const domainName = PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME;
-      const body = {
-        merchantIdentifier: PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID,
-        domainName: domainName,
-        displayName: fields.isv_applePayDisplayName,
-        initiative: Constants.PAYMENT_GATEWAY_APPLE_PAY_INITIATIVE,
-        initiativeContext: domainName,
-      };
-      const applePaySession = await axios.post(fields.isv_applePayValidationUrl, body, {
-        httpsAgent,
-      });
-      const isv_applePaySessionData = JSON.stringify(applePaySession.data);
-      serviceResponse.actions = paymentUtils.setCustomFieldMapper({ isv_applePaySessionData });
     } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_APPLE_PAY_CERTIFICATES);
+      httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: fs.readFileSync(certificateString), key: fs.readFileSync(keyString) });
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION, CustomMessages.EXCEPTION_MSG_SERVICE_PROCESS, exception, '', '', '');
-    serviceResponse = paymentUtils.getEmptyResponse();
+    const domainName = PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME;
+    const body = {
+      merchantIdentifier: PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID,
+      domainName: domainName,
+      displayName: fields.isv_applePayDisplayName,
+      initiative: Constants.PAYMENT_GATEWAY_APPLE_PAY_INITIATIVE,
+      initiativeContext: domainName,
+    };
+    const applePaySession = await axios.post(fields.isv_applePayValidationUrl, body, {
+      httpsAgent,
+    });
+    const isv_applePaySessionData = JSON.stringify(applePaySession.data);
+    serviceResponse.actions = paymentUtils.setCustomFieldMapper({ isv_applePaySessionData });
+  } else {
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_APPLE_PAY_CERTIFICATES);
   }
   return serviceResponse;
 };
+
 /**
  * Handles charge operation for order management.
  * 
@@ -236,30 +228,38 @@ const handleApplePaySession = async (fields: Partial<PaymentCustomFieldsType>): 
 const handleOrderManagementForCharge = async (updatePaymentObj: PaymentType, orderNo: string, updateTransactions: Partial<PaymentTransactionType>) => {
   let authId = '';
   let orderResponse;
-  let paymentId = updatePaymentObj?.id || '';
   authId = paymentUtils.getInteractionId(updatePaymentObj);
-  try {
-    authId
-      ? (orderResponse = await paymentCapture.getCaptureResponse(updatePaymentObj, updateTransactions, authId, orderNo))
-      : paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_ORDER_MANAGEMENT_FOR_CHARGE, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_CAPTURE_FAILURE);
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_ORDER_MANAGEMENT_FOR_CHARGE, '', exception, paymentId, 'PaymentId : ', '');
+  if (authId) {
+    orderResponse = await paymentCapture.getCaptureResponse(updatePaymentObj, updateTransactions, authId, orderNo)
   }
   return orderResponse;
 };
 
+/**
+ * Handles different transaction types based on type and state.
+ *
+ * @async
+ * @param {string | undefined} type - The type of transaction.
+ * @param {string | undefined} state - The state of the transaction.
+ * @param {string} orderNo - The order number associated with the transaction.
+ * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Partial<PaymentTransactionType>} updateTransactions - The transaction update object.
+ * @param {any} cartObj - The cart object associated with the transaction.
+ * @returns {Promise<any | null>} The result of the transaction handling, or null if not applicable.
+ */
 const handleTransactionType = async (type: string | undefined, state: string | undefined, orderNo: string, updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>, cartObj: any) => {
   switch (type) {
     case Constants.CT_TRANSACTION_TYPE_CHARGE:
       return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await handleOrderManagementForCharge(updatePaymentObj, orderNo, updateTransactions) : null;
     case Constants.CT_TRANSACTION_TYPE_REFUND:
-      return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await paymentService.getRefundResponse(updatePaymentObj, updateTransactions, orderNo) : null;
+      return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await orderManagementHelper.getRefundResponse(updatePaymentObj, updateTransactions, orderNo) : null;
     case Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION:
       return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await handleOrderManagementAuthReversal(updatePaymentObj, cartObj.results[0]) : null;
     default:
       return null;
   }
-}
+};
+
 /**
  * Handles authorization reversal operation for order management.
  * 
@@ -269,18 +269,14 @@ const handleTransactionType = async (type: string | undefined, state: string | u
  */
 const handleOrderManagementAuthReversal = async (updatePaymentObj: PaymentType, cartObj: any): Promise<any> => {
   let authReversalId = '';
-  let orderResponse;
-  let paymentId = updatePaymentObj?.id || '';
   authReversalId = paymentUtils.getInteractionId(updatePaymentObj);
-  try {
-    authReversalId
-      ? (orderResponse = await paymentAuthReversal.getAuthReversalResponse(updatePaymentObj, cartObj, authReversalId))
-      : paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_ORDER_MANAGEMENT_AUTH_REVERSAL, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_REVERSAL_FAILURE);
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_ORDER_MANAGEMENT_AUTH_REVERSAL, '', exception, paymentId, 'PaymentId : ', '');
+  let orderResponse;
+  if (authReversalId) {
+    orderResponse = await paymentAuthReversal.getAuthReversalResponse(updatePaymentObj, cartObj, authReversalId)
   }
   return orderResponse;
 };
+
 /**
  * Handles order management operations.
  * 
@@ -290,35 +286,28 @@ const handleOrderManagementAuthReversal = async (updatePaymentObj: PaymentType, 
  * @returns {Promise<ActionResponseType>} - The action response.
  */
 const handleOrderManagement = async (paymentId: string, updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>): Promise<ActionResponseType> => {
-  let orderResponse;
-  let serviceResponse = paymentUtils.getEmptyResponse();
   let isError = false;
+  let serviceResponse = paymentUtils.getEmptyResponse();
+  let orderResponse;
   let cartObj;
-  try {
-    if (updatePaymentObj && updateTransactions) {
-      cartObj = await paymentUtils.getCartObject(updatePaymentObj);
-      if (cartObj?.results[0]?.id) {
-        let { results } = cartObj;
-        let { state, type } = updateTransactions || {};
-        const orderNo = await paymentUtils.getOrderId(results[0].id, paymentId);
-        orderResponse = await handleTransactionType(type, state, orderNo, updatePaymentObj, updateTransactions, cartObj);
-        if (orderResponse && orderResponse?.httpCode) {
-          serviceResponse = paymentService.getOMServiceResponse(orderResponse, updateTransactions, '', 0);
-        } else if (orderResponse && orderResponse?.actions?.length) {
-          serviceResponse = orderResponse;
-        } else {
-          isError = true;
-        }
+  if (updatePaymentObj && updateTransactions) {
+    cartObj = await paymentUtils.getCartObject(updatePaymentObj);
+    if (cartObj?.results[0]?.id) {
+      let { results } = cartObj;
+      let { state, type } = updateTransactions || {};
+      const orderNo = await paymentUtils.getOrderId(results[0].id, paymentId);
+      orderResponse = await handleTransactionType(type, state, orderNo, updatePaymentObj, updateTransactions, cartObj);
+      if (orderResponse && orderResponse?.httpCode) {
+        serviceResponse = orderManagementHelper.getOMServiceResponse(orderResponse, updateTransactions, '', 0);
+      } else if (orderResponse && orderResponse?.actions?.length) {
+        serviceResponse = orderResponse;
       } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_ORDER_MANAGEMENT, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
         isError = true;
       }
     } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_ORDER_MANAGEMENT, Constants.LOG_INFO, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
       isError = true;
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_ORDER_MANAGEMENT, CustomMessages.EXCEPTION_MSG_SERVICE_PROCESS, exception, paymentId, 'PaymentId : ', '');
+  } else {
     isError = true;
   }
   if (isError) {
@@ -326,6 +315,7 @@ const handleOrderManagement = async (paymentId: string, updatePaymentObj: Paymen
   }
   return serviceResponse;
 };
+
 /**
  * Handles the update of card details.
  * 
@@ -336,58 +326,55 @@ const handleOrderManagement = async (paymentId: string, updatePaymentObj: Paymen
  */
 const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId: string, customerObj: Partial<CustomerType>): Promise<ActionResponseType> => {
   let returnResponse: ActionResponseType = paymentUtils.getEmptyResponse();
-  let parsedTokens: Partial<CustomerTokensType>;
-  let addressData: AddressType | null = null;
   const isError = false;
   let finalTokenIndex = -1;
+  let parsedTokens: Partial<CustomerTokensType>;
+  let addressData: AddressType | null = null;
   let updateServiceResponse: any;
-  try {
-    if (customerId) {
-      const customerInfo = await commercetoolsApi.getCustomer(customerId);
-      if (customerObj?.addresses?.length) {
-        customerObj.addresses.forEach((address) => {
-          if (tokens.addressId === address.id) {
-            addressData = address;
-            return;
-          }
-        });
-      }
-      const { isv_cardNewExpiryMonth, isv_cardNewExpiryYear, isv_failedTokens } = customerObj?.custom?.fields || {};
-      const { isv_tokens } = customerInfo?.custom?.fields || {};
-      if (isv_cardNewExpiryMonth && isv_cardNewExpiryYear) {
-        updateServiceResponse = await updateToken.getUpdateTokenResponse(tokens, isv_cardNewExpiryMonth, isv_cardNewExpiryYear, addressData);
-        const isValidUpdateResponse = paymentValidator.isValidUpdateServiceResponse(updateServiceResponse);
-        if (isValidUpdateResponse) {
-          if (customerInfo?.custom?.fields?.isv_tokens?.length) {
-            const existingTokens = isv_tokens as string[];
-            existingTokens.forEach((token, tokenIndex) => {
-              const newToken = JSON.parse(token);
-              if (newToken.paymentToken === tokens.paymentToken) {
-                finalTokenIndex = tokenIndex;
-                return;
-              }
-            });
-            if (-1 < finalTokenIndex) {
-              parsedTokens = JSON.parse(existingTokens[finalTokenIndex]);
-              parsedTokens.cardExpiryMonth = updateServiceResponse?.card.expirationMonth;
-              parsedTokens.cardExpiryYear = updateServiceResponse?.card.expirationYear;
-              parsedTokens.addressId = tokens.addressId;
-              existingTokens[finalTokenIndex] = JSON.stringify(parsedTokens);
-              returnResponse = paymentActions.getUpdateTokenActions(existingTokens, isv_failedTokens, isError, customerObj, null);
-            } else {
-              paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_UPDATE_CARD, Constants.LOG_INFO, CustomMessages.ERROR_MSG_NO_TOKENS_UPDATE, 'CustomerId : ' + customerId);
+  if (customerId) {
+    const customerInfo = await commercetoolsApi.getCustomer(customerId);
+    if (customerObj?.addresses?.length) {
+      customerObj.addresses.forEach((address) => {
+        if (tokens.addressId === address.id) {
+          addressData = address;
+          return;
+        }
+      });
+    }
+    const { isv_cardNewExpiryMonth, isv_cardNewExpiryYear, isv_failedTokens } = customerObj?.custom?.fields || {};
+    const { isv_tokens } = customerInfo?.custom?.fields || {};
+    if (isv_cardNewExpiryMonth && isv_cardNewExpiryYear) {
+      updateServiceResponse = await updateToken.getUpdateTokenResponse(tokens, isv_cardNewExpiryMonth, isv_cardNewExpiryYear, addressData);
+      const isValidUpdateResponse = paymentValidator.isValidUpdateServiceResponse(updateServiceResponse);
+      if (isValidUpdateResponse) {
+        if (customerInfo?.custom?.fields?.isv_tokens?.length) {
+          const existingTokens = isv_tokens as string[];
+          existingTokens.forEach((token, tokenIndex) => {
+            const newToken = JSON.parse(token);
+            if (newToken.paymentToken === tokens.paymentToken) {
+              finalTokenIndex = tokenIndex;
+              return;
             }
+          });
+          if (-1 < finalTokenIndex) {
+            parsedTokens = JSON.parse(existingTokens[finalTokenIndex]);
+            parsedTokens.cardExpiryMonth = updateServiceResponse?.card.expirationMonth;
+            parsedTokens.cardExpiryYear = updateServiceResponse?.card.expirationYear;
+            parsedTokens.addressId = tokens.addressId;
+            existingTokens[finalTokenIndex] = JSON.stringify(parsedTokens);
+            returnResponse = paymentActions.getUpdateTokenActions(existingTokens, isv_failedTokens, isError, customerObj, null);
+          } else {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_UPDATE_CARD, Constants.LOG_ERROR, CustomMessages.ERROR_MSG_NO_TOKENS_UPDATE, 'CustomerId : ' + customerId);
           }
         }
       }
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_UPDATE_CARD, Constants.LOG_INFO, CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, 'CustomerId : ' + customerId);
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_UPDATE_CARD, CustomMessages.EXCEPTION_MSG_CUSTOMER_UPDATE, exception, customerId, 'CustomerId : ', '');
+  } else {
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_UPDATE_CARD, Constants.LOG_ERROR, CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, 'CustomerId : ' + customerId);
   }
   return returnResponse;
 };
+
 /**
  * Handles the deletion of a card.
  * 
@@ -415,16 +402,15 @@ const handleCardDeletion = async (updateCustomerObj: Partial<CustomerTokensType>
           customerTokenHandlerResponse = paymentActions.getUpdateTokenActions(existingTokensMap, customerObj?.custom?.fields?.isv_failedTokens, true, customerObj, null);
           const isv_tokenAction = '';
           customerTokenHandlerResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenAction }));
-        } else {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_CARD_DELETION, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_NO_TOKENS_DELETE);
         }
       }
     }
   } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_CARD_DELETION, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_CUSTOMER_DETAILS);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_CARD_DELETION, Constants.LOG_ERROR, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_CUSTOMER_DETAILS);
   }
   return customerTokenHandlerResponse;
-}
+};
+
 /**
  * Handles the addition of a card.
  * 
@@ -435,48 +421,43 @@ const handleCardDeletion = async (updateCustomerObj: Partial<CustomerTokensType>
  */
 const handleCardAddition = async (customerId: string, addressObj: readonly AddressType[], customerObj: CustomerType) => {
   let customerTokenResponse: ActionResponseType = paymentUtils.getEmptyResponse();
-  try {
-    const tokenCreateResponse = await paymentService.evaluateTokenCreation(customerObj, null, FunctionConstant.FUNC_HANDLE_CARD_ADDITION);
-    if (!tokenCreateResponse.isError) {
-      const isSaveToken = tokenCreateResponse.isSaveToken;
-      const customFields = customerObj?.custom?.fields || {};
-      const { isv_addressId, isv_token } = customFields;
-      if (!isSaveToken && isv_addressId && isv_token) {
-        const billToFields = await tokenHelper.getBillToFields(customFields, addressObj, customerObj);
-        if (!isSaveToken) {
-          const cardTokens = await paymentService.getCardTokens(customerObj, '');
-          const cardResponse = await addTokenService.getAddTokenResponse(customerId, customerObj, billToFields, cardTokens);
-          const isValidResponse = paymentValidator.isValidCardResponse(cardResponse);
-          customerTokenResponse = (isValidResponse) ? await tokenHelper.processValidCardResponse(customFields, cardTokens, cardResponse, customerObj, billToFields) : await tokenHelper.processInvalidCardResponse(customFields, customerObj, customerId);
-        }
+  const tokenCreateResponse = await tokenHelper.evaluateTokenCreation(customerObj, null, FunctionConstant.FUNC_HANDLE_CARD_ADDITION);
+  if (!tokenCreateResponse.isError) {
+    const isSaveToken = tokenCreateResponse.isSaveToken;
+    const customFields = customerObj?.custom?.fields || {};
+    const { isv_addressId, isv_token } = customFields;
+    if (isSaveToken && isv_addressId && isv_token) {
+      const billToFields = await tokenHelper.getBillToFields(customFields, addressObj, customerObj);
+      if (isSaveToken) {
+        const cardTokens = await tokenHelper.getCardTokens(customerObj, '');
+        const cardResponse = await addTokenService.getAddTokenResponse(customerId, customerObj, billToFields, cardTokens);
+        const isValidResponse = paymentValidator.isValidCardResponse(cardResponse);
+        customerTokenResponse = (isValidResponse) ? await tokenHelper.processValidCardResponse(customFields, cardTokens, cardResponse, customerObj, billToFields)
+          : await tokenHelper.processInvalidCardResponse(customFields, customerObj, customerId);
       }
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_CARD_ADDITION, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CARD_ADDITION, CustomMessages.EXCEPTION_MSG_ADDING_A_CARD, exception, customerId, 'CustomerId : ', '');
   }
   return customerTokenResponse;
 };
+
 /**
  * Handles the decision sync process.
  * 
  * @returns {Promise<ReportResponseType>} - The report response.
  */
 const handleReport = async (): Promise<ReportResponseType> => {
-  let conversionDetails;
-  let conversionDetailsData;
   let isDecisionSynced = false;
   let isConversionPresent = false;
+  const { PAYMENT_GATEWAY_DECISION_SYNC, PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID } = process.env;
   const decisionSyncResponse: ReportResponseType = {
     message: '',
     error: '',
   };
-  const { PAYMENT_GATEWAY_DECISION_SYNC, PAYMENT_GATEWAY_DECISION_SYNC_MULTI_MID } = process.env;
-
+  let conversionDetails;
+  let conversionDetailsData;
   if (paymentUtils.toBoolean(PAYMENT_GATEWAY_DECISION_SYNC)) {
     try {
-      const decisionSyncArray = await multiMid.getAllMidDetails();
+      const decisionSyncArray = multiMid.getAllMidDetails();
       decisionSyncArray.push({
         merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
         merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
@@ -487,16 +468,12 @@ const handleReport = async (): Promise<ReportResponseType> => {
         const decisionMidsArray = decisionSyncMids.split(Constants.REGEX_COMMA);
         if (decisionMidsArray && 0 < decisionMidsArray.length) {
           for (let decisionElement of decisionSyncArray) {
-            try {
-              if (decisionElement.merchantId && decisionMidsArray.includes(decisionElement.merchantId)) {
-                conversionDetails = await conversion.getConversionDetails(decisionElement);
-                if (conversionDetails && Constants.HTTP_OK_STATUS_CODE === conversionDetails.status) {
-                  conversionDetailsData = conversionDetails?.data;
-                  isConversionPresent = await syncHelper.updateDecisionSyncService(conversionDetailsData);
-                }
+            if (decisionElement.merchantId && decisionMidsArray.includes(decisionElement.merchantId)) {
+              conversionDetails = await conversion.getConversionDetails(decisionElement);
+              if (conversionDetails && Constants.HTTP_OK_STATUS_CODE === conversionDetails.status) {
+                conversionDetailsData = conversionDetails?.data;
+                isConversionPresent = await syncHelper.updateDecisionSyncService(conversionDetailsData);
               }
-            } catch (exception) {
-              paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_REPORT, CustomMessages.EXCEPTION_MSG_CONVERSION_DETAILS, exception, '', '', '');
             }
           }
           if (isConversionPresent) {
@@ -508,7 +485,6 @@ const handleReport = async (): Promise<ReportResponseType> => {
         decisionSyncResponse.error = CustomMessages.ERROR_MSG_ENABLE_DECISION_SYNC_MIDS;
       }
     } catch (exception) {
-      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_REPORT, CustomMessages.EXCEPTION_MSG_CONVERSION_DETAILS, exception, '', '', '');
       decisionSyncResponse.error = CustomMessages.ERROR_MSG_SYNC_PAYMENT_DETAILS;
     }
   } else {
@@ -516,17 +492,15 @@ const handleReport = async (): Promise<ReportResponseType> => {
   }
   return decisionSyncResponse;
 };
+
 /**
  * Handles the synchronization process.
  * 
  * @returns {Promise<{ message: string, error: string }>} - The sync response.
  */
 const handleSync = async (): Promise<{ message: string, error: string }> => {
-  let createSearchResponse;
-  let transactionSummaries;
-  let paymentDetails: PaymentType | null;
-  let updateSyncResponse;
   let isSyncPresent = false;
+  const { PAYMENT_GATEWAY_RUN_SYNC } = process.env;
   const syncResponse = {
     message: '',
     error: '',
@@ -537,26 +511,25 @@ const handleSync = async (): Promise<{ message: string, error: string }> => {
     merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
   };
   let multiMidArray;
-  const { PAYMENT_GATEWAY_RUN_SYNC } = process.env;
+  let paymentDetails: PaymentType | null;
+  let createSearchResponse;
+  let transactionSummaries;
+  let updateSyncResponse;
   try {
     if (paymentUtils.toBoolean(PAYMENT_GATEWAY_RUN_SYNC)) {
-      multiMidArray = await multiMid.getAllMidDetails();
+      multiMidArray = multiMid.getAllMidDetails();
       multiMidArray.push(midCredentials);
       for (let midElement of multiMidArray) {
-        createSearchResponse = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY, Constants.STRING_SYNC_SORT, midElement);
+        createSearchResponse = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY, 50, Constants.STRING_SYNC_SORT, midElement);
         if (createSearchResponse && Constants.HTTP_SUCCESS_STATUS_CODE === createSearchResponse?.httpCode && createSearchResponse?.data && createSearchResponse.data?._embedded && createSearchResponse.data._embedded?.transactionSummaries) {
           transactionSummaries = createSearchResponse.data._embedded.transactionSummaries;
           for (let element of transactionSummaries) {
-            try {
-              paymentDetails = await commercetoolsApi.retrievePayment(element.clientReferenceInformation.code);
-              if (paymentDetails && Constants.STRING_TRANSACTIONS in paymentDetails) {
-                updateSyncResponse = await syncHelper.retrieveSyncResponse(paymentDetails, element);
-                if (updateSyncResponse) {
-                  isSyncPresent = true;
-                }
+            paymentDetails = await commercetoolsApi.retrievePayment(element.clientReferenceInformation.code);
+            if (paymentDetails && Constants.STRING_TRANSACTIONS in paymentDetails) {
+              updateSyncResponse = await syncHelper.retrieveSyncResponse(paymentDetails, element);
+              if (updateSyncResponse) {
+                isSyncPresent = true;
               }
-            } catch (exception) {
-              paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_SYNC, CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception, '', '', '');
             }
           }
         }
@@ -566,11 +539,11 @@ const handleSync = async (): Promise<{ message: string, error: string }> => {
       syncResponse.error = CustomMessages.ERROR_MSG_ENABLE_SYNC;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_SYNC, CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception, '', '', '');
     syncResponse.error = CustomMessages.ERROR_MSG_SYNC_PAYMENT_DETAILS;
   }
   return syncResponse;
 };
+
 /**
  * Handles the network token update process.
  * 
@@ -579,15 +552,13 @@ const handleSync = async (): Promise<{ message: string, error: string }> => {
  * @returns {Promise<any>} - The response of the token update process.
  */
 const handleNetworkToken = async (customerTokenId: string, retrieveTokenDetailsResponse: InstrumentIdResponse): Promise<any> => {
-  let parsedTokens = [];
   let response = null;
-  let stringifiedTokens = [];
-  let customerId = '';
+  let parsedTokens: any = [];
+  let stringifiedTokens: any = [];
   if (Constants.HTTP_OK_STATUS_CODE === retrieveTokenDetailsResponse?.httpCode) {
     const fetchedCustomers = await commercetoolsApi.retrieveCustomerByCustomField('isv_customerId', customerTokenId);
     const customerObj = fetchedCustomers?.results[0];
     if (customerObj && customerObj?.custom && customerObj.custom?.fields) {
-      customerId = customerObj.id;
       const existingTokens = customerObj.custom.fields.isv_tokens;
       parsedTokens = await existingTokens.map((token: any) => {
         return JSON.parse(token);
@@ -603,8 +574,6 @@ const handleNetworkToken = async (customerTokenId: string, retrieveTokenDetailsR
         response = await commercetoolsApi.updateCustomerToken(stringifiedTokens, customerObj, null, null);
       }
     }
-  } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_NETWORK_TOKEN, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_INSTRUMENT_ID_RESPONSE);
   }
   return response;
 };

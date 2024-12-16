@@ -12,7 +12,7 @@ test('Run sync ', async (t: any) => {
     merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
     merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
   };
-  let result: any = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY, Constants.STRING_SYNC_SORT, midCredentials);
+  let result: any = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY,50, Constants.STRING_SYNC_SORT, midCredentials,false);
   if (Constants.HTTP_SUCCESS_STATUS_CODE === result.httpCode) {
     t.is(result.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
@@ -21,13 +21,13 @@ test('Run sync ', async (t: any) => {
 });
 
 test('Run sync with invalid mid credentials', async (t: any) => {
-  let result: any = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY, Constants.STRING_SYNC_SORT, DeleteWebhookSubscriptionConst.invalidMidCredentials);
+  let result: any = await createSearchRequest.getTransactionSearchResponse(Constants.STRING_SYNC_QUERY,50, Constants.STRING_SYNC_SORT, DeleteWebhookSubscriptionConst.invalidMidCredentials,false);
   t.is(result.httpCode, 401);
   t.is(result.data, '');
 });
 
 test('Run sync with empty query', async (t: any) => {
-  let result: any = await createSearchRequest.getTransactionSearchResponse('', '', DeleteWebhookSubscriptionConst.emptyMidCredentials);
+  let result: any = await createSearchRequest.getTransactionSearchResponse('', 50,'', DeleteWebhookSubscriptionConst.emptyMidCredentials,false);
   t.is(result.httpCode, 0);
   t.is(result.data, '');
 });

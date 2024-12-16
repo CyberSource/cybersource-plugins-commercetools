@@ -13,6 +13,6 @@
       "actions": ["Update"]
     }
   ],
-  "timeoutInMs": 3000,
+  "timeoutInMs": 2000,
   "key": "isv_customer_update_extension"
 }

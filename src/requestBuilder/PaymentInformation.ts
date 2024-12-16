@@ -9,6 +9,14 @@ import paymentValidator from '../utils/PaymentValidator';
 
 export class PaymentInformationModel {
 
+    /**
+     * Maps payment information based on the function and payment method.
+     * @param functionName - The function being processed (e.g. authorization, refund).
+     * @param resourceObj - The payment object containing payment details.
+     * @param cardTokens - Tokenized card information.
+     * @param customerTokenId - Tokenized customer ID.
+     * @returns The mapped payment information object based on the function.
+     */
     public mapPaymentInformation(functionName: string, resourceObj: PaymentType | null, cardTokens: CustomTokenType | null, customerTokenId: string | null) {
         let paymentInformation: any;
         if ((FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName || FunctionConstant.FUNC_GET_REFUND_DATA === functionName) && resourceObj?.paymentMethodInfo?.method) {
@@ -42,7 +50,7 @@ export class PaymentInformationModel {
                     }
                     break;
                 default:
-                    paymentUtils.logData(__filename, FunctionConstant.FUNC_MAP_PAYMENT_INFORMATION, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
+                    paymentUtils.logData(__filename, FunctionConstant.FUNC_MAP_PAYMENT_INFORMATION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
             }
         } else if (FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === functionName && cardTokens && cardTokens.customerTokenId) {
             paymentInformation = {} as Ptsv2paymentsPaymentInformation;
@@ -55,12 +63,22 @@ export class PaymentInformationModel {
         return paymentInformation;
     }
 
+    /**
+     * Sets payment information customer details.
+     * @param id - The customer ID to map into the payment information.
+     * @returns The mapped customer object.
+     */
     private setPaymentInformationCustomerDetails(id: string | null | undefined) {
         const customer = {} as Ptsv2paymentsPaymentInformationCustomer;
         paymentValidator.setObjectValue(customer, 'id', id, '', Constants.STR_STRING, false);
         return customer;
     }
 
+    /**
+     * Sets payment information card details, including security code.
+     * @param securityCode - Optional security code for the card.
+     * @returns The mapped card object.
+     */
     private setPaymentInformationCardDetails(securityCode?: number) {
         const card = {} as Ptsv2paymentsPaymentInformationCard
         paymentValidator.setObjectValue(card, 'securityCode', securityCode, '', Constants.STR_NUMBER, false);
@@ -68,6 +86,11 @@ export class PaymentInformationModel {
         return card;
     }
 
+    /**
+     * Sets payment information bank details.
+     * @param fields - Custom fields related to the payment bank account.
+     * @returns The mapped bank object.
+     */
     private setPaymentInformationBankDetails(fields: Partial<PaymentCustomFieldsType> | undefined) {
         const bankAccount: Ptsv2paymentsPaymentInformationBankAccount = {
             type: fields?.isv_accountType,
@@ -80,6 +103,13 @@ export class PaymentInformationModel {
         return bank;
     }
 
+    /**
+     * Sets fluid data, often used in tokenized payments like Google Pay or Apple Pay.
+     * @param token - The token for the payment method.
+     * @param descriptor - Optional descriptor for the payment.
+     * @param encoding - Optional encoding type for the payment data.
+     * @returns The mapped fluid data object.
+     */
     private setFluidData(token: string, descriptor?: string, encoding?: string) {
         const fluidData = {} as Ptsv2paymentsPaymentInformationFluidData;
         paymentValidator.setObjectValue(fluidData, 'value', token, '', Constants.STR_STRING, false);

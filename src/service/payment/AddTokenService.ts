@@ -2,7 +2,6 @@ import restApi, { CreatePaymentRequest, Ptsv2paymentsOrderInformation, Ptsv2paym
 import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants/constants';
-import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { AddressType, CustomerType, CustomTokenType } from '../../types/Types';
@@ -23,66 +22,59 @@ const getAddTokenResponse = async (customerId: string, customerObj: Partial<Cust
     status: '',
     data: '',
   };
-  try {
-    if (customerId && customerObj && address && customerObj?.custom?.fields?.isv_token) {
-      const apiClient = new restApi.ApiClient();
-      const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, null, null);
-      let clientReferenceInformation = await prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, customerId);
-      let processingInformation = await prepareFields.getProcessingInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, '', '', cardTokens, null) as Ptsv2paymentsProcessingInformation;
-      const tokenInformation: Ptsv2paymentsTokenInformation = {
-        transientTokenJwt: customerObj.custom.fields.isv_token
-      };
-      let paymentInformation = await prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, cardTokens, null);
-      const currencyCode = customerObj?.custom?.fields?.isv_currencyCode || '';
-      let orderInformation = await prepareFields.getOrderInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, null, '', customerObj, address, null, currencyCode) as Ptsv2paymentsOrderInformation;
-      let deviceInformation = await prepareFields.getDeviceInformation(null, customerObj, '');
-      const requestObj: CreatePaymentRequest = {
-        clientReferenceInformation: clientReferenceInformation,
-        processingInformation: processingInformation,
-        tokenInformation: tokenInformation,
-        paymentInformation: paymentInformation,
-        orderInformation: orderInformation,
-        deviceInformation: deviceInformation
-      }
-
-      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, Constants.LOG_INFO, 'CustomerId : ' + customerId, 'Add Token Request = ' + JSON.stringify(requestObj));
-      }
-      const paymentsApiInstance = configObject && new restApi.PaymentsApi(configObject, apiClient);
-      return await new Promise<PtsV2PaymentsPost201Response>(function (resolve, reject) {
-        if (paymentsApiInstance) {
-          paymentsApiInstance.createPayment(requestObj, function (error: any, data: any, response: any) {
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, Constants.LOG_INFO, 'CustomerId : ' + customerId, 'Add Token Response = ' + JSON.stringify(response));
-            if (data) {
-              paymentResponse.httpCode = response[Constants.STATUS_CODE] || response[Constants.STRING_RESPONSE_STATUS];
-              paymentResponse.transactionId = data.id;
-              paymentResponse.status = data.status;
-              paymentResponse.data = data;
-              resolve(paymentResponse);
-            } else if (error) {
-              if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                const errorDataObject = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
-                paymentResponse.transactionId = errorDataObject.id;
-                paymentResponse.status = errorDataObject.status;
-              }
-              paymentResponse.httpCode = error.status;
-              reject(paymentResponse);
-            } else {
-              reject(paymentResponse);
-            }
-          });
-        } else {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
-        }
-      }).catch((error) => {
-        return error;
-      });
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, Constants.LOG_INFO, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_INVALID_INPUT);
-      return paymentResponse;
+  if (customerId && customerObj && address && customerObj?.custom?.fields?.isv_token) {
+    const apiClient = new restApi.ApiClient();
+    const configObject = prepareFields.getConfigObject(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, null, null);
+    let clientReferenceInformation = prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, customerId);
+    let processingInformation = prepareFields.getProcessingInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, '', '', cardTokens, null) as Ptsv2paymentsProcessingInformation;
+    const tokenInformation: Ptsv2paymentsTokenInformation = {
+      transientTokenJwt: customerObj.custom.fields.isv_token
+    };
+    let paymentInformation = prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, cardTokens, null);
+    const currencyCode = customerObj?.custom?.fields?.isv_currencyCode || '';
+    let orderInformation = prepareFields.getOrderInformation(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, null, '', customerObj, address, null, currencyCode) as Ptsv2paymentsOrderInformation;
+    let deviceInformation = prepareFields.getDeviceInformation(null, customerObj, '');
+    const requestObj: CreatePaymentRequest = {
+      clientReferenceInformation: clientReferenceInformation,
+      processingInformation: processingInformation,
+      tokenInformation: tokenInformation,
+      paymentInformation: paymentInformation,
+      orderInformation: orderInformation,
+      deviceInformation: deviceInformation
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, '', exception, customerId, 'CustomerId : ', '');
+    if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, Constants.LOG_DEBUG, 'CustomerId : ' + customerId, 'Add Token Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
+    }
+    const paymentsApiInstance = configObject && new restApi.PaymentsApi(configObject, apiClient);
+    const startTime = new Date().getTime();
+    return await new Promise<PtsV2PaymentsPost201Response>(function (resolve, reject) {
+      if (paymentsApiInstance) {
+        paymentsApiInstance.createPayment(requestObj, function (error: any, data: any, response: any) {
+          const endTime = new Date().getTime();
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, Constants.LOG_DEBUG, 'CustomerId : ' + customerId, 'Add Token Response = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
+          if (data) {
+            paymentResponse.httpCode = response[Constants.STATUS_CODE] || response[Constants.STRING_RESPONSE_STATUS];
+            paymentResponse.transactionId = data.id;
+            paymentResponse.status = data.status;
+            paymentResponse.data = data;
+            resolve(paymentResponse);
+          } else if (error) {
+            if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
+              const errorDataObject = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
+              paymentResponse.transactionId = errorDataObject.id;
+              paymentResponse.status = errorDataObject.status;
+            }
+            paymentResponse.httpCode = error.status;
+            reject(paymentResponse);
+          } else {
+            reject(paymentResponse);
+          }
+        });
+      }
+    }).catch((error) => {
+      return error;
+    });
+  } else {
     return paymentResponse;
   }
 };

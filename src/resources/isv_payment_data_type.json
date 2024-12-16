@@ -535,6 +535,17 @@
         "name": "String"
       },
       "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_metadata",  
+      "label": {
+        "en": "Metadata to be passed as merchantDefinedInformation to payment gateway"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
     }
   ]
 }
