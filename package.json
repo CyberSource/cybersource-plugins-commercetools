@@ -1,6 +1,6 @@
 {
   "name": "commercetools-extension",
-  "version": "24.3.2",
+  "version": "24.3.1",
   "description": "Payment Services Commercetools Extension",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
