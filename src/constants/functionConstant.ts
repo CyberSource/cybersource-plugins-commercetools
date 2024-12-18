@@ -67,6 +67,7 @@ export abstract class FunctionConstant {
   static readonly FUNC_RETRIEVE_CART_BY_PAYMENT_ID = 'FuncRetrieveCartByPaymentId';
   static readonly FUNC_RETRIEVE_ORDER_BY_CART_ID = 'FuncRetrieveOrderByCartId';
   static readonly FUNC_RETRIEVE_ORDER_BY_PAYMENT_ID = 'FuncRetrieveOrderByPaymentId';
+  static readonly FUNC_RETRIEVE_CUSTOMER_OBJECT_BY_CONTAINER = 'FuncRetrieveCustomObjectByContainer'
   static readonly FUNC_RETRIEVE_PAYMENT = 'FuncRetrievePayment';
   static readonly FUNC_RUN_SYNC_ADD_TRANSACTION = 'FuncRunSyncAddTransaction';
   static readonly FUNC_SET_CUSTOMER_TOKEN_DATA = 'FuncSetCustomerTokenData';
@@ -112,7 +113,49 @@ export abstract class FunctionConstant {
   static readonly FUNC_HANDLE_NETWORK_TOKEN = 'FuncHandleNetWorkToken';
   static readonly FUNC_GET_MID_CREDENTIALS = 'FuncGetMidCredentials';
   static readonly FUNC_GET_PAYMENT_RESPONSE = 'FuncGetPaymentResponse';
-  static readonly FUNC_PROCESS_INVALID_CARD_RESPONSE = 'FuncProcessInvalidCardResponse'
-  static readonly FUNC_HANDLE_PAYMENT_AUTH = 'FuncHandlePaymentAuth'
+  static readonly FUNC_PROCESS_INVALID_CARD_RESPONSE = 'FuncProcessInvalidCardResponse';
+  static readonly FUNC_HANDLE_PAYMENT_AUTH = 'FuncHandlePaymentAuth';
+  static readonly FUNC_TEST_API_CONNECTION = 'FuncTestApiConnection';
+  static readonly FUNC_HANDLE_TEST_CONNECTION = 'FuncHandleTestConnection';
 
+  //requestBuilder Functions
+  static readonly FUNC_GET_CONFIG_OBJECT = 'FuncGetConfigObject';
+  static readonly FUNC_GET_META_DATA = 'FuncGetMetaData';
+
+  //utils Functions
+  static readonly FUNC_SYNC_EXTENSIONS = 'FuncSyncExtensions';
+  static readonly FUNC_SYNC_CUSTOM_TYPE = 'FuncSyncCustomType';
+  static readonly FUNC_SET_TRANSACTION_CUSTOM_TYPE = 'FuncSetTransactionCustomType';
+  static readonly FUNC_EVALUATE_TOKEN_CREATION = ' FuncEvaluateTokenCreation';
+  static readonly FUNC_UPDATE_CARD_DETAILS = 'FuncUpdateCardDetails';
+  static readonly FUNC_ADD_TOKEN_ADDRESS_FOR_UC = 'FuncAddTokenAddressForUC';
+  static readonly FUNC_HANDLE_TOKEN_CREAION = 'FuncHandleTokenCreation';
+  static readonly FUNC_GET_CUSTOM_TYPES = 'FuncGetCustomTypes';
+  static readonly FUNC_SET_CUSTOM_FIELD_MAPPER = 'FuncSetCustomFieldMapper';
+  static readonly FUNC_SET_CUSTOM_FIELD_TO_NULL = 'FuncSetCustomFieldToNull';
+  static readonly FUNC_AUTHENTICATE_NET_TOKEN = 'FunAuthenticateNetToken';
+  static readonly FUNC_GET_REQUEST_OBJ = 'FuncGetRequestObj';
+  static readonly FUNC_SET_OBJECT_VALUE = 'FuncSetObjectValue';
+  static readonly FUNC_ADD_CUSTOM_TYPE = 'FuncAddCustomType';
+
+  //Controller Functions
+  static readonly FUNC_PAYMENT_CREATE_API = 'FuncPaymentCreateApi';
+  static readonly FUNC_PAYMENT_UPDATE_API = 'FuncPaymentUpdateApi';
+  static readonly FUNC_CUSTOMER_UPDATE_API = 'FuncCustomerUpdateApi';
+  static readonly FUNC_PAYMENT_DETAILS_API = 'FuncPaymentDetailsApi';
+  static readonly FUNC_CAPTURE_CONTEXT_API = 'FuncCaptureContextApi';
+  static readonly FUNC_NOTIFICATION_API = 'FuncNotificationApi';
+  static readonly FUNC_AUTHENTICATION = 'FuncAuthentication';
+  static readonly FUNC_REQUEST_HANDLER = 'FuncRequestHandler';
+  static readonly FUNC_HANDLE_PAYMENTS_DATA = 'FuncHandlePaymentsData';
+  static readonly FUNC_HANDLE_PAYMENT_CREATE = 'FuncHandlePaymentCreate';
+  static readonly FUNC_HANDLE_PAYMENT_UPDATE = 'FuncHandlePaymentUpdate';
+  static readonly FUNC_HANDLE_CUSTOMER_UPDATE = 'FuncHandleCustomerUpdate';
+  static readonly FUNC_HANDLE_AUTH_REVERSAL = 'FuncHandleAuthReversal';
+  static readonly FUNC_HANDLE_CAPTURE = 'FuncHandleCapture';
+  static readonly FUNC_HANDLE_REFUND = 'FuncHandleRefund';
+  static readonly FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION = 'FuncHandlePostNetTokenNotification';
+  static readonly FUNC_HANDLE_CAPTURE_CONTEXT = 'FuncHandleCaptureContext';
+  static readonly FUNC_CREATE_WEBHOOK_SUBSCRIPTION = 'FuncCreateWebhookSubscription';
+  static readonly FUNC_ORDER_MANAGEMENT_API = 'FuncOrderManagementApi';
 }

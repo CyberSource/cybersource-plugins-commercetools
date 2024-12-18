@@ -4,7 +4,7 @@ Unified Checkout provides a single interface with which you can accept numerous 
 
 ## Unified Checkout Processing Sequence Diagram
 
-![Unified Checkout Processing flow](images/Flow-Diagram-UnifiedCheckout.svg)
+![Unified Checkout Processing flow](../images/Flow-Diagram-UnifiedCheckout.svg)
 
 
 ## Setting Up the Client Side

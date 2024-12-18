@@ -3,16 +3,26 @@ import { PaymentTransactionType, PaymentType, ResponseType } from "../types/Type
 
 import paymentUtils from "./PaymentUtils";
 
+/**
+ * Sets a value in the target object based on the source object and validates its type.
+ *
+ * @param {any} targetObject - The object to set the value in.
+ * @param {string} fieldName - The field name to set the value for.
+ * @param {any} sourceObj - The source object from which to get the value.
+ * @param {string} sourcePath - The path in the source object to retrieve the value.
+ * @param {string} expectedType - The expected type of the value.
+ * @param {boolean} isActionValidation - Indicates if action validation is needed.
+ * @returns {void}
+ */
 const setObjectValue = (targetObject: any, fieldName: string, sourceObj: any, sourcePath: string, expectedType: string, isActionValidation: boolean) => {
     let isValidType = false;
-    try {
         const value = sourcePath ? sourcePath.split('.').reduce((acc: any, part: string | number) => acc && acc[part], sourceObj) : sourceObj;
         if (value) {
             switch (expectedType) {
                 case Constants.STR_STRING:
                     isValidType = typeof value === Constants.STR_STRING;
                     break;
-                case 'number':
+                case Constants.STR_NUMBER:
                     isValidType = typeof value === 'number';
                     break;
                 case 'boolean':
@@ -42,19 +52,29 @@ const setObjectValue = (targetObject: any, fieldName: string, sourceObj: any, so
                 }
             }
         }
-    } catch (exception) {
-        paymentUtils.logExceptionData(__filename, 'FuncSetObjectValue', '', exception, '', '', '');
-    }
-}
+};
 
+/**
+ * Validates actions from the source array and pushes them to the target array.
+ *
+ * @param {any[]} sourceArray - The array of actions to validate.
+ * @param {any[]} targetArray - The array to push valid actions into.
+ * @returns {void}
+ */
 const validateActionsAndPush = (sourceArray: any[], targetArray: any[]) => {
     if (sourceArray && Array.isArray(sourceArray) && sourceArray.length && targetArray && Array.isArray(targetArray)) {
         sourceArray.forEach((action: any) => {
             targetArray.push(action);
         })
     }
-}
+};
 
+/**
+ * Checks if the update service response is valid.
+ *
+ * @param {any} updateServiceResponse - The response object to validate.
+ * @returns {boolean} True if valid, otherwise false.
+ */
 const isValidUpdateServiceResponse = (updateServiceResponse: any): boolean => {
     let validUpdateServiceResponseObject = false;
     if (updateServiceResponse && Constants.HTTP_OK_STATUS_CODE === updateServiceResponse?.httpCode && updateServiceResponse?.card && 0 < Object.keys(updateServiceResponse.card).length &&
@@ -63,8 +83,14 @@ const isValidUpdateServiceResponse = (updateServiceResponse: any): boolean => {
         validUpdateServiceResponseObject = true;
     }
     return validUpdateServiceResponseObject;
-}
+};
 
+/**
+ * Checks if the add token response is valid.
+ *
+ * @param {Partial<ResponseType>} addTokenResponse - The response object to validate.
+ * @returns {boolean} True if valid, otherwise false.
+ */
 const isValidAddTokenResponse = (addTokenResponse: Partial<ResponseType>): boolean => {
     let validAddTokenResponseObject = false;
     if (Constants.HTTP_SUCCESS_STATUS_CODE === addTokenResponse.httpCode &&
@@ -76,8 +102,13 @@ const isValidAddTokenResponse = (addTokenResponse: Partial<ResponseType>): boole
         validAddTokenResponseObject = true;
     }
     return validAddTokenResponseObject;
-}
+};
 
+/**
+ * Validates rate limiter input from environment variables.
+ *
+ * @returns {boolean} True if valid, otherwise false.
+ */
 const isValidRateLimiterInput = (): boolean => {
     if (Number.isInteger(Number(process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME)) &&
         0 < Number(process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME) &&
@@ -85,8 +116,16 @@ const isValidRateLimiterInput = (): boolean => {
         0 < Number(process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE))
         return true;
     return false;
-}
+};
 
+/**
+ * Determines if tokens should be processed based on the given conditions.
+ *
+ * @param {boolean} isError - Indicates if an error occurred.
+ * @param {any} paymentResponse - The payment response object.
+ * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @returns {boolean} True if tokens should be processed, otherwise false.
+ */
 const shouldProcessTokens = (isError: boolean, paymentResponse: any, updatePaymentObj: PaymentType): boolean => {
     const paymentMethod = updatePaymentObj?.paymentMethodInfo.method;
     if (!isError &&
@@ -99,8 +138,15 @@ const shouldProcessTokens = (isError: boolean, paymentResponse: any, updatePayme
         return true;
     }
     return false;
-}
+};
 
+/**
+ * Determines if failed tokens should be processed based on the given conditions.
+ *
+ * @param {any} paymentResponse - The payment response object.
+ * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @returns {boolean} True if failed tokens should be processed, otherwise false.
+ */
 const shouldProcessFailedTokens = (paymentResponse: any, updatePaymentObj: PaymentType): boolean => {
     const paymentMethod = updatePaymentObj?.paymentMethodInfo.method;
     const customFields = updatePaymentObj?.custom?.fields;
@@ -114,8 +160,15 @@ const shouldProcessFailedTokens = (paymentResponse: any, updatePaymentObj: Payme
         customFields?.isv_tokenAlias
     ) return true;
     return false
-}
+};
 
+/**
+ * Checks if the transaction is valid.
+ *
+ * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Partial<PaymentTransactionType>} updateTransactions - The transaction update object.
+ * @returns {boolean} True if valid, otherwise false.
+ */
 const isValidTransaction = (updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>): boolean => {
     if (updatePaymentObj
         && updateTransactions
@@ -127,13 +180,27 @@ const isValidTransaction = (updatePaymentObj: PaymentType, updateTransactions: P
         return true;
     }
     return false;
-}
+};
 
+/**
+ * Checks if the charge transaction is successful.
+ *
+ * @param {Partial<PaymentTransactionType>} transaction - The transaction object to check.
+ * @returns {boolean} True if successful, otherwise false.
+ */
 const isSuccessFulChargeTransaction = (transaction: Partial<PaymentTransactionType>): boolean => {
     if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS === transaction.state && transaction?.amount && transaction?.interactionId && transaction?.id) return true;
     return false
-}
+};
 
+/**
+ * Validates transaction summaries against specific conditions.
+ *
+ * @param {any} transactionDetail - The transaction detail object.
+ * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {number} retryCount - The number of retry attempts.
+ * @returns {boolean} True if valid, otherwise false.
+ */
 const isValidTransactionSummaries = (transactionDetail: any, updatePaymentObj: PaymentType, retryCount: number): boolean => {
     if (transactionDetail &&
         Constants.HTTP_SUCCESS_STATUS_CODE === transactionDetail.httpCode &&
@@ -145,8 +212,14 @@ const isValidTransactionSummaries = (transactionDetail: any, updatePaymentObj: P
         return true;
     }
     return false;
-}
+};
 
+/**
+ * Checks if consumer authentication is required based on the payment response.
+ *
+ * @param {any} paymentResponse - The payment response object.
+ * @returns {boolean} True if authentication is required, otherwise false.
+ */
 const isConsumerAuthenticationRequired = (paymentResponse: any) => {
     return (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse?.httpCode &&
         paymentResponse?.data?.errorInformation &&
@@ -154,28 +227,49 @@ const isConsumerAuthenticationRequired = (paymentResponse: any) => {
         Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED === paymentResponse.data.errorInformation?.reason)
 }
 
+/**
+ * Validates the card response.
+ *
+ * @param {any} cardResponse - The card response object.
+ * @returns {boolean} True if valid, otherwise false.
+ */
 const isValidCardResponse = (cardResponse: any): boolean => {
     return (cardResponse.httpCode === Constants.HTTP_SUCCESS_STATUS_CODE &&
         cardResponse.status === Constants.API_STATUS_AUTHORIZED &&
         0 < cardResponse?.data?.tokenInformation?.paymentInstrument?.id.length);
-}
+};
 
-const isValidPendinAuthenticationResponse = (httpCode: number, status: string, data: any, consumerAuthenticationInformation: any) => {
+/**
+ * Validates pending authentication response based on provided parameters.
+ *
+ * @param {number} httpCode - The HTTP status code.
+ * @param {string} status - The status string.
+ * @param {any} data - The response data.
+ * @param {any} consumerAuthenticationInformation - Authentication information.
+ * @returns {boolean} True if valid, otherwise false.
+ */
+const isValidPendingAuthenticationResponse = (httpCode: number, status: string, data: any, consumerAuthenticationInformation: any) => {
     return (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode &&
         Constants.API_STATUS_PENDING_AUTHENTICATION === status &&
         data &&
         0 < Object.keys(data).length &&
         consumerAuthenticationInformation &&
         0 < Object.keys(consumerAuthenticationInformation).length)
-}
+};
 
+/**
+ * Validates if the given URL is whitelisted.
+ *
+ * @param {string} url - The URL to validate.
+ * @returns {boolean} True if whitelisted, otherwise false.
+ */
 const validateWhiteListEndPoints = (url: string): boolean => {
     let urlValidated = false;
     if (Constants.WHITE_LIST_ENDPOINTS.includes(url)) {
         urlValidated = true;
     }
     return urlValidated;
-}
+};
 
 export default {
     setObjectValue,
@@ -190,6 +284,6 @@ export default {
     isValidTransactionSummaries,
     isConsumerAuthenticationRequired,
     isValidCardResponse,
-    isValidPendinAuthenticationResponse,
+    isValidPendingAuthenticationResponse,
     validateWhiteListEndPoints
-}
+};

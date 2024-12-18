@@ -7,14 +7,25 @@ import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
 
 export class ProcessingInformation {
+    private isSaveToken: boolean | null;
     private functionName: string;
-    private resourceObj: PaymentType | null;
     private orderNo: string;
     private service: string;
+    private resourceObj: PaymentType | null;
     private cardTokens: CustomTokenType | null;
-    private isSaveToken: boolean | null;
     private processingInformation: any;
 
+    /**
+    * Constructs a new instance of ProcessingInformation.
+    * Initializes the processing information based on the provided function name.
+    * 
+    * @param functionName - Name of the function being processed (e.g., authorization, refund).
+    * @param resourceObj - The payment resource object, containing payment-related information.
+    * @param orderNo - The order number associated with the transaction.
+    * @param service - The service type associated with the processing (e.g., enrollment check, validation).
+    * @param cardTokens - Card token information, if available.
+    * @param isSaveToken - A flag indicating if a token should be saved.
+    */
     constructor(functionName: string, resourceObj: PaymentType | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) {
         this.functionName = functionName;
         this.resourceObj = resourceObj;
@@ -25,6 +36,11 @@ export class ProcessingInformation {
         this.processingInformation = this.initializeProcessingInformation();
     }
 
+    /**
+    * Initializes the processing information based on the function name.
+    * 
+    * @returns An instance of processing information object (specific to the function).
+    */
     private initializeProcessingInformation() {
         let processingInformationInstance = {};
         switch (this.functionName) {
@@ -43,10 +59,15 @@ export class ProcessingInformation {
         return processingInformationInstance;
     }
 
+    /**
+     * Configures and returns the processing information object.
+     * 
+     * @returns The configured processing information object.
+     */
     public getProcessingInformation() {
         const { resourceObj, orderNo } = this;
-        const actionList: string[] = [];
         const customFields = resourceObj?.custom?.fields;
+        const actionList: string[] = [];
         if ([FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE].includes(this.functionName)) {
             this.configureAuthorizationProcessing(actionList, customFields);
         }
@@ -57,6 +78,13 @@ export class ProcessingInformation {
         return this.processingInformation;
     }
 
+    /**
+   * Configures authorization processing details, including MOTO indicators and capture actions.
+   * It also sets actionList and invokes additional authorization options if necessary.
+   * 
+   * @param actionList - List of actions to be configured for the transaction.
+   * @param customFields - Custom fields related to the payment.
+   */
     private configureAuthorizationProcessing(actionList: string[], customFields: any) {
         if (customFields?.isv_enabledMoto) {
             this.processingInformation.commerceIndicator = 'MOTO';
@@ -74,7 +102,7 @@ export class ProcessingInformation {
         if (this.service === Constants.VALIDATION) {
             actionList.push(Constants.PAYMENT_GATEWAY_VALIDATE_CONSUMER_AUTHENTICATION);
         }
-        if ((!customFields?.isv_savedToken && customFields?.isv_tokenAlias && !this.isSaveToken) || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName) {
+        if ((!customFields?.isv_savedToken && customFields?.isv_tokenAlias && this.isSaveToken) || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName) {
             actionList.push(Constants.PAYMENT_GATEWAY_TOKEN_CREATE);
             this.processingInformation.actionList = actionList;
             this.addAuthorizationOptions();
@@ -82,6 +110,10 @@ export class ProcessingInformation {
         this.processingInformation.actionList = actionList;
     }
 
+    /**
+     * Adds authorization options for token creation or customer token processing.
+     * These options include settings for whether credentials are stored on file.
+     */
     private addAuthorizationOptions() {
         const initiator: Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator = {
             credentialStoredOnFile: true
@@ -95,12 +127,23 @@ export class ProcessingInformation {
             Constants.PAYMENT_GATEWAY_TOKEN_ACTION_TYPES;
     }
 
+    /**
+    * Configures the reconciliation ID if reconciliation is enabled in the environment variables.
+    * 
+    * @param orderNo - The order number used as the reconciliation ID.
+    */
     private configureReconciliationId(orderNo: string) {
         if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ORDER_RECONCILIATION) && orderNo) {
             this.processingInformation.reconciliationId = orderNo;
         }
     }
 
+    /**
+     * Configures the payment solution (e.g., Google Pay, Apple Pay) based on the payment method in the resource object.
+     * 
+     * @param resourceObj - The payment resource object containing payment method info.
+     * @param customFields - Custom fields that may influence the payment solution configuration.
+     */
     private configurePaymentSolution(resourceObj: PaymentType | null, customFields?: Partial<PaymentCustomFieldsType>) {
         switch (resourceObj?.paymentMethodInfo?.method) {
             case Constants.CLICK_TO_PAY: {
@@ -124,6 +167,12 @@ export class ProcessingInformation {
         }
     }
 
+    /**
+     * Configures bank transfer options if the payment method is an eCheck.
+     * 
+     * @param resourceObj - The payment resource object containing payment method info.
+     * @param customFields - Custom fields that may influence the bank transfer configuration.
+     */
     private configureBankTransferOptions(resourceObj: PaymentType | null, customFields?: Partial<PaymentCustomFieldsType>) {
         if (resourceObj?.paymentMethodInfo?.method === Constants.ECHECK) {
             const banktransferOptions: Ptsv2creditsProcessingInformationBankTransferOptions = {

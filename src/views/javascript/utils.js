@@ -52,7 +52,6 @@ export function getPaymentId() {
   }
   return paymentId;
 }
-
 /**
  * Adds a new row to a table body with cells containing the specified data.
  * 
@@ -92,6 +91,7 @@ export function createAndSetAttributes(type, attributes, textContent) {
 export function formatCurrency(amount, currencyCode) {
   return `${currencyCode} ${amount}`;
 }
+
 // Regular expression validation for validating paymentId
 export function validatePaymentId(paymentId) {
   let validatedId = ''
@@ -123,3 +123,4 @@ export const validateWhiteListEndPoints = (url) => {
 }
 
 export const validPathRegex = /^\/paymentDetails\?id=[a-fA-F0-9\-]{36}$/;
+;

@@ -10,12 +10,13 @@ export abstract class CustomMessages {
     static readonly SUCCESS_MSG_UC_ADDRESS_DETAILS = 'Successfully updated cart address as the UC address';
     static readonly SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN = 'Successfully updated customer token through webhooks API';
     static readonly SUCCESS_MSG_FAV_ICON = 'Resolving favicon.io';
+    static readonly SUCCESS_MSG_CONNECTION_TEST = 'Your Cybersource connection is successful';
 
     //Exception messages
     static readonly EXCEPTION_MSG_ADDING_CUSTOM_FIELD = 'An exception occurred while adding custom field';
     static readonly EXCEPTION_MSG_ADD_EXTENSION = 'An exception occurred while adding extension to Commercetools';
     static readonly EXCEPTION_MSG_ADD_TRANSACTION = 'An exception occurred while adding transaction to the payment';
-    static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception occurred while retrieving multi-mid details';
+    static readonly EXCEPTION_MSG_ALL_MID_DETAILS = 'An exception ocurred while retrieving multi-mid details';
     static readonly EXCEPTION_MSG_AUTHORIZING_PAYMENT = 'An exception occurred while authorizing the payment';
     static readonly EXCEPTION_MSG_ADDING_A_CARD = 'An exception occurred while adding a card token to customer';
     static readonly EXCEPTION_MSG_CART_UPDATE = 'An exception occurred while updating the cart';
@@ -36,13 +37,15 @@ export abstract class CustomMessages {
     static readonly EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED = 'MerchantseceretKey is Mandatory';
     static readonly EXCEPTION_MSG_PAYER_AUTH = 'An exception occurred while authenticating the payment';
     static readonly EXCEPTION_MSG_SERVICE_PROCESS = 'An exception occurred while processing your payment';
-    static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception occurred while creating the extensions and custom fields = ';
+    static readonly EXCEPTION_MSG_SETUP_RESOURCES = 'An exception ocurred while creating the extensions and custom fields = ';
+    static readonly ERROR_MSG_CUSTOM_FIELD_SETUP = 'Failed to create custom fields, please provide all the required data in env file';
     static readonly EXCEPTION_MSG_SYNC_DETAILS = 'An exception occurred while fetching sync conversion details';
     static readonly EXCEPTION_MSG_TRANSACTION_SEARCH = 'An exception occurred while retrieving the transaction details';
     static readonly EXCEPTION_CREATE_PAYMENT_API = 'An exception occurred while creating a payment';
     static readonly EXCEPTION_UPDATE_PAYMENT_API = 'An exception occurred while updating a payment';
     static readonly EXCEPTION_UPDATE_CUSTOMER_API = 'An exception occurred while updating a Customer';
     static readonly EXCEPTION_MSG_CUSTOMER_OBJECT = 'An exception occurred while fetching customer object';
+    static readonly EXCEPTION_MSG_CONNECTION_ERROR = 'An exception occured while testing credentials';
 
     //Error messages
     static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
@@ -116,6 +119,10 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_GET_REQUEST = 'Unhandled get request';
     static readonly ERROR_MSG_INTERNAL_SERVER_ERROR = 'Internal Server Error';
     static readonly ERROR_MSG_CUSTOM_TYPE = 'Unable to fetch custom types';
+    static readonly ERROR_MSG_INVALID_CREDENTIALS = 'Cybersource api connection failed, please check the env configuration file';
+    static readonly ERROR_MSG_FILE_NOT_FOUND = 'File not found';
+    static readonly ERROR_MSG_LIMIT_REACHED = 'You have exceeded your limit, please try again';
+    static readonly ERROR_MSG_CUSTOM_FIELDS_NOT_FOUND = 'Custom Field not found';
 
     //Network token logs
     static readonly ERROR_MSG_INVALID_INSTRUMENT_IDENTIFIER = 'Invalid Instrument identifier';

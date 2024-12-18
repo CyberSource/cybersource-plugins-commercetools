@@ -81,7 +81,8 @@ export type PaymentCustomFieldsType = {
   isv_CVVResponse: string;
   isv_responseCode: string;
   isv_dmpaFlag: boolean;
-  isv_shippingMethod?: string
+  isv_shippingMethod?: string;
+  isv_metadata?: string; //type added for metadata
 };
 export type PaymentTransactionType = {
   id: string;
@@ -437,6 +438,7 @@ export type KeyResponse = {
   keyId: null,
   keyExpiration: null,
 };
+
 export type WebhookVerificationObject = {
   isSubscribed: boolean,
   presentInCustomObject: boolean,
@@ -448,5 +450,18 @@ export type WebhookVerificationObject = {
   merchantId: string,
 };
 
+export type LoggerConfigType = {
+  label: string,
+  methodName: string,
+  level: string,
+  message: string,
+  id: string,
+  consolidatedTime: string
+};
+
+export type MetaDataType = {
+  key: string,
+  value: string,
+}
 export type ProcessingInformationType = Ptsv2creditsProcessingInformationBankTransferOptions | Ptsv2paymentsidrefundsProcessingInformation | Ptsv2paymentsidreversalsProcessingInformation | Ptsv2paymentsProcessingInformation | Ptsv2paymentsProcessingInformationAuthorizationOptions | Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator;
 export type OrderInformation = Ptsv2paymentsidcapturesOrderInformation | Ptsv2paymentsidrefundsOrderInformation | Ptsv2paymentsidreversalsOrderInformation | Ptsv2paymentsOrderInformation | Upv1capturecontextsOrderInformation;

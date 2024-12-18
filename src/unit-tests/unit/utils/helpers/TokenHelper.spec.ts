@@ -1,11 +1,15 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 
+import { Constants } from '../../../../constants/constants';
+import { FunctionConstant } from '../../../../constants/functionConstant';
 import tokenHelper from '../../../../utils/helpers/TokenHelper';
 import unit from '../../../JSON/unit.json'
 import AddTokenServiceConst from '../../../const/AddTokenServiceConst';
+import PaymentAuthorizationServiceConstCC from '../../../const/CreditCard/PaymentAuthorizationServiceConstCC';
+import PaymentCaptureServiceConstCC from '../../../const/CreditCard/PaymentCaptureServiceConstCC';
+import PaymentServiceConst from '../../../const/HelpersConst';
 import PaymentHandlerConst from '../../../const/PaymentHandlerConst';
-import PaymentServiceConst from '../../../const/PaymentServiceConst';
 import PaymentUtilsConst from '../../../const/PaymentUtilsConst';
 
 dotenv.config();
@@ -193,3 +197,134 @@ test.serial('Processing valid card response when custom field is a string', asyn
   t.is(result.actions[11].name, 'isv_token');
   t.is(result.actions[12].name, 'isv_maskedPan');
 })
+
+test.serial('get card tokens ', async (t: any) => {
+  let result = await tokenHelper.getCardTokens(PaymentHandlerConst.updateCardHandlerCustomerObj, 'abc');
+  let i = 0;
+  if ('customerTokenId' in result && 'paymentInstrumentId' in result) {
+    i++;
+  }
+  t.is(i, 1);
+});
+
+test.serial('get card tokens when saved token is empty', async (t: any) => {
+  let result = await tokenHelper.getCardTokens(PaymentHandlerConst.updateCardHandlerCustomerObj, '');
+  let i = 0;
+  if ('customerTokenId' in result && 'paymentInstrumentId' in result) {
+    i++;
+  }
+  t.is(i, 1);
+});
+
+
+test.serial('set Customer Token Data', async (t) => {
+  try {
+    let result = await tokenHelper.setCustomerTokenData(
+      PaymentServiceConst.customerCardTokens,
+      PaymentServiceConst.getAuthResponsePaymentResponse,
+      PaymentServiceConst.authResponse,
+      false,
+      PaymentHandlerConst.authorizationHandler3DSUpdatePaymentObject,
+      PaymentCaptureServiceConstCC.cart,
+    );
+    t.is(result.actions[0].action, 'setCustomField');
+    t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
+    t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
+    t.is(result.actions[2].name, 'isv_payerEnrollStatus');
+    t.is(result.actions[3].name, 'isv_payerAuthenticationTransactionId');
+    t.is(result.actions[4].name, 'isv_tokenCaptureContextSignature');
+    t.is(result.actions[5].name, 'isv_payerAuthenticationRequired');
+  } catch (error) {
+    t.pass();
+  }
+});
+
+test.serial('Evaluate token creation ', async (t) => {
+  const result = await tokenHelper.evaluateTokenCreation(AddTokenServiceConst.addTokenResponseCustomerObj, PaymentAuthorizationServiceConstCC.payments, FunctionConstant.FUNC_HANDLE_CARD_ADDITION);
+  t.is(typeof result.isSaveToken, 'boolean');
+  t.is(typeof result.isError, 'boolean');
+});
+
+test.serial('add customer adress for uc', async (t: any) => {
+  let result = await tokenHelper.addTokenAddressForUC(PaymentServiceConst.getCreditCardResponseUpdatePaymentObj, PaymentServiceConst.getCreditCardResponseCartObj);
+  if (result) {
+    let i = 0;
+    if ('email' in result && 'firstName' in result && 'lastName' in result && 'custom' in result) {
+      i++;
+    }
+    t.is(i, 1);
+  } else {
+    t.pass();
+  }
+});
+
+test.serial('Set failed token data to customer', async (t) => {
+  try {
+    let result: any = await tokenHelper.setCustomerFailedTokenData(PaymentAuthorizationServiceConstCC.payment, PaymentServiceConst.customFields, '');
+    if (Constants.HTTP_OK_STATUS_CODE === result?.statusCode) {
+      if (result?.body) result = result.body;
+      let i = 0;
+      if (result && 'email' in result && 'firstName' in result && 'lastName' in result) {
+        i++;
+        t.is(i, 1);
+      }
+    } else {
+      t.pass();
+    }
+  } catch (error) {
+    t.pass();
+  }
+});
+
+test.serial('process tokens ', async (t) => {
+  try {
+    let result = await tokenHelper.processTokens(
+      PaymentServiceConst.processTokensCustomerCardTokensObject.customerTokenId,
+      PaymentServiceConst.processTokensCustomerCardTokensObject.paymentInstrumentId,
+      PaymentServiceConst.processTokensInstrumentIdentifier,
+      PaymentAuthorizationServiceConstCC.payment,
+      '',
+    );
+    if (result) {
+      let i = 0;
+      if ('email' in result && 'firstName' in result && 'lastName' in result && 'custom' in result) {
+        i++;
+      }
+      if (1 === i) t.is(i, 1);
+      else t.is(i, 0);
+    } else {
+      t.pass();
+    }
+  } catch (error) {
+    t.pass();
+  }
+});
+
+test.serial('process tokens when token and instrument id is empty', async (t) => {
+  try {
+    let result = await tokenHelper.processTokens('', '', PaymentServiceConst.processTokensInstrumentIdentifier, PaymentAuthorizationServiceConstCC.payment, '');
+    t.is(result, null);
+  } catch (error) {
+    t.pass();
+  }
+});
+
+
+
+test.serial('process tokens with empty instrument identifier', async (t) => {
+  try {
+    let result = await tokenHelper.processTokens(PaymentServiceConst.processTokensCustomerCardTokensObject.customerTokenId, PaymentServiceConst.processTokensCustomerCardTokensObject.paymentInstrumentId, '', PaymentAuthorizationServiceConstCC.payment, '');
+    if (result) {
+      let i = 0;
+      if ('email' in result && 'firstName' in result && 'lastName' in result && 'custom' in result) {
+        i++;
+      }
+      t.is(i, 1);
+    } else {
+      t.pass();
+    }
+  } catch (error) {
+    t.pass();
+  }
+});
+

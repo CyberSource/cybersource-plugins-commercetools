@@ -1,5 +1,6 @@
 import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
+import { FunctionConstant } from './constants/functionConstant';
 import captureContext from './service/payment/CaptureContextService';
 import flexKeys from './service/payment/FlexKeys';
 import getCardByInstrument from './service/payment/GetCardByInstrumentId';
@@ -7,10 +8,12 @@ import keyVerification from './service/payment/GetPublicKeys';
 import { ActionResponseType, PaymentTransactionType, PaymentType } from './types/Types';
 import paymentActions from './utils/PaymentActions';
 import paymentHandler from './utils/PaymentHandler';
-import paymentService from './utils/PaymentService';
 import paymentUtils from './utils/PaymentUtils';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
+import orderManagementHelper from './utils/helpers/OrderManagementHelper';
 import payerAuthHelper from './utils/helpers/PayerAuthHelper';
+import paymentHelper from './utils/helpers/PaymentHelper';
+
 /**
  * Handles the creation of payment.
  * 
@@ -19,46 +22,38 @@ import payerAuthHelper from './utils/helpers/PayerAuthHelper';
  */
 const paymentCreateApi = async (paymentObj: PaymentType): Promise<ActionResponseType> => {
   let response: ActionResponseType = paymentUtils.getEmptyResponse();
-  try {
-    if (paymentObj?.paymentMethodInfo?.method) {
-      const paymentMethod = paymentObj.paymentMethodInfo.method;
-      if (paymentObj?.custom?.fields?.isv_transientToken) {
-        response = paymentUtils.getEmptyResponse();
-      } else if (Constants.CREDIT_CARD === paymentMethod || Constants.CC_PAYER_AUTHENTICATION === paymentMethod) {
-        if (paymentObj?.custom?.fields?.isv_savedToken) {
-          const actions = paymentUtils.setCustomFieldMapper(paymentObj.custom.fields);
-          response.actions = actions;
-        } else {
-          const microFormKeys = await flexKeys.getFlexKeys(paymentObj);
-          if (microFormKeys?.isv_tokenCaptureContextSignature) {
-            response = paymentUtils.invalidOperationResponse();
-            const verifiedCaptureContext = await keyVerification.getPublicKeys(microFormKeys.isv_tokenCaptureContextSignature, paymentObj);
-            if (verifiedCaptureContext) {
-              const actions = paymentUtils.setCustomFieldMapper(microFormKeys);
-              response.actions = actions;
-            } else {
-              paymentUtils.logData(__filename, 'FuncPaymentCreateApi', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_CAPTURE_CONTEXT);
-            }
-          } else {
-            response = paymentUtils.invalidOperationResponse();
-            paymentUtils.logData(__filename, 'FuncPaymentCreateApi', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_CAPTURE_CONTEXT);
-          }
-        }
-      } else if (Constants.APPLE_PAY === paymentMethod) {
-        if (paymentObj?.custom?.fields?.isv_applePayValidationUrl && paymentObj?.custom?.fields?.isv_applePayDisplayName) {
-          response = await paymentHandler.handleApplePaySession(paymentObj.custom.fields);
-        } else {
-          paymentUtils.logData(__filename, 'FuncPaymentCreateApi', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_INPUT);
-        }
+  if (paymentObj?.paymentMethodInfo?.method) {
+    const paymentMethod = paymentObj.paymentMethodInfo.method;
+    if (paymentObj?.custom?.fields?.isv_transientToken) {
+      response = paymentUtils.getEmptyResponse();
+    } else if (Constants.CREDIT_CARD === paymentMethod || Constants.CC_PAYER_AUTHENTICATION === paymentMethod) {
+      if (paymentObj?.custom?.fields?.isv_savedToken) {
+        const actions = paymentUtils.setCustomFieldMapper(paymentObj.custom.fields);
+        response.actions = actions;
       } else {
-        paymentUtils.logData(__filename, 'FuncPaymentCreateApi', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
+        const microFormKeys = await flexKeys.getFlexKeys(paymentObj);
+        if (microFormKeys?.isv_tokenCaptureContextSignature) {
+          response = paymentUtils.invalidOperationResponse();
+          const verifiedCaptureContext = await keyVerification.getPublicKeys(microFormKeys.isv_tokenCaptureContextSignature, paymentObj);
+          if (verifiedCaptureContext) {
+            const actions = paymentUtils.setCustomFieldMapper(microFormKeys);
+            response.actions = actions;
+          }
+        } else {
+          response = paymentUtils.invalidOperationResponse();
+        }
       }
+    } else if (Constants.APPLE_PAY === paymentMethod) {
+      if (paymentObj?.custom?.fields?.isv_applePayValidationUrl && paymentObj?.custom?.fields?.isv_applePayDisplayName) {
+        response = await paymentHandler.handleApplePaySession(paymentObj.custom.fields);
+      }
+    } else {
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_PAYMENT_CREATE_API, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncPaymentCreateApi', CustomMessages.EXCEPTION_CREATE_PAYMENT_API, exception, '', '', '');
   }
   return response;
 };
+
 /**
  * Handles the update of a payment.
  * 
@@ -76,18 +71,16 @@ const paymentUpdateApi = async (paymentObj: PaymentType): Promise<ActionResponse
           updateResponse = await payerAuthHelper.processPayerAuthentication(paymentObj);
         }
         if (0 < transactionLength) {
-          updateResponse = await paymentService.processTransaction(paymentObj);
+          updateResponse = await paymentHelper.processTransaction(paymentObj);
         }
       } catch (exception) {
-        paymentUtils.logExceptionData(__filename, 'FuncPaymentUpdateApi', CustomMessages.EXCEPTION_UPDATE_PAYMENT_API, exception, '', '', '');
+        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_PAYMENT_UPDATE_API, CustomMessages.EXCEPTION_UPDATE_PAYMENT_API, exception, '', '', '');
       }
     }
-  } else {
-    paymentUtils.logData(__filename, 'FuncPaymentUpdateApi', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
   }
-
   return updateResponse;
 };
+
 /**
  * Handles the update of a customer.
  * 
@@ -125,10 +118,11 @@ const customerUpdateApi = async (customerObj: any): Promise<ActionResponseType> 
       }
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncCustomerUpdateApi', CustomMessages.EXCEPTION_UPDATE_CUSTOMER_API, exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_CUSTOMER_UPDATE_API, CustomMessages.EXCEPTION_UPDATE_CUSTOMER_API, exception, '', '', '');
   }
   return response;
 };
+
 /**
  * Retrieves payment details and cart details via API.
  * 
@@ -145,20 +139,19 @@ const customerUpdateApi = async (customerObj: any): Promise<ActionResponseType> 
 * }>} - A promise resolving to an object containing payment details.
 */
 const paymentDetailsApi = async (paymentId: string) => {
-  let paymentDetails: PaymentType | null = null;
-  let refundTransaction: readonly Partial<PaymentTransactionType>[];
   let isAuthReversed = false;
   const paymentDetailsResponse = {
     paymentId: '',
     locale: '',
     pendingAuthorizedAmount: 0,
     pendingCaptureAmount: 0,
-    errorMessage: '',
+    errorMessage: CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA,
     paymentDetails: {},
     cartData: {},
     orderNo: ''
   };
-  paymentDetailsResponse.errorMessage = CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA;
+  let paymentDetails: PaymentType | null = null;
+  let refundTransaction: readonly Partial<PaymentTransactionType>[];
   try {
     if (typeof paymentId === Constants.STR_STRING && paymentId) {
       paymentDetailsResponse.paymentId = paymentId.replace(Constants.FORMAT_PAYMENT_ID_REGEX, '');
@@ -185,20 +178,21 @@ const paymentDetailsApi = async (paymentId: string) => {
               }
             }
             if (!isAuthReversed) {
-              paymentDetailsResponse.pendingCaptureAmount = paymentService.getCapturedAmount(paymentDetails);
-              paymentDetailsResponse.pendingAuthorizedAmount = paymentService.getAuthorizedAmount(paymentDetails);
+              paymentDetailsResponse.pendingCaptureAmount = orderManagementHelper.getCapturedAmount(paymentDetails);
+              paymentDetailsResponse.pendingAuthorizedAmount = orderManagementHelper.getAuthorizedAmount(paymentDetails);
             }
           }
         }
       } else {
-        paymentUtils.logData(__filename, 'FuncPaymentDetailsApi', Constants.LOG_INFO, 'PaymentId :' + paymentDetailsResponse?.paymentId || '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_PAYMENT_DETAILS_API, Constants.LOG_ERROR, 'PaymentId :' + paymentDetailsResponse?.paymentId || '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
       }
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncPaymentDetailsApi', '', exception, 'PaymentId :' + paymentDetailsResponse?.paymentId || '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_PAYMENT_DETAILS_API, '', exception, 'PaymentId :' + paymentDetailsResponse?.paymentId || '', '', '');
   }
   return paymentDetailsResponse;
 };
+
 /**
  * Handles the ordermanagement services for a payment.
  * 
@@ -214,12 +208,12 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
   errorMessage: string;
   successMessage: string;
 }> => {
+  let pendingAmount;
   let paymentObject: PaymentType | null = null;
   const apiResponse = {
     errorMessage: '',
     successMessage: '',
   };
-  let pendingAmount;
   try {
     if (paymentId) {
       paymentObject = await commercetoolsApi.retrievePayment(paymentId);
@@ -227,10 +221,10 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
         const fractionDigits = paymentObject?.amountPlanned?.fractionDigits;
         switch (transactionType) {
           case Constants.CT_TRANSACTION_TYPE_CHARGE:
-            pendingAmount = paymentService.getAuthorizedAmount(paymentObject);
+            pendingAmount = orderManagementHelper.getAuthorizedAmount(paymentObject);
             break;
           case Constants.CT_TRANSACTION_TYPE_REFUND:
-            pendingAmount = paymentService.getCapturedAmount(paymentObject);
+            pendingAmount = orderManagementHelper.getCapturedAmount(paymentObject);
             break;
         }
         if (0 === transactionAmount) {
@@ -262,10 +256,11 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
       }
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'orderManagementApi', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ORDER_MANAGEMENT_API, '', exception, '', '', '');
   }
   return apiResponse;
 };
+
 /**
  * Handles generation of capture context.
  * 
@@ -289,17 +284,16 @@ const captureContextApi = async (requestObj: any): Promise<string> => {
       const currencyCode = requestObj.currency;
       const captureContextResponse = await captureContext.generateCaptureContext(null, country, locale, currencyCode, merchantId, 'MyAccounts');
       response = captureContextResponse;
-    } else {
-      paymentUtils.logData(__filename, 'FuncCaptureContextApi', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CAPTURE_CONTEXT);
     }
     if ('' === response) {
-      paymentUtils.logData(__filename, 'FuncCaptureContextApi', Constants.LOG_INFO, 'CartId : ' + cartId, CustomMessages.ERROR_MSG_CAPTURE_CONTEXT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_CAPTURE_CONTEXT_API, Constants.LOG_ERROR, 'CartId : ' + cartId, CustomMessages.ERROR_MSG_CAPTURE_CONTEXT);
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncCaptureContextApi', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_CAPTURE_CONTEXT_API, '', exception, '', '', '');
   }
   return response;
 };
+
 /**
  * Handles network token update notifications.
  * 
@@ -310,8 +304,6 @@ const captureContextApi = async (requestObj: any): Promise<string> => {
 * }>} - A promise resolving to the notification API response.
 */
 const notificationApi = async (notification: any): Promise<{ errorMessage: string; successMessage: string; }> => {
-  let instrumentIdResponse;
-  let updateTokenResponse;
   let instrumentIdentifier = '';
   let customerTokenId = '';
   let merchantId = '';
@@ -319,7 +311,8 @@ const notificationApi = async (notification: any): Promise<{ errorMessage: strin
     errorMessage: '',
     successMessage: '',
   };
-
+  let instrumentIdResponse;
+  let updateTokenResponse;
   if (Constants.NETWORK_TOKEN_EVENT === notification?.eventType && notification?.payload && notification.payload[0]?.data) {
     try {
       for (let element of notification.payload) {
@@ -330,23 +323,24 @@ const notificationApi = async (notification: any): Promise<{ errorMessage: strin
           instrumentIdResponse = await getCardByInstrument.getCardByInstrumentResponse(instrumentIdentifier, merchantId);
           if (Constants.HTTP_OK_STATUS_CODE === instrumentIdResponse?.httpCode && Constants.STRING_ACTIVE === instrumentIdResponse?.state) {
             updateTokenResponse = await paymentHandler.handleNetworkToken(customerTokenId, instrumentIdResponse);
-            if (Constants.HTTP_OK_STATUS_CODE === updateTokenResponse?.statusCode) {
+            if (updateTokenResponse) {
               notificationApiResponse.successMessage = CustomMessages.SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN;
             }
           } else {
             notificationApiResponse.errorMessage = CustomMessages.ERROR_MSG_INVALID_INSTRUMENT_ID_RESPONSE;
-            paymentUtils.logData(__filename, 'FuncNotificationApi', Constants.LOG_INFO, '', JSON.stringify(instrumentIdResponse));
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_NOTIFICATION_API, Constants.LOG_DEBUG, '', JSON.stringify(instrumentIdResponse));
           }
         }
       }
     } catch (exception) {
-      paymentUtils.logExceptionData(__filename, 'FuncNotificationApi', '', exception, '', '', '');
+      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_NOTIFICATION_API, '', exception, '', '', '');
     }
   } else {
     notificationApiResponse.errorMessage = CustomMessages.ERROR_MSG_INVALID_NOTIFICATION_DATA;
   }
   return notificationApiResponse;
 };
+
 export default {
   paymentCreateApi,
   paymentUpdateApi,

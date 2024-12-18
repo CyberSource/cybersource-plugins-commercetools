@@ -2,7 +2,6 @@ import restApi, { CreateSearchRequest } from 'cybersource-rest-client';
 import { TssV2TransactionsPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants/constants';
-import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
@@ -15,53 +14,51 @@ import paymentUtils from '../../utils/PaymentUtils';
  * @param {MidCredentialsType} midCredentials - The MID credentials.
  * @returns {Promise<TssV2TransactionsPost201Response>} A promise that resolves with the transaction search response.
  */
-const getTransactionSearchResponse = async (query: string, sort: string, midCredentials: MidCredentialsType): Promise<any> => {
+const getTransactionSearchResponse = async (query: string, limit: number, sort: string, midCredentials: MidCredentialsType, disableDebug?: boolean): Promise<any> => {
   const searchResponse = {
     httpCode: 0,
     data: '',
   };
-  try {
-    if (query && sort && midCredentials) {
-      const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, midCredentials, null, null);
-      const apiClient = new restApi.ApiClient();
-      const requestObj: CreateSearchRequest = {
-        save: false,
-        query: query,
-        limit: 50,
-        offset: 0,
-        sort: sort
-      }
-      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', 'Create Transaction Search Request = ' + JSON.stringify(requestObj));
-      }
-      const searchTransactionsApiInstance = configObject && new restApi.SearchTransactionsApi(configObject, apiClient);
-      return await new Promise<TssV2TransactionsPost201Response>((resolve, reject) => {
-        if(searchTransactionsApiInstance) {
-          searchTransactionsApiInstance.createSearch(requestObj, function (error: any, data: any, response: any) {
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', 'Create Transaction Search Response = ' + JSON.stringify(response));
-            if (data) {
-              searchResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
-              searchResponse.data = data;
-              resolve(searchResponse);
-            } else if (error) {
-              searchResponse.httpCode = error.status;
-              reject(searchResponse);
-            } else {
-              reject(searchResponse);
-            }
-          });
-        } else {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_SERVICE_PROCESS);
-        }
-      }).catch((error) => {
-        return error;
-      });
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_INPUT);
-      return searchResponse;
+  if (query && limit && sort && midCredentials) {
+    const configObject = prepareFields.getConfigObject(FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, midCredentials, null, null);
+    const apiClient = new restApi.ApiClient();
+    const requestObj: CreateSearchRequest = {
+      save: false,
+      query: query,
+      limit: limit,
+      offset: 0,
+      sort: sort
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, '', exception, '', '', '');
+    if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) && !disableDebug) {
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_DEBUG, '', 'Create Transaction Search Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
+    }
+    const searchTransactionsApiInstance = configObject && new restApi.SearchTransactionsApi(configObject, apiClient);
+    const startTime = new Date().getTime();
+    return await new Promise<TssV2TransactionsPost201Response>((resolve, reject) => {
+      if (searchTransactionsApiInstance) {
+        searchTransactionsApiInstance.createSearch(requestObj, function (error: any, data: any, response: any) {
+          const endTime = new Date().getTime();
+          if (!disableDebug) {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_DEBUG, '', 'Create Transaction Search Response = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
+          } else {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_DEBUG, '', '', `${endTime - startTime}`);
+          }
+          if (data) {
+            searchResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
+            searchResponse.data = data;
+            resolve(searchResponse);
+          } else if (error) {
+            searchResponse.httpCode = error.status;
+            reject(searchResponse);
+          } else {
+            reject(searchResponse);
+          }
+        });
+      }
+    }).catch((error) => {
+      return error;
+    });
+  } else {
     return searchResponse;
   }
 };

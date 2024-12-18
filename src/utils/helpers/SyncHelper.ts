@@ -1,15 +1,25 @@
+import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
+
 import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import createSearchRequest from '../../service/payment/CreateTransactionSearchRequest';
 import getTransaction from '../../service/payment/GetTransactionData';
-import { ActionType, AmountPlannedType, ApplicationsType, PaymentTransactionType, PaymentType, ReportSyncType } from '../../types/Types';
-import multiMid from '../../utils/config/MultiMid';
+import { ActionResponseType, ActionType, AmountPlannedType, ApplicationsType, PaymentTransactionType, PaymentType, ReportSyncType } from '../../types/Types';
 import paymentActions from '../PaymentActions';
-import paymentService from '../PaymentService';
 import paymentUtils from '../PaymentUtils';
+import paymentValidator from '../PaymentValidator';
 import commercetoolsApi from '../api/CommercetoolsApi';
+import multiMid from '../config/MultiMid';
 
+import cartHelper from './CartHelper';
+import orderManagementHelper from './OrderManagementHelper';
+
+/**
+ * Initializes a sync update object with default values.
+ * 
+ * @returns {ReportSyncType} - An object representing the sync update with default values.
+ */
 const initializeSyncUpdateObject = (): ReportSyncType => ({
     id: '',
     transactionId: '',
@@ -24,6 +34,11 @@ const initializeSyncUpdateObject = (): ReportSyncType => ({
     securityCodePresent: false,
 });
 
+/**
+ * Updates the authorization status on a reversal if both the authorization and cancel authorization transactions are successful.
+ * 
+ * @param {any} updateSyncResponse - The response object containing transaction details to be updated.
+ */
 const updateAuthStatusOnReversal = async (updateSyncResponse: any) => {
     const authorizationTransaction = await updateSyncResponse.transactions.find((transaction: Partial<PaymentTransactionType>) => transaction.type === Constants.CT_TRANSACTION_TYPE_AUTHORIZATION && transaction.state === Constants.CT_TRANSACTION_STATE_FAILURE);
     const cancelAuthTransaction = await updateSyncResponse.transactions.find((transaction: Partial<PaymentTransactionType>) => transaction.type === Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION && transaction.state === Constants.CT_TRANSACTION_STATE_SUCCESS);
@@ -37,6 +52,12 @@ const updateAuthStatusOnReversal = async (updateSyncResponse: any) => {
     }
 }
 
+/**
+ * Checks if a security code is present in the payment details.
+ * 
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @returns {boolean} - True if the security code is present, otherwise false.
+ */
 const setSecurityCodePresent = (paymentDetails: PaymentType) => {
     if ((Constants.CC_PAYER_AUTHENTICATION == paymentDetails.paymentMethodInfo.method || Constants.CREDIT_CARD == paymentDetails.paymentMethodInfo.method) && paymentDetails?.custom?.fields?.isv_securityCode && paymentDetails.custom.fields.isv_securityCode) {
         return true;
@@ -44,9 +65,16 @@ const setSecurityCodePresent = (paymentDetails: PaymentType) => {
     return false;
 }
 
+/**
+ * Retrieves the sync response based on payment details and the transaction element.
+ * 
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @param {any} transactionElement - The transaction element containing application information.
+ * @returns {Promise<any>} - A promise that resolves to the update sync response.
+ */
 const retrieveSyncResponse = async (paymentDetails: PaymentType, transactionElement: any): Promise<any> => {
-    const syncUpdateObject: ReportSyncType = initializeSyncUpdateObject();
     let isRowPresent = false;
+    const syncUpdateObject: ReportSyncType = initializeSyncUpdateObject();
     let updateSyncResponse;
     const processPaymentDetails = validatePaymentDetails(paymentDetails, transactionElement);
     if (processPaymentDetails) {
@@ -55,7 +83,7 @@ const retrieveSyncResponse = async (paymentDetails: PaymentType, transactionElem
         const { applications } = transactionElement.applicationInformation;
 
         if (applications && transactions) {
-            const applicationResponse = await paymentService.getApplicationsPresent(applications);
+            const applicationResponse = await getApplicationsPresent(applications);
             if (applicationResponse) {
                 isRowPresent = checkTransaction(transactions, transactionElement.id);
                 if (!isRowPresent) {
@@ -65,7 +93,7 @@ const retrieveSyncResponse = async (paymentDetails: PaymentType, transactionElem
                     updateSyncResponse = await processApplicationResponse(applicationResponse, paymentDetails, syncUpdateObject, transactionElement);
                     const updateCardDetails = validateUpdateCardDetails(paymentDetails)
                     if (updateSyncResponse && updateCardDetails) {
-                        await paymentService.updateCardDetails(paymentDetails, updateSyncResponse.version, transactionElement.id);
+                        await cartHelper.updateCardDetails(paymentDetails, updateSyncResponse.version, transactionElement.id);
                     }
                 }
             }
@@ -74,29 +102,71 @@ const retrieveSyncResponse = async (paymentDetails: PaymentType, transactionElem
     return updateSyncResponse;
 };
 
+/**
+ * Validates the payment details and transaction element.
+ * 
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @param {any} transactionElement - The transaction element to validate against.
+ * @returns {boolean} - True if both paymentDetails and transactionElement are valid, otherwise false.
+ */
 const validatePaymentDetails = (paymentDetails: PaymentType, transactionElement: any): boolean => {
     return paymentDetails && transactionElement && Constants.STRING_TRANSACTIONS in paymentDetails;
 };
 
+/**
+ * Checks if a transaction with the given ID is already present in the transactions array.
+ * 
+ * @param {any[]} transactions - The array of transaction objects.
+ * @param {string} transactionId - The transaction ID to check.
+ * @returns {boolean} - True if the transaction is present, otherwise false.
+ */
 const checkTransaction = (transactions: any[], transactionId: string): boolean => {
     return transactions.some((item: any) => item.interactionId === transactionId);
 };
 
+/**
+ * Updates the sync update object with payment details and transaction ID.
+ * 
+ * @param {ReportSyncType} syncUpdateObject - The sync update object to update.
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @param {string} transactionId - The transaction ID to set.
+ */
 const updateSyncObjectDetails = (syncUpdateObject: ReportSyncType, paymentDetails: PaymentType, transactionId: string): void => {
     syncUpdateObject.id = paymentDetails.id;
     syncUpdateObject.version = paymentDetails.version;
     syncUpdateObject.interactionId = transactionId;
 };
 
+/**
+ * Updates the amount details in the sync update object.
+ * 
+ * @param {ReportSyncType} syncUpdateObject - The sync update object to update.
+ * @param {any} amountDetails - The amount details to set in the object.
+ */
 const updateSyncObjectAmountDetails = (syncUpdateObject: ReportSyncType, amountDetails: any): void => {
     syncUpdateObject.amountPlanned.currencyCode = amountDetails?.currencyCode;
     syncUpdateObject.amountPlanned.centAmount = amountDetails?.centAmount;
 };
 
+/**
+ * Validates if the card details need to be updated based on the payment method.
+ * 
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @returns {boolean} - True if the card details need to be updated, otherwise false.
+ */
 const validateUpdateCardDetails = (paymentDetails: PaymentType): boolean => {
     return [Constants.CLICK_TO_PAY, Constants.APPLE_PAY].includes(paymentDetails.paymentMethodInfo.method);
 };
 
+/**
+ * Processes the application response based on the application information present.
+ * 
+ * @param {any} applicationResponse - The application response object containing status flags.
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @param {ReportSyncType} syncUpdateObject - The sync update object to update.
+ * @param {any} transactionElement - The transaction element containing application information.
+ * @returns {Promise<any>} - A promise that resolves to the update sync response.
+ */
 const processApplicationResponse = async (applicationResponse: any, paymentDetails: PaymentType, syncUpdateObject: ReportSyncType, transactionElement: any): Promise<any> => {
     let updateSyncResponse;
     if (applicationResponse.authPresent) {
@@ -117,6 +187,13 @@ const processApplicationResponse = async (applicationResponse: any, paymentDetai
     return updateSyncResponse;
 };
 
+/**
+ * Determines the transaction type based on payment details and application response.
+ * 
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @param {any} applicationResponse - The application response object.
+ * @returns {string} - The determined transaction type.
+ */
 const determineTransactionType = (paymentDetails: PaymentType, applicationResponse: any): string => {
     if (Constants.ECHECK === paymentDetails.paymentMethodInfo.method) {
         return Constants.CT_TRANSACTION_TYPE_CHARGE;
@@ -127,6 +204,15 @@ const determineTransactionType = (paymentDetails: PaymentType, applicationRespon
     }
 };
 
+/**
+ * Updates the response if a capture is present, determining if the card details should be updated.
+ * 
+ * @param {PaymentType} paymentDetails - The payment details object.
+ * @param {ReportSyncType} syncUpdateObject - The sync update object to update.
+ * @param {any} transactionElement - The transaction element containing application information.
+ * @param {any} applicationResponse - The application response object.
+ * @returns {Promise<any>} - A promise that resolves to the update sync response.
+ */
 const updateResponseIfCapturePresent = async (paymentDetails: PaymentType, syncUpdateObject: ReportSyncType, transactionElement: any, applicationResponse: any): Promise<any> => {
     let updateSyncResponse;
     if (paymentDetails?.custom?.fields?.isv_saleEnabled && Constants.CT_TRANSACTION_TYPE_CHARGE === paymentDetails.transactions[0].type) {
@@ -144,6 +230,7 @@ const updateResponseIfCapturePresent = async (paymentDetails: PaymentType, syncU
 
     return updateSyncResponse;
 };
+
 /**
  * Runs sync add transaction based on the provided sync update object and reason code.
  * 
@@ -154,10 +241,10 @@ const updateResponseIfCapturePresent = async (paymentDetails: PaymentType, syncU
  * @returns {Promise<PaymentType | null>} - The updated sync response.
  */
 const runSyncAddTransaction = async (syncUpdateObject: ReportSyncType, reasonCode: string, authPresent: boolean, authReasonCodePresent: boolean): Promise<PaymentType | null> => {
-    let updateSyncResponse: PaymentType | null = null;
-    let paymentDetails: PaymentType | null;
     let isAuthReversalTriggeredFlag = false;
     let refundAmount = 0.0;
+    let updateSyncResponse: PaymentType | null = null;
+    let paymentDetails: PaymentType | null;
     if (syncUpdateObject && reasonCode && syncUpdateObject?.id) {
         if (Constants.PAYMENT_GATEWAY_SUCCESS_REASON_CODE === reasonCode && Constants.CT_TRANSACTION_TYPE_REFUND !== syncUpdateObject.type) {
             syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
@@ -186,11 +273,10 @@ const runSyncAddTransaction = async (syncUpdateObject: ReportSyncType, reasonCod
             syncUpdateObject.state = Constants.CT_TRANSACTION_STATE_FAILURE;
             updateSyncResponse = await commercetoolsApi.syncAddTransaction(syncUpdateObject);
         }
-    } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_RUN_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_FETCH_TRANSACTIONS);
     }
     return updateSyncResponse;
 };
+
 /**
  * Checks if an authorization reversal is triggered for a payment.
  * 
@@ -205,7 +291,7 @@ const isAuthReversalTriggered = async (paymentDetails: PaymentType, query: strin
     let paymentObj: PaymentType | null = null;
     const mid = paymentDetails?.custom?.fields?.isv_merchantId ? paymentDetails.custom.fields.isv_merchantId : '';
     const authMid = await multiMid.getMidCredentials(mid);
-    const transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, Constants.STRING_SYNC_SORT, authMid);
+    const transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, 50, Constants.STRING_SYNC_SORT, authMid);
     if (transactionDetail && Constants.HTTP_SUCCESS_STATUS_CODE === transactionDetail.httpCode && transactionDetail?.data?._embedded?.transactionSummaries) {
         const transactionSummaries = transactionDetail.data._embedded.transactionSummaries;
         for (let element of transactionSummaries) {
@@ -229,6 +315,7 @@ const isAuthReversalTriggered = async (paymentDetails: PaymentType, query: strin
     }
     return isAuthReverseTriggered;
 };
+
 /**
 * Retrieves sync amount details based on the payment details and application response.
 * 
@@ -238,6 +325,7 @@ const isAuthReversalTriggered = async (paymentDetails: PaymentType, query: strin
 * @returns {Promise<{ centAmount: number, currencyCode: string }>} - The sync amount object.
 */
 const retrieveSyncAmountDetails = async (paymentDetails: PaymentType, element: any, applicationResponse: any): Promise<{ centAmount: number, currencyCode: string }> => {
+    const fractionDigits = paymentDetails.amountPlanned.fractionDigits;
     const syncAmountObject = {
         centAmount: 0,
         currencyCode: '',
@@ -247,7 +335,6 @@ const retrieveSyncAmountDetails = async (paymentDetails: PaymentType, element: a
             amountDetails: { currency, totalAmount },
         },
     } = element;
-    const fractionDigits = paymentDetails.amountPlanned.fractionDigits;
     if (applicationResponse.authPresent || applicationResponse.capturePresent || applicationResponse.authReversalPresent) {
         syncAmountObject.currencyCode = (orderInformation && orderInformation.amountDetails && currency) ? currency : paymentDetails.amountPlanned.currencyCode;
         syncAmountObject.centAmount = (orderInformation && orderInformation.amountDetails && totalAmount) ? paymentUtils.convertAmountToCent(Number(totalAmount), fractionDigits) : paymentDetails.amountPlanned.centAmount;
@@ -263,6 +350,7 @@ const retrieveSyncAmountDetails = async (paymentDetails: PaymentType, element: a
     }
     return syncAmountObject;
 };
+
 /**
  * Updates the capture amount for a payment transaction.
  * 
@@ -295,6 +383,7 @@ const runSyncUpdateCaptureAmount = async (updatePaymentObj: PaymentType | null, 
     }
     return updateResponse;
 };
+
 /**
  * Handles decision synchronization for payment transactions based on conversion details.
  * 
@@ -302,15 +391,15 @@ const runSyncUpdateCaptureAmount = async (updatePaymentObj: PaymentType | null, 
  * @returns {Promise<boolean>} - Indicates whether conversion is present.
  */
 const updateDecisionSyncService = async (conversionDetails: any): Promise<boolean> => {
-    let latestTransaction: Partial<PaymentTransactionType>;
-    let paymentDetails = null;
     let isConversionPresent = false;
     let decision = '';
+    let paymentDetails: any = null;
     let decisionUpdateObject = {
         id: '',
         version: 0,
         state: '',
     };
+    let latestTransaction: Partial<PaymentTransactionType>;
     if (conversionDetails) {
         for (let element of conversionDetails) {
             paymentDetails = null;
@@ -336,6 +425,7 @@ const updateDecisionSyncService = async (conversionDetails: any): Promise<boolea
     }
     return isConversionPresent;
 };
+
 /**
 * Processes sync update capture amount based on the provided transaction details.
 * 
@@ -347,9 +437,9 @@ const updateDecisionSyncService = async (conversionDetails: any): Promise<boolea
 * @returns {Promise<any>} - The update response.
 */
 const processRunSyncUpdateCaptureAmount = async (transaction: Partial<PaymentTransactionType>, paymentId: string, paymentVersion: number, refundAmount: number, pendingTransactionAmount: number): Promise<any> => {
-    let updateResponse;
     let transactionId = '';
     let refundAmountUsed = 0;
+    let updateResponse;
     const {
         custom,
         custom: {
@@ -379,6 +469,16 @@ const processRunSyncUpdateCaptureAmount = async (transaction: Partial<PaymentTra
     return updateResponse;
 };
 
+/**
+ * Calculates the updated amount after a refund for a given transaction.
+ * 
+ * 
+ * @param {Partial<PaymentTransactionType>} transaction - The transaction object containing 
+ *        the amount and custom fields to evaluate.
+ * @param {number} refundAmount - The amount to be refunded.
+ * @returns {number | null} - The updated amount after applying the refund, or null if 
+ *        the conditions are not met.
+ */
 const getUpdateAmount = (transaction: Partial<PaymentTransactionType>, refundAmount: number): number | null => {
     let returnAmount: number | null = null;
     if (transaction.amount?.centAmount === refundAmount && !transaction?.custom) {
@@ -393,6 +493,154 @@ const getUpdateAmount = (transaction: Partial<PaymentTransactionType>, refundAmo
     return returnAmount;
 };
 
+/**
+ * Retrieves transaction summaries.
+ * 
+ * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {number} retryCount - Retry count.
+ * @returns {Promise<any>} - Object containing transaction summaries and a flag indicating if history is present.
+ */
+const getTransactionSummaries = async (updatePaymentObj: PaymentType, retryCount: number): Promise<any> => {
+    let transactionSummaryObject: any;
+    let errorData = '';
+    let paymentId = updatePaymentObj.id || '';
+    const query = Constants.PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE + paymentId + Constants.STRING_AND + Constants.STRING_SYNC_QUERY;
+    const midId = updatePaymentObj?.custom?.fields?.isv_merchantId ? updatePaymentObj.custom.fields.isv_merchantId : '';
+    const authMid = await multiMid.getMidCredentials(midId);
+    return await new Promise(function (resolve, reject) {
+        setTimeout(async () => {
+            const transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, 50, Constants.STRING_SYNC_SORT, authMid);
+            const validTransactionSummary = paymentValidator.isValidTransactionSummaries(transactionDetail, updatePaymentObj, retryCount);
+            if (validTransactionSummary) {
+                transactionSummaryObject = {
+                    summaries: transactionDetail?.data?._embedded?.transactionSummaries,
+                    historyPresent: true,
+                };
+                resolve(transactionSummaryObject);
+            } else {
+                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES, Constants.LOG_ERROR, 'PaymentId : ' + updatePaymentObj.id, CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH);
+                reject(transactionSummaryObject);
+            }
+        }, 1500);
+    }).catch((error) => {
+        if (error) {
+            errorData = typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : error;
+        }
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH + errorData);
+        return transactionSummaryObject;
+    });
+};
+
+/**
+ * Checks if an authorization reversal is triggered for the given payment update.
+ * 
+ * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {any} cartObj - Cart object.
+ * @param {any} paymentResponse - Payment response.
+ * @param {ActionResponseType} updateActions - Updated actions.
+ * @returns {Promise<ActionResponseType>} - Updated actions response.
+ */
+const checkAuthReversalTriggered = async (updatePaymentObj: PaymentType, cartObj: any, paymentResponse: PtsV2PaymentsPost201Response, updateActions: ActionResponseType): Promise<ActionResponseType> => {
+    let transactionSummaries;
+    let transactionDetail;
+    let isAuthReversalTriggered = false;
+    let applications: Partial<ApplicationsType>[];
+    let returnAction = {
+        action: 'addTransaction',
+        transaction: {
+            type: Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION,
+            timestamp: paymentUtils.getDate(Date.now(), true),
+            amount: {
+                type: '',
+                currencyCode: '',
+                centAmount: 0,
+                fractionDigits: 0,
+            },
+            state: '',
+            interactionId: null,
+        },
+    };
+    for (let i = 0; i < Constants.PAYMENT_GATEWAY_TRANSACTION_SUMMARIES_MAX_RETRY; i++) {
+        //Retries to get the response, if there is no proper response received
+        transactionDetail = await getTransactionSummaries(updatePaymentObj, i + 1);
+        if (transactionDetail) {
+            transactionSummaries = transactionDetail.summaries;
+            if (true === transactionDetail.historyPresent) {
+                break;
+            }
+        }
+    }
+    if (transactionSummaries) {
+        for (let element of transactionSummaries) {
+            applications = element.applicationInformation.applications;
+            for (let application of applications) {
+                if (Constants.ECHECK !== updatePaymentObj.paymentMethodInfo.method && updatePaymentObj?.custom?.fields?.isv_saleEnabled && Constants.STRING_SYNC_AUTH_NAME === application?.name && application.reasonCode) {
+                    updateActions = await paymentActions.handleAuthApplication(updatePaymentObj, application, updateActions, element);
+                }
+                if (Constants.STRING_SYNC_AUTH_REVERSAL_NAME === application.name) {
+                    if (Constants.APPLICATION_RCODE === application.rCode && Constants.APPLICATION_RFLAG === application.rFlag) {
+                        isAuthReversalTriggered = true;
+                        returnAction.transaction.state = Constants.CT_TRANSACTION_STATE_SUCCESS;
+                    } else {
+                        returnAction.transaction.state = Constants.CT_TRANSACTION_STATE_FAILURE;
+                    }
+                    returnAction.transaction.amount = updatePaymentObj.amountPlanned;
+                    returnAction.transaction.interactionId = element.id;
+                    updateActions.actions.push(returnAction);
+                }
+            }
+        }
+    }
+    if (!isAuthReversalTriggered) {
+        updateActions = await orderManagementHelper.handleAuthReversalResponse(updatePaymentObj, cartObj, paymentResponse, updateActions);
+    }
+    return updateActions;
+};
+
+/**
+ * Checks the presence of different types of applications in a given array of applications.
+ * 
+ * @param {ApplicationsType[]} applications - Array of applications.
+ * @returns {Object} - Object indicating the presence of different types of applications.
+ */
+const getApplicationsPresent = async (applications: Partial<ApplicationsType>) => {
+    let applicationDetails = {
+        authPresent: '',
+        authReasonCodePresent: '',
+        capturePresent: '',
+        captureReasonCodePresent: '',
+        authReversalPresent: '',
+        refundPresent: '',
+    }
+    if (applications) {
+        const checkAuthPresent = applications.some((item: Partial<ApplicationsType>) => Constants.STRING_SYNC_AUTH_NAME === item.name) || applications.some((item: ApplicationsType) => Constants.STRING_SYNC_ECHECK_DEBIT_NAME === item.name);
+        const checkAuthReasonCodePresent = applications.some((item: Partial<ApplicationsType>) => Constants.STRING_SYNC_AUTH_NAME === item.name && item.reasonCode && Constants.PAYMENT_GATEWAY_SUCCESS_REASON_CODE === item.reasonCode
+            || Constants.STRING_SYNC_ECHECK_DEBIT_NAME === item.name && null === item.reasonCode && applications.some((nextItem: Partial<ApplicationsType>) => Constants.STRING_SYNC_DECISION_NAME === nextItem.name && Constants.PAYMENT_GATEWAY_ERROR_REASON_CODE === nextItem.reasonCode));
+        const checkCapturePresent = applications.some((item: Partial<ApplicationsType>) => Constants.STRING_SYNC_CAPTURE_NAME === item.name);
+        const captureReasonCodePresent = applications.some((item: Partial<ApplicationsType>) => Constants.STRING_SYNC_CAPTURE_NAME === item.name && item.reasonCode && Constants.PAYMENT_GATEWAY_SUCCESS_REASON_CODE === item.reasonCode);
+        const checkAuthReversalPresent = applications.some((item: Partial<ApplicationsType>) => Constants.STRING_SYNC_AUTH_REVERSAL_NAME === item.name)
+        const checkRefundPresent = applications.some((item: Partial<ApplicationsType>) => Constants.STRING_SYNC_REFUND_NAME === item.name || Constants.STRING_SYNC_ECHECK_CREDIT_NAME === item.name);
+        applicationDetails = {
+            authPresent: checkAuthPresent,
+            authReasonCodePresent: checkAuthReasonCodePresent,
+            capturePresent: checkCapturePresent,
+            captureReasonCodePresent: captureReasonCodePresent,
+            authReversalPresent: checkAuthReversalPresent,
+            refundPresent: checkRefundPresent,
+        }
+    }
+    return applicationDetails;
+};
+
+/**
+ * Checks for missing card details in commercetools payments with specific digital wallet methods
+ * (Click to Pay, Google Pay, Apple Pay). If details are missing, attempts to fetch them using 
+ * multiple merchant credentials and updates the payment record.
+ * 
+ * @async
+ * @function getMissingPaymentDetails
+ * @returns {Promise<void>} Resolves when the process is complete.
+ * */
 const getMissingPaymentDetails = async () => {
     const midCredentials = {
         merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
@@ -400,7 +648,7 @@ const getMissingPaymentDetails = async () => {
         merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
     };
     let multiMidArray;
-    multiMidArray = await multiMid.getAllMidDetails();
+    multiMidArray = multiMid.getAllMidDetails();
     multiMidArray.push(midCredentials);
     const paymentData = await commercetoolsApi.getAllPayments();
     if (0 < paymentData?.results.length) {
@@ -433,9 +681,22 @@ const getMissingPaymentDetails = async () => {
     }
 }
 
+/**
+ * Syncs payment and cart details with updated transaction data.
+ * 
+ * - If a cart is linked to the payment and is active, updates the cart with transaction details.
+ * - Applies payment updates using provided actions if available.
+ * 
+ * @async
+ * @function syncPaymentAndAddressDetails
+ * @param {Partial<ActionType>[]} dataActions - List of actions to update the payment details.
+ * @param {PaymentType} currentPaymentObject - The current payment object to be updated.
+ * @param {any} getTransactionDataResponse - Response data containing transaction details.
+ * @returns {Promise<void>} Resolves when synchronization is complete.
+ */
 const syncPaymentAndAddressDetails = async (dataActions: Partial<ActionType>[], currentPaymentObject: PaymentType, getTransactionDataResponse: any): Promise<void> => {
     if (currentPaymentObject?.id) {
-        const cartDetails = await paymentService.getCartDetailsByPaymentId(currentPaymentObject?.id);
+        const cartDetails = await cartHelper.getCartDetailsByPaymentId(currentPaymentObject?.id);
         if (cartDetails && 'Active' === cartDetails.cartState && cartDetails?.id && cartDetails?.version) {
             await commercetoolsApi.updateCartByPaymentId(cartDetails.id, currentPaymentObject?.id, cartDetails.version, getTransactionDataResponse);
         }
@@ -460,6 +721,11 @@ export default {
     updateDecisionSyncService,
     processApplicationResponse,
     processRunSyncUpdateCaptureAmount,
+    getApplicationsPresent,
+    getTransactionSummaries,
+    checkAuthReversalTriggered,
     getMissingPaymentDetails,
     syncPaymentAndAddressDetails
 }
+
+

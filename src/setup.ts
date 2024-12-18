@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 
-
 import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
@@ -8,7 +7,7 @@ import { MidCredentialsType, SubscriptionInformationType } from './types/Types';
 import paymentUtils from './utils/PaymentUtils';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
 import MultiMid from './utils/config/MultiMid';
-import resourceHandler from './utils/config/ResourceHandler';
+import { createCustomTypes, createExtension } from './utils/config/ResourceHandler';
 import webhookHelper from './utils/helpers/WebhookHelper';
 
 dotenv.config();
@@ -20,11 +19,11 @@ const setupExtensionResources = async (): Promise<boolean> => {
   let isExtensionSetupComplete = false;
   try {
     if (process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL && process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE && process.env.CT_PROJECT_KEY && process.env.CT_CLIENT_ID && process.env.CT_CLIENT_SECRET && process.env.CT_AUTH_HOST && process.env.CT_API_HOST) {
-      await resourceHandler.ensureExtension();
-      await resourceHandler.ensureCustomTypes();
+      await createExtension();
+      await createCustomTypes();
       isExtensionSetupComplete = true;
     } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_SETUP_RESOURCES);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_SETUP_RESOURCES);
     }
   } catch (exception) {
     paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE, '', CustomMessages.EXCEPTION_MSG_SETUP_RESOURCES, '', '', '');
@@ -52,7 +51,7 @@ const createWebhookSubscription = async (): Promise<any> => {
         if (process.env.PAYMENT_GATEWAY_MERCHANT_ID === mid) {
           mid = '';
         }
-        midCredentials = await MultiMid.getMidCredentials(mid);
+        midCredentials = MultiMid.getMidCredentials(mid);
         subscriptionResponse = await webhookHelper.handleWebhookSubscription(midCredentials);
         if (subscriptionResponse?.subscriptionPresent) {
           paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_INFO, '', `Subcription already present for mid ${mid}`);
