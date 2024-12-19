@@ -14,16 +14,23 @@ This process ensures that:
 
 ### To Test your connection
 
-1. You can run the following npm script from the root directory of the extension:
+1. You can test the connection while starting the server by running the following npm script:
+
+       npm run start
+
+    - The connection will be automatically tested when the server starts
+
+2. Alternatively, you can run the following npm script from the root directory of the extension:
 
        npm run test-connection
-
-2. Alternatively, Send a `GET` request to `{baseUrl}/testConnection`. Ensure that your environment variables (env file) are correctly configured to receive a successful response.
+ 
+3.  You can also send a `GET` request to `{baseUrl}/testConnection`. Ensure that your environment variables (env file) are correctly configured to receive a successful response.
     - The baseUrl will depend on where the extension is deployed.
     - Use HTTPS for production environments to ensure secure communication.
 
 
 > **_NOTE:_** Test Connection endpoint can be called for maximum of 10 times per minute.
+
 
 
 
