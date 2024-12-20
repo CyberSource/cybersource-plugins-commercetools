@@ -605,7 +605,7 @@ function generateCustomLineItems(customLineItems, orderItemsTableBody, discountO
  * @param {string} locale - The locale used for formatting.
  * @param {number} fractionDigits - The number of fraction digits to display.
  */
-function generateShipping(cart, orderItemsTableBody, discountObject, locale, fractionDigits) {
+function generateShipping(cart, orderItemsTableBody, discountObject, _locale, fractionDigits) {
   if (!cart || !orderItemsTableBody) return;
   if (cart?.shipping && 0 < cart.shipping?.length && 'Multiple' === cart.shippingMode) {
     cart.shipping.forEach((shippingDetail) => {

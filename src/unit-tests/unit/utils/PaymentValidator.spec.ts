@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 import { Constants } from '../../../constants/constants';
 import paymentValidator from '../../../utils/PaymentValidator';
-import PaymentServiceConst from '../../const/PaymentServiceConst';
+import PaymentServiceConst from '../../const/HelpersConst';
 import PaymentValidatorConst from '../../const/PaymentValidatorConst';
 
 dotenv.config();
@@ -126,7 +126,7 @@ test.serial('Test Is Successful Charge Transaction with status failure', async (
 test.serial('Test Validate Pending Authentication Response', async (t) => {
   const { httpCode, status, data } = PaymentServiceConst.getAuthResponsePaymentPendingResponse;
   const { consumerAuthenticationInformation } = data || {};
-  const result = paymentValidator.isValidPendinAuthenticationResponse(httpCode, status, data, consumerAuthenticationInformation);
+  const result = paymentValidator.isValidPendingAuthenticationResponse(httpCode, status, data, consumerAuthenticationInformation);
   t.is(result, true);
 })
 
@@ -134,7 +134,7 @@ test.serial('Test Validate Pending Authentication Response with Invalid status',
   const { httpCode, data } = PaymentServiceConst.getAuthResponsePaymentPendingResponse;
   const { consumerAuthenticationInformation } = data || {};
   const status = 'AUTHORIZED';
-  const result = paymentValidator.isValidPendinAuthenticationResponse(httpCode, status, data, consumerAuthenticationInformation);
+  const result = paymentValidator.isValidPendingAuthenticationResponse(httpCode, status, data, consumerAuthenticationInformation);
   t.is(result, false);
 })
 

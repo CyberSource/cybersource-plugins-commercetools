@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
-import { AddressType, CustomerType, CustomTokenType, MidCredentialsType, PaymentTransactionType, PaymentType, ProcessingInformationType } from '../types/Types';
+import { AddressType, CustomerType, CustomTokenType, MetaDataType, MidCredentialsType, PaymentTransactionType, PaymentType, ProcessingInformationType } from '../types/Types';
 import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
 import commercetoolsApi from '../utils/api/CommercetoolsApi';
@@ -14,7 +14,6 @@ import { AddressMapper } from './AddressMapper';
 import { OrderInformationMapper } from './OrderInformationMapper';
 import { PaymentInformationModel } from './PaymentInformation';
 import { ProcessingInformation } from './ProcessingInformationMapper';
-
 
 /**
  * Generates the configuration object based on the provided parameters.
@@ -32,7 +31,7 @@ import { ProcessingInformation } from './ProcessingInformationMapper';
 *   logConfiguration: { enableLog: boolean };
 * } | undefined>} - A promise resolving to the configuration object.
 */
-const getConfigObject = async (functionName: string, midCredentials: MidCredentialsType | null, resourceObj: PaymentType | null, merchantId: string | null) => {
+const getConfigObject = (functionName: string, midCredentials: MidCredentialsType | null, resourceObj: PaymentType | null, merchantId: string | null) => {
   let configObject = {
     authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
     runEnvironment: '',
@@ -41,7 +40,7 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
     merchantsecretKey: '',
     logConfiguration: {
       enableLog: false,
-    },
+    }
   };
   let midCredentialsObject: MidCredentialsType = {
     merchantId: '',
@@ -52,12 +51,12 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
   configObject.runEnvironment = Constants.LIVE_ENVIRONMENT === process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
   if (resourceObj && Constants.GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS.includes(functionName)) {
     mid = resourceObj?.custom?.fields?.isv_merchantId ? resourceObj.custom.fields.isv_merchantId : '';
-    midCredentialsObject = await multiMid.getMidCredentials(mid);
+    midCredentialsObject = multiMid.getMidCredentials(mid);
   } else if (merchantId && (FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT === functionName || FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE === functionName)) {
     if (process.env.PAYMENT_GATEWAY_MERCHANT_ID === merchantId) {
       merchantId = '';
     }
-    midCredentialsObject = await multiMid.getMidCredentials(merchantId);
+    midCredentialsObject = multiMid.getMidCredentials(merchantId);
   } else if (midCredentials && Constants.GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS.includes(functionName)) {
     midCredentialsObject = midCredentials;
   } else {
@@ -70,7 +69,7 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
     configObject.merchantKeyId = midCredentialsObject.merchantKeyId;
     configObject.merchantsecretKey = midCredentialsObject.merchantSecretKey;
   } else {
-    paymentUtils.logData(__filename, 'FuncGetConfigObject', Constants.LOG_INFO, '', CustomMessages.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CONFIG_OBJECT, Constants.LOG_WARN, '', CustomMessages.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET);
     return null;
   }
   return configObject;
@@ -87,7 +86,7 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
  * @param {boolean | null} isSaveToken - Specifies whether to save the token or not. 
  * @returns {Promise<restApi.Ptsv2paymentsProcessingInformation>} - The processing information object.
  */
-const getProcessingInformation = async (functionName: string, resourceObj: PaymentType | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) => {
+const getProcessingInformation = (functionName: string, resourceObj: PaymentType | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) => {
   const processingInformation = new ProcessingInformation(functionName, resourceObj, orderNo, service, cardTokens, isSaveToken);
   return processingInformation.getProcessingInformation() as ProcessingInformationType;
 };
@@ -101,7 +100,7 @@ const getProcessingInformation = async (functionName: string, resourceObj: Payme
  * @param {string | null} customerTokenId - The customer token ID associated with the payment.
  * @returns {Promise<any>} - The payment information object.
  */
-const getPaymentInformation = async (functionName: string, resourceObj: PaymentType | null, cardTokens: CustomTokenType | null, customerTokenId: string | null): Promise<any> => {
+const getPaymentInformation = (functionName: string, resourceObj: PaymentType | null, cardTokens: CustomTokenType | null, customerTokenId: string | null): any => {
   const paymentInformationInstance = new PaymentInformationModel();
   const paymentInformation = paymentInformationInstance.mapPaymentInformation(functionName, resourceObj, cardTokens, customerTokenId);
   return paymentInformation;
@@ -114,10 +113,10 @@ const getPaymentInformation = async (functionName: string, resourceObj: PaymentT
  * @param {string} resourceId - The ID of the resource.
  * @returns {Promise<any>} - The client reference information object.
  */
-const getClientReferenceInformation = async (service: string, resourceId: string, payment?: PaymentType): Promise<any> => {
+const getClientReferenceInformation = (service: string, resourceId: string, payment?: PaymentType): any => {
+  let customFields = payment?.custom?.fields;
   let clientReferenceInformationPartner;
   let clientReferenceInformation;
-  let customFields = payment?.custom?.fields;
   if (FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE === service) {
     clientReferenceInformation = {} as Riskv1decisionsClientReferenceInformation;
     clientReferenceInformationPartner = {} as Riskv1decisionsClientReferenceInformationPartner;
@@ -141,7 +140,6 @@ const getClientReferenceInformation = async (service: string, resourceId: string
   }
   return clientReferenceInformation;
 };
-
 
 /**
  * Generates order information based on the provided parameters.
@@ -263,6 +261,7 @@ const getOrderInformationShipToDetails = (cartObj: any, shippingMethod: string |
     shippingAddress = cartObj.shipping[0].shippingAddress;
   } else if (cartObj.shippingAddress) {
     shippingAddress = cartObj.shippingAddress;
+
   }
   const addressMapper = new AddressMapper(shippingAddress);
   orderInformationShipTo = addressMapper.mapOrderInformationShipto();
@@ -272,7 +271,6 @@ const getOrderInformationShipToDetails = (cartObj: any, shippingMethod: string |
   return orderInformationShipTo;
 };
 
-
 /**
  * Generates device information for payment based on the provided parameters.
  * 
@@ -281,7 +279,7 @@ const getOrderInformationShipToDetails = (cartObj: any, shippingMethod: string |
  * @param {string} service - The name of the service.
  * @returns {Promise<any>} - The device information.
  */
-const getDeviceInformation = async (paymentObj: PaymentType | null, customerObj: Partial<CustomerType> | null, service: string): Promise<any> => {
+const getDeviceInformation = (paymentObj: PaymentType | null, customerObj: Partial<CustomerType> | null, service: string): any => {
   const deviceInformation = {} as Ptsv2paymentsDeviceInformation;
   const customFields = paymentObj?.custom?.fields;
   if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER)) {
@@ -309,7 +307,7 @@ const getDeviceInformation = async (paymentObj: PaymentType | null, customerObj:
  * @param {boolean} payerAuthMandateFlag - Flag indicating whether payer authentication is mandated.
  * @returns {Promise<any>} - The consumer authentication information.
  */
-const getConsumerAuthenticationInformation = async (resourceObj: PaymentType, service: string, isSaveToken: boolean, payerAuthMandateFlag: boolean): Promise<any> => {
+const getConsumerAuthenticationInformation = (resourceObj: PaymentType, service: string, isSaveToken: boolean, payerAuthMandateFlag: boolean): any => {
   const { isv_payerAuthenticationTransactionId, isv_payerAuthenticationPaReq, isv_cardinalReferenceId, isv_tokenAlias, isv_savedToken } = resourceObj?.custom?.fields || {};
   const consumerAuthenticationInformation = {} as Ptsv2paymentsConsumerAuthenticationInformation;
   if (Constants.VALIDATION === service) {
@@ -318,7 +316,7 @@ const getConsumerAuthenticationInformation = async (resourceObj: PaymentType, se
   } else if (Constants.STRING_ENROLL_CHECK === service) {
     consumerAuthenticationInformation.referenceId = isv_cardinalReferenceId;
     consumerAuthenticationInformation.returnUrl = process.env.PAYMENT_GATEWAY_3DS_RETURN_URL;
-    if (payerAuthMandateFlag || (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_SCA_CHALLENGE) && !isv_savedToken && isv_tokenAlias && !isSaveToken)) {
+    if (payerAuthMandateFlag || (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_SCA_CHALLENGE) && !isv_savedToken && isv_tokenAlias && isSaveToken)) {
       consumerAuthenticationInformation.challengeCode = Constants.PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE;
     }
   }
@@ -331,7 +329,7 @@ const getConsumerAuthenticationInformation = async (resourceObj: PaymentType, se
  * @param {string} functionName - The name of the function.
  * @returns {Promise<string[]>} - An array of target origins.
  */
-const getTargetOrigins = async (): Promise<string[]> => {
+const getTargetOrigins = (): string[] => {
   let targetOriginArray: string[] = [];
   let { PAYMENT_GATEWAY_TARGET_ORIGINS } = process.env;
   if (PAYMENT_GATEWAY_TARGET_ORIGINS) {
@@ -346,9 +344,9 @@ const getTargetOrigins = async (): Promise<string[]> => {
  * 
  * @returns {Promise<string[]>} - An array of allowed payment methods.
  */
-const getAllowedPaymentMethods = async (): Promise<string[]> => {
-  let allowedPaymentTypesArray = ['PANENTRY', 'SRC', 'GOOGLEPAY'];
+const getAllowedPaymentMethods = (): string[] => {
   let { PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS } = process.env;
+  let allowedPaymentTypesArray = ['PANENTRY', 'SRC', 'GOOGLEPAY'];
   if (PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS) {
     const allowedPaymentTypes = PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS;
     allowedPaymentTypesArray = allowedPaymentTypes.split(Constants.REGEX_COMMA);
@@ -356,16 +354,15 @@ const getAllowedPaymentMethods = async (): Promise<string[]> => {
   return allowedPaymentTypesArray;
 };
 
-
 /**
  * Generates allowed card networks based on the function name from environment variables.
  * 
  * @param {string} functionName - The name of the function.
  * @returns {Promise< Promise<string[] | undefined>>} - An array of allowed card networks.
  */
-const getAllowedCardNetworks = async (functionName: string): Promise<string[] | undefined> => {
-  let allowedCardNetworksArray = (FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT === functionName) ? Constants.UC_ALLOWED_CARD_NETWORKS : Constants.FLEX_MICROFORM_ALLOWED_CARDS;
+const getAllowedCardNetworks = (functionName: string): string[] | undefined => {
   let { PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS } = process.env;
+  let allowedCardNetworksArray = (FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT === functionName) ? Constants.UC_ALLOWED_CARD_NETWORKS : Constants.FLEX_MICROFORM_ALLOWED_CARDS;
   if (PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS) {
     const allowedCardNetworks = PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS;
     allowedCardNetworksArray = allowedCardNetworks.split(Constants.REGEX_COMMA);
@@ -380,7 +377,7 @@ const getAllowedCardNetworks = async (functionName: string): Promise<string[] | 
  * @param {string} functionName - The name of the function.
  * @returns {Promise<any>} - Token information.
  */
-const getTokenInformation = async (payment: PaymentType, functionName: string): Promise<any> => {
+const getTokenInformation = (payment: PaymentType, functionName: string): any => {
   let jtiToken = {
     jti: '',
   };
@@ -397,8 +394,7 @@ const getTokenInformation = async (payment: PaymentType, functionName: string): 
     tokenInformation = {} as Ptsv2paymentsTokenInformation;
     if (!payment?.custom?.fields.isv_savedToken && !payment?.custom?.fields?.isv_transientToken) {
       tokenInformation.transientTokenJwt = payment?.custom?.fields.isv_token;
-    }
-    else if (payment?.custom?.fields?.isv_transientToken) {
+    } else if (payment?.custom?.fields?.isv_transientToken) {
       tokenInformation.transientTokenJwt = payment.custom.fields.isv_transientToken;
     }
   }
@@ -411,7 +407,7 @@ const getTokenInformation = async (payment: PaymentType, functionName: string): 
  * @param {string} service - The service type.
  * @returns {Promise<any>} - Capture mandate information.
  */
-const getCaptureMandate = async (service: string): Promise<any> => {
+const getCaptureMandate = (service: string): any => {
   const captureMandate = {} as Upv1capturecontextsCaptureMandate;
   const { PAYMENT_GATEWAY_UC_BILLING_TYPE, PAYMENT_GATEWAY_UC_ENABLE_PHONE, PAYMENT_GATEWAY_UC_ENABLE_EMAIL, PAYMENT_GATEWAY_UC_ENABLE_NETWORK_ICONS,
     PAYMENT_GATEWAY_UC_ENABLE_SHIPPING, PAYMENT_GATEWAY_UC_ALLOWED_SHIP_TO_COUNTRIES
@@ -442,13 +438,14 @@ const getCaptureMandate = async (service: string): Promise<any> => {
 
   return captureMandate;
 };
+
 /**
  * Generates bill-to information for updating a token.
  * 
  * @param {AddressType | null} addressData - The address data.
  * @returns {Promise<any>} - Bill-to information.
  */
-const getUpdateTokenBillTo = async (addressData: AddressType | null): Promise<any> => {
+const getUpdateTokenBillTo = (addressData: AddressType | null): any => {
   let billTo;
   if (addressData) {
     const addressMapperInstance = new AddressMapper(addressData);
@@ -495,7 +492,7 @@ const getRiskInformation = async (payment: PaymentType) => {
  * @param {object} paymentObj - The payment object.
  * @returns {Promise<any>} - The buyer information object.
  */
-const getBuyerInformation = async (paymentObj: PaymentType): Promise<any> => {
+const getBuyerInformation = (paymentObj: PaymentType): any => {
   let buyerInformation = {} as Tmsv2customersBuyerInformation;
   paymentValidator.setObjectValue(buyerInformation, 'merchantCustomerID', paymentObj, 'customer.id', Constants.STR_STRING, false);
   if (!buyerInformation.merchantCustomerID) {
@@ -518,6 +515,20 @@ const getPromotionInformation = async (cartObject: any): Promise<any> => {
   return promotionInformation;
 }
 
+//function added for custom field
+const getMetaData = (payment:PaymentType): MetaDataType[] => {
+  let metaData: MetaDataType[] = [];
+  let customMetaData = payment?.custom?.fields?.isv_metadata && JSON.parse(payment.custom.fields.isv_metadata);
+  if (customMetaData) {
+    metaData = Object.entries(customMetaData)
+      .map(([key, value]) => ({
+        key: key,
+        value: value
+      })) as MetaDataType[];
+  }
+  return metaData;
+};
+
 export default {
   getProcessingInformation,
   getPaymentInformation,
@@ -538,4 +549,5 @@ export default {
   getOrderInformationAmountDetails,
   getOrderInformationBillToDetails,
   getOrderInformationShipToDetails,
+  getMetaData
 };

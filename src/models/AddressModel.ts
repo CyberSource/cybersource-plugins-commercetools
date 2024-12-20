@@ -1,6 +1,7 @@
 import { Constants } from "../constants/constants";
 import { AddressType } from "../types/Types";
 import paymentValidator from "../utils/PaymentValidator";
+
 export class Address {
     firstName?: string;
     lastName?: string;
@@ -13,6 +14,13 @@ export class Address {
     email?: string;
     phone?: string;
 
+    /**
+        * Constructor for the Address class.
+        * It initializes the address fields by mapping values from the given addressData.
+        * If specific fields are not available in the provided addressData, fallback logic is used to fill in the missing values.
+        * 
+        * @param {Partial<AddressType>} addressData - Partial object containing address data to be mapped.
+        */
     constructor(addressData: Partial<AddressType>) {
         paymentValidator.setObjectValue(this, 'firstName', addressData, 'firstName', Constants.STR_STRING, false);
         paymentValidator.setObjectValue(this, 'lastName', addressData, 'lastName', Constants.STR_STRING, false);

@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import getCardByInstrumentId from '../../../service/payment/GetCardByInstrumentId';
-import PaymentServiceConst from '../../const/PaymentServiceConst';
+import PaymentServiceConst from '../../const/HelpersConst';
 
 test.serial('Test get instrument id response', async (t) => {
   let response = await getCardByInstrumentId.getCardByInstrumentResponse(PaymentServiceConst.processTokensInstrumentIdentifier, process.env.PAYMENT_GATEWAY_MERCHANT_ID as any);

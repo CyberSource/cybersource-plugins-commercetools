@@ -12,7 +12,7 @@ let visaCheckoutData: any = {
 };
 
 test.serial('Get click to pay data and check http code', async (t: any) => {
-  let response: any = await getTransactionData.getTransactionData(GetTransactionDataConst.paymentResponse, PaymentAuthorizationServiceVsConst.payment);
+  let response: any = await getTransactionData.getTransactionData(GetTransactionDataConst?.paymentResponse?.transactionId, PaymentAuthorizationServiceVsConst.payment, null);
   visaCheckoutData.httpCode = response.httpCode;
   if (Constants.HTTP_OK_STATUS_CODE == visaCheckoutData.httpCode) {
     t.is(visaCheckoutData.httpCode, Constants.HTTP_OK_STATUS_CODE);
@@ -22,13 +22,13 @@ test.serial('Get click to pay data and check http code', async (t: any) => {
 });
 
 test.serial('Get click to pay data for invalid order and check http code', async (t: any) => {
-  let response: any = await getTransactionData.getTransactionData(GetTransactionDataConst.paymentResponses, PaymentAuthorizationServiceVsConst.payment);
+  let response: any = await getTransactionData.getTransactionData(GetTransactionDataConst?.paymentResponses?.transactionId, PaymentAuthorizationServiceVsConst.payment, null);
   visaCheckoutData.httpCode = response.httpCode;
   t.not(visaCheckoutData.httpCode, Constants.HTTP_OK_STATUS_CODE);
 });
 
 test.serial('Get click to pay data with empty payment response and check http code', async (t: any) => {
-  let response: any = await getTransactionData.getTransactionData('', PaymentAuthorizationServiceVsConst.payment);
+  let response: any = await getTransactionData.getTransactionData('', PaymentAuthorizationServiceVsConst.payment, null);
   visaCheckoutData.httpCode = response.httpCode;
   t.is(visaCheckoutData.httpCode, 0);
 });

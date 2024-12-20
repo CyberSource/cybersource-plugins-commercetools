@@ -1,4 +1,4 @@
-import { amountConversion, dateConversion } from './utils.js';
+import { amountConversion, dateConversion, validPathRegex } from './utils.js';
 
 if (window.location.pathname.includes('orders')) {
   document.addEventListener('DOMContentLoaded', async function () {
@@ -77,7 +77,9 @@ async function renderOrders(orderList) {
             `/paymentDetails?id=${encodeURIComponent(order.id)}`);
           newRow.addEventListener('click', () => {
             const url = newRow.getAttribute('data-href');
-            window.location.href = url;
+            if (validPathRegex.test(url)) {
+              window.location.href = encodeURI(url);
+            }
           });
           paymentDetailsBody.appendChild(newRow);
         }

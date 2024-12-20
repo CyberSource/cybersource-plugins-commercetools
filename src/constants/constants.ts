@@ -1,5 +1,5 @@
 export abstract class Constants {
-  //Constant values
+
   //Cybersource reason codes
   static readonly PAYMENT_GATEWAY_SUCCESS_REASON_CODE = '100';
   static readonly PAYMENT_GATEWAY_ERROR_REASON_CODE = '480';
@@ -30,7 +30,6 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_TOKEN_CREATE = 'TOKEN_CREATE';
   static readonly PAYMENT_GATEWAY_ACS_WINDOW_SIZE = '01';
   static readonly PAYMENT_GATEWAY_WEBHOOK_PORT = '443';
-  static readonly PAYMENT_GATEWAY_TRANSACTION_SUMMARIES_MAX_RETRY = 3;
   static readonly PAYMENT_GATEWAY_VALIDATE_CONSUMER_AUTHENTICATION = 'VALIDATE_CONSUMER_AUTHENTICATION';
   static readonly PAYMENT_GATEWAY_WEBHOOK_ENDPOINT = '/netTokenNotification';
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
@@ -44,6 +43,7 @@ export abstract class Constants {
   static readonly HTTP_BAD_REQUEST_STATUS_CODE = 400;
   static readonly HTTP_UNAUTHORIZED_STATUS_CODE = 401;
   static readonly HTTP_NOT_FOUND_STATUS_CODE = 404;
+  static readonly HTTP_GONE_STATUS_CODE = 410;
   static readonly HTTP_SERVER_ERROR_STATUS_CODE = 500;
 
   //Payment response
@@ -118,11 +118,14 @@ export abstract class Constants {
   static readonly STRING_DEFAULT = 'default';
   static readonly CART_ID = 'cartId';
   static readonly PAYMENT_ID = 'paymentId';
+  static readonly INTERACTION_ID = 'interactionId';
+  static readonly TRANSACTION_ID = 'transactionId';
   static readonly BASE_SIXTY_FOUR_ENCODING = 'Base64';
   static readonly CUSTOM_OBJECT_CONTAINER = 'ctWebHookSubscription';
   static readonly CUSTOM_OBJECT_KEY = 'webHookSubscription';
   static readonly STRING_ACTIVE = 'ACTIVE';
   static readonly NETWORK_TOKEN_EVENT = 'tms.networktoken.updated';
+  static readonly ADDITIONAL_CUSTOM_TYPE_FILE_PATH = 'src/resources/isv_additonal_custom_type.json';
 
   static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ENCODING_SHA_TWO_FIFTY_SIX = 'sha256';
@@ -152,26 +155,38 @@ export abstract class Constants {
 
   //CT custom fields
   static readonly ADD_INTERFACE_INTERACTION = 'addInterfaceInteraction';
+  static readonly ADD_TRANSACTION = 'addTransaction';
+  static readonly ADD_FIELD_DEFINITION = 'addFieldDefinition'
+  static readonly CHANGE_TRANSACTION_STATE = 'changeTransactionState';
   static readonly CHANGE_TRANSACTION_INTERACTION_ID = 'changeTransactionInteractionId';
   static readonly INVALID_INPUT = 'InvalidInput';
   static readonly ISV_ADDRESS_ID = 'isv_addressId';
+  static readonly ISV_TRANSACTION_DATA = 'isv_transaction_data';
+  static readonly ISV_TOKEN_ACTION = 'isv_tokenAction';
+  static readonly ISV_CARD_NEW_EXPIRY_MONTH = 'isv_cardNewExpiryMonth';
+  static readonly ISV_CARD_NEW_EXPIRY_YEAR = 'isv_cardNewExpiryYear';
   static readonly ISV_FAILED_TOKENS = 'isv_failedTokens';
   static readonly ISV_SECURITY_CODE = 'isv_securityCode';
   static readonly ISV_TOKEN = 'isv_token';
+  static readonly ISV_PAYMENTS_CUSTOMER_TOKENS = 'isv_payments_customer_tokens';
+  static readonly ISV_TOKENS = 'isv_tokens';
   static readonly SET_CUSTOM_FIELD = 'setCustomField';
+  static readonly SET_CUSTOM_TYPE = 'setCustomType';
+  static readonly SET_TRANSACTION_CUSTOM_TYPE = 'setTransactionCustomType';
   static readonly TYPE_ID_TYPE = 'type';
   static readonly UC_ADDRESS = 'UCAddress';
+  static readonly ISV_CUSTOMER_ID = 'isv_customerId';
 
   //  API Endpoints
   static readonly PAYMENT_CREATE_DESTINATION_URL = '/api/extension/payment/create';
   static readonly PAYMENT_UPDATE_DESTINATION_URL = '/api/extension/payment/update';
   static readonly CUSTOMER_UPDATE_DESTINATION_URL = '/api/extension/customer/update';
-  static readonly EXTENSION_SERVICE_END_POINTS = ['/capture', '/refund', '/authReversal', '/orders', '/orderData', '/paymentData', '/paymentDetails', '/decisionSync', '/sync', '/configureExtension', '/generateHeader', '/favicon.ico'];
+  static readonly EXTENSION_SERVICE_END_POINTS = ['/capture', '/refund', '/authReversal', '/orders', '/orderData', '/paymentData', '/paymentDetails', '/decisionSync', '/sync', '/configureExtension', '/generateHeader', '/testConnection', '/favicon.ico'];
   static readonly PAYER_AUTH_RETURN_URL = '/payerAuthReturnUrl';
   static readonly WHITE_LIST_ENDPOINTS = ['/api/extension/payment/create', '/api/extension/payment/update',
     '/api/extension/customer/update', '/netTokenNotification', '/captureContext', '/orders', '/orderData',
-    '/capture', '/refund', '/authReversal', '/paymentDetails', '/paymentData','/payerAuthReturnUrl',
-    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico'];
+    '/capture', '/refund', '/authReversal', '/paymentDetails', '/paymentData', '/payerAuthReturnUrl',
+    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico', '/testConnection'];
 
   //HTMLContent
   static readonly HTML_PREFIX =
@@ -181,7 +196,7 @@ export abstract class Constants {
   //Function Arrays
   static readonly UPDATE_AMOUNT_RESPONSE_FUNCTIONS = ['FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetAuthReversalResponse'];
   static readonly GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS = ['FuncGetTransactionData', 'FuncGetFlexKeys', 'FuncGetPayerAuthSetupData', 'FuncGetAuthReversalResponse', 'FuncGetAuthorizationResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData'];
-  static readonly GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS = ['FuncGetTransactionSearchResponse', 'FuncGetConversionDetails', 'FuncGetPublicKeys', 'FuncGetTransientTokenDataResponse', 'FuncWebhookSubscriptionResponse', 'FuncGetKeyGenerationResponse', 'FuncGetCreateWebhookSubscriptionResponse', 'FuncDeleteWebhookSubscriptionResponse'];
+  static readonly GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS = ['FuncGetTransactionSearchResponse', 'FuncGetConversionDetails', 'FuncGetPublicKeys', 'FuncGetTransientTokenDataResponse', 'FuncWebhookSubscriptionResponse', 'FuncGetKeyGenerationResponse', 'FuncGetCreateWebhookSubscriptionResponse', 'FuncDeleteWebhookSubscriptionResponse', 'FuncGetTransactionData'];
 
   //default cards
   static readonly UC_ALLOWED_CARD_NETWORKS = ['VISA', 'MASTERCARD', 'AMEX'];
@@ -196,4 +211,8 @@ export abstract class Constants {
   //Port
   static readonly DEFAULT_PORT = 3000;
 
+  //Limits
+  static readonly PAYMENT_GATEWAY_TRANSACTION_SUMMARIES_MAX_RETRY = 3;
+  static readonly MAX_REQUESTS = 10;
+  static readonly RATE_LIMIT_TIME_WINDOW = 60000; //1 minute in ms
 }

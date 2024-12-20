@@ -17,6 +17,18 @@ export class Token {
     timestamp?: Date | string;
     address?: Record<string, unknown>;
 
+    /**
+     * Constructor for the Token class.
+     * It maps the custom fields, customer token ID, payment token, and other relevant details
+     * to the class properties using the `paymentValidator.setObjectValue` method.
+     *
+     * @param {Partial<CustomerCustomType>} customFields - Custom fields associated with the token.
+     * @param {string | undefined} customerTokenId - The customer token ID.
+     * @param {string | undefined} paymentToken - The token value used for payment processing.
+     * @param {string | undefined} instrumentIdentifier - Identifier for the payment instrument.
+     * @param {string | undefined} addressId - The ID of the address associated with the token.
+     * @param {any} address - The address associated with the token.
+     */
     constructor(customFields: Partial<CustomerCustomType>, customerTokenId: string | undefined, paymentToken: string | undefined, instrumentIdentifier: string | undefined, addressId: string | undefined, address: any) {
         paymentValidator.setObjectValue(this, 'alias', customFields, 'isv_tokenAlias', Constants.STR_STRING, false);
         paymentValidator.setObjectValue(this, 'value', customerTokenId, '', Constants.STR_STRING, false);

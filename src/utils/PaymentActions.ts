@@ -1,11 +1,10 @@
 import { Constants } from "../constants/constants";
-import { CustomMessages } from '../constants/customMessages';
-import { FunctionConstant } from '../constants/functionConstant';
 import { Address } from '../models/AddressModel';
 import { ActionResponseType, ActionType, AddressType, AddTransactionType, AmountPlannedType, ApplicationsType, CardAddressGroupType, ConsumerAuthenticationInformationType, CustomerType, PaymentType } from "../types/Types";
 
 import paymentUtils from "./PaymentUtils";
 import paymentValidator from "./PaymentValidator";
+
 /**
  * Creates a refund action object to add a refund transaction.
  * 
@@ -16,7 +15,7 @@ import paymentValidator from "./PaymentValidator";
  */
 const addRefundAction = (amount: AmountPlannedType, orderResponse: any, state: string): AddTransactionType | null => {
     const refundAction = {
-        action: 'addTransaction',
+        action: Constants.ADD_TRANSACTION,
         transaction: {
             type: Constants.CT_TRANSACTION_TYPE_REFUND,
             timestamp: paymentUtils.getDate(Date.now(), true) as string,
@@ -26,12 +25,10 @@ const addRefundAction = (amount: AmountPlannedType, orderResponse: any, state: s
         },
     };
     paymentValidator.setObjectValue(refundAction.transaction, 'amount', amount, '', Constants.STR_OBJECT, false);
-    paymentValidator.setObjectValue(refundAction.transaction, 'interactionId', orderResponse, 'transactionId', Constants.STR_STRING, false);
-    if (!refundAction.transaction.amount || !refundAction.transaction.interactionId) {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_REFUND_ACTION, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_INPUT);
-    }
+    paymentValidator.setObjectValue(refundAction.transaction, Constants.INTERACTION_ID, orderResponse, Constants.TRANSACTION_ID, Constants.STR_STRING, false);
     return refundAction;
 };
+
 /**
  * Creates a response object based on the provided actions and optional parameters.
  * 
@@ -54,6 +51,7 @@ const createResponse = (setTransaction: Partial<ActionType>, setCustomField: Par
     };
     return returnResponse;
 };
+
 /**
  * Generates actions based on card details.
  * 
@@ -62,28 +60,33 @@ const createResponse = (setTransaction: Partial<ActionType>, setCustomField: Par
  */
 const cardDetailsActions = (cardDetails: Partial<CardAddressGroupType>): Partial<ActionType>[] => {
     let actions: Partial<ActionType>[] = [];
-    try {
-        const { cardFieldGroup } = cardDetails || {};
-        if (cardFieldGroup) {
-            const { prefix, suffix, expirationMonth, expirationYear, type } = cardFieldGroup;
-            actions = [
-                ...(prefix && suffix ? paymentUtils.setCustomFieldMapper({ isv_maskedPan: prefix.concat(Constants.CLICK_TO_PAY_CARD_MASK, suffix) }) : []),
-                ...(expirationMonth ? paymentUtils.setCustomFieldMapper({ isv_cardExpiryMonth: expirationMonth }) : []),
-                ...(expirationYear ? paymentUtils.setCustomFieldMapper({ isv_cardExpiryYear: expirationYear }) : []),
-                ...(type ? paymentUtils.setCustomFieldMapper({ isv_cardType: type }) : [])
-            ].flat();
-        } else {
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_CARD_DETAILS_ACTION, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_CLICK_TO_PAY_DATA);
-        }
-    } catch (exception) {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_CARD_DETAILS_ACTION, '', exception, '', '', '');
+    const { cardFieldGroup } = cardDetails || {};
+    if (cardFieldGroup) {
+        const { prefix, suffix, expirationMonth, expirationYear, type } = cardFieldGroup;
+        actions = [
+            ...(prefix && suffix ? paymentUtils.setCustomFieldMapper({ isv_maskedPan: prefix.concat(Constants.CLICK_TO_PAY_CARD_MASK, suffix) }) : []),
+            ...(expirationMonth ? paymentUtils.setCustomFieldMapper({ isv_cardExpiryMonth: expirationMonth }) : []),
+            ...(expirationYear ? paymentUtils.setCustomFieldMapper({ isv_cardExpiryYear: expirationYear }) : []),
+            ...(type ? paymentUtils.setCustomFieldMapper({ isv_cardType: type }) : [])
+        ].flat();
     }
     return actions;
 };
 
+/**
+ * Generates update token actions based on the provided parameters.
+ *
+ * @param {string[]} isvTokens - An array of ISV tokens.
+ * @param {string[] | undefined} existingFailedTokensMap - An array of existing failed tokens.
+ * @param {boolean} isError - Indicates if there was an error.
+ * @param {Partial<CustomerType>} customerObj - The customer object.
+ * @param {Partial<AddressType> | null} address - The address object or null.
+ * @param {string} [customerTokenId] - Optional customer token ID.
+ * @returns {ActionResponseType} The response containing the actions to be performed.
+ */
 const getUpdateTokenActions = (isvTokens: string[], existingFailedTokensMap: string[] | undefined, isError: boolean, customerObj: Partial<CustomerType>, address: Partial<AddressType> | null, customerTokenId?: string): ActionResponseType => {
-    let returnResponse: ActionResponseType = paymentUtils.getEmptyResponse();
     const customTypePresent = !!customerObj?.custom?.type?.id;
+    let returnResponse: ActionResponseType = paymentUtils.getEmptyResponse();
     let fields = {} as any;
     let customFields = {} as any;
     if (customTypePresent) {
@@ -143,7 +146,8 @@ const getUpdateTokenActions = (isvTokens: string[], existingFailedTokensMap: str
         })
     }
     return returnResponse;
-}
+};
+
 /**
  * Handles authorization application for the given payment update.
  * 
@@ -166,6 +170,7 @@ const handleAuthApplication = async (updatePaymentObj: PaymentType, application:
     updateActions.actions.push(authAction);
     return updateActions;
 };
+
 /**
  * Generates actions based on payer enrollment response.
  * 
@@ -174,69 +179,63 @@ const handleAuthApplication = async (updatePaymentObj: PaymentType, application:
  * @returns {ActionResponseType} - Object containing actions and errors.
  */
 const createEnrollResponseActions = (response: any, updatePaymentObj: PaymentType): ActionResponseType => {
-    const action: ActionResponseType = { actions: [], errors: [] };
-    let consumerErrorData: Partial<ActionType>[] = [];
+    let isv_dmpaFlag = false;
+    let isv_payerAuthenticationRequired = false;
     let isv_payerAuthenticationTransactionId = '';
     const isv_cardinalReferenceId = '';
     const isv_deviceDataCollectionUrl = '';
     const isv_requestJwt = '';
     const isv_responseJwt = '';
     const isv_stepUpUrl = '';
-    let isv_dmpaFlag = false;
-    const isv_payerAuthenticationPaReq = '';
-    let isv_payerAuthenticationRequired = false;
     const isv_tokenCaptureContextSignature = '';
     const isv_tokenVerificationContext = '';
+    const isv_payerAuthenticationPaReq = '';
     const customFields = updatePaymentObj?.custom?.fields;
-    try {
-        if (response) {
-            let { transactionId: isv_payerEnrollTransactionId, httpCode: isv_payerEnrollHttpCode, status: isv_payerEnrollStatus, data } = response || {};
-            action.actions = paymentUtils.setCustomFieldMapper({ isv_payerEnrollTransactionId, isv_payerEnrollHttpCode, isv_payerEnrollStatus });
-            if (Constants.HTTP_SUCCESS_STATUS_CODE === isv_payerEnrollHttpCode && Constants.API_STATUS_AUTHORIZED === isv_payerEnrollStatus && data) {
-                isv_payerAuthenticationTransactionId = response.data.consumerAuthenticationInformation?.authenticationTransactionId || isv_payerEnrollTransactionId;
-                action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_payerAuthenticationTransactionId }));
-            }
-            if (response.data?.id && 'PAYERAUTH_INVOKE' === response.action || 'PAYERAUTH_EXTERNAL' === response.action || ('04' === response?.requestData?.consumerAuthenticationInformation?.challengeCode && paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER))) {
-                isv_dmpaFlag = true;
-            }
-            action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_dmpaFlag }));
-            if (customFields?.isv_tokenCaptureContextSignature) {
-                action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenCaptureContextSignature }));
-            }
-            if (customFields?.isv_savedToken && customFields?.isv_tokenVerificationContext) {
-                action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenVerificationContext }));
-            }
-            isv_payerAuthenticationRequired = Constants.API_STATUS_PENDING_AUTHENTICATION === response.status ? true : updatePaymentObj?.custom?.fields.isv_payerAuthenticationRequired ? true : false;
-            action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_payerAuthenticationRequired }));
-            if (Constants.HTTP_SUCCESS_STATUS_CODE === response?.httpCode && response?.data && response.data?.errorInformation && 0 < Object.keys(response.data.errorInformation)?.length && Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED === response.data.errorInformation?.reason) {
-                isv_payerEnrollStatus = response.data.errorInformation.reason;
-                action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_payerEnrollStatus }));
-                if (customFields?.isv_payerAuthenticationRequired) {
-                    consumerErrorData = paymentUtils.setCustomFieldToNull({
-                        isv_payerAuthenticationTransactionId,
-                        isv_cardinalReferenceId,
-                        isv_deviceDataCollectionUrl,
-                        isv_requestJwt,
-                        isv_responseJwt,
-                        isv_stepUpUrl,
-                        isv_payerAuthenticationPaReq,
-                    });
-                } else {
-                    consumerErrorData = paymentUtils.setCustomFieldToNull({
-                        isv_cardinalReferenceId,
-                        isv_deviceDataCollectionUrl,
-                        isv_requestJwt,
-                    });
-                }
-                consumerErrorData.forEach((i) => {
-                    action.actions.push(i);
+    const action: ActionResponseType = { actions: [], errors: [] };
+    let consumerErrorData: Partial<ActionType>[] = [];
+    if (response) {
+        let { transactionId: isv_payerEnrollTransactionId, httpCode: isv_payerEnrollHttpCode, status: isv_payerEnrollStatus, data } = response || {};
+        action.actions = paymentUtils.setCustomFieldMapper({ isv_payerEnrollTransactionId, isv_payerEnrollHttpCode, isv_payerEnrollStatus });
+        if (Constants.HTTP_SUCCESS_STATUS_CODE === isv_payerEnrollHttpCode && Constants.API_STATUS_AUTHORIZED === isv_payerEnrollStatus && data) {
+            isv_payerAuthenticationTransactionId = response.data.consumerAuthenticationInformation?.authenticationTransactionId || isv_payerEnrollTransactionId;
+            action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_payerAuthenticationTransactionId }));
+        }
+        if (response.data?.id && 'PAYERAUTH_INVOKE' === response.action || 'PAYERAUTH_EXTERNAL' === response.action || ('04' === response?.requestData?.consumerAuthenticationInformation?.challengeCode && paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER))) {
+            isv_dmpaFlag = true;
+        }
+        action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_dmpaFlag }));
+        if (customFields?.isv_tokenCaptureContextSignature) {
+            action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenCaptureContextSignature }));
+        }
+        if (customFields?.isv_savedToken && customFields?.isv_tokenVerificationContext) {
+            action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenVerificationContext }));
+        }
+        isv_payerAuthenticationRequired = Constants.API_STATUS_PENDING_AUTHENTICATION === response.status ? true : updatePaymentObj?.custom?.fields.isv_payerAuthenticationRequired ? true : false;
+        action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_payerAuthenticationRequired }));
+        if (Constants.HTTP_SUCCESS_STATUS_CODE === response?.httpCode && response?.data && response.data?.errorInformation && 0 < Object.keys(response.data.errorInformation)?.length && Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED === response.data.errorInformation?.reason) {
+            isv_payerEnrollStatus = response.data.errorInformation.reason;
+            action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_payerEnrollStatus }));
+            if (customFields?.isv_payerAuthenticationRequired) {
+                consumerErrorData = paymentUtils.setCustomFieldToNull({
+                    isv_payerAuthenticationTransactionId,
+                    isv_cardinalReferenceId,
+                    isv_deviceDataCollectionUrl,
+                    isv_requestJwt,
+                    isv_responseJwt,
+                    isv_stepUpUrl,
+                    isv_payerAuthenticationPaReq,
+                });
+            } else {
+                consumerErrorData = paymentUtils.setCustomFieldToNull({
+                    isv_cardinalReferenceId,
+                    isv_deviceDataCollectionUrl,
+                    isv_requestJwt,
                 });
             }
-        } else {
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_CREATE_ENROLL_RESPONSE_ACTIONS, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_INPUT);
+            consumerErrorData.forEach((i) => {
+                action.actions.push(i);
+            });
         }
-    } catch (exception) {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_CREATE_ENROLL_RESPONSE_ACTIONS, '', exception, '', '', '');
     }
     return action;
 };
@@ -250,50 +249,53 @@ const createEnrollResponseActions = (response: any, updatePaymentObj: PaymentTyp
 
 const payerAuthActions = (response: Partial<ConsumerAuthenticationInformationType>): Partial<ActionType>[] => {
     let action: Partial<ActionType>[] = [];
-    try {
-        if (response) {
-            const { isv_payerAuthenticationRequired, isv_payerAuthenticationTransactionId, acsUrl: isv_payerAuthenticationAcsUrl, isv_payerAuthenticationPaReq,
-                stepUpUrl: isv_stepUpUrl,
-                isv_responseJwt,
-                acsUrl,
+    if (response) {
+        const { isv_payerAuthenticationRequired, isv_payerAuthenticationTransactionId, acsUrl: isv_payerAuthenticationAcsUrl, isv_payerAuthenticationPaReq,
+            stepUpUrl: isv_stepUpUrl,
+            isv_responseJwt,
+            acsUrl,
+            xid,
+            paReq,
+            authenticationTransactionId,
+            veresEnrolled,
+            cardinalId: cardinalReferenceId,
+            proofXml,
+            specificationVersion,
+            directoryServerTransactionId
+        } = response || {}
+        action = paymentUtils.setCustomFieldMapper({
+            isv_payerAuthenticationRequired, isv_payerAuthenticationTransactionId, isv_payerAuthenticationAcsUrl, isv_payerAuthenticationPaReq, isv_stepUpUrl, isv_responseJwt,
+        });
+        action.push({
+            action: Constants.ADD_INTERFACE_INTERACTION,
+            type: { key: 'isv_payments_payer_authentication_enrolment_check' },
+            fields: {
+                authorizationAllowed: true,
+                authenticationRequired: true,
                 xid,
-                paReq,
+                paReq: paReq,
+                acsUrl: acsUrl,
                 authenticationTransactionId,
                 veresEnrolled,
-                cardinalId: cardinalReferenceId,
+                cardinalReferenceId,
                 proofXml,
                 specificationVersion,
                 directoryServerTransactionId
-            } = response || {}
-            action = paymentUtils.setCustomFieldMapper({
-                isv_payerAuthenticationRequired, isv_payerAuthenticationTransactionId, isv_payerAuthenticationAcsUrl, isv_payerAuthenticationPaReq, isv_stepUpUrl, isv_responseJwt,
-            });
-            action.push({
-                action: Constants.ADD_INTERFACE_INTERACTION,
-                type: { key: 'isv_payments_payer_authentication_enrolment_check' },
-                fields: {
-                    authorizationAllowed: true,
-                    authenticationRequired: true,
-                    xid,
-                    paReq: paReq,
-                    acsUrl: acsUrl,
-                    authenticationTransactionId,
-                    veresEnrolled,
-                    cardinalReferenceId,
-                    proofXml,
-                    specificationVersion,
-                    directoryServerTransactionId
-                },
-            });
-        } else {
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_PAYER_AUTH_ACTIONS, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_INPUT);
-        }
-    } catch (exception) {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_PAYER_AUTH_ACTIONS, '', exception, '', '', '');
+            },
+        });
     }
     return action;
 };
-const payerAuthValidateActions = async (authResponse: ActionResponseType, paymentResponse: any) => {
+
+/**
+ * Validates payer authentication actions based on the authentication and payment responses.
+ *
+ * @async
+ * @param {ActionResponseType} authResponse - The action response object to update.
+ * @param {any} paymentResponse - The payment response object containing authentication data.
+ * @returns {Promise<ActionResponseType>} The updated action response object.
+ */
+const payerAuthValidateActions = async (authResponse: ActionResponseType, paymentResponse: any): Promise<ActionResponseType> => {
     const { consumerAuthenticationInformation, processorInformation, submitTimeUtc } = paymentResponse?.data || {};
     const { cavv, eciRaw, paresStatus, indicator, authenticationResult, xid, cavvAlgorithm, eci, specificationVersion } = consumerAuthenticationInformation || {};
     authResponse.actions.push({

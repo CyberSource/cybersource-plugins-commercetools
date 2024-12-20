@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import path from 'path';
 
 import axios from 'axios';
@@ -14,12 +13,14 @@ import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
 import { Token } from '../models/TokenModel';
-import { ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, CustomerType, ErrorType, PaymentCustomFieldsType, PaymentTransactionType, PaymentType, TransactionObjectType } from '../types/Types';
+import { ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, CustomerType, ErrorType, LoggerConfigType, PaymentCustomFieldsType, PaymentTransactionType, PaymentType, TransactionObjectType } from '../types/Types';
 
 import paymentValidator from './PaymentValidator';
 import commercetoolsApi from './api/CommercetoolsApi';
 
 const { combine, printf } = format;
+
+
 /**
 * Handles logging info and errors.
 * 
@@ -29,20 +30,14 @@ const { combine, printf } = format;
 * @param {string} id - Identifier.
 * @param {string} logMessage - Log message.
 */
-const logData = (filePath: string, method: string, type: string, id: string, logMessage: string): void => {
+const logData = (filePath: string, method: string, type: string, id: string, logMessage: string, consolidatedTime?: string): void => {
   let loggingFormat: winston.Logform.Format;
   let logger: winston.Logger;
   let fileName = path.parse(path.basename(filePath)).name;
   let newDate = getDate(Date.now(), true);
-  if (id) {
-    loggingFormat = printf(({ label, methodName, level, message }) => {
-      return `[${newDate}] [${label}] [${methodName}] [${level.toUpperCase()}] [${id}] : ${message}`;
-    });
-  } else {
-    loggingFormat = printf(({ label, methodName, level, message }) => {
-      return `[${newDate}] [${label}] [${methodName}] [${level.toUpperCase()}]  : ${message}`;
-    });
-  }
+  loggingFormat = printf(({ label, methodName, level, message }) => {
+    return `[${newDate}] [${label}] [${methodName}] [${level.toUpperCase()}]` + (id ? ` [${id}]` : '') + (consolidatedTime ? ` [Execution Time: ${consolidatedTime}] Ms` : '') + ` : ${message}`;
+  });
   if (Constants.STRING_AZURE !== process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT && Constants.STRING_AWS !== process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
     logger = winston.createLogger({
       level: type,
@@ -57,22 +52,19 @@ const logData = (filePath: string, method: string, type: string, id: string, log
         }),
       ],
     });
+    const loggerConfig = {
+      label: fileName,
+      methodName: method,
+      level: type,
+      message: logMessage,
+    } as Partial<LoggerConfigType>;
     if (id) {
-      logger.log({
-        label: fileName,
-        methodName: method,
-        level: type,
-        id: id,
-        message: logMessage,
-      });
-    } else {
-      logger.log({
-        label: fileName,
-        methodName: method,
-        level: type,
-        message: logMessage,
-      });
+      loggerConfig.id = id;
     }
+    if (consolidatedTime) {
+      loggerConfig.consolidatedTime = `${consolidatedTime} Ms`
+    }
+    logger.log(loggerConfig as LoggerConfigType);
   }
 };
 
@@ -92,6 +84,7 @@ const getDate = (dateInput: Date | string | number | null = null, isReturnTypeSt
   }
   return currentDate;
 };
+
 /**
  * Log exceptions.
  * 
@@ -110,11 +103,11 @@ const logExceptionData = (fileName: string, functionName: string, exceptionMsg: 
   } else if (exception instanceof Error) {
     if (exceptionMsg) {
       exceptionData =
-        FunctionConstant.FUNC_ADD_CUSTOM_TYPES === functionName || FunctionConstant.FUNC_ADD_EXTENSIONS === functionName || 'FuncGetCustomTypes' === functionName
+        FunctionConstant.FUNC_ADD_CUSTOM_TYPES === functionName || FunctionConstant.FUNC_ADD_EXTENSIONS === functionName || FunctionConstant.FUNC_GET_CUSTOM_TYPES === functionName
           ? exceptionMsg + Constants.STRING_FULL_COLON + key + Constants.STRING_HYPHEN + exception.message
           : exceptionMsg + Constants.STRING_HYPHEN + exception.message;
     } else {
-      exceptionData = FunctionConstant.FUNC_ADD_CUSTOM_TYPES === functionName || FunctionConstant.FUNC_ADD_EXTENSIONS === functionName || 'FuncGetCustomTypes' === functionName ? exceptionMsg + Constants.STRING_FULL_COLON + key + Constants.STRING_HYPHEN + exception : exception.message;
+      exceptionData = FunctionConstant.FUNC_ADD_CUSTOM_TYPES === functionName || FunctionConstant.FUNC_ADD_EXTENSIONS === functionName || FunctionConstant.FUNC_GET_CUSTOM_TYPES === functionName ? exceptionMsg + Constants.STRING_FULL_COLON + key + Constants.STRING_HYPHEN + exception : exception.message;
     }
   } else {
     exceptionData = exceptionMsg ? exceptionMsg + Constants.STRING_HYPHEN + exception : JSON.stringify(exception);
@@ -124,6 +117,7 @@ const logExceptionData = (fileName: string, functionName: string, exceptionMsg: 
   }
   id ? logData(fileName, functionName, Constants.LOG_ERROR, resourceType + id, exceptionData) : logData(fileName, functionName, Constants.LOG_ERROR, '', exceptionData);
 };
+
 /**
  * Set custom field mapper.
  * 
@@ -133,24 +127,19 @@ const logExceptionData = (fileName: string, functionName: string, exceptionMsg: 
 const setCustomFieldMapper = (fields: Partial<PaymentCustomFieldsType>): Partial<ActionType>[] => {
   const actions: Partial<ActionType>[] = [];
   let keys: readonly string[];
-  try {
-    keys = Object.keys(fields);
-    if (keys) {
-      keys.forEach((key) => {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: key,
-          value: fields[key as keyof PaymentCustomFieldsType],
-        });
+  keys = Object.keys(fields);
+  if (keys) {
+    keys.forEach((key) => {
+      actions.push({
+        action: Constants.SET_CUSTOM_FIELD,
+        name: key,
+        value: fields[key as keyof PaymentCustomFieldsType],
       });
-    } else {
-      logData(__filename, 'FuncSetCustomFieldMapper', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_CUSTOM_FIELDS);
-    }
-  } catch (exception) {
-    logExceptionData(__filename, 'FuncSetCustomFieldMapper', '', exception, '', '', '');
+    });
   }
   return actions;
 };
+
 /**
  * Set custom fields to null.
  * 
@@ -160,24 +149,19 @@ const setCustomFieldMapper = (fields: Partial<PaymentCustomFieldsType>): Partial
 const setCustomFieldToNull = (fields: Partial<PaymentCustomFieldsType> | Partial<CustomerCustomType>): Partial<ActionType>[] => {
   const actions: Partial<ActionType>[] = [];
   let keys: string[];
-  try {
-    keys = Object.keys(fields);
-    if (keys) {
-      keys.forEach((key) => {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: key,
-          value: null,
-        });
+  keys = Object.keys(fields);
+  if (keys) {
+    keys.forEach((key) => {
+      actions.push({
+        action: Constants.SET_CUSTOM_FIELD,
+        name: key,
+        value: null,
       });
-    } else {
-      logData(__filename, 'FuncSetCustomFieldToNull', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_CUSTOM_FIELDS);
-    }
-  } catch (exception) {
-    logExceptionData(__filename, 'FuncSetCustomFieldToNull', '', exception, '', '', '');
+    });
   }
   return actions;
 };
+
 /**
  * Set transaction ID for a payment.
  * 
@@ -194,10 +178,11 @@ const setTransactionId = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2P
   paymentValidator.setObjectValue(transactionIdData, 'interactionId', paymentResponse, 'transactionId', Constants.STR_STRING, false);
   paymentValidator.setObjectValue(transactionIdData, 'transactionId', transactionDetail, 'id', Constants.STR_STRING, false);
   if (!transactionIdData.interactionId || !transactionIdData.transactionId) {
-    logData(__filename, FunctionConstant.FUNC_SET_TRANSACTION_ID, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    logData(__filename, FunctionConstant.FUNC_SET_TRANSACTION_ID, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
   }
   return transactionIdData;
 };
+
 /**
  * Change the state of a transaction.
  * 
@@ -207,15 +192,13 @@ const setTransactionId = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2P
  */
 const changeState = (transactionDetail: Partial<PaymentTransactionType>, state: string) => {
   const changeStateData = {
-    action: 'changeTransactionState',
+    action: Constants.CHANGE_TRANSACTION_STATE,
     state: '',
     transactionId: '',
   };
   if (transactionDetail && state && transactionDetail?.id) {
     changeStateData.state = state;
     changeStateData.transactionId = transactionDetail.id;
-  } else {
-    logData(__filename, FunctionConstant.FUNC_CHANGE_STATE, Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
   }
   return changeStateData;
 };
@@ -240,11 +223,10 @@ const failureResponse = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2Pa
   if (paymentResponse && transactionDetail && transactionDetail?.id) {
     failureResponseData.fields.reasonCode = `${paymentResponse.httpCode}`;
     failureResponseData.fields.transactionId = transactionDetail.id;
-  } else {
-    logData(__filename, 'FUNC_FAILURE_RESPONSE', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
   }
   return failureResponseData;
 };
+
 /**
  * Convert cent amount to its corresponding amount with the specified fraction digits.
  * 
@@ -253,9 +235,11 @@ const failureResponse = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2Pa
  * @returns {number} - The converted amount.
  */
 const convertCentToAmount = (amount: number, fractionDigits: number): number => {
-  if (amount) amount = Number((amount / Math.pow(10, fractionDigits)).toFixed(fractionDigits)) * 1;
+  if (amount)
+    amount = Number((amount / Math.pow(10, fractionDigits)).toFixed(fractionDigits)) * 1;
   return amount;
 };
+
 /**
  * Convert an amount to its corresponding cent value with the specified fraction digits.
  * 
@@ -268,11 +252,14 @@ const convertAmountToCent = (amount: number, fractionDigits: number): number => 
   if (amount && 'number' === typeof fractionDigits) {
     const amountArray = amount.toString().split('.');
     amount = Number(amountArray[0]);
-    if (2 === amountArray.length && fractionDigits) amount = Number(amountArray[0] + '.' + amountArray[1].substring(0, fractionDigits));
+    if (2 === amountArray.length && fractionDigits) {
+      amount = Number(amountArray[0] + '.' + amountArray[1].substring(0, fractionDigits));
+    }
     cent = Math.round(amount * Math.pow(10, fractionDigits));
   }
   return cent;
 };
+
 /**
  * Round off the amount to the specified number of fraction digits.
  * 
@@ -282,9 +269,12 @@ const convertAmountToCent = (amount: number, fractionDigits: number): number => 
  */
 const roundOff = (amount: number, fractionDigits: number): number => {
   let value = 0;
-  if (amount && fractionDigits) value = Math.round(amount * Math.pow(10, fractionDigits)) / Math.pow(10, fractionDigits);
+  if (amount && fractionDigits) {
+    value = Math.round(amount * Math.pow(10, fractionDigits)) / Math.pow(10, fractionDigits);
+  }
   return value;
 };
+
 /**
  * Get an empty response object with empty actions and errors arrays.
  * 
@@ -300,6 +290,7 @@ const getEmptyResponse = (): { actions: Partial<ActionType>[], errors: ErrorType
     errors: [],
   };
 };
+
 /**
  * Get an invalid operation response object with an empty actions array and an error object indicating an invalid operation.
  * 
@@ -316,6 +307,7 @@ const invalidOperationResponse = (): { actions: Partial<ActionType>[], errors: E
     ],
   };
 };
+
 /**
  * Get an invalid input response object with an empty actions array and an error object indicating invalid input.
  * 
@@ -332,6 +324,7 @@ const invalidInputResponse = (): { actions: Partial<ActionType>[], errors: Error
     ],
   };
 };
+
 /**
  * Get a refund response object with details about the refund, including capture ID, transaction ID, and pending transaction amount.
  * 
@@ -352,6 +345,7 @@ const getRefundResponseObject = (transaction: Partial<PaymentTransactionType>, p
   }
   return refundResponseAmountObject;
 };
+
 /**
  * Get the order ID based on either the cart ID or the payment ID.
  * 
@@ -360,8 +354,8 @@ const getRefundResponseObject = (transaction: Partial<PaymentTransactionType>, p
  * @returns {Promise<string>} - The order ID.
  */
 const getOrderId = async (cartId: string, paymentId: string): Promise<string> => {
-  let orderObj = null;
   let orderNo = '';
+  let orderObj = null;
   if (cartId) {
     orderObj = await commercetoolsApi.queryOrderById(cartId, Constants.CART_ID);
     if (orderObj && 0 < orderObj.count && orderObj.results[0]?.orderNumber) {
@@ -376,57 +370,7 @@ const getOrderId = async (cartId: string, paymentId: string): Promise<string> =>
   }
   return orderNo;
 };
-/**
- * Encrypts the provided data using AES-GCM encryption.
- * 
- * @param {string} data - The data to be encrypted.
- * @returns {string} - The encrypted data encoded in Base64.
- */
-const encryption = (data: string): string => {
-  let baseEncodedData = '';
-  let encryptionInfo;
-  try {
-    if (data && process.env.CT_CLIENT_SECRET) {
-      const key = process.env.CT_CLIENT_SECRET;
-      const iv = crypto.randomBytes(12);
-      const cipher = crypto.createCipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, key, iv);
-      encryptionInfo = cipher.update(data, Constants.UNICODE_ENCODING_SYSTEM, Constants.ENCODING_BASE_SIXTY_FOUR);
-      encryptionInfo += cipher.final(Constants.ENCODING_BASE_SIXTY_FOUR);
-      const authTag = cipher.getAuthTag();
-      const encryptStringData = iv.toString(Constants.HEX) + Constants.STRING_FULL_COLON + encryptionInfo.toString() + Constants.STRING_FULL_COLON + authTag.toString(Constants.HEX);
-      baseEncodedData = Buffer.from(encryptStringData).toString(Constants.ENCODING_BASE_SIXTY_FOUR);
-    }
-  } catch (exception) {
-    logExceptionData(__filename, 'FuncEncryption', '', exception, '', '', '');
-  }
-  return baseEncodedData;
-};
-/**
- * Decrypts the provided encoded credentials using AES-GCM decryption.
- * 
- * @param {string} encodedCredentials - The encoded credentials to be decrypted.
- * @returns {string} - The decrypted data.
- */
-const decryption = (encodedCredentials: string): string => {
-  let decryptedData = '';
-  let dataArray = [];
-  try {
-    if (encodedCredentials && process.env.CT_CLIENT_SECRET) {
-      const data = Buffer.from(encodedCredentials, Constants.ENCODING_BASE_SIXTY_FOUR).toString('ascii');
-      dataArray = data.split(Constants.STRING_FULL_COLON);
-      const ivBuff = Buffer.from(dataArray[0], Constants.HEX);
-      const encryptedData = dataArray[1];
-      const authTagBuff = Buffer.from(dataArray[2], Constants.HEX);
-      const decipher = crypto.createDecipheriv(Constants.HEADER_ENCRYPTION_ALGORITHM, process.env.CT_CLIENT_SECRET, ivBuff);
-      decipher.setAuthTag(authTagBuff);
-      decryptedData = decipher.update(encryptedData, Constants.ENCODING_BASE_SIXTY_FOUR, Constants.UNICODE_ENCODING_SYSTEM);
-      decryptedData += decipher.final(Constants.UNICODE_ENCODING_SYSTEM);
-    }
-  } catch (exception) {
-    logExceptionData(__filename, FunctionConstant.FUNC_DECRYPTION, '', exception, '', '', '');
-  }
-  return decryptedData;
-};
+
 /**
  * Retrieves data from the specified URL.
  * 
@@ -449,7 +393,7 @@ const getCertificatesData = async (url: string): Promise<{ status: number; data:
             resolve(certificateResponse);
           } else {
             certificateResponse.status = response.status;
-            logData(__filename, FunctionConstant.FUNC_GET_CERTIFICATES_DATA, Constants.LOG_ERROR, '', stringify(response));
+            logData(__filename, FunctionConstant.FUNC_GET_CERTIFICATES_DATA, Constants.LOG_DEBUG, '', stringify(response));
             reject(certificateResponse);
           }
         })
@@ -463,6 +407,7 @@ const getCertificatesData = async (url: string): Promise<{ status: number; data:
   }
   return certificateResponse;
 };
+
 /**
  * Retrieves the cart object associated with a payment.
  * 
@@ -481,6 +426,7 @@ const getCartObject = async (paymentObj: PaymentType): Promise<any> => {
   }
   return cartObj;
 };
+
 /**
  * Creates token data based on the provided parameters.
  * 
@@ -496,6 +442,7 @@ const createTokenData = async (customFields: Partial<CustomerCustomType>, custom
   const address = Constants.UC_ADDRESS === customerObj.custom?.fields?.isv_addressId ? billToFields : {};
   return new Token(customFields, customerTokenId, paymentInstrumentId, instrumentIdentifier, customFields?.isv_addressId, address)
 };
+
 /**
  * Creates data for failed tokens based on the provided custom fields and address ID.
  * 
@@ -515,6 +462,7 @@ const createFailedTokenData = async (customFields: Partial<CustomerCustomType>, 
   }
   return existingFailedTokens;
 };
+
 /**
  * Creates a transaction object based on the provided parameters.
  * 
@@ -545,6 +493,7 @@ const createTransactionObject = (version: number | undefined, amountPlanned: Amo
   }
   return transactionObject;
 };
+
 /**
  * Prepares headers and parameters for making requests to the CyberSource API.
  * 
@@ -572,6 +521,7 @@ const prepareApiHeaders = (pathParams: any, headerParams: any, queryParams: any,
     accepts: accepts,
   };
 };
+
 /**
  * Collects data from an incoming HTTP request.
  * 
@@ -591,43 +541,6 @@ const collectRequestData = (request: any): Promise<string> => {
   });
 };
 /**
- * Validates the headers in network tokenization webhook notification.
- * 
- * @param {any} signature - The signature string.
- * @param {any} notification - The notification object.
- * @returns {Promise<boolean>} - A promise that resolves with a boolean indicating whether the notification is valid.
- */
-const authenticateNetToken = async (signature: any, notification: any): Promise<boolean> => {
-  let isValidNotification = false;
-  try {
-    if (notification && Constants.STR_OBJECT === typeof notification && signature && Constants.STR_STRING === typeof signature) {
-      const payloadBody = notification?.payload;
-      const signatureInfo = signature.split(';');
-      if (Array.isArray(signatureInfo) && 3 === signatureInfo.length) {
-        const timeStamp = signatureInfo[0].split('=')[1].trim();
-        const keyId = signatureInfo[1].split('=')[1].trim();
-        const sign = signatureInfo[2].split('sig=')[1].trim();
-        const getCustomObjectSubscriptions = await commercetoolsApi.retrieveCustomObjectByContainer(Constants.CUSTOM_OBJECT_CONTAINER);
-        if (0 < getCustomObjectSubscriptions?.results?.length) {
-          const subscriptionData = await getCustomObjectSubscriptions?.results[0]?.value?.find((customObject: any) => notification?.webhookId === customObject?.webhookId && keyId === customObject?.keyId);
-          if (timeStamp && keyId && sign && payloadBody && subscriptionData?.key) {
-            const payload = `${timeStamp}.${JSON.stringify(payloadBody)}`;
-            const decodedKey = Buffer.from(subscriptionData.key, Constants.ENCODING_BASE_SIXTY_FOUR);
-            const hmac = crypto.createHmac(Constants.ENCODING_SHA_TWO_FIFTY_SIX, decodedKey);
-            const generatedSignature = hmac.update(payload).digest(Constants.ENCODING_BASE_SIXTY_FOUR);
-            if (generatedSignature === sign) {
-              isValidNotification = true;
-            }
-          }
-        }
-      }
-    }
-  } catch (exception) {
-    logExceptionData(__filename, 'FunAuthenticateNetToken', '', exception, '', '', '');
-  }
-  return isValidNotification;
-};
-/**
  * Sanitizes HTML content to prevent XSS attacks.
  * 
  * @param {string} htmlData - The HTML content to sanitize.
@@ -645,7 +558,8 @@ function sanitizeHtml(htmlData: string): string {
   const bodyContent = domElement.window.document.body.innerHTML;
   const sanitizedBodyContent = DOMPurifyInstance.sanitize(bodyContent, config);
   return sanitizedBodyContent;
-}
+};
+
 /**
  * Counts the number of tokens within a specified time interval.
  * 
@@ -665,6 +579,7 @@ const countTokenForGivenInterval = (tokens: string[], startTime: string, endTime
   });
   return count;
 };
+
 /**
  * Extracts the request object from the request body.
  * 
@@ -675,12 +590,11 @@ const getRequestObj = (body: any): any => {
   let requestObj;
   if (body) {
     const requestBody = JSON.parse(body.toString());
-    (requestBody?.resource?.obj) ? requestObj = requestBody?.resource?.obj : logData(__filename, 'FuncGetRequestObj', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_REQUEST);
-  } else {
-    logData(__filename, 'FuncGetRequestObj', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_INVALID_REQUEST);
+    (requestBody?.resource?.obj) ? requestObj = requestBody?.resource?.obj : logData(__filename, 'FuncGetRequestObj', Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_INVALID_REQUEST);
   }
   return requestObj;
 };
+
 /**
  * Extracts the token ID from the input element.
  * 
@@ -695,6 +609,7 @@ const extractTokenValue = (inputElement: any): string => {
   }
   return tokenId;
 };
+
 /**
  * Updates the parsed token object with new values.
  * 
@@ -722,6 +637,7 @@ const updateParsedToken = (token: string, customFields: Partial<CustomerCustomTy
   }
   return parsedToken;
 };
+
 /**
  * Generates error messages based on the error code and transaction type.
  * 
@@ -765,6 +681,12 @@ const handleOMErrorMessage = (errorCode: number, transactionType: string): strin
   return errorMessage;
 };
 
+/**
+ * Handles success messages based on the transaction type.
+ *
+ * @param {string} transactionType - The type of transaction.
+ * @returns {string} The corresponding success message.
+ */
 const handleOmSuccessMessage = (transactionType: string) => {
   let successMessage = ''
   switch (transactionType) {
@@ -778,8 +700,16 @@ const handleOmSuccessMessage = (transactionType: string) => {
       successMessage = CustomMessages.SUCCESS_MSG_REVERSAL_SERVICE;
   }
   return successMessage;
-}
+};
 
+/**
+ * Logs error messages based on the error and function name.
+ *
+ * @param {any} error - The error object to log.
+ * @param {string} functionName - The name of the function where the error occurred.
+ * @param {string} id - An identifier related to the operation.
+ * @returns {void}
+ */
 const logErrorMessage = (error: any, functionName: string, id: string) => {
   let errorData = '';
   let idValue = '';
@@ -811,8 +741,20 @@ const logErrorMessage = (error: any, functionName: string, id: string) => {
   }
 };
 
+/**
+ * Converts a string value to a boolean.
+ *
+ * @param {string | undefined} value - The string value to convert.
+ * @returns {boolean} True if the value is "true", otherwise false.
+ */
 const toBoolean = (value: string | undefined): boolean => value?.toLowerCase() === 'true';
 
+/**
+ * Retrieves the interaction ID from the payment update object.
+ *
+ * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @returns {string} The interaction ID if found, otherwise an empty string.
+ */
 const getInteractionId = (updatePaymentObj: PaymentType) => {
   let interactionId = '';
   for (let transaction of updatePaymentObj.transactions) {
@@ -822,15 +764,47 @@ const getInteractionId = (updatePaymentObj: PaymentType) => {
     }
   }
   return interactionId;
-}
-const validatePaymentId = (paymentId: string) => {
+};
+
+/**
+ * Validates a payment ID against a UUID format.
+ *
+ * @param {string} paymentId - The payment ID to validate.
+ * @returns {string} The validated payment ID if valid, otherwise an empty string.
+ */
+const validatePaymentId = (paymentId: string): string => {
   let validatedId = ''
   const paymentIdRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   if (paymentIdRegex.test(paymentId)) {
     validatedId = paymentId;
   }
   return validatedId;
-}
+};
+
+const logRateLimitException = (requestCount: number): void => {
+  const timestamp = new Date().toISOString();
+  console.log(`Rate limit exceeded: Time [${timestamp}], Requests [${requestCount}], Max Allowed [${Constants.RATE_LIMIT_TIME_WINDOW} in 1 minute].`);
+};
+
+const maskData = (obj: any) => {
+  let logData = JSON.parse(JSON.stringify(obj));
+  replaceChar(logData);
+  return logData;
+};
+
+const replaceChar = (logData: any) => {
+  const replaceCharacterRegex = /./g;
+  const payload = ['email', 'lastName', 'firstName', 'expirationYear', 'expirationMonth', 'phoneNumber', 'cvv', 'securityCode'];
+  Object.keys(logData).forEach(key => {
+    if ('object' === typeof logData[key] && null !== logData[key]) {
+      replaceChar(logData[key]);
+    } else {
+      if (payload.includes(key) && null !== logData[key] && typeof "string" === logData[key]) {
+        logData[key] = logData[key].replace(replaceCharacterRegex, "x");
+      }
+    }
+  });
+};
 
 export default {
   logData,
@@ -848,8 +822,6 @@ export default {
   invalidInputResponse,
   getRefundResponseObject,
   getOrderId,
-  encryption,
-  decryption,
   getCertificatesData,
   getCartObject,
   createTokenData,
@@ -857,7 +829,6 @@ export default {
   createTransactionObject,
   prepareApiHeaders,
   collectRequestData,
-  authenticateNetToken,
   sanitizeHtml,
   countTokenForGivenInterval,
   getRequestObj,
@@ -868,6 +839,8 @@ export default {
   toBoolean,
   handleOmSuccessMessage,
   logErrorMessage,
+  logRateLimitException,
   getInteractionId,
-  validatePaymentId
+  validatePaymentId,
+  maskData
 };

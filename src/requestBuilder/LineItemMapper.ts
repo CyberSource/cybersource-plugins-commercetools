@@ -6,20 +6,88 @@ import { PaymentType } from "../types/Types";
 import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
 
+/**
+ * Factory class responsible for creating the appropriate line item object 
+ * based on the function being executed.
+ */
+class LineItemFactory {
+    /**
+     * Creates and returns a line item object based on the provided function name.
+     * @param {string} functionName - The name of the function requesting a line item.
+     * @returns {Ptsv2paymentsidreversalsOrderInformationLineItems | Ptsv2paymentsOrderInformationLineItems} 
+     *          The appropriate line item object based on the function.
+     */
+    static createLineItem(functionName: string): Ptsv2paymentsidreversalsOrderInformationLineItems | Ptsv2paymentsOrderInformationLineItems {
+        if (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName) {
+            return {} as Ptsv2paymentsidreversalsOrderInformationLineItems;
+        } else {
+            return {} as Ptsv2paymentsOrderInformationLineItems;
+        }
+    }
+}
+
+/**
+ * Mapper class responsible for mapping values to line item objects.
+ */
+class LineItemMapper {
+    /**
+     * Maps values to the line item object and returns the populated object.
+     * @param {string} functionName - The name of the function requesting a line item.
+     * @param {number} lineItemTotalAmount - The total amount for the line item.
+     * @param {string} productName - The name of the product.
+     * @param {string} productSku - The SKU of the product.
+     * @param {string} productCode - The code representing the product.
+     * @param {number} unitPrice - The unit price of the product.
+     * @param {number} quantity - The quantity of the product.
+     * @param {number} [discountAmount] - The discount applied to the product.
+     * @param {number} [taxRate] - The tax rate applied to the product.
+     * @returns {any} - The populated line item object.
+     */
+    static mapLineItemValues(functionName: string, lineItemTotalAmount: number, productName: string, productSku: string, productCode: string, unitPrice: number, quantity: number, discountAmount?: number, taxRate?: number) {
+        let orderInformationLineItem = LineItemFactory.createLineItem(functionName);
+        orderInformationLineItem.totalAmount = lineItemTotalAmount;
+        orderInformationLineItem.productName = productName;
+        orderInformationLineItem.productSku = productSku;
+        orderInformationLineItem.productCode = productCode;
+        orderInformationLineItem.unitPrice = unitPrice;
+        orderInformationLineItem.quantity = quantity;
+        orderInformationLineItem.discountAmount = discountAmount;
+        paymentValidator.setObjectValue(orderInformationLineItem, 'taxRate', taxRate, '', Constants.STR_STRING, false);
+        return orderInformationLineItem;
+    }
+}
+
+/**
+ * Main class responsible for handling and managing line items for payments.
+ */
 export class LineItem {
     private isShipping: boolean;
     private isCustomLineItem: boolean;
     private isTotalPriceDiscount: boolean;
+    private functionName: string;
+    private locale: string;
     private unitPrice: number;
     private lineItemTotalAmount: number;
     private fractionDigits: number;
-    private functionName: string;
-    private locale: string;
+    private paymentObj: PaymentType | null;
     private lineItem: any;
     private item: any;
-    private paymentObj: PaymentType | null;
     private cartObj: any;
 
+    /**
+     * Constructor for the LineItem class, initializes line item properties.
+     * @param {any} lineItem - The line item data object.
+     * @param {number} unitPrice - The unit price of the item.
+     * @param {string} functionName - The name of the function being called.
+     * @param {string} locale - The locale for the item.
+     * @param {any} item - Additional item data.
+     * @param {PaymentType | null} paymentObj - The payment object for processing.
+     * @param {boolean} isShipping - Flag to indicate if the item is for shipping.
+     * @param {any} cartObj - The cart object containing item details.
+     * @param {boolean} isCustomLineItem - Flag to indicate if the item is a custom line item.
+     * @param {boolean} isTotalPriceDiscount - Flag to indicate if the total price is discounted.
+     * @param {number} lineItemTotalAmount - The total amount for the line item.
+     */
     constructor(lineItem: any, unitPrice: number, functionName: string, locale: string, item: any, paymentObj: PaymentType | null, isShipping: boolean, cartObj: any, isCustomLineItem: boolean, isTotalPriceDiscount: boolean, lineItemTotalAmount: number) {
         this.lineItem = lineItem;
         this.unitPrice = unitPrice;
@@ -35,38 +103,26 @@ export class LineItem {
         this.fractionDigits = this.paymentObj?.amountPlanned?.fractionDigits || 0;
     }
 
-    private createLineItem() {
-        if (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === this.functionName) {
-            return {} as Ptsv2paymentsidreversalsOrderInformationLineItems;
-        } else {
-            return {} as Ptsv2paymentsOrderInformationLineItems;
-        }
-    }
-
-    private mapLineItemValues(productName: string, productSku: string, productCode: string, unitPrice: number, quantity: number, discountAmount?: number, taxRate?: number) {
-        let orderInformationLineItem = this.createLineItem();
-        orderInformationLineItem.totalAmount = this.lineItemTotalAmount;
-        orderInformationLineItem.productName = productName;
-        orderInformationLineItem.productSku = productSku;
-        orderInformationLineItem.productCode = productCode;
-        orderInformationLineItem.unitPrice = unitPrice;
-        orderInformationLineItem.quantity = quantity;
-        orderInformationLineItem.discountAmount = discountAmount;
-        paymentValidator.setObjectValue(orderInformationLineItem, 'taxRate', taxRate, '', Constants.STR_STRING, false);
-        return orderInformationLineItem;
-    }
-
+    /**
+     * Sets values for a coupon price line item.
+     * @returns {any} - The mapped line item object for the coupon.
+     */
     private setCouponPriceLineItemValues() {
-        return this.mapLineItemValues('coupon', 'coupon', 'coupon', this.unitPrice, 1);
+        return LineItemMapper.mapLineItemValues(this.functionName, this.lineItemTotalAmount, 'coupon', 'coupon', 'coupon', this.unitPrice, 1);
     }
 
+    /**
+     * Sets values for a line item based on whether it is a shipping item.
+     * @param {boolean} isShipping - Indicates if the line item is for shipping.
+     * @returns {any} - The mapped line item object with values set.
+     */
     private setLineItemValues(isShipping: boolean): any {
         let discountPrice = 0;
-        let item: any;
-        let discountArray: any;
-        let unitPrice: number
+        let unitPrice: number;
         let quantity: number;
         let taxRate: number;
+        let item: any;
+        let discountArray: any;
         if (isShipping) {
             item = this.lineItem.shippingInfo;
             discountArray = item?.discountedPrice?.includedDiscounts;
@@ -88,7 +144,8 @@ export class LineItem {
             });
         }
         const discountAmount = paymentUtils.roundOff(discountPrice, this.fractionDigits);
-        return this.mapLineItemValues(
+        return LineItemMapper.mapLineItemValues(
+            this.functionName, this.lineItemTotalAmount,
             isShipping ? item.shippingMethodName : this.lineItem.name[this.locale],
             isShipping ? Constants.SHIPPING_AND_HANDLING : (this.isCustomLineItem ? this.lineItem.slug : this.lineItem.variant.sku),
             isShipping ? Constants.SHIPPING_AND_HANDLING : Constants.STRING_DEFAULT,
@@ -99,6 +156,10 @@ export class LineItem {
         );
     }
 
+    /**
+     * Retrieves the details of the line item based on the flags set.
+     * @returns {any} - The populated line item object.
+     */
     public getLineItemDetails() {
         return this.isTotalPriceDiscount ? this.setCouponPriceLineItemValues() : this.setLineItemValues(this.isShipping);
     }

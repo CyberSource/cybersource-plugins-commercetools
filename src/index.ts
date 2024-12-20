@@ -13,13 +13,17 @@ import { AppHandler } from './app/AppHandler';
 import { RouterHandler } from './app/RouterHandler';
 import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
+import { FunctionConstant } from './constants/functionConstant';
+import { testApiConnection } from './testConnection';
 import { PaymentType } from './types/Types';
 import paymentActions from './utils/PaymentActions';
 import paymentHandler from './utils/PaymentHandler';
 import paymentUtils from './utils/PaymentUtils';
 import paymentValidator from './utils/PaymentValidator'
 import commercetoolsApi from './utils/api/CommercetoolsApi';
-import resourceHandler from './utils/config/ResourceHandler';
+import { createCustomTypes, createExtension } from './utils/config/ResourceHandler';
+import authenticationHelper from './utils/helpers/AuthenticationHelper';
+import syncHelper from './utils/helpers/SyncHelper';
 
 let errorMessage = '';
 let successMessage = '';
@@ -41,7 +45,7 @@ app.listen(port, (err: any) => {
   if (err) {
     console.log('Error in starting the extension :', err);
   } else {
-    console.log(`Extension started in port ${port}`);
+    console.log(`Extension started in port ${app.port || ''}`);
   }
 });
 
@@ -53,17 +57,17 @@ app.listen(port, (err: any) => {
  * @returns {Promise<void>} - A promise resolving to void.
  */
 async function authentication(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
-  let notificationBody: any;
   let isWhitelisted = false;
   let isValidNotification = false;
   const authHeader = req?.headers['authorization'];
-  let parsedUrl;
   const whitelistUrls = process.env.PAYMENT_GATEWAY_WHITELIST_URLS;
   const requestUrl = req.url;
+  let notificationBody: any;
+  let parsedUrl;
+  let whitelistUrlArray: string[] = [];
   if (requestUrl) {
     parsedUrl = url.parse(requestUrl, true);
   }
-  let whitelistUrlArray: string[] = [];
   if ('/netTokenNotification' === parsedUrl?.pathname) {
     if ('GET' === req.method) {
       res.statusCode = Constants.HTTP_OK_STATUS_CODE;
@@ -77,19 +81,19 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
         notificationBody = JSON.parse(body);
         const vcSignature = req?.headers['v-c-signature'];
         if (vcSignature && notificationBody) {
-          isValidNotification = await paymentUtils.authenticateNetToken(vcSignature, notificationBody);
+          isValidNotification = await authenticationHelper.authenticateNetToken(vcSignature, notificationBody);
           if (isValidNotification) {
             await handlePostNetTokenNotification(notificationBody, res);
           }
         }
         if (!isValidNotification) {
-          paymentUtils.logData(__filename, 'FuncAuthentication', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_SIGNATURE_DOES_NOT_MATCH);
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_AUTHENTICATION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_SIGNATURE_DOES_NOT_MATCH);
           res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
           res.end();
         }
       });
     } else {
-      paymentUtils.logData(__filename, 'FuncAuthentication', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_UNHANDLED_REQUEST_METHOD);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_AUTHENTICATION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_UNHANDLED_REQUEST_METHOD);
       res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
       res.end();
     }
@@ -124,7 +128,7 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
           : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS }));
       } else if (Constants.PAYMENT_CREATE_DESTINATION_URL === requestUrl || Constants.PAYMENT_UPDATE_DESTINATION_URL === requestUrl || Constants.CUSTOMER_UPDATE_DESTINATION_URL === requestUrl || '/captureContext' === requestUrl) {
         const encodedCredentials = authHeader.split(' ')[1];
-        const decrypt = paymentUtils.decryption(encodedCredentials);
+        const decrypt = authenticationHelper.decryption(encodedCredentials);
         decrypt && decrypt === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE ? handleRequest(req, res) : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       } else {
         route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
@@ -134,105 +138,57 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
 }
 
 /**
- * Handles incoming HTTP requests based on their method and URL path.
- * 
- * @param {any} req - The incoming HTTP request object.
- * @param {any} res - The server response object.
- * @returns {Promise<void>} - A promise resolving to void.
- */
+* Handles incoming HTTP requests based on their method and URL path.
+* 
+* @param {any} req - The incoming HTTP request object.
+* @param {any} res - The server response object.
+* @returns {Promise<void>} - A promise resolving to void.
+*/
 const handleRequest = async (req: any, res: any): Promise<void> => {
   const parsedUrl = url.parse(req.url, true);
   const pathName = paymentValidator.validateWhiteListEndPoints(parsedUrl.pathname || '') ? parsedUrl.pathname : '';
-  if (pathName) {
-    if ('GET' === req.method) {
-      switch (pathName) {
-        case '/orders': {
-          await handleOrders(req, res);
-          break;
-        }
-        case '/orderData': {
-          await handleOrdersData(parsedUrl, res);
-          break;
-        }
-        case '/capture': {
-          await handleCapture(parsedUrl, res);
-          break;
-        }
-        case '/refund': {
-          await handleRefund(parsedUrl, res);
-          break;
-        }
-        case '/authReversal': {
-          await handleAuthReversal(parsedUrl, res);
-          break;
-        }
-        case '/paymentDetails': {
-          await handlePaymentDetails(parsedUrl, res);
-          break;
-        }
-        case '/paymentData': {
-          await handlePaymentsData(parsedUrl, res);
-          break;
-        }
-        case '/sync': {
-          await handleSync(req, res);
-          break;
-        }
-        case '/decisionSync': {
-          await handleDecisionSync(req, res);
-          break;
-        }
-        case '/configureExtension': {
-          await handleConfigureExtensions(req, res);
-          break;
-        }
-        case '/generateHeader': {
-          await handlegenerateHeader(req, res);
-          break;
-        }
-        default: {
-          paymentUtils.logData(__filename, 'FuncRequestHandler', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_GET_REQUEST);
-          res.end('not found');
-          break;
-        }
-      }
-    } else if ('POST' === req.method) {
-      switch (pathName) {
-        case '/api/extension/payment/update': {
-          await handlePaymentUpdate(req, res);
-          break;
-        }
-        case '/api/extension/payment/create': {
-          await handlePaymentCreate(req, res);
-          break;
-        }
-        case '/api/extension/customer/update': {
-          await handleCustomerUpdate(req, res);
-          break;
-        }
-        case '/netTokenNotification': {
-          await handlePostNetTokenNotification(req, res);
-          break;
-        }
-        case '/captureContext': {
-          await handleCaptureContext(req, res);
-          break;
-        }
-        default: {
-          paymentUtils.logData(__filename, 'FuncRequestHandler', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_POST_REQUEST);
-          res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
-        }
-      }
-    } else {
-      paymentUtils.logData(__filename, 'FuncRequestHandler', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_UNHANDLED_REQUEST_METHOD);
-      res.end(CustomMessages.ERROR_MSG_UNHANDLED_REQUEST_METHOD);
+  const methodHandlers: Record<string, Record<string, (req: any, res: any) => Promise<void>>> = {
+    'GET': {
+      '/orders': handleOrders,
+      '/orderData': (_req, res) => handleOrdersData(parsedUrl, res),
+      '/capture': (_req, res) => handleCapture(parsedUrl, res),
+      '/refund': (_req, res) => handleRefund(parsedUrl, res),
+      '/authReversal': (_req, res) => handleAuthReversal(parsedUrl, res),
+      '/paymentDetails': (_req, res) => handlePaymentDetails(parsedUrl, res),
+      '/paymentData': (_req, res) => handlePaymentsData(parsedUrl, res),
+      '/sync': handleSync,
+      '/decisionSync': handleDecisionSync,
+      '/configureExtension': handleConfigureExtensions,
+      '/generateHeader': handleGenerateHeader,
+      '/testConnection': handleTestConnection,
+    },
+    'POST': {
+      '/api/extension/payment/update': handlePaymentUpdate,
+      '/api/extension/payment/create': handlePaymentCreate,
+      '/api/extension/customer/update': handleCustomerUpdate,
+      '/netTokenNotification': handlePostNetTokenNotification,
+      '/captureContext': handleCaptureContext,
+    }
+  };
+  if (!pathName) {
+    res.statusCode = Constants.HTTP_NOT_FOUND_STATUS_CODE;
+    return res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
+  }
+  const handler = methodHandlers[req.method]?.[pathName];
+  if (handler) {
+    try {
+      await handler(req, res);
+    } catch (exception) {
+      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, '', exception, '', '', '');
+      res.end(CustomMessages.ERROR_MSG_INTERNAL_SERVER_ERROR);
     }
   } else {
-    paymentUtils.logData(__filename, 'FuncRequestHandler', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_POST_REQUEST);
-    res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
+    const errorMessage = req.method === 'GET' ? CustomMessages.ERROR_MSG_GET_REQUEST : CustomMessages.ERROR_MSG_POST_REQUEST;
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, Constants.LOG_ERROR, '', errorMessage);
+    res.statusCode = 404;
+    return res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
   }
 };
-
 
 /**
  * handles payment details view.
@@ -375,18 +331,17 @@ const handlePaymentCreate = async (req: any, res: any): Promise<void> => {
       const paymentObj = requestObj;
       response = await apiHandler.paymentCreateApi(paymentObj);
     } else {
-      paymentUtils.logData(__filename, 'FuncHandlePaymentCreate', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
       response = paymentUtils.getEmptyResponse();
     }
   } catch (exception) {
     const paymentId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-    paymentUtils.logExceptionData(__filename, 'FuncHandlePaymentCreate', '', exception, paymentId, 'PaymentId', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE, '', exception, paymentId, Constants.PAYMENT_ID, '');
     response = paymentUtils.invalidOperationResponse();
   }
   const paymentCreateResponse = JSON.stringify(response);
   res.end(paymentCreateResponse);
 };
-
 /**
  * Handles the payment update endpoint.
  * 
@@ -405,7 +360,7 @@ const handlePaymentUpdate = async (req: any, res: any): Promise<void> => {
     }
   } catch (exception) {
     const paymentId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-    paymentUtils.logExceptionData(__filename, 'FuncHandlePaymentUpdate', '', exception, paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_UPDATE, '', exception, paymentId, 'PaymentId : ', '');
     updateResponse = paymentUtils.invalidOperationResponse();
   }
   const paymentUpdateResponse = JSON.stringify(updateResponse);
@@ -429,7 +384,7 @@ const handleCustomerUpdate = async (req: any, res: any): Promise<void> => {
       response = await apiHandler.customerUpdateApi(customerObj);
     } catch (exception) {
       const customerId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-      paymentUtils.logExceptionData(__filename, 'FuncHandleCustomerUpdate', '', exception, customerId, 'CustomerId : ', '');
+      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CUSTOMER_UPDATE, '', exception, customerId, 'CustomerId : ', '');
     }
   }
   //If an exception or an error occurs, return the received customer object back
@@ -453,11 +408,11 @@ const handleCustomerUpdate = async (req: any, res: any): Promise<void> => {
  */
 const handleAuthReversal = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
+  let viewData = '/orders';
   let authReverseApiResponse = {
     errorMessage: '',
     successMessage: '',
   };
-  let viewData = '/orders';
   try {
     if (req?.query?.id) {
       const authId = paymentUtils.validatePaymentId(req.query.id);
@@ -472,7 +427,7 @@ const handleAuthReversal = async (req: any, res: any): Promise<void> => {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncHandleAuthReversal', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_AUTH_REVERSAL, '', exception, '', '', '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
@@ -489,11 +444,11 @@ const handleAuthReversal = async (req: any, res: any): Promise<void> => {
  */
 const handleCapture = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
+  let viewData = '/orders';
   let captureApiResponse = {
     errorMessage: '',
     successMessage: '',
   };
-  let viewData = '/orders';
   try {
     if (req?.query?.captureId && req.query?.captureAmount) {
       const captureId = paymentUtils.validatePaymentId(req.query.captureId);
@@ -510,7 +465,7 @@ const handleCapture = async (req: any, res: any): Promise<void> => {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncHandleCapture', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CAPTURE, '', exception, '', '', '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
@@ -527,11 +482,11 @@ const handleCapture = async (req: any, res: any): Promise<void> => {
  */
 const handleRefund = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
+  let viewData = '/orders';
   let refundApiResponse = {
     errorMessage: '',
     successMessage: '',
   };
-  let viewData = '/orders';
   try {
     if (req?.query?.refundId && req.query?.refundAmount) {
       const refundId = paymentUtils.validatePaymentId(req.query.refundId);
@@ -548,7 +503,7 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncHandleRefund', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_REFUND, '', exception, '', '', '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
@@ -564,25 +519,25 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
  * @returns {Promise<void>} - A promise resolving to void.
  */
 const handlePostNetTokenNotification = async (req: any, res: any): Promise<void> => {
+  res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
   let response = {
     errorMessage: '',
     successMessage: '',
   };
   let notificationData = req;
-  res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
   try {
     if (notificationData && typeof notificationData === Constants.STR_OBJECT) {
       const notification = notificationData;
       response = await apiHandler.notificationApi(notification);
       if (response?.successMessage) {
         res.statusCode = Constants.HTTP_OK_STATUS_CODE;
-        paymentUtils.logData(__filename, 'FuncHandlePostNetTokenNotification', Constants.LOG_INFO, '', response.successMessage);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION, Constants.LOG_INFO, '', response.successMessage);
       } else {
-        paymentUtils.logData(__filename, 'FuncHandlePostNetTokenNotification', Constants.LOG_INFO, '', response.errorMessage);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION, Constants.LOG_ERROR, '', response.errorMessage);
       }
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncHandlePostNetTokenNotification', '', exception, '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION, '', exception, '', '', '');
   }
   res.end();
 };
@@ -612,6 +567,9 @@ const handleDecisionSync = async (_req: any, res: any): Promise<void> => {
  */
 const handleSync = async (_req: any, res: any): Promise<void> => {
   const syncResponse = await paymentHandler.handleSync();
+  if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_RUN_SYNC)) {
+    await syncHelper.getMissingPaymentDetails();
+  }
   orderSuccessMessage = syncResponse.message;
   orderErrorMessage = syncResponse.error;
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
@@ -627,40 +585,73 @@ const handleSync = async (_req: any, res: any): Promise<void> => {
  * @returns {Promise<void>} - A promise resolving to void.
  */
 const handleConfigureExtensions = async (_req: any, res: any): Promise<void> => {
-  await resourceHandler.ensureExtension();
-  await resourceHandler.ensureCustomTypes();
+  await createExtension();
+  await createCustomTypes();
   orderSuccessMessage = CustomMessages.SUCCESS_MSG_EXTENSION_CREATION;
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
   res.setHeader('Location', '/orders');
   await res.end();
 };
 
-
-const handlegenerateHeader = async (_req: any, res: any): Promise<void> => {
+/**
+ * Generates and sends a header value after encrypting it.
+ *
+ * @async
+ * @function handleGenerateHeader
+ * @param {any} _req - The incoming request object.
+ * @param {any} res - The response object used to send the header.
+ * @returns {Promise<void>} Resolves when the header has been set and response sent.
+ */
+const handleGenerateHeader = async (_req: any, res: any): Promise<void> => {
   let headerValue: any;
   let response: any;
   if (process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE) {
-    headerValue = paymentUtils.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
+    headerValue = authenticationHelper.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
     response = headerValue;
     res.setHeader('Content-Security-Policy', "script-src 'self'");
     res.end(response);
   }
 }
 
+/**
+ * Handles the capture context by processing the request data and calling the capture API.
+ *
+ * @async
+ * @function handleCaptureContext
+ * @param {any} req - The incoming request object.
+ * @param {any} res - The response object used to send the response.
+ * @returns {Promise<void>} Resolves when the response has been sent.
+ */
 const handleCaptureContext = async (req: any, res: any): Promise<void> => {
   let response = '';
   const body = await paymentUtils.collectRequestData(req);
   const requestObj = JSON.parse(body);
-  try {
-    if (null !== requestObj && typeof requestObj === Constants.STR_OBJECT) {
+
+  if (null !== requestObj && typeof requestObj === Constants.STR_OBJECT) {
+    try {
       response = await apiHandler.captureContextApi(requestObj);
+    } catch (exception) {
+      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CAPTURE_CONTEXT, '', exception, '', '', '');
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncHandleCaptureContext', '', exception, '', '', '');
   }
   const captureContextResponse = JSON.stringify(response);
   res.end(captureContextResponse);
-}
+};
+
+const handleTestConnection = async (_req: any, res: any): Promise<void> => {
+  let testApiResponse = '';
+  try {
+    let isEndPointLimitViolated = authenticationHelper.rateLimitEndpointAccess();
+    if (!isEndPointLimitViolated) {
+      testApiResponse = await testApiConnection();
+    } else {
+      testApiResponse = CustomMessages.ERROR_MSG_LIMIT_REACHED;
+    }
+  } catch (exception) {
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_TEST_CONNECTION, '', exception, '', '', '');
+  }
+  res.end(testApiResponse);
+};
 
 if (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
   exports.handler = serverless(app.server);

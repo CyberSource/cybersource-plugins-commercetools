@@ -9,7 +9,7 @@ import unit from '../../JSON/unit.json';
 import ApiControllerConst from '../../const/ApiControllerConst';
 import PaymentAuthorizationServiceConstCC from '../../const/CreditCard/PaymentAuthorizationServiceConstCC';
 import PaymentCaptureServiceConstCC from '../../const/CreditCard/PaymentCaptureServiceConstCC';
-import PaymentServiceConst from '../../const/PaymentServiceConst';
+import PaymentServiceConst from '../../const/HelpersConst';
 import PaymentUtilsConst from '../../const/PaymentUtilsConst';
 
 
@@ -350,17 +350,3 @@ test.serial('count of token for an interval', (t) => {
   t.is(result, 0);
 })
 
-test.serial('Get InterationID with Invalid Signature', async (t) => {
-  const result = await paymentUtils.authenticateNetToken(PaymentUtilsConst.invalidSignature,ApiControllerConst.notification);
-  t.is(result, false)
-})
-
-test.serial('Test Encryption', async (t) => {
-  const result =  paymentUtils.encryption(PaymentUtilsConst.decodedValue);
-  t.not(result,PaymentUtilsConst.headerValue)
-})
-
-test.serial('Test Decryption', async (t) => {
-  const result = paymentUtils.decryption(PaymentUtilsConst.headerValue);
-  t.is(result,PaymentUtilsConst.decodedValue)
-})

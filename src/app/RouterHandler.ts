@@ -3,7 +3,6 @@ import _path from 'path';
 
 import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
-
 /**
  * Handles routing and serving static files.
  */
@@ -15,8 +14,8 @@ export class RouterHandler {
   mimeType: any;
 
   /**
-  * Creates an instance of RouterHandler.
-  */
+   * Creates an instance of RouterHandler.
+   */
   constructor() {
     this.staticFiles = [];
     this.port = Constants.DEFAULT_PORT;
@@ -83,8 +82,9 @@ export class RouterHandler {
   listen(port: number, callback = (err: any) => { console.log("error : ", err) }) {
     try {
       this.port = port || Constants.DEFAULT_PORT;
-      this.server.listen(this.port);
-      callback('');
+      this.server.listen(this.port, () => {
+        callback(null);
+      });
     } catch (err) {
       callback(err);
     }
