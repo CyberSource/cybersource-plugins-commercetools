@@ -1,5 +1,4 @@
-import restApi from 'cybersource-rest-client';
-import { GenerateCaptureContextRequest } from 'cybersource-rest-client';
+import restApi, { GenerateCaptureContextRequest } from 'cybersource-rest-client';
 import jwt from 'jsonwebtoken';
 import { jwtDecode } from 'jwt-decode';
 
@@ -23,6 +22,8 @@ const getFlexKeys = async (paymentObj: PaymentType): Promise<any> => {
   const flexKeysResponse = {
     isv_tokenCaptureContextSignature: '',
     isv_tokenVerificationContext: '',
+    isv_clientLibrary: '',
+    isv_clientLibraryIntegrity: ''
   };
 
   let targetOrigins = [];
@@ -51,7 +52,10 @@ const getFlexKeys = async (paymentObj: PaymentType): Promise<any> => {
           const endTime = new Date().getTime();
           paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_FLEX_KEYS, Constants.LOG_DEBUG, 'PaymentId : ' + paymentId, 'Flex Keys Response = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
           if (data && process.env.PAYMENT_GATEWAY_VERIFICATION_KEY) {
+            let decodedCaptureContext = jwt.decode(data);
             flexKeysResponse.isv_tokenCaptureContextSignature = data;
+            flexKeysResponse.isv_clientLibrary = decodedCaptureContext.ctx?.[0]?.data?.clientLibrary;
+            flexKeysResponse.isv_clientLibraryIntegrity = decodedCaptureContext.ctx?.[0]?.data?.clientLibraryIntegrity;
             contextWithoutSignature = flexKeysResponse.isv_tokenCaptureContextSignature.substring(0, flexKeysResponse.isv_tokenCaptureContextSignature.lastIndexOf(Constants.REGEX_DOT) + 1);
             parsedContext = jwtDecode(contextWithoutSignature);
             flexKeysResponse.isv_tokenVerificationContext = jwt.sign(parsedContext, process.env.PAYMENT_GATEWAY_VERIFICATION_KEY);

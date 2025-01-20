@@ -9792,6 +9792,14 @@ declare module "cybersource-rest-client" {
      */
     'comments'?: string;
     'partner'?: Riskv1decisionsClientReferenceInformationPartner;
+     /**
+     * The name of the Connection Method client (such as Virtual Terminal or SOAP Toolkit API) that the merchant uses to send a transaction request to CyberSource.
+     */
+    'applicationName'?: string;
+    /**
+     * Version of the CyberSource application or integration used for a transaction.
+     */
+    'applicationVersion'?: string;
   }
   export interface Riskv1decisionsClientReferenceInformationPartner {
     /**

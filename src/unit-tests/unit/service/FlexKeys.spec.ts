@@ -5,19 +5,11 @@ import key from '../../../service/payment/FlexKeys';
 import FlexKeysConst from '../../const/FlexKeysConst';
 dotenv.config();
 
-test('Check for capture context', async (t: any) => {
+test('Check for capture context fields', async (t: any) => {
   let result: any = await key.getFlexKeys(FlexKeysConst.paymentObj);
   let i = 0;
-  if ('isv_tokenCaptureContextSignature' in result) {
-    i++;
-  }
-  t.is(i, 1);
-});
-
-test('Check for verification context', async (t: any) => {
-  let result: any = await key.getFlexKeys(FlexKeysConst.paymentObj);
-  let i = 0;
-  if ('isv_tokenVerificationContext' in result) {
+  if (result.isv_tokenCaptureContextSignature && result.isv_tokenVerificationContext &&
+    result.isv_clientLibrary && result.isv_clientLibraryIntegrity) {
     i++;
   }
   t.is(i, 1);
@@ -26,7 +18,8 @@ test('Check for verification context', async (t: any) => {
 test('Check for any other context', async (t: any) => {
   let result: any = await key.getFlexKeys(FlexKeysConst.paymentObj);
   let i = 0;
-  if ('isv_tokenVerificationContext' in result && 'isv_tokenCaptureContextSignature' in result) {
+  if ('isv_tokenVerificationContext' in result && 'isv_tokenCaptureContextSignature' in result && 'isv_clientLibrary' in result
+    && 'isv_clientLibraryIntegrity' in result) {
     i = 0;
   } else {
     i++;

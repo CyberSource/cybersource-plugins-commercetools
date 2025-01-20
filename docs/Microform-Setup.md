@@ -4,29 +4,17 @@ Microform Integration replaces the primary account number (PAN) or card verifica
 
 ## Setting Up the Client Side
 
-- Add the Microform Integration JavaScript library to your page by loading it directly from Cybersource and this can be achieved dynamically per environment by using the asset path returned in the JWT (JSON Web Token).
+- Add the Microform Integration JavaScript library to your page by loading it directly using the clientLibrary and clientLibraryIntegrity values provided in the isv_clientLibrary and isv_clientLibraryIntegrity custom fields from the Payment Create call.
 
-        ctx": [
-            {
-            "data": {
-            "clientLibrary": https://testflex.cybersource.com/microform/bundle/v2/flex-microform.min.js
-            ...
-
-  a. For Test Environment:
-
-        <script src="https://testflex.cybersource.com/microform/bundle/v2/flex-microform.min.js"></script>
-
-  b. For Production Environment:
-
-        <script src="https://flex.cybersource.com/microform/bundle/v2/flex-microform.min.js"></script>
+        <script src="[INSERT isv_clientLibrary VALUE HERE]" integrity="[INSERT isv_clientLibraryIntegrity VALUE HERE]" crossorigin="anonymous"></script>
 
 - Create the HTML placeholder objects to attach to the microforms.
 
-        <div id="numbercontainer" class="form-control"></div>
+        <div id="number-container" class="form-control"></div>
 
-- Invoke the Flex SDK by passing the Capture Context that was generated in the Payment create call.
+- Invoke the Flex SDK by passing the Capture Context from isv_tokenCaptureContextSignature custom field from the Payment create call.
 
-        var flex = new Flex(captureContext);
+        var flex = new Flex(isv_tokenCaptureContextSignature);
 
 - Initiate the microform object with styling to match your web page.
 

@@ -19,6 +19,10 @@ test.serial('payment Create Api with credit card payment', async (t) => {
       t.is(result.actions[0].name, 'isv_tokenCaptureContextSignature');
       t.is(result.actions[1].action, 'setCustomField');
       t.is(result.actions[1].name, 'isv_tokenVerificationContext');
+      t.is(result.actions[2].action, 'setCustomField');
+      t.is(result.actions[2].name, 'isv_clientLibrary');
+      t.is(result.actions[3].action, 'setCustomField');
+      t.is(result.actions[3].name, 'isv_clientLibraryIntegrity');
     }
   } catch (error) {
     t.pass()
@@ -225,6 +229,10 @@ test.serial('Test Customer Update  Flex Microform', async (t) => {
       t.is(result.actions[0].name, 'isv_tokenCaptureContextSignature');
       t.is(result.actions[1].action, 'setCustomField');
       t.is(result.actions[1].name, 'isv_tokenVerificationContext');
+      t.is(result.actions[2].action, 'setCustomField');
+      t.is(result.actions[2].name, 'isv_clientLibrary');
+      t.is(result.actions[3].action, 'setCustomField');
+      t.is(result.actions[3].name, 'isv_clientLibraryIntegrity');
     }
   } catch (error) {
     t.pass()
@@ -323,7 +331,7 @@ test.serial('Test Customer Update when token is being delete', async (t) => {
 test.serial('Test CaptureContext Api function', async (t) => {
   let result = await apiController.captureContextApi(ApiControllerConst.cart);
   if (result) {
-    let length = result.length;
+    let length = Object.keys(result).length;
     t.true(length > 0);
   } else {
     t.pass();

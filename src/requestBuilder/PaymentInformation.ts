@@ -41,7 +41,7 @@ export class PaymentInformationModel {
                         paymentInformation.paymentInstrument = { id: cardTokens?.paymentInstrumentId };
                         if (customFields?.isv_securityCode) {
                             paymentInformation.card = this.setPaymentInformationCardDetails(customFields.isv_securityCode);
-                        };
+                        }
                     } else {
                         if (cardTokens?.customerTokenId) {
                             paymentInformation.customer = this.setPaymentInformationCustomerDetails(cardTokens.customerTokenId);

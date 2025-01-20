@@ -1,5 +1,4 @@
-import restApi, { AuthReversalRequest, Ptsv2paymentsidreversalsOrderInformation } from 'cybersource-rest-client';
-import { PtsV2PaymentsReversalsPost201Response } from 'cybersource-rest-client';
+import restApi, { AuthReversalRequest, Ptsv2paymentsidreversalsOrderInformation, PtsV2PaymentsReversalsPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants/constants';
 import { FunctionConstant } from '../../constants/functionConstant';

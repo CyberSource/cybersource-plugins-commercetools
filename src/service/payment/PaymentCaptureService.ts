@@ -1,5 +1,4 @@
-import restApi, { CapturePaymentRequest, Ptsv2paymentsidcapturesOrderInformation, Ptsv2paymentsidreversalsProcessingInformation } from 'cybersource-rest-client';
-import { PtsV2PaymentsCapturesPost201Response } from 'cybersource-rest-client';
+import restApi, { CapturePaymentRequest, PtsV2PaymentsCapturesPost201Response, Ptsv2paymentsidcapturesOrderInformation, Ptsv2paymentsidreversalsProcessingInformation } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants/constants';
 import { FunctionConstant } from '../../constants/functionConstant';
