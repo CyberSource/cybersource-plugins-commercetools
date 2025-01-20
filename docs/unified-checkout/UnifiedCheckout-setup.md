@@ -9,7 +9,7 @@ Unified Checkout provides a single interface with which you can accept numerous 
 
 ## Setting Up the Client Side
 
-- To obtain the captureContext, clientLibrary, and clientLibraryIntegrity, you must first generate an authentication header. This is done by sending a `GET` request to `{baseUrl}/generateHeader` and using the response to include the required authentication header for subsequent requests. Once the header is generated, send a `GET` request to `{baseUrl}/captureContext`, ensuring the request includes the previously generated authentication header. In the response, CyberSource will provide the captureContext, which can be decoded to extract the clientLibrary and clientLibraryIntegrity fields. These fields, along with the captureContext, are included in subsequent requests to `{baseUrl}/captureContext`. A sample response typically contains the captureContext, clientLibrary, and clientLibraryIntegrity fields in JSON format, as shown below.
+- To obtain the captureContext, clientLibrary, and clientLibraryIntegrity, you must first generate an authentication header. This is done by sending a `GET` request to `{baseUrl}/generateHeader` and using the response to include the required authentication header for subsequent requests. Once the header is generated, send a `GET` request to `{baseUrl}/captureContext`, ensuring the request includes the previously generated authentication header. The response will contain the `captureContextData` provided by CyberSource, which can be decoded to extract the `clientLibrary` and `clientLibraryIntegrity` fields. These fields, along with the `captureContextData`, are included in subsequent requests to `{baseUrl}/captureContext`. A sample response typically contains the `captureContextData`, `clientLibrary`, and `clientLibraryIntegrity` fields in JSON format, as shown below.
 
     Example Response:
 
@@ -19,7 +19,7 @@ Unified Checkout provides a single interface with which you can accept numerous 
           "clientLibraryIntegrity": "xxxx"
         }
 
-- Use the client library and client Library Integrity values from the capture context response to invoke Unified Checkout on your page.
+- Use the `clientLibrary` and `clientLibraryIntegrity` values from the capture context response to invoke Unified Checkout on your page.
 
     When you load the library, use the capture context obtained from the GET request to `{baseUrl}/captureContext` as a parameter for invoking the accept function.
 
@@ -32,7 +32,7 @@ Unified Checkout provides a single interface with which you can accept numerous 
         });
         </script>
 
-    header.payload.signature refers to the captureContextData
+    header.payload.signature refers to the `captureContextData`.
 
 
 - Adding the Payment Application and Payment Acceptance

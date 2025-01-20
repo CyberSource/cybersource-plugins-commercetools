@@ -4,7 +4,7 @@ Microform Integration replaces the primary account number (PAN) or card verifica
 
 ## Setting Up the Client Side
 
-- Add the Microform Integration JavaScript library to your page by loading it directly using the clientLibrary and clientLibraryIntegrity values provided in the isv_clientLibrary and isv_clientLibraryIntegrity custom fields from the Payment Create call.
+- Add the Microform Integration JavaScript library to your page by loading it directly using the clientLibrary and clientLibraryIntegrity values provided in the `isv_clientLibrary` and `isv_clientLibraryIntegrity` custom fields from the Payment Create call.
 
         <script src="[INSERT isv_clientLibrary VALUE HERE]" integrity="[INSERT isv_clientLibraryIntegrity VALUE HERE]" crossorigin="anonymous"></script>
 
@@ -12,7 +12,7 @@ Microform Integration replaces the primary account number (PAN) or card verifica
 
         <div id="number-container" class="form-control"></div>
 
-- Invoke the Flex SDK by passing the Capture Context from isv_tokenCaptureContextSignature custom field from the Payment create call.
+- Invoke the Flex SDK by passing the Capture Context from `isv_tokenCaptureContextSignature` custom field from the Payment create call.
 
         var flex = new Flex(isv_tokenCaptureContextSignature);
 
