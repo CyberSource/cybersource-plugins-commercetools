@@ -34,7 +34,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_WEBHOOK_ENDPOINT = '/netTokenNotification';
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
   static readonly PAYMENT_GATEWAY_NETWORK_TOKEN_EVENT_TYPE = 'tms.networktoken.updated';
-  static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'CommerceTools(REST)';
+  static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'Commercetools(REST)';
   static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.1.0';
 
   //Payment status codes
