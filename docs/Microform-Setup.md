@@ -11,6 +11,7 @@ Microform Integration replaces the primary account number (PAN) or card verifica
 - Create the HTML placeholder objects to attach to the microforms.
 
         <div id="number-container" class="form-control"></div>
+        <div id="securityCode-container" class="form-control"></div>
 
 - Invoke the Flex SDK by passing the Capture Context from `isv_tokenCaptureContextSignature` custom field from the Payment create call.
 
@@ -18,7 +19,7 @@ Microform Integration replaces the primary account number (PAN) or card verifica
 
 - Initiate the microform object with styling to match your web page.
 
-        var microform = flex.microform({ styles: myStyles });
+        var microform = flex.microform("card",{ styles: myStyles });
 
 - Create and attach the microform fields to the HTML objects through the Microform Integration JavaScript library.
 
