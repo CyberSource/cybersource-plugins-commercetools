@@ -1,7 +1,5 @@
 # Tokenization
 
-- [Tokenization with Microform](#Tokenization-with-Microform)
-
 - [Tokenization with Unified Checkout](#Tokenization-with-UnifiedCheckout)
 
 - [Customization-in-Tokenization](#customization-in-tokenization)
@@ -20,52 +18,6 @@ Merchant can display the customer tokens by querying the Customer using Customer
 The customer saved tokens can be viewed in:
 
 Merchant Centre → Customers → Customer list → Select a Customer → Custom Fields
-
-# Tokenization with Microform
-
-## Tokenize a card
-
-1.  Tokenize Card details using Cybersource Microform v2
-
-    a. If there are no cards available, update the customer by creating a custom type with the following
-
-    | Property                                       | Value                        | Required |
-    | ---------------------------------------------- | ---------------------------- | -------- |
-    | custom.type.key                                | isv_payments_customer_tokens | Yes      |
-    | custom.fields.isv_tokenCaptureContextSignature | empty string                 | Yes      |
-
-    b. If there are tokens available already, update the customer by setting the following custom field
-
-    | Property                                       | Value        | Required |
-    | ---------------------------------------------- | ------------ | -------- |
-    | custom.fields.isv_tokenCaptureContextSignature | empty string | Yes      |
-
-2.  The response should have the `isv_tokenCaptureContextSignature` and `isv_tokenVerificationContext` custom fields.
-    Set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Microform
-
-            flexInstance = new Flex(captureContext);
-
-3.  Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Microform JS to tokenize a Card
-
-4.  After the card details are entered by the customer, ask the customer to add billing address for the card and update the customer by populating the following
-
-    | Property                              | Value                                            | Required | Notes                                                                                                                                                                                                                                                                                                                                                                        |
-    | ------------------------------------- | ------------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | custom.fields.isv_token               | Cybersource flex token                           | Yes      | This is the token parameter passed into the callback for the microform.createToken call                                                                                                                                                                                                                                                                                      |
-    | custom.fields.isv_tokenAlias          | Alias for saved token                            | Yes      | When this is specified the token will be saved as a subscription for later use. Merchant can either provide a input text field asking for the customer to provide value for this field or a checkbox to select if the token needs be saved as a subscription for later use. In the latter case, Merchant should provide a unique value upon selecting the checkbox           |
-    | custom.fields.isv_maskedPan           | Masked Card number                        | No       | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a `flexData.content.paymentInformation.card.number.bin + flexData.content.paymentInformation.card.number.maskedValue` field containing the masked card number <br><br> Not required by extension but can be used for display |
-    | custom.fields.isv_cardType            | Card type                                 | No       | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a `flexData.content.paymentInformation.card.number.detectedCardTypes[0]` field containing the card type <br><br> Not required by extension but can be used for display                                                                        |
-    | custom.fields.isv_cardExpiryMonth     | Card expiry month                                | No       | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a `flexData.content.paymentInformation.card.expirationMonth.value` field containing the card expiration month <br><br> Not required by extension but can be used for display                                                 |
-    | custom.fields.isv_cardExpiryYear      | Card expiry year                                 | No       | Can be obtained from the token parameter passed into the callback for the microform.createToken call. The token is a JWT which when decoded has a `flexData.content.paymentInformation.card.expirationYear.value` field containing the card expiration year <br><br> Not required by extension but can be used for display                                                   |
-    | custom.fields.isv_addressId           | Id of the address added by customer for the card | Yes      |                                                                                                                                                                                                                                                                                                                                                                              |
-    | custom.fields.isv_currencyCode        | Currency code of the store                       | Yes      |                                                                                                                                                                                                                                                                                                                                                                              |
-    | custom.fields.isv_deviceFingerprintId | Customer device fingerprint Id                   | Yes      | Refer [Device Fingerprinting](Decision-Manager.md#device-fingerprinting) to generate this value                                                                                                                                                                                                                                                                              |
-
-5.  Wait for the updated response and verify the `custom.fields.isv_tokens` field
-
-6.  If token is created successfully, `custom.fields.isv_tokens` field will have updated tokens along with `custom.fields.is_customerId` with the customer id returned in response.
-
-7.  If there was an error, `custom.fields.isv_token`s field either be empty if there were no tokens available or will have the old tokens which were available before adding the new token. Also `custom.fields.isv_failedTokens` field will have all the failed card records if there was an error while adding the token
 
 # Tokenization with UnifiedCheckout
 
