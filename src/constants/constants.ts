@@ -23,7 +23,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE = 'CHECK';
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = '42EA2Y58';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'FAV669SU';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
@@ -34,6 +34,8 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_WEBHOOK_ENDPOINT = '/netTokenNotification';
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
   static readonly PAYMENT_GATEWAY_NETWORK_TOKEN_EVENT_TYPE = 'tms.networktoken.updated';
+  static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'Commercetools(REST)';
+  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.1.0';
 
   //Payment status codes
   static readonly HTTP_OK_STATUS_CODE = 200;
@@ -138,8 +140,8 @@ export abstract class Constants {
   static readonly UNICODE_ENCODING_SYSTEM = 'utf8';
   static readonly VALIDATION = 'validation';
   static readonly STRING_FULL = 'FULL';
-  static readonly CAPTURE_CONTEXT_CLIENT_VERSION = '0.19';
-  static readonly FLEX_MICROFORM_CLIENT_VERSION = 'v2.0';
+  static readonly UNIFIED_CHECKOUT_CAPTURE_CONTEXT_CLIENT_VERSION = '0.19';
+  static readonly FLEX_MICROFORM_CLIENT_VERSION = 'v2';
 
   //CT transaction type
   static readonly CT_TRANSACTION_TYPE_AUTHORIZATION = 'Authorization';
@@ -199,8 +201,8 @@ export abstract class Constants {
   static readonly GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS = ['FuncGetTransactionSearchResponse', 'FuncGetConversionDetails', 'FuncGetPublicKeys', 'FuncGetTransientTokenDataResponse', 'FuncWebhookSubscriptionResponse', 'FuncGetKeyGenerationResponse', 'FuncGetCreateWebhookSubscriptionResponse', 'FuncDeleteWebhookSubscriptionResponse', 'FuncGetTransactionData'];
 
   //default cards
-  static readonly UC_ALLOWED_CARD_NETWORKS = ['VISA', 'MASTERCARD', 'AMEX'];
-  static readonly FLEX_MICROFORM_ALLOWED_CARDS = ['VISA', 'MASTERCARD', 'AMEX', 'MAESTRO', 'CARTESBANCAIRES', 'CUP', 'JCB', 'DINERSCLUB', 'DISCOVER'];
+  static readonly UC_ALLOWED_CARD_NETWORKS = ['VISA'];
+  static readonly FLEX_MICROFORM_ALLOWED_CARDS = ['VISA'];
 
   //Datatypes
   static readonly STR_ARRAY = 'array';

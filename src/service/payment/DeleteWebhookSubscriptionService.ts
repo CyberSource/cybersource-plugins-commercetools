@@ -27,8 +27,8 @@ const deleteWebhookSubscriptionResponse = async (midCredentials: MidCredentialsT
       if (manageWebhooksApiInstance) {
         manageWebhooksApiInstance.deleteWebhookSubscription(id, (error: any, data: any, response: any) => {
           const endTime = new Date().getTime();
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, 'webhookId : ' + webhookId, 'deleteWebhookSubscriptionResponse = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, '', 'Delete subscription data = ' + paymentUtils.maskData(JSON.stringify(data)));
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, 'webhookId : ' + webhookId, 'deleteWebhookSubscriptionResponse = ' + response, `${endTime - startTime}`);
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, '', 'Delete subscription data = ' + data);
           if (Constants.HTTP_OK_STATUS_CODE === response?.status) {
             deleteResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
             resolve(deleteResponse);

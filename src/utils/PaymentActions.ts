@@ -40,7 +40,7 @@ const addRefundAction = (amount: AmountPlannedType, orderResponse: any, state: s
  */
 const createResponse = (setTransaction: Partial<ActionType>, setCustomField: Partial<ActionType>, paymentFailure: Partial<ActionType> | null, setCustomType: Partial<ActionType> | null): ActionResponseType => {
     const actions: Partial<ActionType>[] = [];
-    let returnResponse: ActionResponseType = paymentUtils.getEmptyResponse();
+    let returnResponse: ActionResponseType;
     paymentValidator.setObjectValue(actions, '', setTransaction, '', Constants.STR_OBJECT, false);
     paymentValidator.setObjectValue(actions, '', setCustomField, '', Constants.STR_OBJECT, false);
     paymentValidator.setObjectValue(actions, '', paymentFailure, '', Constants.STR_OBJECT, false);
@@ -188,6 +188,8 @@ const createEnrollResponseActions = (response: any, updatePaymentObj: PaymentTyp
     const isv_responseJwt = '';
     const isv_stepUpUrl = '';
     const isv_tokenCaptureContextSignature = '';
+    const isv_clientLibrary = '';
+    const isv_clientLibraryIntegrity = '';
     const isv_tokenVerificationContext = '';
     const isv_payerAuthenticationPaReq = '';
     const customFields = updatePaymentObj?.custom?.fields;
@@ -206,6 +208,12 @@ const createEnrollResponseActions = (response: any, updatePaymentObj: PaymentTyp
         action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_dmpaFlag }));
         if (customFields?.isv_tokenCaptureContextSignature) {
             action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenCaptureContextSignature }));
+        }
+        if (customFields?.isv_clientLibrary) {
+            action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_clientLibrary }))
+        }
+        if (customFields?.isv_clientLibraryIntegrity) {
+            action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_clientLibraryIntegrity }))
         }
         if (customFields?.isv_savedToken && customFields?.isv_tokenVerificationContext) {
             action.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenVerificationContext }));

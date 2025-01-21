@@ -1,5 +1,4 @@
-import restApi, { CreateSearchRequest } from 'cybersource-rest-client';
-import { TssV2TransactionsPost201Response } from 'cybersource-rest-client';
+import restApi, { CreateSearchRequest, TssV2TransactionsPost201Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants/constants';
 import { FunctionConstant } from '../../constants/functionConstant';

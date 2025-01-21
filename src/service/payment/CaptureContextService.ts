@@ -22,7 +22,7 @@ const generateCaptureContext = async (cartObj: any, country: string, locale: str
   if (('Payments' === service && cartObj) || ('MyAccounts' === service && country && locale && currencyCode)) {
     const apiClient = new restApi.ApiClient();
     const configObject = prepareFields.getConfigObject(FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT, null, null, merchantId);
-    let clientVersion = Constants.CAPTURE_CONTEXT_CLIENT_VERSION;
+    let clientVersion = Constants.UNIFIED_CHECKOUT_CAPTURE_CONTEXT_CLIENT_VERSION;
     const allowedCardNetworks = prepareFields.getAllowedCardNetworks(FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT);
     let targetOrigins = prepareFields.getTargetOrigins();
     const requestObj: GenerateUnifiedCheckoutCaptureContextRequest = {

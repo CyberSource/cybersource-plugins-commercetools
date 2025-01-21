@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+
 import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
@@ -13,6 +15,7 @@ import commercetoolsApi from './utils/api/CommercetoolsApi';
 import orderManagementHelper from './utils/helpers/OrderManagementHelper';
 import payerAuthHelper from './utils/helpers/PayerAuthHelper';
 import paymentHelper from './utils/helpers/PaymentHelper';
+
 
 /**
  * Handles the creation of payment.
@@ -267,25 +270,32 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
  * @param {object} requestObj - The request object containing either cart details or country, locale, and currency information.
  * @returns {Promise<string>} - A promise resolving to the capture context response.
  */
-const captureContextApi = async (requestObj: any): Promise<string> => {
+const captureContextApi = async (requestObj: any): Promise<any> => {
   let cartId = requestObj?.cartId || '';
-  let response = '';
+  let response;
+  let captureContextResponse;
   const merchantId = requestObj?.merchantId ? requestObj.merchantId : '';
   try {
     if (requestObj?.cartId) {
       const cartDetails = await commercetoolsApi.getCartById(cartId);
       if (cartDetails && cartDetails?.id) {
-        const captureContextResponse = await captureContext.generateCaptureContext(cartDetails, '', '', '', merchantId, 'Payments');
-        response = captureContextResponse;
+        captureContextResponse = await captureContext.generateCaptureContext(cartDetails, '', '', '', merchantId, 'Payments');
       }
     } else if (requestObj?.country && requestObj?.locale && requestObj?.currency) {
       const country = requestObj.country;
       const locale = requestObj.locale;
       const currencyCode = requestObj.currency;
-      const captureContextResponse = await captureContext.generateCaptureContext(null, country, locale, currencyCode, merchantId, 'MyAccounts');
-      response = captureContextResponse;
+      captureContextResponse = await captureContext.generateCaptureContext(null, country, locale, currencyCode, merchantId, 'MyAccounts');
     }
-    if ('' === response) {
+    let decodedCaptureContext = jwt.decode(captureContextResponse);
+    if(captureContextResponse && decodedCaptureContext?.ctx?.[0]?.data?.clientLibrary && decodedCaptureContext?.ctx?.[0].data.clientLibraryIntegrity){
+      response = {
+        captureContextData: captureContextResponse,
+        clientLibrary: decodedCaptureContext?.ctx?.[0].data.clientLibrary,
+        clientLibraryIntegrity: decodedCaptureContext?.ctx?.[0].data.clientLibraryIntegrity,
+      }
+    }
+    if (!response) {
       paymentUtils.logData(__filename, FunctionConstant.FUNC_CAPTURE_CONTEXT_API, Constants.LOG_ERROR, 'CartId : ' + cartId, CustomMessages.ERROR_MSG_CAPTURE_CONTEXT);
     }
   } catch (exception) {

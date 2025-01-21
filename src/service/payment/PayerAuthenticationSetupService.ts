@@ -1,5 +1,4 @@
-import restApi, { PayerAuthSetupRequest, Riskv1authenticationsetupsTokenInformation } from 'cybersource-rest-client';
-import { RiskV1AuthenticationSetupsPost201Response } from 'cybersource-rest-client';
+import restApi, { PayerAuthSetupRequest, RiskV1AuthenticationSetupsPost201Response, Riskv1authenticationsetupsTokenInformation } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants/constants';
 import { FunctionConstant } from '../../constants/functionConstant';

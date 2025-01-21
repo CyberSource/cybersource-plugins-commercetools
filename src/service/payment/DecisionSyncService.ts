@@ -1,5 +1,4 @@
-import restApi from 'cybersource-rest-client';
-import { ReportingV3ConversionDetailsGet200Response } from 'cybersource-rest-client';
+import restApi, { ReportingV3ConversionDetailsGet200Response } from 'cybersource-rest-client';
 import moment from 'moment';
 
 import { Constants } from '../../constants/constants';
