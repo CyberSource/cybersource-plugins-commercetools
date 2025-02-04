@@ -28,8 +28,8 @@ const deleteCustomerToken = async (customerTokenObj: Partial<CustomerTokensType>
       if (customerPaymentInstrumentApiInstance) {
         customerPaymentInstrumentApiInstance.deleteCustomerPaymentInstrument(customerTokenId, paymentInstrumentTokenId, opts, function (error: any, data: any, response: any) {
           const endTime = new Date().getTime();
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN, Constants.LOG_DEBUG, '', 'Delete Token Response = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN, Constants.LOG_DEBUG, '', 'Delete Token Response Data = ' + paymentUtils.maskData(JSON.stringify(data)));
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN, Constants.LOG_DEBUG, '', 'Delete Token Response = ' + response, `${endTime - startTime}`);
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN, Constants.LOG_DEBUG, '', 'Delete Token Response Data = ' + data);
           if (Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE === response?.status) {
             customerTokenDeleteResponse.httpCode = response.status;
             customerTokenDeleteResponse.deletedToken = paymentInstrumentTokenId;

@@ -787,19 +787,19 @@ const logRateLimitException = (requestCount: number): void => {
 };
 
 const maskData = (obj: any) => {
-  let logData = JSON.parse(JSON.stringify(obj));
+  let logData = JSON.parse(obj);
   replaceChar(logData);
-  return logData;
+  return JSON.stringify(logData);
 };
 
 const replaceChar = (logData: any) => {
   const replaceCharacterRegex = /./g;
-  const payload = ['email', 'lastName', 'firstName', 'expirationYear', 'expirationMonth', 'phoneNumber', 'cvv', 'securityCode'];
+  const payload = ['email', 'lastName', 'firstName', 'expirationYear', 'expirationMonth', 'phoneNumber', 'cvv', 'securityCode', 'address1', 'postalCode', 'locality', 'address2', 'ipAddress'];
   Object.keys(logData).forEach(key => {
     if ('object' === typeof logData[key] && null !== logData[key]) {
       replaceChar(logData[key]);
     } else {
-      if (payload.includes(key) && null !== logData[key] && typeof "string" === logData[key]) {
+      if (payload.includes(key) && null !== logData[key] && "string" === typeof logData[key]) {
         logData[key] = logData[key].replace(replaceCharacterRegex, "x");
       }
     }

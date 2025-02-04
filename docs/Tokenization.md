@@ -37,10 +37,9 @@ Merchant Centre → Customers → Customer list → Select a Customer → Custom
     | ---------------------------------------------- | ------------ | -------- |
     | custom.fields.isv_tokenCaptureContextSignature | empty string | Yes      |
 
-2.  The response should have the `isv_tokenCaptureContextSignature` and `isv_tokenVerificationContext` custom fields.
-    Set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of flex object which will load Cybersource Microform
+2.  The response should include `isv_tokenCaptureContextSignature`, `isv_tokenVerificationContext`, `isv_clientLibrary`, and `clientLibraryIntegrity`. The `isv_clientLibrary` and `isv_clientLibraryIntegrity` are obtained by decoding the capture context received from Cybersource. Additionally, set the `isv_tokenCaptureContextSignature` custom field value to the captureContext of the Flex object, which will load the Cybersource Microform.
 
-            flexInstance = new Flex(captureContext);
+            flexInstance = new Flex(isv_tokenCaptureContextSignature);
 
 3.  Use the Microform Integration v2 to tokenize card details. See <https://github.com/CyberSource/cybersource-flex-samples-node> for an example of how to use the captureContext obtained above and the Microform JS to tokenize a Card
 

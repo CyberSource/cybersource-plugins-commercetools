@@ -133,6 +133,8 @@ const getClientReferenceInformation = (service: string, resourceId: string, paym
   }
   clientReferenceInformationPartner.solutionId = Constants.PAYMENT_GATEWAY_PARTNER_SOLUTION_ID;
   clientReferenceInformation.partner = clientReferenceInformationPartner;
+  clientReferenceInformation.applicationName = Constants.PAYMENT_GATEWAY_APPLICATION_NAME;
+  clientReferenceInformation.applicationVersion = Constants.PAYMENT_GATEWAY_APPLICATION_VERSION;
   if (payment?.id) {
     clientReferenceInformation.partner.originalTransactionId = payment.id;
   } else if (resourceId) {
@@ -267,7 +269,7 @@ const getOrderInformationShipToDetails = (cartObj: any, shippingMethod: string |
   orderInformationShipTo = addressMapper.mapOrderInformationShipto();
   if (shippingMethod) {
     orderInformationShipTo.method = shippingMethod;
-  };
+  }
   return orderInformationShipTo;
 };
 
@@ -516,7 +518,7 @@ const getPromotionInformation = async (cartObject: any): Promise<any> => {
 }
 
 //function added for custom field
-const getMetaData = (payment:PaymentType): MetaDataType[] => {
+const getMetaData = (payment: PaymentType): MetaDataType[] => {
   let metaData: MetaDataType[] = [];
   let customMetaData = payment?.custom?.fields?.isv_metadata && JSON.parse(payment.custom.fields.isv_metadata);
   if (customMetaData) {

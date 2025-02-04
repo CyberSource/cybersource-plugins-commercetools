@@ -96,12 +96,20 @@ const handleAuthorization = async (updatePaymentObj: PaymentType, updateTransact
 const handleSetTokenToNull = async (customFields: Partial<PaymentCustomFieldsType> | undefined, authResponse: ActionResponseType, paymentMethod: string): Promise<any> => {
   const isv_tokenVerificationContext = '';
   const isv_tokenCaptureContextSignature = '';
+  const isv_clientLibrary = '';
+  const isv_clientLibraryIntegrity = '';
   const isv_securityCode = 0;
   if ((customFields?.isv_savedToken && customFields?.isv_tokenVerificationContext) || (Constants.CREDIT_CARD !== paymentMethod && Constants.CC_PAYER_AUTHENTICATION !== paymentMethod && customFields?.isv_tokenVerificationContext)) {
     authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenVerificationContext }));
   }
   if (customFields?.isv_tokenCaptureContextSignature) {
     authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenCaptureContextSignature }));
+  }
+  if(customFields?.isv_clientLibrary){
+    authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_clientLibrary }));
+  }
+  if(customFields?.isv_clientLibraryIntegrity){
+    authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_clientLibraryIntegrity }));
   }
   if (customFields?.isv_securityCode) {
     authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_securityCode }));

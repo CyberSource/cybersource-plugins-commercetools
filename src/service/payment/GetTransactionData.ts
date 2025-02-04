@@ -1,5 +1,4 @@
-import restApi from 'cybersource-rest-client';
-import { TssV2TransactionsGet200Response } from 'cybersource-rest-client';
+import restApi, { TssV2TransactionsGet200Response } from 'cybersource-rest-client';
 
 import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
@@ -30,7 +29,7 @@ const getTransactionData = async (transactionId: string, payment: PaymentType | 
       return await new Promise<TssV2TransactionsGet200Response>((resolve, reject) => {
         if (transactionDetailsApiInstance) {
           transactionDetailsApiInstance.getTransaction(transactionId, function (error: any, data: any, response: any) {
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, 'Transaction Details Response = ' + JSON.stringify(response));
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, Constants.LOG_INFO, 'PaymentId : ' + paymentId, 'Transaction Details Response = ' + paymentUtils.maskData(JSON.stringify(response)));
             if (data) {
               visaCheckoutData.httpCode = response[Constants.STRING_RESPONSE_STATUS];
               visaCheckoutData.billToFieldGroup = data.orderInformation.billTo;

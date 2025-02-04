@@ -183,8 +183,8 @@ const handleRequest = async (req: any, res: any): Promise<void> => {
       res.end(CustomMessages.ERROR_MSG_INTERNAL_SERVER_ERROR);
     }
   } else {
-    const errorMessage = req.method === 'GET' ? CustomMessages.ERROR_MSG_GET_REQUEST : CustomMessages.ERROR_MSG_POST_REQUEST;
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, Constants.LOG_ERROR, '', errorMessage);
+    const handleRequestMessage = req.method === 'GET' ? CustomMessages.ERROR_MSG_GET_REQUEST : CustomMessages.ERROR_MSG_POST_REQUEST;
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, Constants.LOG_ERROR, '', handleRequestMessage);
     res.statusCode = 404;
     return res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
   }

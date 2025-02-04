@@ -50,8 +50,8 @@ const getTransientTokenDataResponse = async (resourceObj: any, service: string):
       if (getTransientTokenDataApiInstance) {
         getTransientTokenDataApiInstance.getTransactionForTransientToken(transientToken, function (error: any, data: any, response: any) {
           const endTime = new Date().getTime();
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + resourceObj.id, 'Transient Token Response Data is = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + resourceObj.id, 'Transient Token Data Response data object = ' + paymentUtils.maskData(JSON.stringify(data)));
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + resourceObj.id, 'Transient Token Response Data is = ' + response, `${endTime - startTime}`);
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + resourceObj.id, 'Transient Token Data Response data object = ' + data);
           if (Constants.HTTP_OK_STATUS_CODE === response.status) {
             paymentResponse.httpCode = response.status;
             paymentResponse.data = JSON.parse(response.text);
