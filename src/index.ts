@@ -1,7 +1,7 @@
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
-import url, { URLSearchParams } from 'url';
+import url from 'url';
 
 import { Payment } from '@commercetools/platform-sdk';
 import dotenv from 'dotenv';
