@@ -1,5 +1,7 @@
-import { Constants } from "../constants/constants";
-import { PaymentTransactionType, PaymentType, ResponseType } from "../types/Types";
+import { Payment, Transaction } from "@commercetools/platform-sdk";
+
+import { Constants } from "../constants/paymentConstants";
+import { PaymentTransactionType, ResponseType } from "../types/Types";
 
 import paymentUtils from "./PaymentUtils";
 
@@ -16,42 +18,42 @@ import paymentUtils from "./PaymentUtils";
  */
 const setObjectValue = (targetObject: any, fieldName: string, sourceObj: any, sourcePath: string, expectedType: string, isActionValidation: boolean) => {
     let isValidType = false;
-        const value = sourcePath ? sourcePath.split('.').reduce((acc: any, part: string | number) => acc && acc[part], sourceObj) : sourceObj;
-        if (value) {
-            switch (expectedType) {
-                case Constants.STR_STRING:
-                    isValidType = typeof value === Constants.STR_STRING;
-                    break;
-                case Constants.STR_NUMBER:
-                    isValidType = typeof value === 'number';
-                    break;
-                case 'boolean':
-                    isValidType = typeof value === 'boolean';
-                    break;
-                case Constants.STR_OBJECT:
-                    isValidType = typeof value === Constants.STR_OBJECT;
-                    break;
-                case Constants.STR_ARRAY:
-                    isValidType = Array.isArray(value);
-                    break;
-                default:
-                    isValidType = false;
-                    break;
-            }
-            if (isValidType) {
-                if (Array.isArray(targetObject)) {
-                    if (isActionValidation) {
-                        targetObject.push(...paymentUtils.setCustomFieldMapper({ [fieldName]: value }));
-                    } else if (Array.isArray(sourceObj)) {
-                        targetObject.push(...sourceObj);
-                    } else {
-                        targetObject.push(sourceObj);
-                    }
+    const value = sourcePath ? sourcePath.split('.').reduce((acc: any, part: string | number) => acc && acc[part], sourceObj) : sourceObj;
+    if (value) {
+        switch (expectedType) {
+            case Constants.STR_STRING:
+                isValidType = typeof value === Constants.STR_STRING;
+                break;
+            case Constants.STR_NUMBER:
+                isValidType = typeof value === 'number';
+                break;
+            case 'boolean':
+                isValidType = typeof value === 'boolean';
+                break;
+            case Constants.STR_OBJECT:
+                isValidType = typeof value === Constants.STR_OBJECT;
+                break;
+            case Constants.STR_ARRAY:
+                isValidType = Array.isArray(value);
+                break;
+            default:
+                isValidType = false;
+                break;
+        }
+        if (isValidType) {
+            if (Array.isArray(targetObject)) {
+                if (isActionValidation) {
+                    targetObject.push(...paymentUtils.setCustomFieldMapper({ [fieldName]: value }));
+                } else if (Array.isArray(sourceObj)) {
+                    targetObject.push(...sourceObj);
                 } else {
-                    targetObject[fieldName] = value;
+                    targetObject.push(sourceObj);
                 }
+            } else {
+                targetObject[fieldName] = value;
             }
         }
+    }
 };
 
 /**
@@ -123,10 +125,10 @@ const isValidRateLimiterInput = (): boolean => {
  *
  * @param {boolean} isError - Indicates if an error occurred.
  * @param {any} paymentResponse - The payment response object.
- * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Payment} updatePaymentObj - The payment update object.
  * @returns {boolean} True if tokens should be processed, otherwise false.
  */
-const shouldProcessTokens = (isError: boolean, paymentResponse: any, updatePaymentObj: PaymentType): boolean => {
+const shouldProcessTokens = (isError: boolean, paymentResponse: any, updatePaymentObj: Payment): boolean => {
     const paymentMethod = updatePaymentObj?.paymentMethodInfo.method;
     if (!isError &&
         updatePaymentObj?.customer?.id &&
@@ -144,10 +146,10 @@ const shouldProcessTokens = (isError: boolean, paymentResponse: any, updatePayme
  * Determines if failed tokens should be processed based on the given conditions.
  *
  * @param {any} paymentResponse - The payment response object.
- * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Payment} updatePaymentObj - The payment update object.
  * @returns {boolean} True if failed tokens should be processed, otherwise false.
  */
-const shouldProcessFailedTokens = (paymentResponse: any, updatePaymentObj: PaymentType): boolean => {
+const shouldProcessFailedTokens = (paymentResponse: any, updatePaymentObj: Payment): boolean => {
     const paymentMethod = updatePaymentObj?.paymentMethodInfo.method;
     const customFields = updatePaymentObj?.custom?.fields;
     if (
@@ -165,11 +167,11 @@ const shouldProcessFailedTokens = (paymentResponse: any, updatePaymentObj: Payme
 /**
  * Checks if the transaction is valid.
  *
- * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Payment} updatePaymentObj - The payment update object.
  * @param {Partial<PaymentTransactionType>} updateTransactions - The transaction update object.
  * @returns {boolean} True if valid, otherwise false.
  */
-const isValidTransaction = (updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>): boolean => {
+const isValidTransaction = (updatePaymentObj: Payment, updateTransactions: Partial<PaymentTransactionType>): boolean => {
     if (updatePaymentObj
         && updateTransactions
         && updateTransactions?.amount
@@ -188,7 +190,7 @@ const isValidTransaction = (updatePaymentObj: PaymentType, updateTransactions: P
  * @param {Partial<PaymentTransactionType>} transaction - The transaction object to check.
  * @returns {boolean} True if successful, otherwise false.
  */
-const isSuccessFulChargeTransaction = (transaction: Partial<PaymentTransactionType>): boolean => {
+const isSuccessFulChargeTransaction = (transaction: Transaction): boolean => {
     if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS === transaction.state && transaction?.amount && transaction?.interactionId && transaction?.id) return true;
     return false
 };
@@ -197,11 +199,11 @@ const isSuccessFulChargeTransaction = (transaction: Partial<PaymentTransactionTy
  * Validates transaction summaries against specific conditions.
  *
  * @param {any} transactionDetail - The transaction detail object.
- * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Payment} updatePaymentObj - The payment update object.
  * @param {number} retryCount - The number of retry attempts.
  * @returns {boolean} True if valid, otherwise false.
  */
-const isValidTransactionSummaries = (transactionDetail: any, updatePaymentObj: PaymentType, retryCount: number): boolean => {
+const isValidTransactionSummaries = (transactionDetail: any, updatePaymentObj: Payment, retryCount: number): boolean => {
     if (transactionDetail &&
         Constants.HTTP_SUCCESS_STATUS_CODE === transactionDetail.httpCode &&
         transactionDetail?.data?._embedded?.transactionSummaries &&

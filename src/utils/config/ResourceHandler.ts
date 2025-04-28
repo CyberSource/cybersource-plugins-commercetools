@@ -1,6 +1,6 @@
-import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import paymentUtils from '../PaymentUtils';
 
 import customExtension from './CustomExtensions';
@@ -31,7 +31,7 @@ const createCustomTypes = async () => {
  * 
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-const addCustomType = async (): Promise<void> => {//sudharsan review comment
+const addCustomType = async (): Promise<void> => {
   try {
     if (process.env.CT_PROJECT_KEY && process.env.CT_CLIENT_ID && process.env.CT_CLIENT_SECRET && process.env.CT_AUTH_HOST && process.env.CT_API_HOST) {
       await customType.createAdditionalCustomType();

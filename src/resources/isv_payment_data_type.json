@@ -415,17 +415,6 @@
       "inputHint": "SingleLine"
     },
     {
-      "name": "isv_securityCode",
-      "label": {
-        "en": "Security code for stored card transaction"
-      },
-      "required": false,
-      "type": {
-        "name": "Number"
-      },
-      "inputHint": "SingleLine"
-    },
-    {
       "name": "isv_transientToken",
       "label": {
         "en": "Transient token for Unified Checkout"
@@ -436,7 +425,7 @@
       },
       "inputHint": "SingleLine"
     },
-    { 
+    {
       "name": "isv_screenWidth",
       "label": {
         "en": "Total width of the Cardholder's screen in pixels"
@@ -513,7 +502,6 @@
       },
       "inputHint": "SingleLine"
     },
-    
     {
       "name": "isv_CVVResponse",
       "label": {
@@ -559,13 +547,24 @@
       "inputHint": "SingleLine"
     },
     {
-      "name": "isv_metadata",  
+      "name": "isv_metadata",
       "label": {
         "en": "Metadata to be passed as merchantDefinedInformation to payment gateway"
       },
       "required": false,
       "type": {
         "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_accountPurchaseCount",
+      "label": {
+        "en": "Number of purchases with this customer account during the previous six months"
+      },
+      "required": false,
+      "type": {
+        "name": "Number"
       },
       "inputHint": "SingleLine"
     }

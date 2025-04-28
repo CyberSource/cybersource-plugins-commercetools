@@ -1,8 +1,9 @@
+import { Payment } from '@commercetools/platform-sdk';
 import { Ptsv2creditsProcessingInformationBankTransferOptions, Ptsv2paymentsidrefundsProcessingInformation, Ptsv2paymentsidreversalsProcessingInformation, Ptsv2paymentsProcessingInformation, Ptsv2paymentsProcessingInformationAuthorizationOptions, Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator } from 'cybersource-rest-client';
 
-import { Constants } from '../constants/constants';
 import { FunctionConstant } from '../constants/functionConstant';
-import { CustomTokenType, PaymentCustomFieldsType, PaymentType } from '../types/Types';
+import { Constants } from '../constants/paymentConstants';
+import { CustomTokenType, PaymentCustomFieldsType } from '../types/Types';
 import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
 
@@ -11,7 +12,7 @@ export class ProcessingInformation {
     private functionName: string;
     private orderNo: string;
     private service: string;
-    private resourceObj: PaymentType | null;
+    private resourceObj: Payment | null;
     private cardTokens: CustomTokenType | null;
     private processingInformation: any;
 
@@ -26,7 +27,7 @@ export class ProcessingInformation {
     * @param cardTokens - Card token information, if available.
     * @param isSaveToken - A flag indicating if a token should be saved.
     */
-    constructor(functionName: string, resourceObj: PaymentType | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) {
+    constructor(functionName: string, resourceObj: Payment | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) {
         this.functionName = functionName;
         this.resourceObj = resourceObj;
         this.orderNo = orderNo;
@@ -68,7 +69,7 @@ export class ProcessingInformation {
         const { resourceObj, orderNo } = this;
         const customFields = resourceObj?.custom?.fields;
         const actionList: string[] = [];
-        if ([FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE].includes(this.functionName)) {
+        if (Constants.GET_PROCESSING_INFORMATION_FUNCTIONS.includes(this.functionName)) {
             this.configureAuthorizationProcessing(actionList, customFields);
         }
         this.configureReconciliationId(orderNo);
@@ -93,14 +94,16 @@ export class ProcessingInformation {
             this.processingInformation.capture = true;
         }
         paymentValidator.setObjectValue(this.processingInformation, 'walletType', customFields, 'isv_walletType', Constants.STR_STRING, false);
-        if (!paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER)) {
+        if (!paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER) && (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === this.functionName || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName)) {
             actionList.push(Constants.PAYMENT_GATEWAY_DECISION_SKIP);
         }
-        if (this.service === Constants.STRING_ENROLL_CHECK) {
-            actionList.push(Constants.PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION);
-        }
-        if (this.service === Constants.VALIDATION) {
-            actionList.push(Constants.PAYMENT_GATEWAY_VALIDATE_CONSUMER_AUTHENTICATION);
+        const actionMap: Record<string, string[]> = {
+            [Constants.STRING_ENROLL_CHECK]: [Constants.PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION],
+            [Constants.VALIDATION]: [Constants.PAYMENT_GATEWAY_VALIDATE_CONSUMER_AUTHENTICATION]
+        };
+
+        if (actionMap[this.service]) {
+            actionList.push(...actionMap[this.service]);
         }
         if ((!customFields?.isv_savedToken && customFields?.isv_tokenAlias && this.isSaveToken) || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName) {
             actionList.push(Constants.PAYMENT_GATEWAY_TOKEN_CREATE);
@@ -144,17 +147,12 @@ export class ProcessingInformation {
      * @param resourceObj - The payment resource object containing payment method info.
      * @param customFields - Custom fields that may influence the payment solution configuration.
      */
-    private configurePaymentSolution(resourceObj: PaymentType | null, customFields?: Partial<PaymentCustomFieldsType>) {
+    private configurePaymentSolution(resourceObj: Payment | null, customFields?: Partial<PaymentCustomFieldsType>) {
         switch (resourceObj?.paymentMethodInfo?.method) {
             case Constants.CLICK_TO_PAY: {
-                if (customFields) {
-                    if (customFields?.isv_transientToken) {
-                        this.processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_UC_PAYMENT_SOLUTION;
-                        this.processingInformation.visaCheckoutId = customFields.isv_transientToken;
-                    } else {
-                        this.processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION;
-                        this.processingInformation.visaCheckoutId = customFields.isv_token;
-                    }
+                if (customFields && customFields?.isv_transientToken) {
+                    this.processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_UC_PAYMENT_SOLUTION;
+                    this.processingInformation.visaCheckoutId = customFields.isv_transientToken;
                 }
                 break;
             }
@@ -173,8 +171,8 @@ export class ProcessingInformation {
      * @param resourceObj - The payment resource object containing payment method info.
      * @param customFields - Custom fields that may influence the bank transfer configuration.
      */
-    private configureBankTransferOptions(resourceObj: PaymentType | null, customFields?: Partial<PaymentCustomFieldsType>) {
-        if (resourceObj?.paymentMethodInfo?.method === Constants.ECHECK) {
+    private configureBankTransferOptions(resourceObj: Payment | null, customFields?: Partial<PaymentCustomFieldsType>) {
+        if (Constants.ECHECK === resourceObj?.paymentMethodInfo?.method) {
             const banktransferOptions: Ptsv2creditsProcessingInformationBankTransferOptions = {
                 secCode: customFields?.isv_enabledMoto ? 'TEL' : 'WEB',
                 fraudScreeningLevel: 1

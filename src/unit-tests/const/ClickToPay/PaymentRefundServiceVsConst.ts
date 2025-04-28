@@ -1,71 +1,72 @@
 import clickToPay from '../../JSON/clickToPay.json';
 const payment = {
-  id: '779f9ebb-27f8-45af-b966-56fc7c54c340',
-  version: 12,
-  lastMessageSequenceNumber: 6,
-  createdAt: '2021-11-10T06:15:42.254Z',
-  lastModifiedAt: '2021-11-10T07:16:42.046Z',
-  lastModifiedBy: { clientId: '4OdEsQlt0ZNkkwpineHHUy3h', isPlatformClient: false },
-  createdBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '9f9da50d-abc8-416b-a31d-ea319abf31fc',
+  "id": "f7653d99-e765-4ab0-a9c4-d09ccbb8701b",
+  "version": 8,
+  "versionModifiedAt": "2025-03-17T10:17:22.560Z",
+  "lastMessageSequenceNumber": 3,
+  "createdAt": "2025-03-17T10:17:17.963Z",
+  "lastModifiedAt": "2025-03-17T10:17:22.560Z",
+  "lastModifiedBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "af1d0296-0af7-4f8b-b95d-6f773498794f"
   },
-  amountPlanned: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: 6970,
-    fractionDigits: 2,
+  "createdBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "af1d0296-0af7-4f8b-b95d-6f773498794f"
   },
-  paymentMethodInfo: {
-    paymentInterface: 'cybersource',
-    method: 'clickToPay',
-    name: {
-      en: 'Click to Pay',
-    },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 501900,
+      "fractionDigits": 2
   },
-  custom: {
-    type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
-    fields: {
-      isv_deviceFingerprintId: '8a22fb00-dc63-496b-b0de-9f1d1fd36a50',
-      isv_cardExpiryYear: '25  ',
-      isv_token: '4304492039459355101',
-      isv_customerIpAddress: '106.202.150.94',
-      isv_maskedPan: '411111XXXXXX1111',
-      isv_cardExpiryMonth: '05',
-      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
-      isv_acceptHeader: '*/*',
-      isv_cardType: '001',
-    },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "clickToPay",
+      "name": {
+          "en": "Click to Pay"
+      }
   },
-  paymentStatus: {},
-  transactions: [
-    {
-      id: '598400c2-794b-4d01-aa56-85b546faec20',
-      type: 'Authorization',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 6970,
-        fractionDigits: 2,
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
-      interactionId: '6365249466406423103955',
-      state: 'Success',
-    },
-    {
-      id: 'eeaa46c0-e6a1-4bc2-8b88-7fe73f772815',
-      type: 'Charge',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 6970,
-        fractionDigits: 2,
-      },
-      interactionId: clickToPay.captureId,
-      state: 'Success',
-    },
+      "fields": {
+          "isv_deviceFingerprintId": "2b06fc7d-f575-4438-b543-b47f5a47b992",
+          "isv_merchantId": "chtest",
+          "isv_token": "6487362459229686102",
+          "isv_saleEnabled": false,
+          "isv_shippingMethod": "SINGLE",
+          "isv_acceptHeader": "*/*",
+          "isv_AVSResponse": "Y",
+          "isv_authorizationStatus": "AUTHORIZED",
+          "isv_metadata": "{\"1\":\"testValue1\",\"2\":\"testValue2\"}",
+          "isv_responseCode": "00",
+          "isv_responseDateAndTime": "2025-03-17T10:17:22Z",
+          "isv_userAgentHeader": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "37e724d0-de4c-441f-b9fb-9ddad300e13d",
+          "timestamp": "2025-03-17T10:17:19.286Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 501900,
+              "fractionDigits": 2
+          },
+          "interactionId": clickToPay.captureId,
+          "state": "Success"
+      }
   ],
-  interfaceInteractions: [],
+  "interfaceInteractions": [],
+  "anonymousId": "af1d0296-0af7-4f8b-b95d-6f773498794f"
 };
 
 const captureId = clickToPay.captureId;

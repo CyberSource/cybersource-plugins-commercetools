@@ -63,12 +63,11 @@ export function createTableRow(tableBody, cellsData) {
     const row = tableBody.insertRow();
     cellsData.forEach((data) => {
       const cell = row.insertCell();
-      const range = document.createRange();
-      const documentFragment = range.createContextualFragment(data);
-      cell.appendChild(documentFragment);
+      cell.textContent = data;
     });
   }
 }
+
 export function createAndSetAttributes(type, attributes, textContent) {
   const element = document.createElement(type);
   for (const key in attributes) {
@@ -120,6 +119,36 @@ export const validateWhiteListEndPoints = (url) => {
     urlValidated = true;
   }
   return urlValidated;
+}
+
+function sanitizeForHTML(input) {
+  return input.replace(/[&<>"']/g, (match) => {
+    const escapeMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return escapeMap[match];
+  });
+}
+
+export function sanitizeResponseData(data) {
+  if (data && 'object' === typeof data) {
+    Object.keys(data).forEach(key => {
+      if ('string' === typeof data[key]) {
+        data[key] = sanitizeForHTML(data[key]);
+      }
+      if (Array.isArray(data[key])) {
+        data[key] = data[key].map(item => typeof item === 'string' ? sanitizeForHTML(item) : item);
+      }
+      if (typeof data[key] === 'object') {
+        data[key] = sanitizeResponseData(data[key]);
+      }
+    });
+  }
+  return data;
 }
 
 export const validPathRegex = /^\/paymentDetails\?id=[a-fA-F0-9\-]{36}$/;

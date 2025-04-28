@@ -1,57 +1,57 @@
-import { createRequestBuilder } from '@commercetools/api-request-builder';
-import { createClient } from '@commercetools/sdk-client';
-import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth';
-import { createHttpMiddleware } from '@commercetools/sdk-middleware-http';
+import { ByProjectKeyRequestBuilder, createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
+import {
+  _BaseAddress, ApiRequest, CartUpdateAction,
+  Customer, CustomerUpdateAction, CustomObjectDraft,
+  ExtensionDraft, OrderPagedQueryResponse, Payment,
+  PaymentAddTransactionAction, PaymentPagedQueryResponse,
+  PaymentUpdateAction, TypeDraft
+} from '@commercetools/platform-sdk';
+import { type AuthMiddlewareOptions, ClientBuilder, type HttpMiddlewareOptions } from '@commercetools/ts-client';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 
-import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import { Address } from '../../models/AddressModel';
 import { Token } from '../../models/TokenModel';
-import { ActionType, AddressType, CardAddressGroupType, CustomerType, PaymentTransactionType, PaymentType, ReportSyncType, VisaUpdateType } from '../../types/Types';
+import { AmountPlannedType, CardAddressGroupType, PaymentTransactionType, ReportSyncType, VisaUpdateType } from '../../types/Types';
 import paymentUtils from '../PaymentUtils';
-type createClient = typeof createClient;
-type createHttpMiddleware = typeof createHttpMiddleware;
 dotenv.config();
 
-/**
- * Gets the CommerceTools client.
- * 
- * @returns {any} - The CommerceTools client.
- */
-const getClient = () => {
-  const projectKey = process.env.CT_PROJECT_KEY;
-  let client: createClient;
+const projectKey = process.env.CT_PROJECT_KEY || '';
+const clientId = process.env.CT_CLIENT_ID || '';
+const clientSecret = process.env.CT_CLIENT_SECRET || '';
+const authHost = process.env.CT_AUTH_HOST || '';
+const apiHost = process.env.CT_API_HOST || '';
+
+const getClient = async () => {
+  let client: ByProjectKeyRequestBuilder | null = null;
+  const httpMiddlewareOptions: HttpMiddlewareOptions = {
+    host: apiHost,
+    httpClient: fetch,
+  };
+  const authMiddlewareOptions: AuthMiddlewareOptions = {
+    host: authHost,
+    projectKey: projectKey,
+    credentials: {
+      clientId: clientId,
+      clientSecret: clientSecret,
+    },
+    httpClient: fetch,
+  };
   try {
-    if (process.env.CT_AUTH_HOST && process.env.CT_CLIENT_ID && process.env.CT_CLIENT_SECRET && process.env.CT_API_HOST) {
-      const authMiddleware = createAuthMiddlewareForClientCredentialsFlow({
-        host: process.env.CT_AUTH_HOST,
-        projectKey,
-        credentials: {
-          clientId: process.env.CT_CLIENT_ID,
-          clientSecret: process.env.CT_CLIENT_SECRET,
-        },
-        fetch,
-      });
-      client = createClient({
-        middlewares: [
-          authMiddleware,
-          createHttpMiddleware({
-            host: process.env.CT_API_HOST,
-            fetch,
-          }),
-        ],
-      });
-    }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CLIENT, CustomMessages.EXCEPTION_MSG_COMMERCETOOLS_CONNECT, exception, '', '', '');
+    const ctpClient = new ClientBuilder()
+      .withProjectKey(projectKey)
+      .withClientCredentialsFlow(authMiddlewareOptions)
+      .withHttpMiddleware(httpMiddlewareOptions)
+      .build();
+    return createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
+  } catch (error) {
+    paymentUtils.logData(__filename, 'FuncInitializeCommercetoolsClient', Constants.LOG_ERROR, '', CustomMessages.EXCEPTION_MSG_COMMERCETOOLS_CONNECT, '');
   }
   return client;
-};
-
-const client = getClient();
+}
 
 /**
  * Executes a request against the Commercetools API and returns the response.
@@ -63,10 +63,10 @@ const client = getClient();
  * @param {any} request - The request object to be executed against the Commercetools API.
  * @returns {Promise<any>} - A promise that resolves with the API response, including timing details.
  */
-const makeCommercetoolsRequest = async (request: any) => {
+const makeCommercetoolsRequest = async (query: any) => {
   let clientResponse: any = {};
   const startTime = new Date().getTime();
-  const clientResponseObject = await client.execute(request);
+  const clientResponseObject = await query.execute();;
   const endTime = new Date().getTime();
   if (clientResponseObject?.body) {
     clientResponse = clientResponseObject.body;
@@ -82,39 +82,60 @@ const makeCommercetoolsRequest = async (request: any) => {
  * @param {string} idType - The type of ID.
  * @returns {Promise<any>} - The cart details.
  */
+
 const queryCartById = async (id: string, idType: string): Promise<any> => {
-  let retrieveCartByIdResponse = null;
-  let uri = '';
+  let query;
   let logIdType = '';
-  if (id && idType) {
-    if (client && process.env.CT_PROJECT_KEY) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      switch (idType) {
-        case Constants.ANONYMOUS_ID:
-          uri = requestBuilder.carts.parse({ where: [`${Constants.ANONYMOUS_ID} = "${id}"`, `${Constants.ACTIVE_CART_STATE}`], sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build();
-          logIdType = 'Anonymous Id : ';
-          break;
-        case Constants.CUSTOMER_ID:
-          uri = requestBuilder.carts.parse({ where: [`${Constants.CUSTOMER_ID} = "${id}"`, `${Constants.ACTIVE_CART_STATE}`], sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build();
-          logIdType = 'Customer Id : ';
-          break;
-        case Constants.PAYMENT_ID:
-          uri = requestBuilder.carts.parse({ where: [`paymentInfo(payments(id="${id}"))`] }).build();
-          logIdType = 'Payment Id : ';
-      }
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      retrieveCartByIdResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_CART_BY_ID, Constants.LOG_INFO, logIdType + id || '', '', `${retrieveCartByIdResponse.consolidatedTime}`)
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_CART_BY_ID, Constants.LOG_ERROR, logIdType + id || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+  let queryCartByIdResponse = null;
+  const client = await getClient();
+  if (id && idType && client) {
+    switch (idType) {
+      case Constants.ANONYMOUS_ID:
+        query = client
+          .carts()
+          .get({
+            queryArgs: {
+              where: `${Constants.ANONYMOUS_ID}="${id}" AND ${Constants.ACTIVE_CART_STATE}`,
+              sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
+            },
+          });
+        logIdType = 'Anonymous Id: ';
+        break;
+      case Constants.CUSTOMER_ID:
+        query = client
+          .carts()
+          .get({
+            queryArgs: {
+              where: `${Constants.CUSTOMER_ID}="${id}" AND ${Constants.ACTIVE_CART_STATE}`,
+              sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
+            },
+          });
+        logIdType = 'Customer Id: ';
+        break;
+      case Constants.PAYMENT_ID:
+        query = client
+          .carts()
+          .get({
+            queryArgs: {
+              where: `paymentInfo(payments(id="${id}"))`,
+            },
+          });
+        logIdType = 'Payment Id: ';
+        break;
+      default:
+        return null;
     }
+    queryCartByIdResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(
+      __filename,
+      FunctionConstant.FUNC_QUERY_CART_BY_ID,
+      Constants.LOG_INFO,
+      logIdType + id,
+      '',
+      `${queryCartByIdResponse.consolidatedTime}`
+    );
   }
-  return retrieveCartByIdResponse;
+  return queryCartByIdResponse;
 };
 
 /**
@@ -126,39 +147,24 @@ const queryCartById = async (id: string, idType: string): Promise<any> => {
  */
 const queryOrderById = async (id: string, idType: string) => {
   let queryOrderByIdResponse = null;
-  let uri = '';
+  let query: ApiRequest<OrderPagedQueryResponse>;
   let logIdType = '';
-  if (id && idType) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      switch (idType) {
-        case Constants.CART_ID:
-          uri = requestBuilder.orders.parse({ where: [`cart(id="${id}")`] }).build();
-          logIdType = 'CartId : ';
-          break;
-        case Constants.PAYMENT_ID:
-          uri = requestBuilder.orders.parse({ where: [`paymentInfo(payments(id="${id}"))`] }).build();
-          logIdType = 'PaymentId : ';
-          break;
-        case Constants.CUSTOMER_ID: {
-          let newDate = paymentUtils.getDate(null, false, -6, null) as number;
-          let setDate = paymentUtils.getDate(null, false, null, newDate);
-          let filterDate = paymentUtils.getDate(setDate, true);
-          uri = requestBuilder.orders.where(`customerId="${id}" and createdAt >= "${filterDate}"`).build();
-          logIdType = 'CustomerId : ';
-        }
-      }
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      queryOrderByIdResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_ORDER_BY_ID, Constants.LOG_INFO, logIdType + id || '', '', `${queryOrderByIdResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_ORDER_BY_ID, Constants.LOG_ERROR, logIdType + id || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+  const client = await getClient();
+  if (id && idType && client) {
+    switch (idType) {
+      case Constants.CART_ID:
+        query = client.orders().get({ queryArgs: { where: [`cart(id="${id}")`] } });
+        logIdType = 'CartId : ';
+        break;
+      case Constants.PAYMENT_ID:
+        query = client.orders().get({ queryArgs: { where: [`paymentInfo(payments(id="${id}"))`] } });
+        logIdType = 'PaymentId : ';
+        break;
+      default:
+        return null;
     }
+    queryOrderByIdResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_ORDER_BY_ID, Constants.LOG_INFO, logIdType + id || '', '', `${queryOrderByIdResponse.consolidatedTime}`);
   }
   return queryOrderByIdResponse;
 };
@@ -171,23 +177,15 @@ const queryOrderById = async (id: string, idType: string) => {
  */
 const retrievePayment = async (paymentId: string): Promise<any> => {
   let retrievePaymentResponse = null;
-  try {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.payments.byId(paymentId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      retrievePaymentResponse = await makeCommercetoolsRequest(channelsRequest);
+  const client = await getClient();
+  if (paymentId && client) {
+    try {
+      const query = client.payments().withId({ ID: paymentId }).get();
+      retrievePaymentResponse = await makeCommercetoolsRequest(query);
       paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, '', '', `${retrievePaymentResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_ERROR, 'PaymentId: ' + paymentId || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+    } catch (exception) {
+      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT, exception, '', '', '');
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT, exception, '', '', '');
   }
   return retrievePaymentResponse;
 };
@@ -197,39 +195,30 @@ const retrievePayment = async (paymentId: string): Promise<any> => {
  * 
  * @param {PaymentTransactionType} transactionObject - The transaction object to add.
  * @param {string} paymentId - The ID of the payment.
- * @returns {Promise<PaymentType | null>} - The updated payment with the added transaction.
+ * @returns {Promise<Payment | null>} - The updated payment with the added transaction.
  */
-const addTransaction = async (transactionObject: Partial<PaymentTransactionType>, paymentId: string): Promise<PaymentType | null> => {
+const addTransaction = async (transactionObject: Partial<PaymentTransactionType>, paymentId: string): Promise<Payment | null> => {
   let addTransactionResponse = null;
-  if (transactionObject && paymentId) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.payments.byId(paymentId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify({
-          version: transactionObject.version,
-          actions: [
-            {
-              action: 'addTransaction',
-              transaction: {
-                type: transactionObject.type,
-                timestamp: paymentUtils.getDate(Date.now(), true),
-                amount: transactionObject.amount,
-                state: transactionObject.state,
-              },
+  const client = await getClient();
+  if (transactionObject && paymentId && client) {
+    const query = client.payments().withId({ ID: paymentId }).post({
+      body: {
+        version: transactionObject.version as number,
+        actions: [
+          {
+            action: 'addTransaction',
+            transaction: {
+              type: transactionObject.type as string,
+              timestamp: paymentUtils.getDate(Date.now(), true),
+              amount: transactionObject.amount as AmountPlannedType,
+              state: transactionObject.state,
             },
-          ],
-        }),
-      };
-      addTransactionResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, '', '', `${addTransactionResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_TRANSACTION, Constants.LOG_ERROR, 'PaymentId: ' + paymentId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT)
-    }
+          },
+        ],
+      }
+    });
+    addTransactionResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, '', '', `${addTransactionResponse.consolidatedTime}`);
   }
   return addTransactionResponse;
 };
@@ -241,19 +230,15 @@ const addTransaction = async (transactionObject: Partial<PaymentTransactionType>
  */
 const getOrders = async (): Promise<any> => {
   let getOrderResponse: any = null;
+  const client = await getClient();
   if (client) {
-    const requestBuilder = createRequestBuilder({
-      projectKey: process.env.CT_PROJECT_KEY,
+    const query = client.payments().get({
+      queryArgs: {
+        sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
+      },
     });
-    const uri = requestBuilder.payments.parse({ sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build();
-    const channelsRequest = {
-      uri: uri,
-      method: 'GET',
-    };
-    getOrderResponse = await makeCommercetoolsRequest(channelsRequest);
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ORDERS, Constants.LOG_INFO, '', '', `${getOrderResponse.consolidatedTime}`)
-  } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ORDERS, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+    getOrderResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ORDERS, Constants.LOG_INFO, '', '', `${getOrderResponse.consolidatedTime} `);
   }
   return getOrderResponse;
 };
@@ -270,12 +255,13 @@ const getOrders = async (): Promise<any> => {
  */
 const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVersion: number, addressData: Partial<CardAddressGroupType>): Promise<any> => {
   let updateCartByPaymentIdResponse = null;
-  const actions: Partial<ActionType>[] = [];
-  if (cartId && cartVersion && addressData && Object.keys(addressData).length) {
+  let actions: CartUpdateAction[] = [];
+  const client = await getClient();
+  if (cartId && cartVersion && addressData && Object.keys(addressData).length && client) {
     if (addressData?.billToFieldGroup && Object.keys(addressData.billToFieldGroup).length) {
       actions.push({
         action: 'setBillingAddress',
-        address: new Address(addressData.billToFieldGroup)
+        address: new Address(addressData.billToFieldGroup) as _BaseAddress
       });
     }
     if (addressData?.shipToFieldGroup && 0 !== Object.keys(addressData.shipToFieldGroup).length) {
@@ -285,13 +271,13 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
       }
       actions.push({
         action: 'setShippingAddress',
-        address: new Address(addressData.shipToFieldGroup),
+        address: new Address(addressData.shipToFieldGroup) as _BaseAddress,
       });
     }
     if (addressData?.billTo && Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
       actions.push({
         action: 'setBillingAddress',
-        address: new Address(addressData.billTo),
+        address: new Address(addressData.billTo) as _BaseAddress,
       });
     }
     if (addressData?.shipTo && paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING)) {
@@ -300,51 +286,41 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
         if ('Single' === cartDetail.shippingMode) {
           actions.push({
             action: 'setShippingAddress',
-            address: new Address(addressData.shipTo),
+            address: new Address(addressData.shipTo) as _BaseAddress,
           })
         }
       }
     }
     if (actions && actions.length) {
-      if (client) {
-        const requestBuilder = createRequestBuilder({
-          projectKey: process.env.CT_PROJECT_KEY,
-        });
-        const uri = requestBuilder.carts.byId(cartId).build();
-        const channelsRequest = {
-          uri: uri,
-          method: 'POST',
-          body: JSON.stringify({
-            version: cartVersion,
-            actions: actions,
-          }),
-        };
-        updateCartByPaymentIdResponse = await makeCommercetoolsRequest(channelsRequest);
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, 'CartId: ' + cartId || '', '', `${updateCartByPaymentIdResponse.consolidatedTime}`);
-      } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_ERROR, 'CartId: ' + cartId || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-      }
+      const query = client.carts().withId({ ID: cartId }).post({
+        body: {
+          version: cartVersion,
+          actions: actions,
+        },
+      });
+      updateCartByPaymentIdResponse = await makeCommercetoolsRequest(query);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, 'CartId: ' + cartId || '', '', `${updateCartByPaymentIdResponse.consolidatedTime} `);
     }
   }
   return updateCartByPaymentIdResponse;
 };
 
-//Aswin:need to change this
 /**
  * Sets customer tokens.
  * 
  * @param {string} tokenCustomerId - The ID of the token customer.
  * @param {string} paymentInstrumentId - The ID of the payment instrument.
  * @param {string} instrumentIdentifier - The identifier of the instrument.
- * @param {PaymentType} updatePaymentObj - The payment object to update.
+ * @param {Payment} updatePaymentObj - The payment object to update.
  * @param {string} addressId - The ID of the address.
  * @returns {Promise<any>} - The response after setting customer tokens.
  */
-const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: string, instrumentIdentifier: string, updatePaymentObj: PaymentType, addressId: string): Promise<any> => {
+const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: string, instrumentIdentifier: string, updatePaymentObj: Payment, addressId: string): Promise<any> => {
   let setCustomerTokensResponse = null;
   let isCustomTypePresent = false;
   let failedTokens: string[] = [];
-  if (paymentInstrumentId && instrumentIdentifier && updatePaymentObj?.customer?.id && updatePaymentObj?.custom?.fields) {
+  const client = await getClient();
+  if (paymentInstrumentId && instrumentIdentifier && updatePaymentObj?.customer?.id && updatePaymentObj?.custom?.fields && client) {
     const customerId = updatePaymentObj.customer.id;
     const customFields = updatePaymentObj?.custom?.fields;
     const customerInfo = await getCustomer(customerId);
@@ -357,7 +333,7 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
             failedTokens = customerInfo.custom.fields.isv_failedTokens;
           }
           const isvTokens = customerInfo.custom.fields.isv_tokens;
-          const mappedTokens = isvTokens.map((item) => item);
+          const mappedTokens = isvTokens.map((item: any) => item);
           const length = mappedTokens.length;
           mappedTokens[length] = stringTokenData;
           setCustomerTokensResponse = await updateCustomerToken(mappedTokens, customerInfo, failedTokens, tokenCustomerId);
@@ -381,25 +357,15 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
  * Retrieves customer information by ID.
  * 
  * @param {string} customerId - The ID of the customer.
- * @returns {Promise<CustomerType | null>} - The response containing customer information.
+ * @returns {Promise<Customer| null>} - The response containing customer information.
  */
-const getCustomer = async (customerId: string): Promise<Partial<CustomerType> | null> => {
+const getCustomer = async (customerId: string): Promise<Customer | null> => {
   let getCustomerResponse = null;
-  if (customerId) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.customers.byId(customerId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      getCustomerResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOMER, Constants.LOG_INFO, 'CustomerId : ' + customerId, '', `${getCustomerResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOMER, Constants.LOG_ERROR, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+  const client = await getClient();
+  if (customerId && client) {
+    const query = client.customers().withId({ ID: customerId }).get();
+    getCustomerResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOMER, Constants.LOG_INFO, 'CustomerId : ' + customerId, '', `${getCustomerResponse.consolidatedTime} `);
   }
   return getCustomerResponse;
 };
@@ -407,36 +373,27 @@ const getCustomer = async (customerId: string): Promise<Partial<CustomerType> | 
 /**
  * Updates a payment transaction's state synchronously.
  * 
- * @param {PaymentTransactionType} decisionUpdateObject - The object containing payment transaction details.
+ * @param {Partial<PaymentTransactionType>} decisionUpdateObject - The object containing payment transaction details.
  * @param {string} transactionId - The ID of the transaction to update.
  * @returns {Promise<void>}
  */
 const updateDecisionSync = async (decisionUpdateObject: Partial<PaymentTransactionType>, transactionId: string): Promise<void> => {
-  if (decisionUpdateObject) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.payments.byId(decisionUpdateObject.id).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify({
-          version: decisionUpdateObject.version,
-          actions: [
-            {
-              action: 'changeTransactionState',
-              transactionId: transactionId,
-              state: decisionUpdateObject.state,
-            },
-          ],
-        }),
-      };
-      const decisionSyncResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, 'PaymentId : ' + decisionUpdateObject?.id, '', `${decisionSyncResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_ERROR, 'PaymentId : ' + decisionUpdateObject?.id, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+  const client = await getClient();
+  if (decisionUpdateObject && decisionUpdateObject?.id && client) {
+    const query = client.payments().withId({ ID: decisionUpdateObject.id }).post({
+      body: {
+        version: decisionUpdateObject.version as number,
+        actions: [
+          {
+            action: Constants.CHANGE_TRANSACTION_STATE,
+            transactionId: transactionId,
+            state: decisionUpdateObject.state as string,
+          },
+        ],
+      },
+    });
+    const decisionSyncResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, 'PaymentId : ' + decisionUpdateObject?.id, '', `${decisionSyncResponse.consolidatedTime} `);
   }
 };
 
@@ -444,29 +401,20 @@ const updateDecisionSync = async (decisionUpdateObject: Partial<PaymentTransacti
  * Syncs Visa card details for a payment.
  * 
  * @param {VisaUpdateType} visaUpdateObject - Object containing Visa card update details.
- * @returns {Promise<PaymentType | null>} - Updated payment object.
+ * @returns {Promise<Payment | null>} - Updated payment object.
  */
-const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<PaymentType | null> => {
+const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<Payment | null> => {
+  const client = await getClient();
   let syncVisaCardDetailsResponse = null;
-  if (visaUpdateObject && visaUpdateObject?.id) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.payments.byId(visaUpdateObject.id).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify({
-          version: visaUpdateObject.version,
-          actions: visaUpdateObject.actions,
-        }),
-      };
-      syncVisaCardDetailsResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, 'PaymentId : ' + visaUpdateObject?.id, '', `${syncVisaCardDetailsResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_ERROR, 'PaymentId : ' + visaUpdateObject?.id, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+  if (visaUpdateObject && visaUpdateObject?.id && client) {
+    const query = client.payments().withId({ ID: visaUpdateObject.id }).post({
+      body: {
+        version: visaUpdateObject.version,
+        actions: visaUpdateObject.actions as PaymentUpdateAction[],
+      }
+    });
+    syncVisaCardDetailsResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, 'PaymentId : ' + visaUpdateObject?.id, '', `${syncVisaCardDetailsResponse.consolidatedTime} `);
   }
   return syncVisaCardDetailsResponse;
 };
@@ -475,68 +423,31 @@ const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<Pa
  * Syncs additional transaction details for a payment.
  * 
  * @param {ReportSyncType} syncUpdateObject - Object containing transaction details to sync.
- * @returns {Promise<PaymentType | null>} - Updated payment object.
+ * @returns {Promise<Payment | null>} - Updated payment object.
  */
-const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<PaymentType | null> => {
-  let channelsRequest = null;
+const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<Payment | null> => {
   let syncAddTransactionResponse = null;
-  if (syncUpdateObject) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.payments.byId(syncUpdateObject.id).build();
-      if (syncUpdateObject.securityCodePresent) {
-        channelsRequest = {
-          uri: uri,
-          method: 'POST',
-          body: JSON.stringify({
-            version: syncUpdateObject.version,
-            actions: [
-              {
-                action: 'addTransaction',
-                transaction: {
-                  type: syncUpdateObject.type,
-                  timestamp: paymentUtils.getDate(Date.now(), true),
-                  amount: syncUpdateObject.amountPlanned,
-                  state: syncUpdateObject.state,
-                  interactionId: syncUpdateObject.interactionId,
-                },
-              },
-              {
-                action: Constants.SET_CUSTOM_FIELD,
-                name: Constants.ISV_SECURITY_CODE,
-                value: null,
-              },
-            ],
-          }),
-        };
-      } else {
-        channelsRequest = {
-          uri: uri,
-          method: 'POST',
-          body: JSON.stringify({
-            version: syncUpdateObject.version,
-            actions: [
-              {
-                action: 'addTransaction',
-                transaction: {
-                  type: syncUpdateObject.type,
-                  timestamp: paymentUtils.getDate(Date.now(), true),
-                  amount: syncUpdateObject.amountPlanned,
-                  state: syncUpdateObject.state,
-                  interactionId: syncUpdateObject.interactionId,
-                },
-              },
-            ],
-          }),
-        };
+  const client = await getClient();
+  const addTransactionAction: (PaymentUpdateAction | PaymentAddTransactionAction)[] = [];
+  if (syncUpdateObject && syncUpdateObject.id && client) {
+    addTransactionAction.push({
+      action: 'addTransaction',
+      transaction: {
+        type: syncUpdateObject.type as string,
+        timestamp: paymentUtils.getDate(Date.now(), true),
+        amount: syncUpdateObject.amountPlanned,
+        state: syncUpdateObject.state,
+        interactionId: syncUpdateObject.interactionId,
+      },
+    });
+    const query = client.payments().withId({ ID: syncUpdateObject.id }).post({
+      body: {
+        version: syncUpdateObject.version as number,
+        actions: addTransactionAction
       }
-      syncAddTransactionResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, 'PaymentId : ' + syncUpdateObject?.id, '', `${syncAddTransactionResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_ERROR, 'PaymentId : ' + syncUpdateObject?.id, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+    });
+    syncAddTransactionResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, 'PaymentId : ' + syncUpdateObject?.id, '', `${syncAddTransactionResponse.consolidatedTime} `);
   }
   return syncAddTransactionResponse;
 };
@@ -544,29 +455,22 @@ const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<Pay
 /**
  * Adds custom types to the CommerceTools project.
  * 
- * @param {any} customType - Custom type object to add.
+ * @param {TypeDraft} customType - Custom type object to add.
  * @returns {Promise<any>} - Response of the add custom type operation.
  */
-const addCustomTypes = async (customType: any): Promise<any> => {
+const addCustomTypes = async (customType: TypeDraft): Promise<any> => {
   let addCustomTypeResponse;
   let data: any;
   try {
+    const client = await getClient();
     if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
+      const query = client.types().post({
+        body: customType
       });
-      const uri = requestBuilder.types.build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify(customType),
-      };
       const startTime = new Date().getTime();
-      addCustomTypeResponse = await client.execute(channelsRequest);
+      addCustomTypeResponse = await query.execute();
       const endTime = new Date().getTime();
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, '', '', `${endTime - startTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, '', '', `${endTime - startTime} `);
     }
   } catch (exception) {
     paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', '');
@@ -581,27 +485,20 @@ const addCustomTypes = async (customType: any): Promise<any> => {
 /**
  * Adds extensions to the CommerceTools project.
  * 
- * @param {any} extension - Extension object to add.
+ * @param {ExtensionDraft} extension - Extension object to add.
  * @returns {Promise<any>} - Response of the add extension operation.
  */
-const addExtensions = async (extension: any): Promise<any> => {
+const addExtensions = async (extension: ExtensionDraft): Promise<any> => {
   let addExtensionsResponse;
+  const client = await getClient();
   if (client) {
-    const requestBuilder = createRequestBuilder({
-      projectKey: process.env.CT_PROJECT_KEY,
+    const query = client.extensions().post({
+      body: extension
     });
-    const uri = requestBuilder.extensions.build();
-    const channelsRequest = {
-      uri: uri,
-      method: 'POST',
-      body: JSON.stringify(extension),
-    };
     const startTime = new Date().getTime();
-    addExtensionsResponse = await client.execute(channelsRequest);
+    addExtensionsResponse = await query.execute();
     const endTime = new Date().getTime();
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_EXTENSIONS, Constants.LOG_INFO, '', '', `${endTime - startTime}`);
-  } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_EXTENSIONS, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_EXTENSIONS, Constants.LOG_INFO, '', '', `${endTime - startTime} `);
   }
   return addExtensionsResponse;
 };
@@ -614,21 +511,13 @@ const addExtensions = async (extension: any): Promise<any> => {
  */
 const getCustomType = async (key: string): Promise<any> => {
   let getCustomTypeResponse = null;
-  if (key) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.types.byKey(key).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      const startTime = new Date().getTime();
-      getCustomTypeResponse = await client.execute(channelsRequest);
-      const endTime = new Date().getTime();
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOM_TYPE, Constants.LOG_INFO, '', '', `${endTime - startTime}`);
-    }
+  const client = await getClient();
+  if (key && client) {
+    const query = client.types().withKey({ key: key }).get();
+    const startTime = new Date().getTime();
+    getCustomTypeResponse = await query.execute();
+    const endTime = new Date().getTime();
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CUSTOM_TYPE, Constants.LOG_INFO, '', '', `${endTime - startTime} `);
   }
   return getCustomTypeResponse;
 };
@@ -640,44 +529,35 @@ const getCustomType = async (key: string): Promise<any> => {
  * @param {string[]} fieldsData - Data to update the custom type fields.
  * @param {string[]} failedTokenData - Array of failed token data.
  * @param {string} [customerTokenId] - Customer token ID.
- * @returns {Promise<CustomerType | null>} - Response of the set custom type operation.
+ * @returns {Promise<Customer | null>} - Response of the set custom type operation.
  */
-const setCustomType = async (customerId: string | undefined, fieldsData: string[], failedTokenData: string[] | undefined, customerTokenId?: string): Promise<Partial<CustomerType> | null> => {
+const setCustomType = async (customerId: string | undefined, fieldsData: string[], failedTokenData: string[] | undefined, customerTokenId?: string): Promise<Partial<Customer> | null> => {
   let setCustomTypeResponse = null;
-  if (customerId) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const customerInfo = await getCustomer(customerId);
-      const uri = requestBuilder.customers.byId(customerId).build();
-      const failedTokens = failedTokenData ? failedTokenData : [];
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify({
-          version: customerInfo?.version,
-          actions: [
-            {
-              action: 'setCustomType',
-              type: {
-                key: 'isv_payments_customer_tokens',
-                typeId: Constants.TYPE_ID_TYPE,
-              },
-              fields: {
-                isv_tokens: fieldsData,
-                isv_failedTokens: failedTokens,
-                isv_customerId: customerTokenId,
-              },
+  const failedTokens = failedTokenData ? failedTokenData : [];
+  const client = await getClient();
+  if (customerId && client) {
+    const customerInfo = await getCustomer(customerId);
+    const query = client.customers().withId({ ID: customerId }).post({
+      body: {
+        version: customerInfo?.version as number,
+        actions: [
+          {
+            action: Constants.SET_CUSTOM_TYPE,
+            type: {
+              key: 'isv_payments_customer_tokens',
+              typeId: Constants.TYPE_ID_TYPE,
             },
-          ],
-        }),
-      };
-      setCustomTypeResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, '', '', `${setCustomTypeResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOM_TYPE, Constants.LOG_ERROR, 'CustomerId: ' + customerId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+            fields: {
+              isv_tokens: fieldsData,
+              isv_failedTokens: failedTokens,
+              isv_customerId: customerTokenId,
+            },
+          },
+        ],
+      }
+    });
+    setCustomTypeResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, '', '', `${setCustomTypeResponse.consolidatedTime} `);
   }
   return setCustomTypeResponse;
 };
@@ -686,36 +566,27 @@ const setCustomType = async (customerId: string | undefined, fieldsData: string[
  * Changes the interaction ID of a transaction.
  * 
  * @param {any} transactionObj - Object containing transaction details.
- * @returns {Promise<PaymentType | null>} - Response of the change transaction interaction ID operation.
+ * @returns {Promise<Payment | null>} - Response of the change transaction interaction ID operation.
  */
 const changeTransactionInteractionId = async (transactionObj: any) => {
   let changeTransactionInteractionIdResponse = null;
-  if (transactionObj) {
+  const client = await getClient();
+  if (transactionObj?.paymentId && client) {
     let paymentId = transactionObj.paymentId;
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.payments.byId(paymentId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-        body: JSON.stringify({
-          version: transactionObj.version,
-          actions: [
-            {
-              action: Constants.CHANGE_TRANSACTION_INTERACTION_ID,
-              transactionId: transactionObj.transactionId,
-              interactionId: transactionObj.interactionId,
-            },
-          ],
-        }),
-      };
-      changeTransactionInteractionIdResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_CHANGE_TRANSACTION_INTERACTION_ID, Constants.LOG_INFO, '', '', `${changeTransactionInteractionIdResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_CHANGE_TRANSACTION_INTERACTION_ID, Constants.LOG_ERROR, 'PaymentId: ' + paymentId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+    const query = client.payments().withId({ ID: paymentId }).post({
+      body: {
+        version: transactionObj.version,
+        actions: [
+          {
+            action: Constants.CHANGE_TRANSACTION_INTERACTION_ID,
+            transactionId: transactionObj.transactionId,
+            interactionId: transactionObj.interactionId,
+          },
+        ],
+      }
+    });
+    changeTransactionInteractionIdResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_CHANGE_TRANSACTION_INTERACTION_ID, Constants.LOG_INFO, '', '', `${changeTransactionInteractionIdResponse.consolidatedTime} `);
   }
   return changeTransactionInteractionIdResponse;
 };
@@ -730,30 +601,21 @@ const changeTransactionInteractionId = async (transactionObj: any) => {
  */
 const addCustomField = async (typeId: string, version: number, fieldDefinition: any) => {
   let addCustomFieldResponse;
-  if (typeId && version && fieldDefinition) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.types.byId(typeId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify({
-          version: version,
-          actions: [
-            {
-              action: 'addFieldDefinition',
-              fieldDefinition: fieldDefinition,
-            },
-          ],
-        }),
-      };
-      addCustomFieldResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${addCustomFieldResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+  const client = await getClient();
+  if (typeId && version && fieldDefinition && client) {
+    const query = client.types().withId({ ID: typeId }).post({
+      body: {
+        version: version,
+        actions: [
+          {
+            action: Constants.ADD_FIELD_DEFINITION,
+            fieldDefinition: fieldDefinition,
+          },
+        ],
+      }
+    });
+    addCustomFieldResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${addCustomFieldResponse.consolidatedTime} `);
   }
   return addCustomFieldResponse;
 };
@@ -769,37 +631,28 @@ const addCustomField = async (typeId: string, version: number, fieldDefinition: 
  */
 const updateAvailableAmount = async (paymentId: string, version: number, transactionId: string, pendingAmount: number) => {
   let updateAvailableAmountResponse;
-  if (paymentId && version && transactionId && 0 > pendingAmount) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.payments.byId(paymentId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify({
-          version: version,
-          actions: [
-            {
-              action: 'setTransactionCustomType',
-              type: {
-                key: 'isv_transaction_data',
-                typeId: Constants.TYPE_ID_TYPE,
-              },
-              fields: {
-                isv_availableCaptureAmount: pendingAmount,
-              },
-              transactionId: transactionId,
+  const client = await getClient();
+  if (paymentId && version && transactionId && 0 > pendingAmount && client) {
+    const query = client.payments().withId({ ID: paymentId }).post({
+      body: {
+        version: version,
+        actions: [
+          {
+            action: Constants.SET_TRANSACTION_CUSTOM_TYPE,
+            type: {
+              key: Constants.ISV_TRANSACTION_DATA,
+              typeId: Constants.TYPE_ID_TYPE,
             },
-          ],
-        }),
-      };
-      updateAvailableAmountResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_INFO, '', '', `${updateAvailableAmountResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+            fields: {
+              isv_availableCaptureAmount: pendingAmount,
+            },
+            transactionId: transactionId,
+          },
+        ],
+      }
+    });
+    updateAvailableAmountResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_INFO, '', '', `${updateAvailableAmountResponse.consolidatedTime} `);
   }
   return updateAvailableAmountResponse;
 };
@@ -812,21 +665,11 @@ const updateAvailableAmount = async (paymentId: string, version: number, transac
  */
 const getCartById = async (cartId: string) => {
   let getCartByIdResponse;
-  if (cartId) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.carts.byId(cartId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      getCartByIdResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CART_BY_ID, Constants.LOG_INFO, '', '', `${getCartByIdResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CART_BY_ID, Constants.LOG_ERROR, 'CartId : ' + cartId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+  const client = await getClient();
+  if (cartId && client) {
+    const query = client.carts().withId({ ID: cartId }).get();
+    getCartByIdResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CART_BY_ID, Constants.LOG_INFO, '', '', `${getCartByIdResponse.consolidatedTime} `);
   }
   return getCartByIdResponse;
 };
@@ -838,63 +681,44 @@ const getCartById = async (cartId: string) => {
  * @param {AddressType} addressObj - The address object to add.
  * @returns {Promise<any>} - Response containing the updated customer details.
  */
-const addCustomerAddress = async (customerId: string, addressObj: Partial<AddressType>) => {
-  const actions: Partial<ActionType>[] = [];
+const addCustomerAddress = async (customerId: string, addressObj: Partial<_BaseAddress>) => {
+  const actions: CustomerUpdateAction[] = [];
   let addCustomerAddressResponse = null;
-  let customerData: Partial<CustomerType> | null = null;
-  if (customerId) {
+  let customerData: Partial<Customer> | null = null;
+  const client = await getClient();
+  if (customerId && client) {
     customerData = await getCustomer(customerId);
     actions.push({
       action: 'addAddress',
-      address: new Address(addressObj)
+      address: new Address(addressObj) as _BaseAddress
     });
     if (actions && actions.length && customerData) {
-      if (client) {
-        const requestBuilder = createRequestBuilder({
-          projectKey: process.env.CT_PROJECT_KEY,
-        });
-        const uri = requestBuilder.customers.byId(customerId).build();
-        const channelsRequest = {
-          uri: uri,
-          method: 'POST',
-          body: JSON.stringify({
-            version: customerData.version,
-            actions: actions,
-          }),
-        };
-        addCustomerAddressResponse = await makeCommercetoolsRequest(channelsRequest);
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOMER_ADDRESS, Constants.LOG_INFO, '', '', `${addCustomerAddressResponse.consolidatedTime}`);
-      } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOMER_ADDRESS, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-      }
+      const query = client.customers().withId({ ID: customerId }).post({
+        body: {
+          version: customerData.version as number,
+          actions: actions,
+        }
+      });
+      addCustomerAddressResponse = await makeCommercetoolsRequest(query);
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOMER_ADDRESS, Constants.LOG_INFO, '', '', `${addCustomerAddressResponse.consolidatedTime} `);
     }
   }
   return addCustomerAddressResponse;
 };
 
-//Network Tokenization
 /**
  * Creates a custom object in the commercetools platform.
  * 
- * @param {any} customObjectData - Data for the custom object.
+ * @param {CustomObjectDraft} customObjectData - Data for the custom object.
  * @returns {Promise<any>} - Response containing the created custom object.
  */
-const createCTCustomObject = async (customObjectData: any) => {
+const createCTCustomObject = async (customObjectData: CustomObjectDraft) => {
   let setCustomObjectResponse: any;
-  if (client) {
-    const requestBuilder = createRequestBuilder({
-      projectKey: process.env.CT_PROJECT_KEY,
-    });
-    const uri = requestBuilder.customObjects.build();
-    const channelsRequest = {
-      uri: uri,
-      method: 'POST',
-      body: JSON.stringify(customObjectData),
-    };
-    setCustomObjectResponse = await makeCommercetoolsRequest(channelsRequest);
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_CREATE_CT_CUSTOM_OBJECT, Constants.LOG_INFO, '', '', `${setCustomObjectResponse.consolidatedTime}`);
-  } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_CREATE_CT_CUSTOM_OBJECT, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+  const client = await getClient();
+  if (customObjectData && client) {
+    const query = client.customObjects().post({ body: customObjectData });
+    setCustomObjectResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_CREATE_CT_CUSTOM_OBJECT, Constants.LOG_INFO, '', '', `${setCustomObjectResponse.consolidatedTime} `);
   }
   return setCustomObjectResponse;
 };
@@ -907,22 +731,16 @@ const createCTCustomObject = async (customObjectData: any) => {
  */
 const retrieveCustomObjectByContainer = async (container: string) => {
   let getCustomObjectsResponse: any;
-  if (client) {
-    const requestBuilder = createRequestBuilder({
-      projectKey: process.env.CT_PROJECT_KEY,
-    })
-    const uri = requestBuilder.customObjects.where(`container = "${container}"`).build();
-    const channelsRequest = {
-      uri: uri,
-      method: 'GET',
-    };
+  const client = await getClient();
+  if (container && client) {
+    const query = client.customObjects().get({ queryArgs: { where: [`container="${container}"`] } });
     const startTime = new Date().getTime();
-    getCustomObjectsResponse = await client.execute(channelsRequest);
+    getCustomObjectsResponse = await query.execute();
     const endTime = new Date().getTime();
     if (getCustomObjectsResponse?.body) {
       getCustomObjectsResponse = getCustomObjectsResponse.body;
     }
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_OBJECT_BY_CONTAINER, Constants.LOG_INFO, '', '', `${endTime - startTime}`);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_OBJECT_BY_CONTAINER, Constants.LOG_INFO, '', '', `${endTime - startTime} `);
   }
   return getCustomObjectsResponse;
 };
@@ -935,71 +753,27 @@ const retrieveCustomObjectByContainer = async (container: string) => {
  * @param {any} failedTokens - Failed tokens data.
  * @returns {Promise<any>} - Response containing the result of the update.
  */
-const updateCustomerToken = async (updateObject: any, customerObject: Partial<CustomerType>, failedTokens: any, customerTokenId: string | null) => {
-  let actions: any = [];
+const updateCustomerToken = async (updateObject: any, customerObject: Partial<Customer>, failedTokens: any, customerTokenId: string | null) => {
   let setCustomFieldResponse: any;
-  if (customerObject && customerObject?.id) {
+  const client = await getClient();
+  if (customerObject && customerObject?.id && client) {
     let customerId = customerObject.id;
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      if (failedTokens) {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: Constants.ISV_FAILED_TOKENS,
-          value: failedTokens,
-        });
+    const actions = [
+      failedTokens && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_FAILED_TOKENS, value: failedTokens },
+      updateObject && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_TOKENS, value: updateObject },
+      customerTokenId && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_CUSTOMER_ID, value: customerTokenId },
+      customerObject?.custom?.fields?.isv_tokenAction && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_TOKEN_ACTION, value: null },
+      customerObject?.custom?.fields?.isv_cardNewExpiryMonth && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_CARD_NEW_EXPIRY_MONTH, value: null },
+      customerObject?.custom?.fields?.isv_cardNewExpiryYear && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_CARD_NEW_EXPIRY_YEAR, value: null }
+    ].filter(Boolean);
+    const query = client.customers().withId({ ID: customerId }).post({
+      body: {
+        version: customerObject.version as number,
+        actions: actions,
       }
-      if (updateObject) {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: Constants.ISV_TOKENS,
-          value: updateObject,
-        });
-      }
-      if (customerTokenId) {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: Constants.ISV_CUSTOMER_ID,
-          value: customerTokenId
-        });
-      }
-      if (customerObject?.custom?.fields?.isv_tokenAction) {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: Constants.ISV_TOKEN_ACTION,
-          value: null,
-        });
-      }
-      if (customerObject?.custom?.fields?.isv_cardNewExpiryMonth) {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: Constants.ISV_CARD_NEW_EXPIRY_MONTH,
-          value: null,
-        });
-      }
-      if (customerObject?.custom?.fields?.isv_cardNewExpiryYear) {
-        actions.push({
-          action: Constants.SET_CUSTOM_FIELD,
-          name: Constants.ISV_CARD_NEW_EXPIRY_YEAR,
-          value: null,
-        });
-      }
-      const uri = requestBuilder.customers.byId(customerId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'POST',
-        body: JSON.stringify({
-          version: customerObject.version,
-          actions: actions,
-        }),
-      };
-      setCustomFieldResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CUSTOMER_TOKEN, Constants.LOG_INFO, customerId, '', `${setCustomFieldResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CUSTOMER_TOKEN, Constants.LOG_ERROR, customerId, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+    })
+    setCustomFieldResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CUSTOMER_TOKEN, Constants.LOG_INFO, customerId, '', `${setCustomFieldResponse.consolidatedTime} `);
   }
   return setCustomFieldResponse;
 };
@@ -1013,22 +787,11 @@ const updateCustomerToken = async (updateObject: any, customerObject: Partial<Cu
  */
 const retrieveCustomerByCustomField = async (customFieldName: string, customFieldValue: string) => {
   let retrieveCustomerByCustomObjectResponse;
-  if (client) {
-    const requestBuilder = createRequestBuilder({
-      projectKey: process.env.CT_PROJECT_KEY,
-    });
-    if (customFieldName && customFieldValue) {
-      const query = `custom(fields(${customFieldName} = "${customFieldValue}"))`;
-      const uri = await requestBuilder.customers.where(query).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      retrieveCustomerByCustomObjectResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${retrieveCustomerByCustomObjectResponse.consolidatedTime}`);
-    }
-  } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
+  const client = await getClient();
+  if (customFieldName && customFieldValue && client) {
+    const query = client.customers().get({ queryArgs: { where: `custom(fields(${customFieldName} = "${customFieldValue}"))` } });
+    retrieveCustomerByCustomObjectResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${retrieveCustomerByCustomObjectResponse.consolidatedTime} `);
   }
   return retrieveCustomerByCustomObjectResponse;
 };
@@ -1041,21 +804,11 @@ const retrieveCustomerByCustomField = async (customFieldName: string, customFiel
  */
 const getDiscountCodes = async (discountId: string) => {
   let getDiscountResponse = null;
-  if (discountId) {
-    if (client) {
-      const requestBuilder = createRequestBuilder({
-        projectKey: process.env.CT_PROJECT_KEY,
-      });
-      const uri = requestBuilder.discountCodes.byId(discountId).build();
-      const channelsRequest = {
-        uri: uri,
-        method: 'GET',
-      };
-      getDiscountResponse = await makeCommercetoolsRequest(channelsRequest);
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${getDiscountResponse.consolidatedTime}`);
-    } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_DISCOUNT_CODES, Constants.LOG_ERROR, discountId || '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
-    }
+  const client = await getClient();
+  if (discountId && client) {
+    const query = client.discountCodes().withId({ ID: discountId }).get();
+    getDiscountResponse = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${getDiscountResponse.consolidatedTime} `);
   }
   return getDiscountResponse;
 };
@@ -1069,27 +822,34 @@ const getDiscountCodes = async (discountId: string) => {
  * 
  * Logs an error if unable to connect to the commercetools client.
  * */
-const getAllPayments = async () => {
-  let getAllPaymentsResponse = null;
-  const client = getClient();
+const getAllPayments = async (): Promise<PaymentPagedQueryResponse> => {
+  let getAllPaymentsResponse = {} as PaymentPagedQueryResponse;
+  const client = await getClient();
   if (client) {
-    const requestBuilder = createRequestBuilder({
-      projectKey: process.env.CT_PROJECT_KEY,
-    });
-    const uri = requestBuilder.payments.parse({ sort: [{ by: Constants.LAST_MODIFIED_AT, direction: Constants.DESC_ORDER }] }).build()
-    const channelsRequest = {
-      uri: uri,
-      method: 'GET',
-    };
-    const getAllPaymentsResponseObject = await client.execute(channelsRequest);
+    const query = client.payments().get({ queryArgs: { sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}` } })
+    const getAllPaymentsResponseObject = await query.execute();
     if (getAllPaymentsResponseObject?.body) {
       getAllPaymentsResponse = getAllPaymentsResponseObject.body;
     }
-  } else {
-    paymentUtils.logData(__filename, 'FuncGetAllPayments', Constants.LOG_INFO, '', CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT);
   }
   return getAllPaymentsResponse;
 }
+
+const updateOrderAddress = async (orderId: string, orderVersion: number, actions: any[]) => {
+  const client = await getClient();
+  let orderUpdateResponse = null;
+  if (client && orderId && orderVersion && actions && actions.length) {
+    const query = client.orders().withId({ ID: orderId }).post({
+      body: {
+        version: orderVersion,
+        actions: actions,
+      },
+    });
+    orderUpdateResponse = await query.execute();
+  }
+  return orderUpdateResponse;
+}
+
 export default {
   queryCartById,
   queryOrderById,
@@ -1116,5 +876,6 @@ export default {
   updateCustomerToken,
   retrieveCustomerByCustomField,
   getDiscountCodes,
-  getAllPayments
+  getAllPayments,
+  updateOrderAddress
 };

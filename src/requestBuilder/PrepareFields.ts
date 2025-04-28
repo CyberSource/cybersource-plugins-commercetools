@@ -1,10 +1,23 @@
-import { Ptsv2paymentsClientReferenceInformation, Ptsv2paymentsConsumerAuthenticationInformation, Ptsv2paymentsDeviceInformation, Ptsv2paymentsidcapturesOrderInformationAmountDetails, Ptsv2paymentsidClientReferenceInformationPartner, Ptsv2paymentsidreversalsClientReferenceInformation, Ptsv2paymentsidreversalsClientReferenceInformationPartner, Ptsv2paymentsidreversalsOrderInformationAmountDetails, Ptsv2paymentsOrderInformationAmountDetails, Ptsv2paymentsOrderInformationBillTo, Ptsv2paymentsOrderInformationShipTo, Ptsv2paymentsPromotionInformation, Ptsv2paymentsRiskInformationBuyerHistory, Ptsv2paymentsRiskInformationBuyerHistoryCustomerAccount, Ptsv2paymentsTokenInformation, Riskv1authenticationsetupsTokenInformation, Riskv1authenticationsRiskInformation, Riskv1decisionsClientReferenceInformation, Riskv1decisionsClientReferenceInformationPartner, Tmsv2customersBuyerInformation, Upv1capturecontextsCaptureMandate, Upv1capturecontextsOrderInformationAmountDetails } from 'cybersource-rest-client';
+import fs from 'fs';
+import path from 'path';
+
+import { _BaseAddress, Cart, Customer, Payment } from '@commercetools/platform-sdk';
+import {
+  Ptsv2paymentsBuyerInformation, Ptsv2paymentsClientReferenceInformation, Ptsv2paymentsConsumerAuthenticationInformation,
+  Ptsv2paymentsDeviceInformation, Ptsv2paymentsidcapturesOrderInformationAmountDetails, Ptsv2paymentsidClientReferenceInformationPartner,
+  Ptsv2paymentsidreversalsClientReferenceInformation, Ptsv2paymentsidreversalsClientReferenceInformationPartner,
+  Ptsv2paymentsidreversalsOrderInformationAmountDetails, Ptsv2paymentsOrderInformationAmountDetails,
+  Ptsv2paymentsOrderInformationBillTo, Ptsv2paymentsOrderInformationShipTo, Ptsv2paymentsPromotionInformation, Ptsv2paymentsRiskInformationBuyerHistory,
+  Ptsv2paymentsRiskInformationBuyerHistoryCustomerAccount, Ptsv2paymentsTokenInformation, Riskv1authenticationsetupsTokenInformation,
+  Riskv1authenticationsRiskInformation, Riskv1decisionsClientReferenceInformation, Riskv1decisionsClientReferenceInformationPartner,
+  Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo, Upv1capturecontextsCaptureMandate, Upv1capturecontextsOrderInformationAmountDetails
+} from 'cybersource-rest-client';
 import { jwtDecode } from 'jwt-decode';
 
-import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
-import { AddressType, CustomerType, CustomTokenType, MetaDataType, MidCredentialsType, PaymentTransactionType, PaymentType, ProcessingInformationType } from '../types/Types';
+import { Constants } from '../constants/paymentConstants';
+import { AddressType, CustomTokenType, MetaDataType, MidCredentialsType, PaymentTransactionType, ProcessingInformationType } from '../types/Types';
 import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
 import commercetoolsApi from '../utils/api/CommercetoolsApi';
@@ -20,33 +33,30 @@ import { ProcessingInformation } from './ProcessingInformationMapper';
  * 
  * @param {string} functionName - The name of the function.
  * @param {MidCredentialsType | null} midCredentials - MID credentials.
- * @param {PaymentType | null} resourceObj - The payment object.
+ * @param {Payment | null} resourceObj - The payment object.
  * @param {string | null} merchantId - The merchant ID.
- * @returns {Promise<{
+ * @returns {
 *   authenticationType: string;
 *   runEnvironment: string;
 *   merchantID: string;
 *   merchantKeyId: string;
 *   merchantsecretKey: string;
 *   logConfiguration: { enableLog: boolean };
-* } | undefined>} - A promise resolving to the configuration object.
+* } 
 */
-const getConfigObject = (functionName: string, midCredentials: MidCredentialsType | null, resourceObj: PaymentType | null, merchantId: string | null) => {
-  let configObject = {
+const getConfigObject = async (functionName: string, midCredentials: MidCredentialsType | null, resourceObj: Payment | null, merchantId: string | null) => {
+  let configObject: any = {
     authenticationType: Constants.PAYMENT_GATEWAY_AUTHENTICATION_TYPE,
     runEnvironment: '',
-    merchantID: '',
-    merchantKeyId: '',
-    merchantsecretKey: '',
+    mleKeyAlias: '',
+    keyFileName: '',
+    keysDirectory: '',
     logConfiguration: {
       enableLog: false,
-    }
+    },
+    useMLEGlobally: false,
   };
-  let midCredentialsObject: MidCredentialsType = {
-    merchantId: '',
-    merchantKeyId: '',
-    merchantSecretKey: '',
-  };
+  let midCredentialsObject = {} as MidCredentialsType;
   let mid = '';
   configObject.runEnvironment = Constants.LIVE_ENVIRONMENT === process.env.PAYMENT_GATEWAY_RUN_ENVIRONMENT?.toUpperCase() ? Constants.PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT : Constants.PAYMENT_GATEWAY_TEST_ENVIRONMENT;
   if (resourceObj && Constants.GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS.includes(functionName)) {
@@ -68,6 +78,29 @@ const getConfigObject = (functionName: string, midCredentials: MidCredentialsTyp
     configObject.merchantID = midCredentialsObject?.merchantId;
     configObject.merchantKeyId = midCredentialsObject.merchantKeyId;
     configObject.merchantsecretKey = midCredentialsObject.merchantSecretKey;
+    if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_USE_MLE) && !Constants.MLE_UNSUPPORTED_FUNCTIONS.includes(functionName)) {
+      const jwtConfiguration = multiMid.getKeyCredentials(midCredentialsObject.merchantId);
+      if (jwtConfiguration.keyPass && (jwtConfiguration.keyFileName || jwtConfiguration.keyFileUrl)) {
+        configObject.useMLEGlobally = true;
+        configObject.authenticationType = Constants.JWT_AUTHENTICATION;
+        configObject.mleKeyAlias = jwtConfiguration.keyAlias || '';
+        configObject.keyPass = jwtConfiguration.keyPass;
+        const keysDirectory = path.join(__dirname, Constants.CERTIFICATE_PATH);
+        let filePath = path.resolve(path.join(keysDirectory, process.env.PAYMENT_GATEWAY_KEY_FILE_NAME + '.p12'));
+        if (!jwtConfiguration.keyFileName && !fs.existsSync(filePath) && (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) && jwtConfiguration.keyFileUrl) {
+          configObject.keyFileName = Constants.STRING_TEST;
+          configObject.keysDirectory = path.resolve(__dirname, Constants.CERTIFICATE_PATH);
+          await paymentUtils.setCertificatecache(jwtConfiguration.keyFileUrl, jwtConfiguration.keyPass, midCredentialsObject.merchantId);
+        } else if (jwtConfiguration.keyFileName && fs.existsSync(filePath)) {
+          configObject.keyFileName = jwtConfiguration.keyFileName;
+          configObject.keysDirectory = path.resolve(__dirname, Constants.CERTIFICATE_PATH);
+        } else {
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CONFIG_OBJECT, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_CERTIFICATE_NOT_SET);
+        }
+      } else {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CONFIG_OBJECT, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_JWT_ENV_VARIABLE_NOT_SET);
+      }
+    }
   } else {
     paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CONFIG_OBJECT, Constants.LOG_WARN, '', CustomMessages.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET);
     return null;
@@ -79,14 +112,14 @@ const getConfigObject = (functionName: string, midCredentials: MidCredentialsTyp
  * Generates processing information object based on the provided function name and payment scenario.
  * 
  * @param {string} functionName - The name of the function.
- * @param {PaymentType | null} resourceObj - The payment object containing custom fields.
+ * @param {Payment | null} resourceObj - The payment object containing custom fields.
  * @param {string} orderNo - The order number associated with the payment.
  * @param {string} service - The service type for the payment.
  * @param {CustomTokenType | null} cardTokens - The card tokens associated with the payment.
  * @param {boolean | null} isSaveToken - Specifies whether to save the token or not. 
- * @returns {Promise<restApi.Ptsv2paymentsProcessingInformation>} - The processing information object.
+ * @returns {restApi.Ptsv2paymentsProcessingInformation} - The processing information object.
  */
-const getProcessingInformation = (functionName: string, resourceObj: PaymentType | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) => {
+const getProcessingInformation = (functionName: string, resourceObj: Payment | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) => {
   const processingInformation = new ProcessingInformation(functionName, resourceObj, orderNo, service, cardTokens, isSaveToken);
   return processingInformation.getProcessingInformation() as ProcessingInformationType;
 };
@@ -95,12 +128,12 @@ const getProcessingInformation = (functionName: string, resourceObj: PaymentType
  * Generates payment information object based on the provided function name and payment scenario.
  * 
  * @param {string} functionName - The name of the function.
- * @param {PaymentType | null} resourceObj - The payment object containing custom fields.
+ * @param {Payment | null} resourceObj - The payment object containing custom fields.
  * @param {CustomTokenType | null} cardTokens - The card tokens associated with the payment.
  * @param {string | null} customerTokenId - The customer token ID associated with the payment.
- * @returns {Promise<any>} - The payment information object.
+ * @returns {any} - The payment information object.
  */
-const getPaymentInformation = (functionName: string, resourceObj: PaymentType | null, cardTokens: CustomTokenType | null, customerTokenId: string | null): any => {
+const getPaymentInformation = (functionName: string, resourceObj: Payment | null, cardTokens: CustomTokenType | null, customerTokenId: string | null): any => {
   const paymentInformationInstance = new PaymentInformationModel();
   const paymentInformation = paymentInformationInstance.mapPaymentInformation(functionName, resourceObj, cardTokens, customerTokenId);
   return paymentInformation;
@@ -111,9 +144,9 @@ const getPaymentInformation = (functionName: string, resourceObj: PaymentType | 
  * 
  * @param {string} service - The name of the service.
  * @param {string} resourceId - The ID of the resource.
- * @returns {Promise<any>} - The client reference information object.
+ * @returns {any} - The client reference information object.
  */
-const getClientReferenceInformation = (service: string, resourceId: string, payment?: PaymentType): any => {
+const getClientReferenceInformation = (service: string, resourceId: string, payment?: Payment): any => {
   let customFields = payment?.custom?.fields;
   let clientReferenceInformationPartner;
   let clientReferenceInformation;
@@ -147,16 +180,16 @@ const getClientReferenceInformation = (service: string, resourceId: string, paym
  * Generates order information based on the provided parameters.
  * 
  * @param {string} functionName - The name of the function.
- * @param {PaymentType | null} paymentObj - The payment object.
+ * @param {Payment | null} paymentObj - The payment object.
  * @param {PaymentTransactionType | null} updateTransactions - The updated transaction object.
- * @param {any} cartObj - The cart object.
- * @param {CustomerType | null} customerObj - The customer object.
+ * @param {Cart} cartObj - The cart object.
+ * @param {Customer | null} customerObj - The customer object.
  * @param {AddressType | null} address - The address object.
  * @param {string | null} service - The service name.
  * @param {string} currencyCode - The currency code.
- * @returns {Promise<OrderInformationType>} - The order information object.
+ * @returns {OrderInformationType} - The order information object.
  */
-const getOrderInformation = (functionName: string, paymentObj: PaymentType | null, updateTransactions: Partial<PaymentTransactionType> | null, cartObj: any, customerObj: Partial<CustomerType> | null, address: AddressType | null, service: string | null, currencyCode: string) => {
+const getOrderInformation = (functionName: string, paymentObj: Payment | null, updateTransactions: Partial<PaymentTransactionType> | null, cartObj: Cart | null, customerObj: Customer | null, address: Partial<AddressType> | null, service: string, currencyCode: string) => {
   const orderInformationMapper = new OrderInformationMapper(functionName, paymentObj, updateTransactions, cartObj, customerObj, address, service, currencyCode);
   return orderInformationMapper.getOrderInformation();
 };
@@ -166,13 +199,13 @@ const getOrderInformation = (functionName: string, paymentObj: PaymentType | nul
  * 
  * @param {string} functionName - The name of the function.
  * @param {number | null} captureAmount - The capture amount.
- * @param {PaymentType | null} paymentObj - The payment object.
- * @param {any} cartObj - The cart object.
+ * @param {Payment | null} paymentObj - The payment object.
+ * @param {Cart} cartObj - The cart object.
  * @param {string | null} currencyCode - The currency code.
  * @param {string | null} service - The service type.
- * @returns {Promise<any>} - The order information amount details.
+ * @returns {any} - The order information amount details.
  */
-const getOrderInformationAmountDetails = (functionName: string, captureAmount: number | null, paymentObj: PaymentType | null, cartObj: any, currencyCode: string | null, service: string | null) => {
+const getOrderInformationAmountDetails = (functionName: string, captureAmount: number | null, paymentObj: Payment | null, cartObj: Cart | null, currencyCode: string | null, service: string | null) => {
   let orderInformationAmountDetails: any;
   if (FunctionConstant.FUNC_GET_REFUND_DATA === functionName || FunctionConstant.FUNC_GET_CAPTURE_RESPONSE === functionName || FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE === functionName) {
     switch (functionName) {
@@ -188,13 +221,13 @@ const getOrderInformationAmountDetails = (functionName: string, captureAmount: n
     }
     orderInformationAmountDetails.totalAmount = captureAmount;
     orderInformationAmountDetails.currency = paymentObj?.amountPlanned?.currencyCode;
-  } else if (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName) {
+  } else if (cartObj?.totalPrice && (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName)) {
     orderInformationAmountDetails = {} as Ptsv2paymentsOrderInformationAmountDetails;
     orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits);
     orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
   } else if (FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT === functionName) {
     orderInformationAmountDetails = {} as Upv1capturecontextsOrderInformationAmountDetails;
-    if ('Payments' === service) {
+    if ('Payments' === service && cartObj?.totalPrice) {
       orderInformationAmountDetails.totalAmount = `${paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits)}`;
       orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
     } else if ('MyAccounts' === service) {
@@ -213,14 +246,14 @@ const getOrderInformationAmountDetails = (functionName: string, captureAmount: n
  * Generates order information bill-to details based on the provided parameters.
  * 
  * @param {string} functionName - The name of the function.
- * @param {any} cartObj - The cart object.
+ * @param {Cart} cartObj - The cart object.
  * @param {AddressType | null} address - The address object.
- * @param {CustomerType | null} customerObj - The customer object.
- * @returns {Promise<any>} - The order information bill-to details.
+ * @param {Customer | null} customerObj - The customer object.
+ * @returns {Ptsv2paymentsOrderInformationBillTo} - The order information bill-to details.
  */
-const getOrderInformationBillToDetails = (functionName: string, cartObj: any, address: AddressType | null, customerObj: Partial<CustomerType> | null): any => {
+const getOrderInformationBillToDetails = (functionName: string, cartObj: Cart | null, address: Partial<AddressType> | null, customerObj: Customer | null): Ptsv2paymentsOrderInformationBillTo => {
   let orderInformationBillTo = {} as Ptsv2paymentsOrderInformationBillTo;
-  if (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName && cartObj) {
+  if (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName && cartObj?.billingAddress) {
     const addressMapper = new AddressMapper(cartObj.billingAddress);
     orderInformationBillTo = addressMapper.mapOrderInformationBillTo();
   } else if (FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === functionName && address && customerObj) {
@@ -253,17 +286,16 @@ const getOrderInformationBillToDetails = (functionName: string, cartObj: any, ad
 /**
  * Generates order information ship-to details based on the provided cart object.
  * 
- * @param {any} cartObj - The cart object.
- * @returns {Promise<any>} - The order information ship-to details.
+ * @param {Cart} cartObj - The cart object.
+ * @returns {Ptsv2paymentsOrderInformationShipTo} - The order information ship-to details.
  */
-const getOrderInformationShipToDetails = (cartObj: any, shippingMethod: string | undefined): any => {
+const getOrderInformationShipToDetails = (cartObj: Cart | null, shippingMethod: string | undefined): Ptsv2paymentsOrderInformationShipTo => {
   let orderInformationShipTo = {} as Ptsv2paymentsOrderInformationShipTo;
-  let shippingAddress;
+  let shippingAddress = {} as _BaseAddress;
   if (cartObj?.shippingMode && Constants.SHIPPING_MODE_MULTIPLE === cartObj?.shippingMode && 0 < cartObj?.shipping?.length) {
     shippingAddress = cartObj.shipping[0].shippingAddress;
-  } else if (cartObj.shippingAddress) {
+  } else if (cartObj?.shippingAddress) {
     shippingAddress = cartObj.shippingAddress;
-
   }
   const addressMapper = new AddressMapper(shippingAddress);
   orderInformationShipTo = addressMapper.mapOrderInformationShipto();
@@ -276,12 +308,12 @@ const getOrderInformationShipToDetails = (cartObj: any, shippingMethod: string |
 /**
  * Generates device information for payment based on the provided parameters.
  * 
- * @param {PaymentType | null} paymentObj - The payment object.
- * @param {CustomerType | null} customerObj - The customer object.
+ * @param {Payment | null} paymentObj - The payment object.
+ * @param {Customer | null} customerObj - The customer object.
  * @param {string} service - The name of the service.
- * @returns {Promise<any>} - The device information.
+ * @returns {Ptsv2paymentsDeviceInformation} - The device information.
  */
-const getDeviceInformation = (paymentObj: PaymentType | null, customerObj: Partial<CustomerType> | null, service: string): any => {
+const getDeviceInformation = (paymentObj: Payment | null, customerObj: Customer | null, service: string): Ptsv2paymentsDeviceInformation => {
   const deviceInformation = {} as Ptsv2paymentsDeviceInformation;
   const customFields = paymentObj?.custom?.fields;
   if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER)) {
@@ -303,13 +335,13 @@ const getDeviceInformation = (paymentObj: PaymentType | null, customerObj: Parti
 /**
  * Generates consumer authentication information for payment based on the provided parameters.
  * 
- * @param {PaymentType} resourceObj - The payment object.
+ * @param {Payment} resourceObj - The payment object.
  * @param {string} service - The name of the service.
  * @param {boolean} isSaveToken - Flag indicating whether to save the token.
  * @param {boolean} payerAuthMandateFlag - Flag indicating whether payer authentication is mandated.
- * @returns {Promise<any>} - The consumer authentication information.
+ * @returns {Ptsv2paymentsConsumerAuthenticationInformation} - The consumer authentication information.
  */
-const getConsumerAuthenticationInformation = (resourceObj: PaymentType, service: string, isSaveToken: boolean, payerAuthMandateFlag: boolean): any => {
+const getConsumerAuthenticationInformation = (resourceObj: Payment, service: string, isSaveToken: boolean, payerAuthMandateFlag: boolean): Ptsv2paymentsConsumerAuthenticationInformation => {
   const { isv_payerAuthenticationTransactionId, isv_payerAuthenticationPaReq, isv_cardinalReferenceId, isv_tokenAlias, isv_savedToken } = resourceObj?.custom?.fields || {};
   const consumerAuthenticationInformation = {} as Ptsv2paymentsConsumerAuthenticationInformation;
   if (Constants.VALIDATION === service) {
@@ -329,7 +361,7 @@ const getConsumerAuthenticationInformation = (resourceObj: PaymentType, service:
  * Generates target origins based on the provided function name.
  * 
  * @param {string} functionName - The name of the function.
- * @returns {Promise<string[]>} - An array of target origins.
+ * @returns {string[]} - An array of target origins.
  */
 const getTargetOrigins = (): string[] => {
   let targetOriginArray: string[] = [];
@@ -344,7 +376,7 @@ const getTargetOrigins = (): string[] => {
 /**
  * Generates allowed payment methods from environment variables.
  * 
- * @returns {Promise<string[]>} - An array of allowed payment methods.
+ * @returns {string[]} - An array of allowed payment methods.
  */
 const getAllowedPaymentMethods = (): string[] => {
   let { PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS } = process.env;
@@ -360,7 +392,7 @@ const getAllowedPaymentMethods = (): string[] => {
  * Generates allowed card networks based on the function name from environment variables.
  * 
  * @param {string} functionName - The name of the function.
- * @returns {Promise< Promise<string[] | undefined>>} - An array of allowed card networks.
+ * @returns {string[] | undefined} - An array of allowed card networks.
  */
 const getAllowedCardNetworks = (functionName: string): string[] | undefined => {
   let { PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS } = process.env;
@@ -375,11 +407,11 @@ const getAllowedCardNetworks = (functionName: string): string[] | undefined => {
 /**
  * Generates token information based on the payment and function name.
  * 
- * @param {PaymentType} payment - The payment object.
+ * @param {Payment} payment - The payment object.
  * @param {string} functionName - The name of the function.
- * @returns {Promise<any>} - Token information.
+ * @returns {any} - Token information.
  */
-const getTokenInformation = (payment: PaymentType, functionName: string): any => {
+const getTokenInformation = (payment: Payment, functionName: string): any => {
   let jtiToken = {
     jti: '',
   };
@@ -407,9 +439,9 @@ const getTokenInformation = (payment: PaymentType, functionName: string): any =>
  * Generates capture mandate based on the service.
  * 
  * @param {string} service - The service type.
- * @returns {Promise<any>} - Capture mandate information.
+ * @returns {Upv1capturecontextsCaptureMandate} - Capture mandate information.
  */
-const getCaptureMandate = (service: string): any => {
+const getCaptureMandate = (service: string): Upv1capturecontextsCaptureMandate => {
   const captureMandate = {} as Upv1capturecontextsCaptureMandate;
   const { PAYMENT_GATEWAY_UC_BILLING_TYPE, PAYMENT_GATEWAY_UC_ENABLE_PHONE, PAYMENT_GATEWAY_UC_ENABLE_EMAIL, PAYMENT_GATEWAY_UC_ENABLE_NETWORK_ICONS,
     PAYMENT_GATEWAY_UC_ENABLE_SHIPPING, PAYMENT_GATEWAY_UC_ALLOWED_SHIP_TO_COUNTRIES
@@ -445,10 +477,10 @@ const getCaptureMandate = (service: string): any => {
  * Generates bill-to information for updating a token.
  * 
  * @param {AddressType | null} addressData - The address data.
- * @returns {Promise<any>} - Bill-to information.
+ * @returns {Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo} billTo - Bill-to information.
  */
-const getUpdateTokenBillTo = (addressData: AddressType | null): any => {
-  let billTo;
+const getUpdateTokenBillTo = (addressData: AddressType | null): Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo => {
+  let billTo: Tmsv2customersEmbeddedDefaultPaymentInstrumentBillTo = {};
   if (addressData) {
     const addressMapperInstance = new AddressMapper(addressData);
     billTo = addressMapperInstance.mapUpdateTokenBillTo();
@@ -459,12 +491,11 @@ const getUpdateTokenBillTo = (addressData: AddressType | null): any => {
 /**
  * Generates risk information for a payment.
  * 
- * @param {PaymentType} payment - The payment object.
- * @returns {Promise<any>} - Risk information.
+ * @param {Payment} payment - The payment object.
+ * @returns {Promise<Riskv1authenticationsRiskInformation>} - Risk information.
  */
-const getRiskInformation = async (payment: PaymentType) => {
+const getRiskInformation = async (payment: Payment): Promise<Riskv1authenticationsRiskInformation> => {
   let creationHistory = 'GUEST';
-  let orderDetails;
   let riskInformation = {} as Riskv1authenticationsRiskInformation;
   let riskInformationBuyerHistory = {} as Ptsv2paymentsRiskInformationBuyerHistory;
   let riskInformationBuyerHistoryCustomerAccount = {} as Ptsv2paymentsRiskInformationBuyerHistoryCustomerAccount;
@@ -472,11 +503,10 @@ const getRiskInformation = async (payment: PaymentType) => {
   if (customerId) {
     const customer = await commercetoolsApi.getCustomer(customerId);
     if (customer) {
-      orderDetails = await commercetoolsApi.queryOrderById(customerId, Constants.CUSTOMER_ID);
-      if (orderDetails?.total) {
+      if (0 < payment?.custom?.fields?.isv_accountPurchaseCount) {
         creationHistory = 'EXISTING_ACCOUNT';
         riskInformationBuyerHistoryCustomerAccount.createDate = customer?.createdAt?.split('T')[0];
-        riskInformationBuyerHistory.accountPurchases = orderDetails.total;
+        riskInformationBuyerHistory.accountPurchases = payment?.custom?.fields?.isv_accountPurchaseCount;
       } else {
         creationHistory = 'NEW_ACCOUNT';
       }
@@ -492,10 +522,10 @@ const getRiskInformation = async (payment: PaymentType) => {
  * Generates buyer information based on the provided card tokens.
  * 
  * @param {object} paymentObj - The payment object.
- * @returns {Promise<any>} - The buyer information object.
+ * @returns {Ptsv2paymentsBuyerInformation} - The buyer information object.
  */
-const getBuyerInformation = (paymentObj: PaymentType): any => {
-  let buyerInformation = {} as Tmsv2customersBuyerInformation;
+const getBuyerInformation = (paymentObj: Payment): Ptsv2paymentsBuyerInformation => {
+  let buyerInformation = {} as Ptsv2paymentsBuyerInformation;
   paymentValidator.setObjectValue(buyerInformation, 'merchantCustomerID', paymentObj, 'customer.id', Constants.STR_STRING, false);
   if (!buyerInformation.merchantCustomerID) {
     buyerInformation.merchantCustomerID = paymentObj?.anonymousId
@@ -506,10 +536,10 @@ const getBuyerInformation = (paymentObj: PaymentType): any => {
 /**
  * Generates promotion information based on the provided cart object.
  * 
- * @param {any} cartObject - The card tokens.
- * @returns {Promise<any>} - The buyer information object.
+ * @param {Cart} cartObject - The card tokens.
+ * @returns {Promise<Ptsv2paymentsPromotionInformation>} - The buyer information object.
  */
-const getPromotionInformation = async (cartObject: any): Promise<any> => {
+const getPromotionInformation = async (cartObject: Cart): Promise<Ptsv2paymentsPromotionInformation> => {
   let discountObject = null;
   let promotionInformation = {} as Ptsv2paymentsPromotionInformation;
   discountObject = await commercetoolsApi.getDiscountCodes(cartObject?.discountCodes[0]?.discountCode?.id);
@@ -517,8 +547,7 @@ const getPromotionInformation = async (cartObject: any): Promise<any> => {
   return promotionInformation;
 }
 
-//function added for custom field
-const getMetaData = (payment: PaymentType): MetaDataType[] => {
+const getMetaData = (payment: Payment): MetaDataType[] => {
   let metaData: MetaDataType[] = [];
   let customMetaData = payment?.custom?.fields?.isv_metadata && JSON.parse(payment.custom.fields.isv_metadata);
   if (customMetaData) {

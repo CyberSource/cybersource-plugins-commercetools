@@ -1,19 +1,20 @@
+import { Payment } from '@commercetools/platform-sdk';
 import restApi, { TssV2TransactionsGet200Response } from 'cybersource-rest-client';
 
-import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
-import { MidCredentialsType, PaymentType } from '../../types/Types';
+import { MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
  * Retrieves transaction data based on the payment response.
  * @param {any} PaymentResponse - The payment response object.
- * @param {PaymentType} payment - The payment object.
+ * @param {Payment} payment - The payment object.
  * @returns {Promise<TssV2TransactionsGet200Response>} - A promise resolving to Visa Checkout data.
  */
-const getTransactionData = async (transactionId: string, payment: PaymentType | null, midCredentials: MidCredentialsType | null): Promise<any> => {
+const getTransactionData = async (transactionId: string, payment: Payment | null, midCredentials: MidCredentialsType | null): Promise<any> => {
   const visaCheckoutData = {
     httpCode: 0,
     billToFieldGroup: '',

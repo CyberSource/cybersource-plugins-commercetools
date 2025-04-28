@@ -2,7 +2,7 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants/constants';
+import { Constants } from '../../../constants/paymentConstants';
 import paymentHandler from '../../../utils/PaymentHandler';
 import CommercetoolsApi from '../../../utils/api/CommercetoolsApi';
 import unit from '../../JSON/unit.json';
@@ -47,10 +47,15 @@ test.serial('Get update card handler data', async (t: any) => {
     if (result.actions.length) {
       t.is(result.actions[0].action, 'setCustomType');
     } else {
-      t.pass();
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -60,7 +65,12 @@ test.serial('Get update card handler data when customer id is null', async (t: a
     t.deepEqual(result.actions, []);
     t.deepEqual(result.errors, []);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -85,10 +95,15 @@ test.serial('Get order management handler for capture ', async (t: any) => {
         }
       }
     } else {
-      t.pass();
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -113,10 +128,15 @@ test.serial('Get order management handler for capture with payment id as null', 
         }
       }
     } else {
-      t.pass();
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -141,10 +161,15 @@ test.serial('Get order management handler for refund ', async (t: any) => {
         }
       }
     } else {
-      t.pass();
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -169,17 +194,21 @@ test.serial('Get order management handler for refund with payment id as null', a
         }
       }
     } else {
-      t.pass();
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Get apple Pay Session Handler response ', async (t: any) => {
   try {
     let result = await paymentHandler.handleApplePaySession(PaymentHandlerConst.applePaySessionHandlerFields);
-    t.pass();
     if ('setCustomField' === result.actions[0]?.action) {
       t.is(result.actions[0].action, 'setCustomField');
       t.is(result.actions[0].name, 'isv_applePaySessionData');
@@ -188,7 +217,12 @@ test.serial('Get apple Pay Session Handler response ', async (t: any) => {
       t.deepEqual(result.errors, []);
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -198,13 +232,18 @@ test.serial('Get apple Pay Session Handler response with empty fields', async (t
     t.deepEqual(result.actions, []);
     t.deepEqual(result.errors, []);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get authorization handler for google pay', async (t: any) => {
   try {
-    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerGPUpdatePaymentObject, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
+    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerGPUpdatePaymentObject as any, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
     if (result.actions[0] == undefined) {
       t.deepEqual(result.actions, []);
     } else {
@@ -212,13 +251,18 @@ test.serial('get authorization handler for google pay', async (t: any) => {
       t.is(result.actions[1].action, 'changeTransactionState');
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get authorization handler for click to pay', async (t: any) => {
   try {
-    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerVSUpdatePaymentObject, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
+    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerVSUpdatePaymentObject as any, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
     if (result.actions[0] == undefined) {
       t.deepEqual(result.actions, []);
     } else {
@@ -226,13 +270,18 @@ test.serial('get authorization handler for click to pay', async (t: any) => {
       t.is(result.actions[1].action, 'changeTransactionState');
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get authorization handler for credit card', async (t: any) => {
   try {
-    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerCCUpdatePaymentObject, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
+    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerCCUpdatePaymentObject as any, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
     if (result.actions[0] == undefined) {
       t.deepEqual(result.actions, []);
     } else {
@@ -240,13 +289,18 @@ test.serial('get authorization handler for credit card', async (t: any) => {
       t.is(result.actions[1].action, 'changeTransactionState');
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get authorization handler for payer auth', async (t: any) => {
   try {
-    let result: any = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandler3DSUpdatePaymentObject, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
+    let result: any = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandler3DSUpdatePaymentObject as any, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
     if (0 === result.actions[0]?.length) {
       t.deepEqual(result.actions, []);
       t.deepEqual(result.errors, []);
@@ -262,13 +316,18 @@ test.serial('get authorization handler for payer auth', async (t: any) => {
       t.is(result.errors[0].message, 'Cannot process the payment due to invalid input');
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get authorization handler for apple pay', async (t: any) => {
   try {
-    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerAPUpdatePaymentObject, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
+    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerAPUpdatePaymentObject as any, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
     if (0 === result.actions?.length) {
       t.deepEqual(result.actions, []);
     } else {
@@ -276,13 +335,18 @@ test.serial('get authorization handler for apple pay', async (t: any) => {
       t.is(result.actions[1].action, 'changeTransactionState');
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get authorization handler for eCheck', async (t: any) => {
   try {
-    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerECUpdatePaymentObject, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
+    let result = await paymentHandler.handleAuthorization(PaymentHandlerConst.authorizationHandlerECUpdatePaymentObject as any, PaymentHandlerConst.authorizationHandlerUpdateTransactions);
     if (result.actions[0] == undefined) {
       t.deepEqual(result.actions, []);
     } else {
@@ -290,7 +354,12 @@ test.serial('get authorization handler for eCheck', async (t: any) => {
       t.is(result.actions[1].action, 'changeTransactionState');
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -310,7 +379,12 @@ test.serial('Check the run sync ', async (t: any) => {
       t.pass()
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -324,7 +398,7 @@ test.serial('set token null handler ', async (t) => {
 
 test.serial('Handle payment for credit card', async (t) => {
   try {
-    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstCC.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstCC.payment, null, PaymentAuthorizationServiceConstCC.cart, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
+    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstCC.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstCC.payment as any, null, PaymentAuthorizationServiceConstCC.cart as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
     t.is(typeof result.isError, 'boolean');
     let i = 0;
     if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
@@ -332,13 +406,18 @@ test.serial('Handle payment for credit card', async (t) => {
     }
     t.is(i, 1);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Handle payment for click to pay', async (t) => {
   try {
-    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceVsConst.clickToPayPayment.paymentMethodInfo.method, PaymentAuthorizationServiceVsConst.clickToPayPayment, null, PaymentAuthorizationServiceConstCC.cart, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
+    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceVsConst.clickToPayPayment.paymentMethodInfo.method, PaymentAuthorizationServiceVsConst.clickToPayPayment as any, null, PaymentAuthorizationServiceConstCC.cart as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
     t.is(typeof result.isError, 'boolean');
     let i = 0;
     if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
@@ -346,13 +425,18 @@ test.serial('Handle payment for click to pay', async (t) => {
     }
     t.is(i, 1);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Handle payment for google pay', async (t) => {
   try {
-    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstGP.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstGP.payment, null, PaymentAuthorizationServiceConstCC.cart, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
+    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstGP.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstGP.payment as any, null, PaymentAuthorizationServiceConstCC.cart as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
     t.is(typeof result.isError, 'boolean');
     let i = 0;
     if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
@@ -360,13 +444,18 @@ test.serial('Handle payment for google pay', async (t) => {
     }
     t.is(i, 1);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Handle payment for apple pay', async (t) => {
   try {
-    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstAP.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstAP.payment, null, PaymentAuthorizationServiceConstCC.cart, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
+    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstAP.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstAP.payment as any, null, PaymentAuthorizationServiceConstCC.cart as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
     t.is(typeof result.isError, 'boolean');
     let i = 0;
     if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
@@ -374,13 +463,18 @@ test.serial('Handle payment for apple pay', async (t) => {
     }
     t.is(i, 1);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Handle payment for eCheck', async (t) => {
   try {
-    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstECDebit.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstECDebit.payment, null, PaymentAuthorizationServiceConstCC.cart, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
+    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstECDebit.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstECDebit.payment as any, null, PaymentAuthorizationServiceConstCC.cart as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
     t.is(typeof result.isError, 'boolean');
     let i = 0;
     if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
@@ -388,13 +482,18 @@ test.serial('Handle payment for eCheck', async (t) => {
     }
     t.is(i, 1);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('payment auth handler with invalid customer tokens', async (t) => {
   try {
-    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstCC.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstCC.payment, null, PaymentAuthorizationServiceConstCC.cart, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.processTokensCustomerInvalidCardTokensObject, '');
+    let result = await paymentHandler.handlePaymentAuth(PaymentAuthorizationServiceConstCC.payment.paymentMethodInfo.method, PaymentAuthorizationServiceConstCC.payment as any, null, PaymentAuthorizationServiceConstCC.cart as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.processTokensCustomerInvalidCardTokensObject, '');
     t.is(typeof result.isError, 'boolean');
     let i = 0;
     if ('isError' in result && 'paymentResponse' in result && 'authResponse' in result) {
@@ -402,51 +501,69 @@ test.serial('payment auth handler with invalid customer tokens', async (t) => {
     }
     t.is(i, 1);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('payer Auth Reversal Handler', async (t) => {
   try {
-    let result = await paymentHandler.handlePayerAuthReversal(PaymentHandlerConst.payerAuthPaymentObject, PaymentServiceConst.checkAuthReversalTriggeredPaymentResponse, PaymentHandlerConst.payerAuthReversalHandlerUpdateActions);
+    let result = await paymentHandler.handlePayerAuthReversal(PaymentHandlerConst.payerAuthPaymentObject as any, PaymentServiceConst.checkAuthReversalTriggeredPaymentResponse, PaymentHandlerConst.payerAuthReversalHandlerUpdateActions);
     if (result?.actions) {
       t.is(result.actions[0].action, 'changeTransactionInteractionId');
       t.is(result.actions[1].action, 'changeTransactionState');
     } else {
-      t.pass();
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Order management handler for charge', async (t) => {
   try {
-    let result = await paymentHandler.handleOrderManagementForCharge(PaymentCaptureServiceConstCC.payment, '', PaymentHandlerConst.orderManagementHandlerUpdateTransactions);
+    let result = await paymentHandler.handleOrderManagementForCharge(PaymentCaptureServiceConstCC.payment as any, '', PaymentHandlerConst.orderManagementHandlerUpdateTransactions);
     if (201 == result.httpCode) {
       t.is(result.httpCode, 201);
       t.is(result.status, 'PENDING');
     } else {
-      t.not(result.httpCode, 201);
-      t.not(result.status, 'PENDING');
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Order management handler for auth reversal', async t => {
   try {
-    let result = await paymentHandler.handleOrderManagementAuthReversal(PaymentAuthorizationReversalConstCC.payment, PaymentAuthorizationServiceConstCC.cart);
+    let result = await paymentHandler.handleOrderManagementAuthReversal(PaymentAuthorizationReversalConstCC.payment as any, PaymentAuthorizationServiceConstCC.cart as any);
     if (201 == result.httpCode) {
       t.is(result.httpCode, 201);
       t.is(result.status, 'REVERSED');
     } else {
-      t.not(result.httpCode, 201);
-      t.not(result.status, 'REVERSED');
+       t.fail()
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -458,7 +575,12 @@ test.serial('add card handler', async (t) => {
     t.is(result.actions[1].action, 'setCustomField');
     t.is(result.actions[1].name, 'isv_tokenUpdated');
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -470,7 +592,12 @@ test.serial('add card handler with customer id as null', async (t) => {
     t.is(result.actions[1].action, 'setCustomField');
     t.is(result.actions[1].name, 'isv_tokenUpdated');
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -493,7 +620,12 @@ test.serial('delete card handler', async (t) => {
       t.deepEqual(result.errors, []);
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -516,7 +648,12 @@ test.serial('delete card handler with customer id as null', async (t) => {
       t.deepEqual(result.errors, []);
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -530,10 +667,15 @@ test.serial('Test Network Token Handler function', async (t) => {
         t.not(result.statusCode, 200);
       }
     } else {
-      t.pass();
+      t.fail();
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -542,7 +684,12 @@ test.serial('Test Network Token Handler function with token id as null', async (
     let result = await paymentHandler.handleNetworkToken('', PaymentHandlerConst.retrieveTokenDetailsResponse);
     t.falsy(result);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -558,7 +705,12 @@ test.serial('delete card handler with invalid customer id', async (t) => {
       t.deepEqual(result.errors, []);
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -570,7 +722,12 @@ test.serial('add card handler with invalid customer id', async (t) => {
     t.is(result.actions[1].action, 'setCustomField');
     t.is(result.actions[1].name, 'isv_tokenUpdated');
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -579,7 +736,12 @@ test.serial('Test Network Token Handler function with invalid customer token id'
     let result = await paymentHandler.handleNetworkToken(PaymentServiceConst.processTokensCustomerInvalidCardTokensObject.customerTokenId, PaymentHandlerConst.retrieveTokenDetailsResponse);
     t.falsy(result);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -591,7 +753,12 @@ test.serial('set token null handler with payment method as empty string', async 
     t.is(result.actions[2].action, 'setCustomField');
     t.is(result.actions[2].name, 'isv_tokenCaptureContextSignature');
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
@@ -601,38 +768,52 @@ test.serial('Get apple Pay Session Handler response with invalid fields data', a
     t.deepEqual(result.actions, []);
     t.deepEqual(result.errors, []);
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
-test.serial('Get update card handler data with invalid custome tokens', async (t: any) => {
+test.serial('Get update card handler data with invalid customer tokens', async (t: any) => {
   try {
     let result = await paymentHandler.handleUpdateCard(PaymentHandlerConst.updateCardHandlerInvalidTokens, PaymentHandlerConst.updateCardHandlerCustomerId, PaymentHandlerConst.updateCardHandlerCustomerObj);
     t.deepEqual(result.actions, [])
     t.deepEqual(result.errors, [])
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Handle transaction type for charge', async (t) => {
   try {
     const { type, state } = PaymentHandlerConst.orderManagementHandlerUpdateTransactions;
-    const result = await paymentHandler.handleTransactionType(type, state, '123', PaymentCaptureServiceConstCC.payment, PaymentHandlerConst.orderManagementHandlerUpdateTransactions, PaymentAuthorizationServiceConstCC.cart);
-    t.pass();
+    const result = await paymentHandler.handleTransactionType(type, state, '123', PaymentCaptureServiceConstCC.payment as any, PaymentHandlerConst.orderManagementHandlerUpdateTransactions, PaymentAuthorizationServiceConstCC.cart as any);
     if (Constants.HTTP_SUCCESS_STATUS_CODE == result.httpCode) {
       t.is(result.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
     } else {
       t.not(result.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 })
 
 test.serial('Handle transaction type for refund', async (t) => {
   const { type, state } = PaymentHandlerConst.orderManagementHandlerRefundUpdateTransactions;
-  const result = await paymentHandler.handleTransactionType(type, state, '123', PaymentRefundServiceConstCC.payment, PaymentHandlerConst.orderManagementHandlerRefundUpdateTransactions, PaymentAuthorizationServiceConstCC.cart);
+  const result = await paymentHandler.handleTransactionType(type, state, '123', PaymentRefundServiceConstCC.payment as any, PaymentHandlerConst.orderManagementHandlerRefundUpdateTransactions, PaymentAuthorizationServiceConstCC.cart as any);
   if ('changeTransactionInteractionId' === result.actions[0]?.action) {
     t.is(result.actions[0].action, 'changeTransactionInteractionId');
     t.is(result.actions[1].action, 'changeTransactionState');
@@ -645,10 +826,10 @@ test.serial('Handle transaction type for refund', async (t) => {
 
 test.serial('Handle transaction type for auth reversal', async (t) => {
   const { type, state } = CommercetoolsApiConst.addTransactionTransactionObject;
-  const result = await paymentHandler.handleTransactionType(type, state, '123', PaymentRefundServiceConstCC.payment, CommercetoolsApiConst.addTransactionTransactionObject, PaymentAuthorizationReversalConstGP.cart);
+  const result = await paymentHandler.handleTransactionType(type, state, '123', PaymentRefundServiceConstCC.payment as any, CommercetoolsApiConst.addTransactionTransactionObject, PaymentAuthorizationReversalConstGP.cart as any);
   if (Constants.HTTP_SUCCESS_STATUS_CODE == result.httpCode) {
     t.is(result.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
   } else {
-    t.not(result.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+    t.fail();
   }
 })

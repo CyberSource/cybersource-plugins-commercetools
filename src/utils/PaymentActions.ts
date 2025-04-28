@@ -1,6 +1,8 @@
-import { Constants } from "../constants/constants";
+import { _BaseAddress, Customer, Payment } from "@commercetools/platform-sdk";
+
+import { Constants } from "../constants/paymentConstants";
 import { Address } from '../models/AddressModel';
-import { ActionResponseType, ActionType, AddressType, AddTransactionType, AmountPlannedType, ApplicationsType, CardAddressGroupType, ConsumerAuthenticationInformationType, CustomerType, PaymentType } from "../types/Types";
+import { ActionResponseType, ActionType, AddTransactionType, AmountPlannedType, ApplicationsType, CardAddressGroupType, ConsumerAuthenticationInformationType } from "../types/Types";
 
 import paymentUtils from "./PaymentUtils";
 import paymentValidator from "./PaymentValidator";
@@ -56,7 +58,7 @@ const createResponse = (setTransaction: Partial<ActionType>, setCustomField: Par
  * Generates actions based on card details.
  * 
  * @param {CardAddressGroupType} cardDetails - The card details.
- * @returns {ActionType[]} - Array of actions.
+ * @returns {Partial<ActionType[]>} - Array of actions.
  */
 const cardDetailsActions = (cardDetails: Partial<CardAddressGroupType>): Partial<ActionType>[] => {
     let actions: Partial<ActionType>[] = [];
@@ -79,12 +81,12 @@ const cardDetailsActions = (cardDetails: Partial<CardAddressGroupType>): Partial
  * @param {string[]} isvTokens - An array of ISV tokens.
  * @param {string[] | undefined} existingFailedTokensMap - An array of existing failed tokens.
  * @param {boolean} isError - Indicates if there was an error.
- * @param {Partial<CustomerType>} customerObj - The customer object.
+ * @param {Customer} customerObj - The customer object.
  * @param {Partial<AddressType> | null} address - The address object or null.
  * @param {string} [customerTokenId] - Optional customer token ID.
  * @returns {ActionResponseType} The response containing the actions to be performed.
  */
-const getUpdateTokenActions = (isvTokens: string[], existingFailedTokensMap: string[] | undefined, isError: boolean, customerObj: Partial<CustomerType>, address: Partial<AddressType> | null, customerTokenId?: string): ActionResponseType => {
+const getUpdateTokenActions = (isvTokens: string[], existingFailedTokensMap: string[] | undefined, isError: boolean, customerObj: Customer, address: _BaseAddress | null, customerTokenId?: string): ActionResponseType => {
     const customTypePresent = !!customerObj?.custom?.type?.id;
     let returnResponse: ActionResponseType = paymentUtils.getEmptyResponse();
     let fields = {} as any;
@@ -151,13 +153,13 @@ const getUpdateTokenActions = (isvTokens: string[], existingFailedTokensMap: str
 /**
  * Handles authorization application for the given payment update.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
  * @param {ApplicationsType} application - Application details.
  * @param {ActionResponseType} updateActions - Updated actions.
  * @param {any} element - Element.
  * @returns {Promise<ActionResponseType>} - Updated actions response.
  */
-const handleAuthApplication = async (updatePaymentObj: PaymentType, application: Partial<ApplicationsType>, updateActions: ActionResponseType, element: any): Promise<ActionResponseType> => {
+const handleAuthApplication = async (updatePaymentObj: Payment, application: Partial<ApplicationsType>, updateActions: ActionResponseType, element: any): Promise<ActionResponseType> => {
     const authAction = {
         action: 'addTransaction',
         transaction: {},
@@ -175,10 +177,10 @@ const handleAuthApplication = async (updatePaymentObj: PaymentType, application:
  * Generates actions based on payer enrollment response.
  * 
  * @param {any} response - The payer enrollment response.
- * @param {PaymentType} updatePaymentObj - The payment object to be updated.
+ * @param {Payment} updatePaymentObj - The payment object to be updated.
  * @returns {ActionResponseType} - Object containing actions and errors.
  */
-const createEnrollResponseActions = (response: any, updatePaymentObj: PaymentType): ActionResponseType => {
+const createEnrollResponseActions = (response: any, updatePaymentObj: Payment): ActionResponseType => {
     let isv_dmpaFlag = false;
     let isv_payerAuthenticationRequired = false;
     let isv_payerAuthenticationTransactionId = '';
@@ -251,7 +253,7 @@ const createEnrollResponseActions = (response: any, updatePaymentObj: PaymentTyp
 /**
 * Generates actions based on payer authentication response.
 * 
-* @param {ConsumerAuthenticationInformationType} response - The payer authentication response.
+* @param {Partial<ConsumerAuthenticationInformationType>} response - The payer authentication response.
 * @returns {ActionType[]} - Array of actions.
 */
 

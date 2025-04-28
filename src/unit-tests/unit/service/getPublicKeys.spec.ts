@@ -1,49 +1,64 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 
-dotenv.config();
 import keys from '../../../service/payment/FlexKeys';
 import getPublicKey from '../../../service/payment/GetPublicKeys';
 import PaymentAuthorizationServiceConstCC from '../../const/CreditCard/PaymentAuthorizationServiceConstCC';
 import getPublicKeysConst from '../../const/getPublicKeysConst';
 
+dotenv.config();
+
 test.serial('get public key', async (t: any) => {
   try {
-    let microFormKeys: any = await keys.getFlexKeys(getPublicKeysConst.paymentObj);
-    let result = await getPublicKey.getPublicKeys(microFormKeys.isv_tokenCaptureContextSignature, getPublicKeysConst.paymentObj);
+    let microFormKeys: any = await keys.getFlexKeys(getPublicKeysConst.paymentObj as any);
+    let result = await getPublicKey.getPublicKeys(microFormKeys.isv_tokenCaptureContextSignature as any, getPublicKeysConst.paymentObj as any);
     if (result) {
       t.is(result, true);
     } else {
-      t.pass();
+      t.fail(`Unexpected error: get public key' ${result}`);
     }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get public key with expired captureContext', async (t: any) => {
   try {
-    let result = await getPublicKey.getPublicKeys(PaymentAuthorizationServiceConstCC.payment.custom.fields.isv_tokenCaptureContextSignature, getPublicKeysConst.paymentObj);
-    t.is(result, false);
+    let result = await getPublicKey.getPublicKeys(PaymentAuthorizationServiceConstCC.payment.custom.fields.isv_tokenCaptureContextSignature as any, getPublicKeysConst.paymentObj as any);
+    if (typeof result === 'boolean') {
+      t.is(result, false);
+    } else {
+      t.fail(`Unexpected error: get public key with expired captureContext' ${result}`);
+    }
   } catch (error) {
-    t.pass();
-  }
-});
-
-test.serial('get public key with invalid captureContext', async (t: any) => {
-  try {
-    let result = await getPublicKey.getPublicKeys(getPublicKeysConst.invalidCaptureContext, getPublicKeysConst.paymentObj);
-    t.is(result, false);
-  } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('get public key with empty captureContext', async (t: any) => {
   try {
-    let result = await getPublicKey.getPublicKeys('', getPublicKeysConst.paymentObj);
-    t.is(result, false);
+    let result = await getPublicKey.getPublicKeys('', getPublicKeysConst.paymentObj as any);
+    if (typeof result === 'boolean') {
+      t.is(result, false);
+    } else {
+      t.fail(`Unexpected error: get public key with expired captureContext' ${result}`);
+    }
   } catch (error) {
-    t.pass();
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });

@@ -1,8 +1,8 @@
-import { AddressType, CustomerType } from '../../types/Types';
+import { AddressType } from '../../types/Types';
 import creditCard from '../JSON/creditCard.json';
- const addTokenResponseCustomerId = '88c278f9-82d9-427c-96df-f98a4f23e543';
+const addTokenResponseCustomerId = '88c278f9-82d9-427c-96df-f98a4f23e543';
 
- let addTokenResponseCustomerObj : CustomerType= {
+let addTokenResponseCustomerObj: any = {
   id: '88c278f9-82d9-427c-96df-f98a4f23e543',
   version: 350,
   lastMessageSequenceNumber: 4,
@@ -79,7 +79,7 @@ import creditCard from '../JSON/creditCard.json';
   }
 };
 
- const addInvalidTokenResponseCustomerObj = {
+const addInvalidTokenResponseCustomerObj = {
   id: '88c278f9-82d9-427c-96df-f98a4f23e543',
   version: 350,
   lastMessageSequenceNumber: 4,
@@ -150,7 +150,7 @@ import creditCard from '../JSON/creditCard.json';
   },
   stores: []
 };
- const addTokenResponseAddress: readonly AddressType[] = [
+const addTokenResponseAddress: readonly AddressType[] = [
   {
     id: 'Gu_fd8_a',
     firstName: 'john',
@@ -174,7 +174,7 @@ import creditCard from '../JSON/creditCard.json';
   },
 ];
 
- const addTokenAddress: AddressType = {
+const addTokenAddress: AddressType = {
   id: 'Gu_fd8_a',
   firstName: 'john',
   lastName: 'doe',
@@ -196,7 +196,7 @@ import creditCard from '../JSON/creditCard.json';
   mobile: ''
 };
 
- const addTokenResponseCardTokens = {
+const addTokenResponseCardTokens = {
   customerTokenId: 'D605360941117CECE053AF598E0A6EEC',
   paymentInstrumentId: '',
 };

@@ -1,11 +1,11 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 
-dotenv.config();
-import { Constants } from '../../../constants/constants';
+import { Constants } from '../../../constants/paymentConstants';
 import reverse from '../../../service/payment/PaymentAuthorizationReversal';
 import authReversalConstCC from '../../const/CreditCard/PaymentAuthorizationReversalConstCC';
 
+dotenv.config();
 let paymentResponse: any = {
   httpCode: null,
   status: null,
@@ -22,72 +22,136 @@ let paymentResponseObjects: any = {
 };
 
 test.serial('Reversing an order with invalid auth reversal amount and check http code', async (t: any) => {
-  let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payments, authReversalConstCC.carts, authReversalConstCC.authId);
-  paymentResponseObject.httpCode = result.httpCode;
-  paymentResponseObject.status = result.status;
-  t.not(paymentResponseObject.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+  try {
+    let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payments as any, authReversalConstCC.carts as any, authReversalConstCC.authId as any);
+    paymentResponseObject.httpCode = result.httpCode;
+    paymentResponseObject.status = result.status;
+    if (Constants.HTTP_BAD_REQUEST_STATUS_CODE === paymentResponseObject.httpCode) {
+      t.is(paymentResponseObject.httpCode, Constants.HTTP_BAD_REQUEST_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected response: HTTP ${paymentResponseObject.httpCode}, Status: ${paymentResponseObject.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
 });
 
-test.serial('Çheck status after auth reversal with invalid amount', async (t: any) => {
-  t.not(paymentResponseObject.status, Constants.API_STATUS_REVERSED);
+test.serial('Check status after auth reversal with invalid amount', async (t: any) => {
+  try {
+    if (Constants.API_STATUS_REVERSED !== paymentResponseObject.status) {
+      t.not(paymentResponseObject.status, Constants.API_STATUS_REVERSED);
+    } else {
+      t.fail(`Unexpected Status: ${paymentResponseObject.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
 });
 
 test.serial('Reversing a payment and check http code', async (t: any) => {
-  let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payment, authReversalConstCC.carts, authReversalConstCC.authId);
-  paymentResponse.httpCode = result.httpCode;
-  paymentResponse.status = result.status;
-  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
-    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
-  } else {
-    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+  try {
+    let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payment as any, authReversalConstCC.carts as any, authReversalConstCC.authId as any);
+    paymentResponse.httpCode = result.httpCode;
+    paymentResponse.status = result.status;
+    if (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode) {
+      t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected response: HTTP ${paymentResponse.httpCode}, Status: ${paymentResponse.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
 
 test.serial('Check status for auth reversal', async (t: any) => {
-  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
-    t.is(paymentResponse.status, Constants.API_STATUS_REVERSED);
-  } else {
-    t.not(paymentResponse.status, Constants.API_STATUS_REVERSED);
+  try {
+    if (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode) {
+      t.is(paymentResponse.status, Constants.API_STATUS_REVERSED);
+    } else {
+      t.fail(`Unexpected response: HTTP ${paymentResponse.httpCode}, Status: ${paymentResponse.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
 
 test.serial('Reversing an invalid order and check http code', async (t: any) => {
-  let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payment, authReversalConstCC.carts, authReversalConstCC.authID);
-  paymentResponseObjects.httpCode = result.httpCode;
-  paymentResponseObjects.status = result.status;
-  t.not(paymentResponseObjects.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
-});
-
-test.serial('Çheck status for reversing an invalid order', async (t: any) => {
-  t.not(paymentResponseObjects.status, Constants.API_STATUS_REVERSED);
-});
-
-test.serial('Reversing a payment with multiple shipping and check http code', async (t: any) => {
-  let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.multipleShippingPayment, authReversalConstCC.shippingCart, authReversalConstCC.multipleShippingReversalId);
-  paymentResponse.httpCode = result.httpCode;
-  paymentResponse.status = result.status;
-  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
-    t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
-  } else {
-    t.not(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+  try {
+    let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payment as any, authReversalConstCC.carts as any, authReversalConstCC.authID as any);
+    paymentResponseObjects.httpCode = result.httpCode;
+    paymentResponseObjects.status = result.status;
+    if (Constants.HTTP_BAD_REQUEST_STATUS_CODE === paymentResponseObjects.httpCode) {
+      t.is(paymentResponseObjects.httpCode, Constants.HTTP_BAD_REQUEST_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected response: HTTP ${paymentResponseObjects.httpCode}, Status: ${paymentResponseObjects.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
 
-test.serial('Check status of auth reversal  with multiple shipping', async (t: any) => {
-  if (Constants.HTTP_SUCCESS_STATUS_CODE == paymentResponse.httpCode) {
-    t.is(paymentResponse.status, Constants.API_STATUS_REVERSED);
-  } else {
-    t.not(paymentResponse.status, Constants.API_STATUS_REVERSED);
+test.serial('Check status for reversing an invalid order', async (t: any) => {
+  try {
+    if (Constants.API_STATUS_REVERSED !== paymentResponseObjects.status) {
+      t.not(paymentResponseObjects.status, Constants.API_STATUS_REVERSED);
+    } else {
+      t.fail(`Unexpected Status: ${paymentResponseObjects.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+test.serial('Reversing a payment with multiple shipping and check http code', async (t: any) => {
+  try {
+    let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.multipleShippingPayment as any, authReversalConstCC.shippingCart as any, authReversalConstCC.multipleShippingReversalId as any);
+    paymentResponse.httpCode = result.httpCode;
+    paymentResponse.status = result.status;
+    if (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode) {
+      t.is(paymentResponse.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected response: HTTP ${paymentResponse.httpCode}, Status: ${paymentResponse.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+test.serial('Check status of auth reversal with multiple shipping', async (t: any) => {
+  try {
+    if (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode) {
+      t.is(paymentResponse.status, Constants.API_STATUS_REVERSED);
+    } else {
+      t.fail(`Unexpected response: HTTP ${paymentResponse.httpCode}, Status: ${paymentResponse.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
 
 test.serial('Reversing a payment with empty auth reversal id and check http code', async (t: any) => {
-  let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payment, authReversalConstCC.carts, '');
-  paymentResponseObjects.httpCode = result.httpCode;
-  paymentResponseObjects.status = result.status;
-  t.not(paymentResponseObjects.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
+  try {
+    let result: any = await reverse.getAuthReversalResponse(authReversalConstCC.payment as any, authReversalConstCC.carts as any, '');
+    paymentResponseObjects.httpCode = result.httpCode;
+    paymentResponseObjects.status = result.status;
+    if (Constants.HTTP_CODE_ZERO === paymentResponseObjects.httpCode) {
+      t.is(paymentResponseObjects.httpCode, Constants.HTTP_BAD_REQUEST_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected response: HTTP ${paymentResponseObjects.httpCode}, Status: ${paymentResponseObjects.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
 });
 
 test.serial('Check status for auth reversal with empty auth reversal id', async (t: any) => {
-  t.not(paymentResponseObjects.status, Constants.API_STATUS_REVERSED);
+  try {
+    if (Constants.API_STATUS_REVERSED !== paymentResponseObjects.status) {
+      t.not(paymentResponseObjects.status, Constants.API_STATUS_REVERSED);
+    } else {
+      t.fail(`Unexpected Status: ${paymentResponseObjects.status}`);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
 });

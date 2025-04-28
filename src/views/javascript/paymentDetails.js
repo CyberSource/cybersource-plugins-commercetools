@@ -1,4 +1,4 @@
-import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, validateAmountValue } from './utils.js';
+import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, validateAmountValue, sanitizeResponseData } from './utils.js';
 
 if (window.location.pathname.includes('paymentDetails')) {
   document.addEventListener('DOMContentLoaded', async function () {
@@ -198,7 +198,7 @@ async function fetchPaymentsInfo() {
       const response = await fetch(`/paymentData?id=${encodeURIComponent(paymentId)}`, { method: 'GET' });
       const data = await response.text();
       const jsonData = JSON.parse(data);
-      return jsonData;
+      return sanitizeResponseData(jsonData);
     } catch (error) {
       console.error('Error in fetching Payment details:', error);
       return null;
@@ -333,6 +333,12 @@ function createCustomFieldsTable(payments, orderNo) {
     }
     if (orderNo) {
       tableHTML += createRow('Reconciliation Id', orderNo).outerHTML;
+    }
+    if (fields?.isv_payPalRequestId) {
+      tableHTML += createRow('PayPal Request Id', fields?.isv_payPalRequestId).outerHTML;
+    }
+    if (fields?.isv_payPalUrl) {
+      tableHTML += createRow('PayPal Redirection URL', fields.isv_payPalUrl).outerHTML;
     }
     tableHTML += '</table>';
     return tableHTML;
@@ -555,7 +561,7 @@ function generateOrderItemsTable(cart, discountObject, locale, fractionDigits) {
     const totalDiscountAmount =
       discountObject.customLineItemDiscount || discountObject.cartDiscount || discountObject.shippingDiscount || discountObject.totalPriceDiscount ? formatCurrency(amountConversion(totalPriceDiscountedAmount, fractionDigits), cart.totalPrice.currencyCode) : '';
     const totalAmount = formatCurrency(amountConversion(cart.totalPrice.centAmount, fractionDigits), cart.totalPrice.currencyCode);
-    totalDiscountAmount ? createTableRow(orderItemsTableBody, ['', '', '<b>Total</b>', totalDiscountAmount, `<b>${totalAmount}</b>`]) : createTableRow(orderItemsTableBody, ['', '', '<b>Total</b>', `<b>${totalAmount}</b>`]);
+    totalDiscountAmount ? createTableRow(orderItemsTableBody, ['', '', 'Total', totalDiscountAmount, `${totalAmount}`]) : createTableRow(orderItemsTableBody, ['', '', 'Total', `${totalAmount}`]);
   }
 }
 
@@ -765,9 +771,9 @@ function generateShippingRow(shippingDetail, orderItemsTableBody, discountObject
   discountAmount = discountObject.customLineItemDiscount || discountObject.cartDiscount || discountObject.shippingDiscount || discountObject.totalPriceDiscount ? discountAmount : '';
   let totalCost = `${shippingDetail.shippingInfo.price.currencyCode} ${shippingCost}`;
   if (discountObject.customLineItemDiscount || discountObject.cartDiscount || discountObject.shippingDiscount || discountObject.totalPriceDiscount) {
-    createTableRow(orderItemsTableBody, [`<b>Shipping Cost (${shippingMethodName})</b>`, totalCost, '1', `${shippingDetail.shippingInfo.price.currencyCode} ${discountAmount}`, totalCost]);
+    createTableRow(orderItemsTableBody, [`Shipping Cost (${shippingMethodName})`, totalCost, '1', `${shippingDetail.shippingInfo.price.currencyCode} ${discountAmount}`, totalCost]);
   } else {
-    createTableRow(orderItemsTableBody, [`<b>Shipping Cost (${shippingMethodName})</b>`, totalCost, '1', totalCost]);
+    createTableRow(orderItemsTableBody, [`Shipping Cost (${shippingMethodName})`, totalCost, '1', totalCost]);
   }
 }
 

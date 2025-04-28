@@ -1,68 +1,89 @@
 import creditCard from '../../JSON/creditCard.json';
 const payment = {
-  id: '56d9909e-7c0e-4315-b1ef-5788f7b1d33e',
-  version: 16,
-  lastMessageSequenceNumber: 6,
-  createdAt: '2021-10-29T10:53:36.036Z',
-  lastModifiedAt: '2021-10-29T10:54:32.797Z',
-  lastModifiedBy: { clientId: '4OdEsQlt0ZNkkwpineHHUy3h', isPlatformClient: false },
-  createdBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '85929ae4-3f31-448d-9e50-8bab742866b1',
+  "id": "68ffd019-1192-4659-b4cf-cb5cedd51707",
+  "version": 29,
+  "versionModifiedAt": "2025-03-12T12:54:28.043Z",
+  "lastMessageSequenceNumber": 5,
+  "createdAt": "2025-03-12T12:53:39.539Z",
+  "lastModifiedAt": "2025-03-12T12:54:28.043Z",
+  "lastModifiedBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false
   },
-  amountPlanned: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: 6970,
-    fractionDigits: 2,
+  "createdBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "e918d04f-e9cb-4b33-8d67-b3971f48eeb6"
   },
-  paymentMethodInfo: { paymentInterface: 'cybersource', method: 'creditCard' },
-  custom: {
-    type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
-    fields: {
-      isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
-      isv_cardExpiryYear: '2030',
-      isv_token:
-        'eyJraWQiOiIwODRsbVRWcGlGRlUwYkxHenVzS2Q2RDJyc2tXbjhnciIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAzMCIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTYzNTUwNTcyNywidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTYzNTUwNDgyNywianRpIjoiMUUyUUdVVVpYREZJT1E0VE5CSk9XWEszWDRMVDFISVdFVDVETjlRTkFGQk03QjBMMTk2NzYxN0JENjNGM0RGQSIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDMwIn0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.ibsY5xb6S-shI8f5cFrNPAXj6Jw8Po55lpkuNp7NX8rdtUogCpwPiHBJy9IKX-nTadQd51cYzgvjihCGzVDxGFYXD6w5VKWrJaxhOjn6EGNYYZrLUNuY0lRYIG2fL6db37geMf3SBEE8wkO2N5b1IjVhtiHZ_ezekqXnUnYzOF0GKzJnNH_GMH8pAwePzYL_enE0qkm_z1CYCnHD1xszfafkcf_m_YOz9i_Q6ROfaYvcoTD9QjTQ5ugU-kped4eFVK-x1HAnjxJI5RWrBzt_imhUhLJviwW7A1rsqrwx_mDZsFTJIYYEq4WdU-VPZIsCW_JTE7naT6KTj1edn_98Wg',
-      isv_customerIpAddress: '106.202.150.94',
-      isv_maskedPan: '411111XXXXXX1111',
-      isv_cardExpiryMonth: '01',
-      isv_acceptHeader: '*/*',
-      isv_cardType: '001',
-      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
-      isv_tokenVerificationContext:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJ5SnpJaGIzYkdOUzRQeEFlZjVHc2JCQUFFUGo4QTVwWlRoS3hJTjBSQXpBWDl3SitzRkdrY3hzbGhCTG8wa1NxVVF3ZFdYV3FMYTR3TXI1RnBQMVJPZjV4dGExajVOYkVBR2JnL2hoNHM5djFuQzR1RmRXdFpkZ2Q0OFIxNE1IdXZlVnciLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJwME1ZdW0yVk1xUGJwQ2ZaVVFVOXBRTE9hSEV4M2NDWDFWMjRaWVRtMGtISzczNXJxMEE2SkU4Y253R3NNbnd1cWFUQ2VBSzZVZ2dOOHJOaTZUVUgxZEl6UlFvdURrYXcwZjJseXJMa0I3ejhiUnNxMG4tU0hGT3ZDRDBBTW5JUGt4aV9OZnBOUUtGMGFLZml0TldVTmE4d0VGWWNhX0QyWm03UDZNNGpWNmRmX25NNU9iblI0Y09NT2dQUDc4UW1SeHBRTmpvX3pORFJXb1c5ZVhlOFpwY2dISm4zZTZNY2RvdVh3MHRSTDRUaXd0d1daN1V5RjJxczgwRFZJalI1ZTB3NnNmTmlWM0pmUFVjUXBZa0Jsdlg2WTlFOGdqQ1cySEtoRHBCSFhqM2U2MjhkRHFLYjJUbXJnSFR3dFoyOUpYTjhmR3kyRDY5OG8wVHdDa2MxTXciLCJraWQiOiIwODRsbVRWcGlGRlUwYkxHenVzS2Q2RDJyc2tXbjhnciJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2MzU1MDU3MTUsImlhdCI6MTYzNTUwNDgxNSwianRpIjoiTkRPeXpkRThjN2NwNWh3ZCJ9.qHqVks9k-s0MRC87Ki9iUq30tBqOhDeo8LAL9rzIKKc',
-    },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 504580,
+      "fractionDigits": 2
   },
-  paymentStatus: {},
-  transactions: [
-    {
-      id: '98c82dbc-4303-49d2-869b-2447e7e731ee',
-      type: 'Authorization',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 6970,
-        fractionDigits: 2,
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "creditCard",
+      "name": {
+          "en": "Credit Card"
+      }
+  },
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
-      interactionId: '6355048327036074204004',
-      state: 'Success',
-    },
-    {
-      id: '548f0235-135f-48d3-b791-ff5f92fc387c',
-      type: 'Charge',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 6970,
-        fractionDigits: 2,
+      "fields": {
+          "isv_deviceFingerprintId": "5d0f9433-f32e-48dd-9316-76ac7a29f959",
+          "isv_token": "eyJraWQiOiIwOGJ0c3dlWUE3SW1kalRpVnQwRU5YTld6dXBRdnFHMiIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzA3IiwiZXhwIjoxNzQxNzg0OTI5LCJ0eXBlIjoibWYtMi4xLjAiLCJpYXQiOjE3NDE3ODQwMjksImp0aSI6IjFFMVNFV1ZCMklaRjgwNDk2M1pVNDBUVzZKUUpES0syUE9FMzQzSjQwNzZaR0tWRzdGT002N0QxODc2MUM1RkUiLCJjb250ZW50Ijp7InBheW1lbnRJbmZvcm1hdGlvbiI6eyJjYXJkIjp7ImV4cGlyYXRpb25ZZWFyIjp7InZhbHVlIjoiMjAzMCJ9LCJudW1iZXIiOnsiZGV0ZWN0ZWRDYXJkVHlwZXMiOlsiMDAxIl0sIm1hc2tlZFZhbHVlIjoiWFhYWFhYWFhYWFhYMTExMSIsImJpbiI6IjQxMTExMSJ9LCJzZWN1cml0eUNvZGUiOnt9LCJleHBpcmF0aW9uTW9udGgiOnsidmFsdWUiOiIwMSJ9fX19fQ.ltPkmbAiVXm6tnFOqz_SiGpYjm3z2Yw2Rt_aXfz8zPbDST0qF9Z4Hu1a_0f-EaEF3ReIVGsowLaHeJc81HX-H_0kv8c8XGDQ85yPPFBIBsbDS-2zxs4wWuKWx9tE7L5clOFPuPivvU1rz9Tva4tpbmnoCQ61KpO8IZeWBhV4oVfLAmMviFIhUf381D4Je1DgRgSdGrZinW8NujimFydY_KJXWQMjEX3X4lmhUfXcsZcMFnT5Mq1G1dSF1f2Y_9cR48_IGizIfX0wK8gHEhgfHR1QluIQ3N6Wvsm1vTS-zebdTWDUM7kd6nDGUaQHW1iupzgqoYKyNW_Rzktn-5FVVQ",
+          "isv_saleEnabled": false,
+          "isv_shippingMethod": "SINGLE",
+          "isv_cardType": "001",
+          "isv_customerIpAddress": "192.168.1.1",
+          "isv_CVVResponse": "3",
+          "isv_maskedPan": "411111XXXXXXXXXXXX1111",
+          "isv_AVSResponse": "1",
+          "isv_metadata": "{\"1\":\"testValue1\",\"2\":\"testValue2\"}",
+          "isv_responseCode": "00",
+          "isv_responseDateAndTime": "2025-03-12T12:53:53Z",
+          "isv_tokenVerificationContext": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiIvSk9BcUE5aE5sMmp1TkNLOE1Dd1d4QUFFT3QrZ0ZYd1Jab2RVbyswc2hwSlVGQ2J6K1h0SGIxWXFPVll0SjM4cGxGbnhUSVNkb3EwLzR2T1ZNa0FYdks1SUtNUkJmd1FFVEE2RVQzV1RZV3lPSTg4OERib2hwei9VMmNvek1QNXBybjEiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJubXVaRk0xN0xvenJXMDFYWEN6cGVBdEd2SnN6TGVMXzNZNXAxdnF6enk0VDRLRVgyczdTMWNvd0J1MUlUd1RHMnN3aVI4LXJYMXFBb095VU5Dc19kV1N5ZERXYTlkSFh5c0tGbWFfa2JHZ1hpLVFfOGY2RGdZS2gzU240NnBSRmtzQ3ozb001TXlvbjZ3LUNCVkVsWkVZMGRBYWlkb01FSnd6Y3BLRThXMFBsUzZXZ3gtWUFFQW5XcU8wa09wVkgzZjVlVzFKZDVCLVV2LWpkVVBPdlJuN2o3V3BRTm51SFRRQ2ZaNVFMZXl0REpHaVZIelNIWVdxUnhYSmphVHVPdGVqMU0xa0RkOWRqc3lzTEtnLWFTRkxNTWd5X181cnpMSEZfWXZzOThsYmZOVjMzbUlabkpBdTNTQ2pmSHJWeXpYVUl2NnBTSlhSZlJ3UkttczFITXciLCJraWQiOiIwOGJ0c3dlWUE3SW1kalRpVnQwRU5YTld6dXBRdnFHMiJ9fSwiY3R4IjpbeyJkYXRhIjp7ImNsaWVudExpYnJhcnlJbnRlZ3JpdHkiOiJzaGEyNTYtM0ZxOVJxQlVDaW1DanRNNGNpZDlia0EyVEJWRUZpWkwvbzZjRzIzVnJHbz0iLCJjbGllbnRMaWJyYXJ5IjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20vbWljcm9mb3JtL2J1bmRsZS92Mi41LjIvZmxleC1taWNyb2Zvcm0ubWluLmpzIiwiYWxsb3dlZENhcmROZXR3b3JrcyI6WyJWSVNBIiwiTUFTVEVSQ0FSRCJdLCJ0YXJnZXRPcmlnaW5zIjpbImh0dHBzOi8vbG9jYWxob3N0OjgwODAiLCJodHRwczovL2xvY2FsaG9zdDo4MDg0IiwiaHR0cHM6Ly9sb2NhbGhvc3Q6ODA4NSJdLCJtZk9yaWdpbiI6Imh0dHBzOi8vdGVzdGZsZXguY3liZXJzb3VyY2UuY29tIiwiYWxsb3dlZFBheW1lbnRUeXBlcyI6WyJDQVJEIl19LCJ0eXBlIjoibWYtMi4xLjAifV0sImlzcyI6IkZsZXggQVBJIiwiZXhwIjoxNzQxNzg0OTE5LCJpYXQiOjE3NDE3ODQwMTksImp0aSI6IjBxUWQxYUxYeGY3WHlyR0oifQ.Zw1GC6IuAEiu0QsVmvnvkpl4OOSqVCaGxNR8QRHA9dM",
+          "isv_cardExpiryYear": "2030",
+          "isv_merchantId": "",
+          "isv_authorizationStatus": "AUTHORIZED",
+          "isv_cardExpiryMonth": "01"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "8e48a051-32c0-40ed-ab86-fd4e6eed8329",
+          "timestamp": "2025-03-12T12:53:52.473Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 504580,
+              "fractionDigits": 2
+          },
+          "interactionId": "7417840328766834604806",
+          "state": "Success"
       },
-      interactionId: '6397237528526524203955',
-      state: 'Success',
-    },
+      {
+          "id": "5aed596a-874e-4c07-8f26-0c998150f53c",
+          "timestamp": "2025-03-12T12:54:26.906Z",
+          "type": "Charge",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 504580,
+              "fractionDigits": 2
+          },
+          "interactionId": "7417840677426609004807",
+          "state": "Success"
+      }
   ],
-  interfaceInteractions: [],
+  "interfaceInteractions": [],
+  "anonymousId": "e918d04f-e9cb-4b33-8d67-b3971f48eeb6"
 };
 
 const captureId = creditCard.captureId;

@@ -1,13 +1,15 @@
+import { Cart, Customer, Payment } from '@commercetools/platform-sdk';
 import { Ptsv2paymentsidcapturesOrderInformation, Ptsv2paymentsidrefundsOrderInformation, Ptsv2paymentsidreversalsOrderInformation, Ptsv2paymentsOrderInformation, Upv1capturecontextsOrderInformation } from 'cybersource-rest-client';
 
-import { Constants } from '../constants/constants';
 import { FunctionConstant } from '../constants/functionConstant';
-import { AddressType, CustomerType, PaymentTransactionType, PaymentType } from '../types/Types';
+import { Constants } from '../constants/paymentConstants';
+import { AddressType, PaymentTransactionType } from '../types/Types';
 import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
 
 import { LineItem } from './LineItemMapper';
 import prepareFields from './PrepareFields';
+
 
 class OrderInformationFactory {
   /**
@@ -46,12 +48,12 @@ class ProcessLineItemInformation {
    * 
    * @param {string} functionName - The name of the function processing line items.
    * @param {string} locale - Locale for processing the items.
-   * @param {PaymentType} paymentObject - The payment object containing payment details.
-   * @param {any} cartObj - The cart object containing items.
+   * @param {Payment} paymentObject - The payment object containing payment details.
+   * @param {Cart} cartObj - The cart object containing items.
    * @param {number} fractionDigits - The number of fraction digits for currency conversion.
    * @returns {Array} - An array of processed line items.
    */
-  static processLineItems(functionName: string, locale: string, paymentObject: PaymentType, cartObj: any, fractionDigits: number): any[] {
+  static processLineItems(functionName: string, locale: string, paymentObject: Payment, cartObj: Cart, fractionDigits: number): any[] {
     return this.processLineItemDetails(functionName, locale, paymentObject, cartObj, cartObj.lineItems, false, false, fractionDigits);
   }
 
@@ -60,12 +62,12 @@ class ProcessLineItemInformation {
   * 
   * @param {string} functionName - The name of the function processing custom line items.
   * @param {string} locale - Locale for processing the items.
-  * @param {PaymentType} paymentObject - The payment object containing payment details.
-  * @param {any} cartObj - The cart object containing custom items.
+  * @param {Payment} paymentObject - The payment object containing payment details.
+  * @param {Cart} cartObj - The cart object containing custom items.
   * @param {number} fractionDigits - The number of fraction digits for currency conversion.
   * @returns {Array} - An array of processed custom line items.
   */
-  static processCustomLineItems(functionName: string, locale: string, paymentObject: PaymentType, cartObj: any, fractionDigits: number): any[] {
+  static processCustomLineItems(functionName: string, locale: string, paymentObject: Payment, cartObj: Cart, fractionDigits: number): any[] {
     let customLineItemDetails = [];
     if (cartObj.customLineItems) {
       customLineItemDetails = this.processLineItemDetails(functionName, locale, paymentObject, cartObj, cartObj.customLineItems, true, false, fractionDigits);
@@ -78,8 +80,8 @@ class ProcessLineItemInformation {
   * 
   * @param {string} functionName - The name of the function.
   * @param {string} locale - Locale for processing.
-  * @param {PaymentType} paymentObject - The payment object containing payment details.
-  * @param {any} cartObj - The cart object containing the item.
+  * @param {Payment} paymentObject - The payment object containing payment details.
+  * @param {Cart} cartObj - The cart object containing the item.
   * @param {any} lineitem - The line item to be processed.
   * @param {number} unitPrice - Unit price for the item.
   * @param {any} item - The item being processed.
@@ -89,7 +91,7 @@ class ProcessLineItemInformation {
   * @param {number} lineItemTotalAmount - The total amount for the line item.
   * @returns {any} - A new instance of the line item.
   */
-  static createLineItemDetailsInstance(functionName: string, locale: string, paymentObject: PaymentType, cartObj: any, lineitem: any, unitPrice: number, item: any, isShipping: boolean, isCustom: boolean, isTotalPriceDiscount: boolean, lineItemTotalAmount: number): any {
+  static createLineItemDetailsInstance(functionName: string, locale: string, paymentObject: Payment, cartObj: Cart, lineitem: any, unitPrice: number, item: any, isShipping: boolean, isCustom: boolean, isTotalPriceDiscount: boolean, lineItemTotalAmount: number): any {
     return new LineItem(lineitem, unitPrice, functionName, locale, item, paymentObject, isShipping, cartObj, isCustom, isTotalPriceDiscount, lineItemTotalAmount);
   }
 
@@ -98,12 +100,12 @@ class ProcessLineItemInformation {
    * 
    * @param {string} functionName - The name of the function processing shipping information.
    * @param {string} locale - Locale for processing.
-   * @param {PaymentType} paymentObject - The payment object containing payment details.
+   * @param {Payment} paymentObject - The payment object containing payment details.
    * @param {number} fractionDigits - The number of fraction digits for currency conversion.
-   * @param {any} cartObj - The cart object containing shipping details.
+   * @param {Cart} cartObj - The cart object containing shipping details.
    * @returns {Array} - An array of processed shipping line items.
    */
-  static processShippingInfo(functionName: string, locale: string, paymentObject: PaymentType, fractionDigits: number, cartObj: any): any[] {
+  static processShippingInfo(functionName: string, locale: string, paymentObject: Payment, fractionDigits: number, cartObj: Cart): any[] {
     let shippingLineItems = [];
     if (Constants.SHIPPING_MODE_MULTIPLE === cartObj.shippingMode && cartObj.shipping) {
       shippingLineItems = this.processLineItemDetails(functionName, locale, paymentObject, cartObj, cartObj.shipping, false, true, fractionDigits);
@@ -125,11 +127,11 @@ class ProcessLineItemInformation {
    * 
    * @param {string} functionName - The name of the function processing discount information.
    * @param {string} locale - Locale for processing.
-   * @param {PaymentType} paymentObject - The payment object containing payment details.
-   * @param {any} cartObj - The cart object containing discount details.
+   * @param {Payment} paymentObject - The payment object containing payment details.
+   * @param {Cart} cartObj - The cart object containing discount details.
    * @returns {Array} - An array of processed discount line items.
    */
-  static processDiscountsInfo(functionName: string, locale: string, paymentObject: PaymentType, cartObj: any): any[] {
+  static processDiscountsInfo(functionName: string, locale: string, paymentObject: Payment, cartObj: Cart): any[] {
     let lineItems = [];
     if (cartObj.discountOnTotalPrice) {
       const unitPrice = paymentUtils.convertCentToAmount(cartObj.discountOnTotalPrice.discountedAmount.centAmount, cartObj.discountOnTotalPrice.discountedAmount.fractionDigits);
@@ -147,15 +149,15 @@ class ProcessLineItemInformation {
    * 
    * @param {string} functionName - The name of the function processing line item details.
    * @param {string} locale - Locale for processing the items.
-   * @param {PaymentType} paymentObject - The payment object containing payment details.
-   * @param {any} cartObj - The cart object containing items.
+   * @param {Payment} paymentObject - The payment object containing payment details.
+   * @param {Cart} cartObj - The cart object containing items.
    * @param {Array} items - The list of items to process.
    * @param {boolean} isCustom - Indicates if the items are custom.
    * @param {boolean} isShipping - Indicates if the items are for shipping.
    * @param {number} fractionDigits - The number of fraction digits for currency conversion.
    * @returns {Array} - An array of processed line item details.
    */
-  static processLineItemDetails(functionName: string, locale: string, paymentObject: PaymentType, cartObj: any, items: any[], isCustom: boolean, isShipping: boolean, fractionDigits: number) {
+  static processLineItemDetails(functionName: string, locale: string, paymentObject: Payment, cartObj: Cart, items: any[], isCustom: boolean, isShipping: boolean, fractionDigits: number) {
     let lineItems = [];
     for (let item of items) {
       let lineItemTotalAmount = 0;
@@ -200,25 +202,25 @@ export class OrderInformationMapper {
   private service: string | null;
   private fractionDigits: number;
   private currencyCode: string;
-  private paymentObject: PaymentType | null;
-  private customerObject: Partial<CustomerType> | null;
-  private address: AddressType | null;
+  private paymentObject: Payment | null;
+  private customerObject: Customer | null;
+  private address: Partial<AddressType> | null;
   private updateTransactions: Partial<PaymentTransactionType> | null;
-  private cartObj: any;
+  private cartObj: Cart | null;
 
   /**
   * Constructs the OrderInformationMapper with the necessary parameters.
   * 
   * @param {string} functionName - The name of the function for which order information is being created.
-  * @param {PaymentType | null} paymentObj - The payment object containing payment details.
+  * @param {Payment | null} paymentObj - The payment object containing payment details.
   * @param {Partial<PaymentTransactionType> | null} updateTransactions - The updated transaction details, if available.
-  * @param {any} cartObj - The cart object containing cart details and line items.
-  * @param {Partial<CustomerType> | null} customerObj - The customer object containing customer details.
+  * @param {Cart} cartObj - The cart object containing cart details and line items.
+  * @param {Customer | null} customerObj - The customer object containing customer details.
   * @param {AddressType | null} address - The address object containing billing or shipping details.
   * @param {string | null} service - The service name associated with the function.
   * @param {string} currencyCode - The currency code for the transaction.
   */
-  constructor(functionName: string, paymentObj: PaymentType | null, updateTransactions: Partial<PaymentTransactionType> | null, cartObj: any, customerObj: Partial<CustomerType> | null, address: AddressType | null, service: string | null, currencyCode: string) {
+  constructor(functionName: string, paymentObj: Payment | null, updateTransactions: Partial<PaymentTransactionType> | null, cartObj: Cart | null, customerObj: Customer | null, address: Partial<AddressType> | null, service: string, currencyCode: string) {
     this.functionName = functionName;
     this.paymentObject = paymentObj;
     this.updateTransactions = updateTransactions;
@@ -228,7 +230,7 @@ export class OrderInformationMapper {
     this.service = service;
     this.currencyCode = currencyCode;
     this.fractionDigits = paymentObj?.amountPlanned?.fractionDigits || 0;
-    this.locale = cartObj?.locale;
+    this.locale = cartObj?.locale || '';
   }
 
   /**
@@ -293,10 +295,10 @@ export class OrderInformationMapper {
   private setLineItems() {
     let lineItems: any = [];
     if (this.cartObj && this.cartObj.lineItems) {
-      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processLineItems(this.functionName, this.locale, this.paymentObject as PaymentType, this.cartObj, this.fractionDigits), '', Constants.STR_ARRAY, false);
-      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processCustomLineItems(this.functionName, this.locale, this.paymentObject as PaymentType, this.cartObj, this.fractionDigits), '', Constants.STR_ARRAY, false);
-      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processShippingInfo(this.functionName, this.locale, this.paymentObject as PaymentType, this.fractionDigits, this.cartObj), '', Constants.STR_ARRAY, false);
-      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processDiscountsInfo(this.functionName, this.locale, this.paymentObject as PaymentType, this.cartObj), '', Constants.STR_ARRAY, false);
+      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processLineItems(this.functionName, this.locale, this.paymentObject as Payment, this.cartObj, this.fractionDigits), '', Constants.STR_ARRAY, false);
+      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processCustomLineItems(this.functionName, this.locale, this.paymentObject as Payment, this.cartObj, this.fractionDigits), '', Constants.STR_ARRAY, false);
+      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processShippingInfo(this.functionName, this.locale, this.paymentObject as Payment, this.fractionDigits, this.cartObj), '', Constants.STR_ARRAY, false);
+      paymentValidator.setObjectValue(lineItems, '', ProcessLineItemInformation.processDiscountsInfo(this.functionName, this.locale, this.paymentObject as Payment, this.cartObj), '', Constants.STR_ARRAY, false);
     }
     return lineItems;
   }
@@ -317,7 +319,7 @@ export class OrderInformationMapper {
       case FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE:
         if (this.updateTransactions && this.paymentObject) {
           centAmount = this.updateTransactions?.amount?.centAmount ? this.updateTransactions.amount.centAmount : this.paymentObject?.amountPlanned?.centAmount;
-          captureAmount = paymentUtils.convertCentToAmount(centAmount, this.paymentObject.amountPlanned.fractionDigits);
+          captureAmount = paymentUtils.convertCentToAmount(centAmount, this.paymentObject?.amountPlanned?.fractionDigits);
           amountDetails = prepareFields.getOrderInformationAmountDetails(this.functionName, captureAmount, this.paymentObject, this.cartObj, this.currencyCode, this.service);
         }
         break;
