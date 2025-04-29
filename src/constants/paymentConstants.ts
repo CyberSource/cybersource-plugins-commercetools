@@ -61,8 +61,6 @@ export abstract class Constants {
   static readonly API_STATUS_PENDING_AUTHENTICATION = 'PENDING_AUTHENTICATION';
   static readonly API_STATUS_PENDING_REVIEW = 'PENDING_REVIEW';
   static readonly API_STATUS_REVERSED = 'REVERSED';
-  static readonly API_STATUS_SETTLED = 'SETTLED';
-  static readonly API_STATUS_REFUNDED = 'REFUNDED';
   static readonly API_STATUS_AUTH_REVERSED = 'AUTH_REVERSED';
   static readonly HTTP_STATUS_DECISION_ACCEPT = 'ACCEPT';
   static readonly HTTP_STATUS_DECISION_REJECT = 'REJECT';
@@ -109,7 +107,6 @@ export abstract class Constants {
   static readonly STRING_CUSTOM = 'custom';
   static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
-  static readonly STRING_SESSIONS = 'session';
   static readonly STRING_STATUS = 'status';
   static readonly STRING_ORDER = 'order';
   static readonly STRING_CREATED = 'CREATED';
