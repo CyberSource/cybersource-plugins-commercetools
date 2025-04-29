@@ -25,7 +25,6 @@ import { createCustomTypes, createExtension } from './utils/config/ResourceHandl
 import authenticationHelper from './utils/helpers/AuthenticationHelper';
 import syncHelper from './utils/helpers/SyncHelper';
 
-
 let errorMessage = '';
 let successMessage = '';
 let orderSuccessMessage = '';

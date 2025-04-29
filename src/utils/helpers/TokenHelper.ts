@@ -292,7 +292,6 @@ const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse
     if (cartObj && cartObj?.billingAddress?.id) {
         addressId = cartObj.billingAddress.id;
     }
-
     if (!addressId && customerId) {
         if (updatePaymentObj.custom?.fields?.isv_token) {
             customerInfo = await commercetoolsApi.getCustomer(customerId);

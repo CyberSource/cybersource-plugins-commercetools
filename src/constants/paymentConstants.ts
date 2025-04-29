@@ -201,7 +201,7 @@ export abstract class Constants {
   static readonly WHITE_LIST_ENDPOINTS = ['/api/extension/payment/create', '/api/extension/payment/update',
     '/api/extension/customer/update', '/netTokenNotification', '/captureContext', '/orders', '/orderData',
     '/capture', '/refund', '/authReversal', '/paymentDetails', '/paymentData', '/payerAuthReturnUrl',
-    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico', '/testConnection', '/payPalReturnUrl', '/payPalCancelUrl'];
+    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico', '/testConnection'];
 
   //HTMLContent
   static readonly HTML_PREFIX =

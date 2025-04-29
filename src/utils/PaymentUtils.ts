@@ -805,32 +805,6 @@ const replaceChar = (logData: any) => {
   });
 };
 
-const isEqualAddress = (address1: any, address2: any): boolean => {
-  const fieldMappings: Record<string, string> = {
-    firstName: "firstName",
-    lastName: "lastName",
-    address1: "streetName",
-    locality: "city",
-    administrativeArea: "region",
-    country: "country",
-    postalCode: "postalCode",
-    address2: "additionalStreetInfo",
-    email: "email",
-    phoneNumber: "phone"
-  };
-  let isEqual = true;
-  for (const key in fieldMappings) {
-    const mappedKey = fieldMappings[key];
-    if (address1[key] !== undefined && address2[mappedKey] === undefined) {
-      address2[mappedKey] = address1[key];
-      isEqual = false;
-    } else if (address1[key] !== address2[mappedKey]) {
-      isEqual = false;
-    }
-  }
-  return isEqual;
-};
-
 const setCertificatecache = async (url: string, keyPass: string, merchantId: string) => {
   try {
     const certificateFromCache = cache.get(`cert-${merchantId}`);
@@ -958,7 +932,6 @@ export default {
   getInteractionId,
   validatePaymentId,
   maskData,
-  isEqualAddress,
   setCertificatecache,
   sanitizeAndValidateUrl,
   validateRedirectPaths,

@@ -132,29 +132,9 @@ const getPaymentData = async (paymentResponse: any, updatePaymentObj: Payment) =
   }
   return cartDetails;
 };
-
-const updateCartWithPayPalAddress = async (updatePaymentObj: Payment, cartObj: Cart, transactionStatus: any): Promise<any> => {
-  let message = '';
-  let paymentId = updatePaymentObj.id || '';
-  let cartId = cartObj?.id;
-  let cartVersion = cartObj?.version || '';
-  let updatedCart;
-  if (updatePaymentObj && cartObj && cartId && cartVersion && transactionStatus.orderInformation.billTo) {
-    let orderInformation = transactionStatus.orderInformation;
-    updatedCart = await commercetoolsApi.updateCartByPaymentId(cartId, paymentId, cartObj.version, orderInformation);
-    message = updatedCart ? CustomMessages.SUCCESS_MSG_PAYPAL_ADDRESS_DETAILS : CustomMessages.ERROR_MSG_PAYPAL_ADDRESS_DETAILS;
-  }
-  else {
-    message = CustomMessages.ERROR_MSG_ADDRESS_NOT_FOUND_IN_TRANSACTION;
-  }
-  paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_WITH_PAYPAL_ADDRESS, Constants.LOG_INFO, 'PaymentId : ' + paymentId, message);
-  return updatedCart;
-};
-
 export default {
   getCartDetailsByPaymentId,
   updateCartWithUCAddress,
   updateCardDetails,
   getPaymentData,
-  updateCartWithPayPalAddress
 }

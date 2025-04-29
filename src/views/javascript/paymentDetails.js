@@ -334,12 +334,6 @@ function createCustomFieldsTable(payments, orderNo) {
     if (orderNo) {
       tableHTML += createRow('Reconciliation Id', orderNo).outerHTML;
     }
-    if (fields?.isv_payPalRequestId) {
-      tableHTML += createRow('PayPal Request Id', fields?.isv_payPalRequestId).outerHTML;
-    }
-    if (fields?.isv_payPalUrl) {
-      tableHTML += createRow('PayPal Redirection URL', fields.isv_payPalUrl).outerHTML;
-    }
     tableHTML += '</table>';
     return tableHTML;
   }

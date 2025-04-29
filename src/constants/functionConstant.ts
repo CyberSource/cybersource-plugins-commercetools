@@ -80,7 +80,6 @@ export abstract class FunctionConstant {
   static readonly FUNC_HANDLE_SYNC = 'FuncHandleSync';
   static readonly FUNC_UPDATE_CART_BY_PAYMENT_ID = 'FuncUpdateCartByPaymentId';
   static readonly FUNC_UPDATE_CART_WITH_UC_ADDRESS = 'FuncUpdateCartWithUCAddress';
-  static readonly FUNC_UPDATE_CART_WITH_PAYPAL_ADDRESS = 'FuncUpdateCartWithPayPalAddress';
   static readonly FUNC_HANDLE_UPDATE_CARD = 'FuncHandleUpdateCard';
   static readonly FUNC_UPDATE_CUSTOM_FIELDS = 'FuncUpdateCustomField';
   static readonly FUNC_UPDATE_DECISION_SYNC = 'FuncUpdateDecisionSync';

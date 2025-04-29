@@ -53,8 +53,6 @@ export type PaymentCustomFieldsType = {
   isv_tokenCaptureContextSignature: string;
   isv_clientLibrary: string;
   isv_clientLibraryIntegrity: string;
-  isv_payPalUrl: string;
-  isv_payPalRequestId: string;
   isv_cardType: string;
   isv_maskedPan: string;
   isv_cardExpiryMonth: string;

@@ -193,11 +193,6 @@ const getAuthResponse = (paymentResponse: PtsV2PaymentsPost201Response | any, tr
             const payerAuthenticationData = new PayerAuthData(consumerAuthenticationInformation, paymentResponse);
             const actions = paymentActions.payerAuthActions(payerAuthenticationData);
             response.actions = actions;
-        } else if (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode && Constants.STRING_CREATED === status) {
-            const isv_payPalUrl = paymentResponse.isv_payPalUrl;
-            const isv_payPalRequestId = paymentResponse.isv_payPalRequestId;
-            const actions = paymentUtils.setCustomFieldMapper({ isv_payPalUrl, isv_payPalRequestId });
-            response.actions = actions;
         } else {
             if (!transactionDetail) {
                 response = paymentUtils.getEmptyResponse();
