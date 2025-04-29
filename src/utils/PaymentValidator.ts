@@ -25,7 +25,7 @@ const setObjectValue = (targetObject: any, fieldName: string, sourceObj: any, so
                 isValidType = typeof value === Constants.STR_STRING;
                 break;
             case Constants.STR_NUMBER:
-                isValidType = typeof value === 'number';
+                isValidType = typeof value === Constants.STR_NUMBER;
                 break;
             case 'boolean':
                 isValidType = typeof value === 'boolean';
