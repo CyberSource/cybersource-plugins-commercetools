@@ -172,7 +172,7 @@ const getAuthResponse = (paymentResponse: PtsV2PaymentsPost201Response | any, tr
         const { httpCode, data, status } = paymentResponse || {};
         const { consumerAuthenticationInformation } = data || {};
         const validPendingAuthenticationResponse = paymentValidator.isValidPendingAuthenticationResponse(httpCode, status, data, consumerAuthenticationInformation)
-        if (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode && transactionDetail && (Constants.API_STATUS_AUTHORIZED === status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === status || Constants.API_STATUS_PENDING === status || Constants.API_STATUS_SETTLED === status)) {
+        if (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode && transactionDetail && (Constants.API_STATUS_AUTHORIZED === status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === status || Constants.API_STATUS_PENDING === status)) {
             const setTransaction = paymentUtils.setTransactionId(paymentResponse, transactionDetail);
             setCustomField =
                 Constants.CT_TRANSACTION_TYPE_CHARGE === transactionDetail.type && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === status
