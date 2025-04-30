@@ -190,12 +190,12 @@ const getOrderInformationAmountDetails = (functionName: string, captureAmount: n
     orderInformationAmountDetails.currency = paymentObj?.amountPlanned?.currencyCode;
   } else if (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName) {
     orderInformationAmountDetails = {} as Ptsv2paymentsOrderInformationAmountDetails;
-    orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits);
+    orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(cartObj.taxedPrice.totalGross.centAmount, cartObj.totalPrice.fractionDigits);
     orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
   } else if (FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT === functionName) {
     orderInformationAmountDetails = {} as Upv1capturecontextsOrderInformationAmountDetails;
     if ('Payments' === service) {
-      orderInformationAmountDetails.totalAmount = `${paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits)}`;
+      orderInformationAmountDetails.totalAmount = `${paymentUtils.convertCentToAmount(cartObj.taxedPrice.totalGross.centAmount, cartObj.totalPrice.fractionDigits)}`;
       orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
     } else if ('MyAccounts' === service) {
       orderInformationAmountDetails.currency = currencyCode;
@@ -300,6 +300,45 @@ const getDeviceInformation = (paymentObj: PaymentType | null, customerObj: Parti
   return deviceInformation;
 };
 
+function getReturnUrl(locale: string): string {
+  // Allowed locales
+  const validLocales: Array<'en' | 'de' | 'it' | 'fr'> = ['en', 'de', 'it', 'fr'];
+  // Validate and default to 'en' if not valid
+  const finalLocale: 'en' | 'de' | 'it' | 'fr' = validLocales.includes(locale as any) ? locale as 'en' | 'de' | 'it' | 'fr' : 'en';
+
+  // Retrieve the base URL from the environment variable
+  const baseUrl = process.env.PAYMENT_GATEWAY_3DS_RETURN_URL;
+  if (!baseUrl) {
+    throw new Error("PAYMENT_GATEWAY_3DS_RETURN_URL is not defined.");
+  }
+
+  // Parse the base URL into its components
+  const urlObj = new URL(baseUrl);
+  let newHost = urlObj.hostname;
+
+  // Update the hostname based on the validated locale
+  switch (finalLocale) {
+    case 'de':
+    case 'it':
+      // For 'de' and 'it', replace the TLD '.com' with the appropriate TLD
+      newHost = newHost.replace(/\.com$/, `.${finalLocale}`);
+      break;
+    case 'fr':
+      // For 'fr', change "*.alamy.com" to "*.alamyimages.fr"
+      // This pattern assumes the base hostname is in the format "*.alamy.com"
+      newHost = newHost.replace(/^(.*alamy)(\.com)$/, '$1images.fr');
+      break;
+    case 'en':
+    default:
+      // For 'en', use the base URL unchanged.
+      break;
+  }
+
+  // Update the URL object with the new hostname and return the full URL
+  urlObj.hostname = newHost;
+  return urlObj.toString();
+}
+
 /**
  * Generates consumer authentication information for payment based on the provided parameters.
  * 
@@ -309,7 +348,7 @@ const getDeviceInformation = (paymentObj: PaymentType | null, customerObj: Parti
  * @param {boolean} payerAuthMandateFlag - Flag indicating whether payer authentication is mandated.
  * @returns {Promise<any>} - The consumer authentication information.
  */
-const getConsumerAuthenticationInformation = (resourceObj: PaymentType, service: string, isSaveToken: boolean, payerAuthMandateFlag: boolean): any => {
+const getConsumerAuthenticationInformation = (resourceObj: PaymentType, service: string, isSaveToken: boolean, payerAuthMandateFlag: boolean, locale: string): any => {
   const { isv_payerAuthenticationTransactionId, isv_payerAuthenticationPaReq, isv_cardinalReferenceId, isv_tokenAlias, isv_savedToken } = resourceObj?.custom?.fields || {};
   const consumerAuthenticationInformation = {} as Ptsv2paymentsConsumerAuthenticationInformation;
   if (Constants.VALIDATION === service) {
@@ -317,7 +356,7 @@ const getConsumerAuthenticationInformation = (resourceObj: PaymentType, service:
     consumerAuthenticationInformation.signedPares = isv_payerAuthenticationPaReq;
   } else if (Constants.STRING_ENROLL_CHECK === service) {
     consumerAuthenticationInformation.referenceId = isv_cardinalReferenceId;
-    consumerAuthenticationInformation.returnUrl = process.env.PAYMENT_GATEWAY_3DS_RETURN_URL;
+    consumerAuthenticationInformation.returnUrl = getReturnUrl(locale);
     if (payerAuthMandateFlag || (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_SCA_CHALLENGE) && !isv_savedToken && isv_tokenAlias && isSaveToken)) {
       consumerAuthenticationInformation.challengeCode = Constants.PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE;
     }

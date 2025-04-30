@@ -42,7 +42,7 @@ const getAuthorizationResponse = async (payment: PaymentType, cart: any, service
         requestObj.tokenInformation = tokenInformation;
       }
       if (Constants.CC_PAYER_AUTHENTICATION === payment.paymentMethodInfo.method) {
-        const consumerAuthenticationInformation = prepareFields.getConsumerAuthenticationInformation(payment, service, isSaveToken, payerAuthMandateFlag);
+        const consumerAuthenticationInformation = prepareFields.getConsumerAuthenticationInformation(payment, service, isSaveToken, payerAuthMandateFlag, cart?.locale);
         requestObj.consumerAuthenticationInformation = consumerAuthenticationInformation;
       }
     }
