@@ -1,12 +1,13 @@
 import fs from 'fs';
 import https from 'https';
 
+import { _BaseAddress, Cart, Customer, Payment } from '@commercetools/platform-sdk';
 import axios from 'axios';
 import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
 
-import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
+import { Constants } from '../constants/paymentConstants';
 import addTokenService from '../service/payment/AddTokenService';
 import createSearchRequest from '../service/payment/CreateTransactionSearchRequest';
 import conversion from '../service/payment/DecisionSyncService';
@@ -14,7 +15,7 @@ import deleteToken from '../service/payment/DeleteTokenService';
 import paymentAuthReversal from '../service/payment/PaymentAuthorizationReversal';
 import paymentCapture from '../service/payment/PaymentCaptureService';
 import updateToken from '../service/payment/UpdateTokenService';
-import { ActionResponseType, AddressType, CustomerTokensType, CustomerType, CustomTokenType, InstrumentIdResponse, PaymentCustomFieldsType, PaymentTransactionType, PaymentType, ReportResponseType } from '../types/Types';
+import { ActionResponseType, CustomerTokensType, CustomTokenType, InstrumentIdResponse, PaymentCustomFieldsType, PaymentTransactionType, ReportResponseType } from '../types/Types';
 
 import paymentActions from './PaymentActions';
 import paymentUtils from './PaymentUtils';
@@ -29,11 +30,11 @@ import tokenHelper from './helpers/TokenHelper';
 /**
  * Handles the authorization process for a payment.
  * 
- * @param {PaymentType} updatePaymentObj - The updated payment object.
- * @param {PaymentTransactionType} updateTransactions - The updated transaction object.
+ * @param {Payment} updatePaymentObj - The updated payment object.
+ * @param {Partial<PaymentTransactionType>} updateTransactions - The updated transaction object.
  * @returns {Promise<ActionResponseType>} - The authorization response.
  */
-const handleAuthorization = async (updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>): Promise<ActionResponseType> => {
+const handleAuthorization = async (updatePaymentObj: Payment, updateTransactions: Partial<PaymentTransactionType>): Promise<ActionResponseType> => {
   let isError = false;
   let paymentInstrumentToken = '';
   let paymentId = updatePaymentObj?.id || '';
@@ -41,7 +42,7 @@ const handleAuthorization = async (updatePaymentObj: PaymentType, updateTransact
     customerTokenId: '',
     paymentInstrumentId: '',
   };
-  let customerInfo: Partial<CustomerType> | null = null;
+  let customerInfo: Customer | null = null;
   let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   let cartObj;
   if (updatePaymentObj && updateTransactions) {
@@ -55,7 +56,7 @@ const handleAuthorization = async (updatePaymentObj: PaymentType, updateTransact
       }
       let { results } = cartObj;
       const orderNo = await paymentUtils.getOrderId(results[0]?.id, id);
-      const paymentMethod = paymentMethodInfo.method;
+      const paymentMethod = paymentMethodInfo.method || '';
       const serviceResponse = await handlePaymentAuth(paymentMethod, updatePaymentObj, customerInfo, results[0], updateTransactions, cardTokens, orderNo);
       const authresponse = serviceResponse?.authResponse;
       if (authresponse) {
@@ -88,7 +89,7 @@ const handleAuthorization = async (updatePaymentObj: PaymentType, updateTransact
 /**
  * Handles setting certain custom fields to null.
  * 
- * @param {PaymentCustomFieldsType | undefined} customFields - The custom fields of the payment.
+ * @param {Partial<PaymentCustomFieldsType> | undefined} customFields - The custom fields of the payment.
  * @param {ActionResponseType} authResponse - The authorization response.
  * @param {string} paymentMethod - The payment method.
  * @returns {Promise<ActionResponseType>} - The updated authorization response.
@@ -98,21 +99,17 @@ const handleSetTokenToNull = async (customFields: Partial<PaymentCustomFieldsTyp
   const isv_tokenCaptureContextSignature = '';
   const isv_clientLibrary = '';
   const isv_clientLibraryIntegrity = '';
-  const isv_securityCode = 0;
   if ((customFields?.isv_savedToken && customFields?.isv_tokenVerificationContext) || (Constants.CREDIT_CARD !== paymentMethod && Constants.CC_PAYER_AUTHENTICATION !== paymentMethod && customFields?.isv_tokenVerificationContext)) {
     authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenVerificationContext }));
   }
   if (customFields?.isv_tokenCaptureContextSignature) {
     authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_tokenCaptureContextSignature }));
   }
-  if(customFields?.isv_clientLibrary){
+  if (customFields?.isv_clientLibrary) {
     authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_clientLibrary }));
   }
-  if(customFields?.isv_clientLibraryIntegrity){
+  if (customFields?.isv_clientLibraryIntegrity) {
     authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_clientLibraryIntegrity }));
-  }
-  if (customFields?.isv_securityCode) {
-    authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_securityCode }));
   }
   return authResponse;
 };
@@ -121,15 +118,15 @@ const handleSetTokenToNull = async (customFields: Partial<PaymentCustomFieldsTyp
  * Handles authorization for different payment methods.
  * 
  * @param {string} paymentMethod - The payment method.
- * @param {PaymentType} updatePaymentObj - The updated payment object.
- * @param {CustomerType | null} customerInfo - Information about the customer.
- * @param {any} cartInfo - Information about the cart.
- * @param {PaymentTransactionType} updateTransactions - The updated transaction object.
+ * @param {Payment} updatePaymentObj - The updated payment object.
+ * @param {Customer | null} customerInfo - Information about the customer.
+ * @param {Cart} cartInfo - Information about the cart.
+ * @param {Partial<PaymentTransactionType>} updateTransactions - The updated transaction object.
  * @param {CustomTokenType} cardTokens - Card tokens associated with the customer.
  * @param {string} orderNo - The order number.
  * @returns {Promise<{ isError: boolean; paymentResponse: any; authResponse: ActionResponseType }>} - The service response.
  */
-const handlePaymentAuth = async (paymentMethod: string, updatePaymentObj: PaymentType, customerInfo: Partial<CustomerType> | null, cartInfo: any, updateTransactions: Partial<PaymentTransactionType>, cardTokens: CustomTokenType, orderNo: string) => {
+const handlePaymentAuth = async (paymentMethod: string, updatePaymentObj: Payment, customerInfo: Customer | null, cartInfo: Cart, updateTransactions: Partial<PaymentTransactionType>, cardTokens: CustomTokenType, orderNo: string) => {
   let serviceResponse: { isError: boolean; paymentResponse: any; authResponse: ActionResponseType };
   switch (paymentMethod) {
     case Constants.CREDIT_CARD: {
@@ -162,12 +159,12 @@ const handlePaymentAuth = async (paymentMethod: string, updatePaymentObj: Paymen
 /**
  * Handles payer authentication reversal.
  * 
- * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {Payment} updatePaymentObj - The updated payment object.
  * @param {any} paymentResponse - The payment response.
  * @param {ActionResponseType} updateActions - The updated actions response.
  * @returns {Promise<ActionResponseType>} - The updated actions response.
  */
-const handlePayerAuthReversal = async (updatePaymentObj: PaymentType, paymentResponse: PtsV2PaymentsPost201Response, updateActions: ActionResponseType): Promise<ActionResponseType> => {
+const handlePayerAuthReversal = async (updatePaymentObj: Payment, paymentResponse: PtsV2PaymentsPost201Response, updateActions: ActionResponseType): Promise<ActionResponseType> => {
   let cartObj;
   if (updatePaymentObj && updateActions && paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
     cartObj = await paymentUtils.getCartObject(updatePaymentObj);
@@ -228,12 +225,12 @@ const handleApplePaySession = async (fields: Partial<PaymentCustomFieldsType>): 
 /**
  * Handles charge operation for order management.
  * 
- * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {Payment} updatePaymentObj - The updated payment object.
  * @param {string} orderNo - The order number.
- * @param {PaymentTransactionType} updateTransactions - The updated payment transactions.
+ * @param {Partial<PaymentTransactionType>} updateTransactions - The updated payment transactions.
  * @returns {Promise<any>} - The order response.
  */
-const handleOrderManagementForCharge = async (updatePaymentObj: PaymentType, orderNo: string, updateTransactions: Partial<PaymentTransactionType>) => {
+const handleOrderManagementForCharge = async (updatePaymentObj: Payment, orderNo: string, updateTransactions: Partial<PaymentTransactionType>) => {
   let authId = '';
   let orderResponse;
   authId = paymentUtils.getInteractionId(updatePaymentObj);
@@ -250,19 +247,19 @@ const handleOrderManagementForCharge = async (updatePaymentObj: PaymentType, ord
  * @param {string | undefined} type - The type of transaction.
  * @param {string | undefined} state - The state of the transaction.
  * @param {string} orderNo - The order number associated with the transaction.
- * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Payment} updatePaymentObj - The payment update object.
  * @param {Partial<PaymentTransactionType>} updateTransactions - The transaction update object.
- * @param {any} cartObj - The cart object associated with the transaction.
+ * @param {Cart} cartObj - The cart object associated with the transaction.
  * @returns {Promise<any | null>} The result of the transaction handling, or null if not applicable.
  */
-const handleTransactionType = async (type: string | undefined, state: string | undefined, orderNo: string, updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>, cartObj: any) => {
+const handleTransactionType = async (type: string | undefined, state: string | undefined, orderNo: string, updatePaymentObj: Payment, updateTransactions: Partial<PaymentTransactionType>, cartObj: Cart) => {
   switch (type) {
     case Constants.CT_TRANSACTION_TYPE_CHARGE:
       return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await handleOrderManagementForCharge(updatePaymentObj, orderNo, updateTransactions) : null;
     case Constants.CT_TRANSACTION_TYPE_REFUND:
       return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await orderManagementHelper.getRefundResponse(updatePaymentObj, updateTransactions, orderNo) : null;
     case Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION:
-      return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await handleOrderManagementAuthReversal(updatePaymentObj, cartObj.results[0]) : null;
+      return Constants.CT_TRANSACTION_STATE_INITIAL === state ? await handleOrderManagementAuthReversal(updatePaymentObj, cartObj) : null;
     default:
       return null;
   }
@@ -271,11 +268,11 @@ const handleTransactionType = async (type: string | undefined, state: string | u
 /**
  * Handles authorization reversal operation for order management.
  * 
- * @param {PaymentType} updatePaymentObj - The updated payment object.
+ * @param {Payment} updatePaymentObj - The updated payment object.
  * @param {any} cartObj - The cart object.
  * @returns {Promise<any>} - The order response.
  */
-const handleOrderManagementAuthReversal = async (updatePaymentObj: PaymentType, cartObj: any): Promise<any> => {
+const handleOrderManagementAuthReversal = async (updatePaymentObj: Payment, cartObj: Cart): Promise<any> => {
   let authReversalId = '';
   authReversalId = paymentUtils.getInteractionId(updatePaymentObj);
   let orderResponse;
@@ -289,55 +286,53 @@ const handleOrderManagementAuthReversal = async (updatePaymentObj: PaymentType, 
  * Handles order management operations.
  * 
  * @param {string} paymentId - The ID of the payment.
- * @param {PaymentType} updatePaymentObj - The updated payment object.
- * @param {PaymentTransactionType} updateTransactions - The updated transaction object.
+ * @param {Payment} updatePaymentObj - The updated payment object.
+ * @param {Partial<PaymentTransactionType>} updateTransactions - The updated transaction object.
  * @returns {Promise<ActionResponseType>} - The action response.
  */
-const handleOrderManagement = async (paymentId: string, updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>): Promise<ActionResponseType> => {
+const handleOrderManagement = async (paymentId: string, updatePaymentObj: Payment, updateTransactions: Partial<PaymentTransactionType>): Promise<ActionResponseType> => {
   let isError = false;
   let serviceResponse = paymentUtils.getEmptyResponse();
   let orderResponse;
   let cartObj;
+  let orderNo;
+  let { state, type } = updateTransactions || {};
   if (updatePaymentObj && updateTransactions) {
     cartObj = await paymentUtils.getCartObject(updatePaymentObj);
     if (cartObj?.results[0]?.id) {
       let { results } = cartObj;
-      let { state, type } = updateTransactions || {};
-      const orderNo = await paymentUtils.getOrderId(results[0].id, paymentId);
-      orderResponse = await handleTransactionType(type, state, orderNo, updatePaymentObj, updateTransactions, cartObj);
-      if (orderResponse && orderResponse?.httpCode) {
-        serviceResponse = orderManagementHelper.getOMServiceResponse(orderResponse, updateTransactions, '', 0);
-      } else if (orderResponse && orderResponse?.actions?.length) {
-        serviceResponse = orderResponse;
-      } else {
-        isError = true;
-      }
+      orderNo = await paymentUtils.getOrderId(results[0].id, paymentId);
+    } else {
+      orderNo = await paymentUtils.getOrderId('', paymentId);
+    }
+    orderResponse = await handleTransactionType(type, state, orderNo, updatePaymentObj, updateTransactions, cartObj.results[0]);
+    if (orderResponse && orderResponse?.httpCode) {
+      serviceResponse = orderManagementHelper.getOMServiceResponse(orderResponse, updateTransactions, '', 0);
+    } else if (orderResponse && orderResponse?.actions?.length) {
+      serviceResponse = orderResponse;
     } else {
       isError = true;
     }
-  } else {
-    isError = true;
-  }
-  if (isError) {
-    serviceResponse = paymentUtils.invalidInputResponse();
+    if (isError) {
+      serviceResponse = paymentUtils.invalidInputResponse();
+    }
   }
   return serviceResponse;
 };
-
 /**
  * Handles the update of card details.
  * 
- * @param {CustomerTokensType} tokens - The tokens associated with the customer.
+ * @param {Partial<CustomerTokensType>} tokens - The tokens associated with the customer.
  * @param {string} customerId - The ID of the customer.
  * @param {CustomerType} customerObj - The customer object.
  * @returns {Promise<ActionResponseType>} - The action response.
  */
-const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId: string, customerObj: Partial<CustomerType>): Promise<ActionResponseType> => {
+const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId: string, customerObj: Customer): Promise<ActionResponseType> => {
   let returnResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   const isError = false;
   let finalTokenIndex = -1;
   let parsedTokens: Partial<CustomerTokensType>;
-  let addressData: AddressType | null = null;
+  let addressData: _BaseAddress | null = null;
   let updateServiceResponse: any;
   if (customerId) {
     const customerInfo = await commercetoolsApi.getCustomer(customerId);
@@ -386,7 +381,7 @@ const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId:
 /**
  * Handles the deletion of a card.
  * 
- * @param {CustomerTokensType} updateCustomerObj - The tokens associated with the customer.
+ * @param {Partial<CustomerTokensType>} updateCustomerObj - The tokens associated with the customer.
  * @param {string} customerId - The ID of the customer.
  * @returns {Promise<ActionResponseType>} - The action response.
  */
@@ -424,10 +419,10 @@ const handleCardDeletion = async (updateCustomerObj: Partial<CustomerTokensType>
  * 
  * @param {string} customerId - The ID of the customer.
  * @param {readonly AddressType[]} addressObj - The array of addresses associated with the customer.
- * @param {CustomerType} customerObj - The customer object.
+ * @param {Customer} customerObj - The customer object.
  * @returns {Promise<ActionResponseType>} - The action response.
  */
-const handleCardAddition = async (customerId: string, addressObj: readonly AddressType[], customerObj: CustomerType) => {
+const handleCardAddition = async (customerId: string, addressObj: readonly _BaseAddress[], customerObj: Customer) => {
   let customerTokenResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   const tokenCreateResponse = await tokenHelper.evaluateTokenCreation(customerObj, null, FunctionConstant.FUNC_HANDLE_CARD_ADDITION);
   if (!tokenCreateResponse.isError) {
@@ -519,7 +514,7 @@ const handleSync = async (): Promise<{ message: string, error: string }> => {
     merchantSecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY,
   };
   let multiMidArray;
-  let paymentDetails: PaymentType | null;
+  let paymentDetails: Payment | null;
   let createSearchResponse;
   let transactionSummaries;
   let updateSyncResponse;

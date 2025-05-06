@@ -23,7 +23,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE = 'CHECK';
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'FAV669SU';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'GD1GCCBN';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
@@ -35,13 +35,14 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
   static readonly PAYMENT_GATEWAY_NETWORK_TOKEN_EVENT_TYPE = 'tms.networktoken.updated';
   static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'Commercetools(REST)';
-  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.1.0';
+  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.2.0';
 
   //Payment status codes
+  static readonly HTTP_CODE_ZERO = 0;
   static readonly HTTP_OK_STATUS_CODE = 200;
   static readonly HTTP_SUCCESS_STATUS_CODE = 201;
-  static readonly HTTP_REDIRECT_STATUS_CODE = 302;
   static readonly HTTP_SUCCESS_NO_CONTENT_STATUS_CODE = 204;
+  static readonly HTTP_REDIRECT_STATUS_CODE = 302;
   static readonly HTTP_BAD_REQUEST_STATUS_CODE = 400;
   static readonly HTTP_UNAUTHORIZED_STATUS_CODE = 401;
   static readonly HTTP_NOT_FOUND_STATUS_CODE = 404;
@@ -60,6 +61,7 @@ export abstract class Constants {
   static readonly API_STATUS_PENDING_AUTHENTICATION = 'PENDING_AUTHENTICATION';
   static readonly API_STATUS_PENDING_REVIEW = 'PENDING_REVIEW';
   static readonly API_STATUS_REVERSED = 'REVERSED';
+  static readonly API_STATUS_AUTH_REVERSED = 'AUTH_REVERSED';
   static readonly HTTP_STATUS_DECISION_ACCEPT = 'ACCEPT';
   static readonly HTTP_STATUS_DECISION_REJECT = 'REJECT';
   static readonly APPLICATION_RCODE = '1';
@@ -83,11 +85,13 @@ export abstract class Constants {
   static readonly APPLE_PAY = 'applePay';
   static readonly ECHECK = 'eCheck';
   static readonly GOOGLE_PAY = 'googlePay';
+  static readonly EWALLET = 'EWALLET';
 
   //Strings
   static readonly STRING_AWS = 'aws';
   static readonly STRING_AZURE = 'azure';
-  static readonly STRING_SECRET_KEY = '_SECRET_KEY';
+  static readonly STRING_FILE_NAME = '_KEY_FILE_NAME';
+  static readonly STRING_FILE_URL = '_KEY_FILE_URL'
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
   static readonly ANONYMOUS_ID = 'anonymousId';
   static readonly AUTHENTICATION_SCHEME = 'Basic';
@@ -103,6 +107,9 @@ export abstract class Constants {
   static readonly STRING_CUSTOM = 'custom';
   static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
+  static readonly STRING_STATUS = 'status';
+  static readonly STRING_ORDER = 'order';
+  static readonly STRING_CREATED = 'CREATED';
   static readonly STRING_FALSE = 'false';
   static readonly STRING_RESPONSE = 'response';
   static readonly STRING_RESPONSE_STATUS = 'status';
@@ -128,11 +135,15 @@ export abstract class Constants {
   static readonly STRING_ACTIVE = 'ACTIVE';
   static readonly NETWORK_TOKEN_EVENT = 'tms.networktoken.updated';
   static readonly ADDITIONAL_CUSTOM_TYPE_FILE_PATH = 'src/resources/isv_additonal_custom_type.json';
+  static readonly CERTIFICATE_PATH = '../certificates';
+  static readonly STRING_TEST = 'test';
 
   static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ENCODING_SHA_TWO_FIFTY_SIX = 'sha256';
   static readonly HEADER_ENCRYPTION_ALGORITHM = 'aes-256-gcm';
   static readonly HEX = 'hex';
+  static readonly JWT_AUTHENTICATION = 'jwt';
+
   static readonly LOG_DEBUG = 'debug';
   static readonly LOG_ERROR = 'error';
   static readonly LOG_INFO = 'info';
@@ -168,7 +179,6 @@ export abstract class Constants {
   static readonly ISV_CARD_NEW_EXPIRY_MONTH = 'isv_cardNewExpiryMonth';
   static readonly ISV_CARD_NEW_EXPIRY_YEAR = 'isv_cardNewExpiryYear';
   static readonly ISV_FAILED_TOKENS = 'isv_failedTokens';
-  static readonly ISV_SECURITY_CODE = 'isv_securityCode';
   static readonly ISV_TOKEN = 'isv_token';
   static readonly ISV_PAYMENTS_CUSTOMER_TOKENS = 'isv_payments_customer_tokens';
   static readonly ISV_TOKENS = 'isv_tokens';
@@ -199,6 +209,9 @@ export abstract class Constants {
   static readonly UPDATE_AMOUNT_RESPONSE_FUNCTIONS = ['FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetAuthReversalResponse'];
   static readonly GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS = ['FuncGetTransactionData', 'FuncGetFlexKeys', 'FuncGetPayerAuthSetupData', 'FuncGetAuthReversalResponse', 'FuncGetAuthorizationResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData'];
   static readonly GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS = ['FuncGetTransactionSearchResponse', 'FuncGetConversionDetails', 'FuncGetPublicKeys', 'FuncGetTransientTokenDataResponse', 'FuncWebhookSubscriptionResponse', 'FuncGetKeyGenerationResponse', 'FuncGetCreateWebhookSubscriptionResponse', 'FuncDeleteWebhookSubscriptionResponse', 'FuncGetTransactionData'];
+  static readonly GET_PROCESSING_INFORMATION_FUNCTIONS = ['FuncGetAuthorizationResponse', 'FuncGetAddTokenResponse', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetAuthReversalResponse'];
+  static readonly MAP_PAYMENT_INFORMATION_FUNCTIONS = ['FuncGetAuthorizationResponse', 'FuncGetRefundData', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse', 'FuncGetCaptureResponse', 'FuncGetAuthReversalResponse'];
+  static readonly MLE_UNSUPPORTED_FUNCTIONS = ['FuncGenerateCaptureContext', 'FuncGetTransientTokenDataResponse'];
 
   //default cards
   static readonly UC_ALLOWED_CARD_NETWORKS = ['VISA'];

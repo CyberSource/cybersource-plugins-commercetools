@@ -100,8 +100,7 @@ import unit from '../JSON/unit.json';
     "centAmount": 49310
   },
   "type": "Authorization",
-  "state": "",
-  "securityCodePresent": false
+  "state": ""
 }
 
  let addTransactionForCharge = {

@@ -1,10 +1,11 @@
 import test from 'ava';
 import dotenv from 'dotenv';
-dotenv.config();
 
+import { Constants } from '../../../constants/paymentConstants';
 import getWebhookSubscriptionDetails from '../../../service/payment/GetWebhookSubscriptionDetails';
 import DeleteWebhookSubscriptionConst from '../../const/DeleteWebhookSubscriptionConst';
 
+dotenv.config();
 let midCredentials = {
   merchantId: process.env.PAYMENT_GATEWAY_MERCHANT_ID,
   merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID,
@@ -12,20 +13,55 @@ let midCredentials = {
 };
 
 test.serial('Test get webhook subscription response', async (t) => {
-  let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(midCredentials)) as any;
-  if (200 === response.httpCode) {
-    t.is(response.httpCode, 200);
-  } else {
-    t.not(response.httpCode, 200);
+  try {
+    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(midCredentials)) as any;
+    if (Constants.HTTP_OK_STATUS_CODE === response.httpCode) {
+      t.is(response.httpCode, Constants.HTTP_OK_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected error: http Code' ${response.httpCode}`);
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
   }
 });
 
 test.serial('Test get webhook subscription response without mid credentials', async (t) => {
-  let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.emptyMidCredentials)) as any;
-    t.not(response.httpCode, 200);
+  try {
+    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.emptyMidCredentials)) as any;
+    if (Constants.HTTP_OK_STATUS_CODE !== response.httpCode) {
+      t.not(response.httpCode, Constants.HTTP_OK_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected error: http Code' ${response.httpCode}`);
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
+  }
 });
 
 test.serial('Test get webhook subscription response with invalid mid credentials', async (t) => {
-  let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.invalidMidCredentials)) as any;
-    t.not(response.httpCode, 200);
+  try {
+    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.invalidMidCredentials)) as any;
+    if (Constants.HTTP_OK_STATUS_CODE !== response.httpCode) {
+      t.not(response.httpCode, Constants.HTTP_OK_STATUS_CODE);
+    } else {
+      t.fail(`Unexpected error: http Code' ${response.httpCode}`);
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+      t.log(`Stack trace: ${error.stack}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
+  }
 });

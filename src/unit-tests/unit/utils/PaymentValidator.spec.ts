@@ -1,7 +1,7 @@
 import test from 'ava';
 import dotenv from 'dotenv';
 
-import { Constants } from '../../../constants/constants';
+import { Constants } from '../../../constants/paymentConstants';
 import paymentValidator from '../../../utils/PaymentValidator';
 import PaymentServiceConst from '../../const/HelpersConst';
 import PaymentValidatorConst from '../../const/PaymentValidatorConst';
@@ -12,7 +12,6 @@ test.serial('Set Object value with valid inputs', async (t) => {
   const target = {};
   const source = { key: 'value' };
   paymentValidator.setObjectValue(target, 'fieldName', source, 'key', 'string', false);
-
   t.deepEqual(target, { fieldName: 'value' });
 })
 
@@ -20,7 +19,6 @@ test.serial('Set Object value with invalid inputs', async (t) => {
   const target = {};
   const source = { key: 123 };
   paymentValidator.setObjectValue(target, 'fieldName', source, 'key', 'string', false);
-
   t.deepEqual(target, {});
 })
 
@@ -88,20 +86,20 @@ test.serial('Validate Rate Limiter Input', async (t) => {
 
 
 test.serial('Test Is Valid Transaction with Valid Input', async (t) => {
-  const result = paymentValidator.isValidTransaction(PaymentServiceConst.getRefundResponseUpdatePaymentObj, PaymentServiceConst.getRefundResponseUpdateTransactions);
+  const result = paymentValidator.isValidTransaction(PaymentServiceConst.getRefundResponseUpdatePaymentObj as any, PaymentServiceConst.getRefundResponseUpdateTransactions);
   t.is(result, true);
 });
 
 test.serial('Test Is Valid Transaction with Invalid fraction digits', async (t) => {
   PaymentServiceConst.getRefundResponseUpdateTransactions.amount.fractionDigits = -1;
-  const result = paymentValidator.isValidTransaction(PaymentServiceConst.getRefundResponseUpdatePaymentObj, PaymentServiceConst.getRefundResponseUpdateTransactions);
+  const result = paymentValidator.isValidTransaction(PaymentServiceConst.getRefundResponseUpdatePaymentObj as any, PaymentServiceConst.getRefundResponseUpdateTransactions);
   t.is(result, false);
 });
 
 test.serial('Test Is Successful Charge Transaction with Valid Input', async (t) => {
   let i = 0;
   for (let transaction of PaymentServiceConst.getRefundResponseUpdatePaymentObj.transactions) {
-    const result = paymentValidator.isSuccessFulChargeTransaction(transaction);
+    const result = paymentValidator.isSuccessFulChargeTransaction(transaction as any);
     if (result === true) {
       i++;
     }
@@ -115,7 +113,7 @@ test.serial('Test Is Successful Charge Transaction with status failure', async (
     if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type) {
       transaction.state = 'Failure';
     }
-    const result = paymentValidator.isSuccessFulChargeTransaction(transaction);
+    const result = paymentValidator.isSuccessFulChargeTransaction(transaction as any);
     if (result === true) {
       i++;
     }
@@ -139,12 +137,12 @@ test.serial('Test Validate Pending Authentication Response with Invalid status',
 })
 
 test.serial('Test Validate transaction summaries', async (t) => {
-  const result = paymentValidator.isValidTransactionSummaries(PaymentValidatorConst.validTransactionDetail, PaymentValidatorConst.validateTransactionUpdatePaymentObj, 3);
+  const result = paymentValidator.isValidTransactionSummaries(PaymentValidatorConst.validTransactionDetail, PaymentValidatorConst.validateTransactionUpdatePaymentObj as any, 3);
   t.is(result, true);
 })
 
 test.serial('Test Validate transaction summaries  with Invalid retry count', async (t) => {
-  const result = paymentValidator.isValidTransactionSummaries(PaymentValidatorConst.validTransactionDetail, PaymentValidatorConst.validateTransactionUpdatePaymentObj, 1);
+  const result = paymentValidator.isValidTransactionSummaries(PaymentValidatorConst.validTransactionDetail, PaymentValidatorConst.validateTransactionUpdatePaymentObj as any, 1);
   t.is(result, false);
 })
 
@@ -160,23 +158,23 @@ test.serial('Test Validate Consumer Authentication Required with Invalid Reason'
 })
 
 test.serial('Test Validate should process tokens', async (t) => {
-  const result = paymentValidator.shouldProcessTokens(false, PaymentValidatorConst.processTokenPaymentResponse, PaymentValidatorConst.processTokenUpdatePaymentObj);
+  const result = paymentValidator.shouldProcessTokens(false, PaymentValidatorConst.processTokenPaymentResponse, PaymentValidatorConst.processTokenUpdatePaymentObj as any);
   t.is(result, true);
 })
 
 test.serial('Test Validate should process tokens with invalid Payment method', async (t) => {
   PaymentValidatorConst.processTokenUpdatePaymentObj.paymentMethodInfo.method = 'googlePay';
-  const result = paymentValidator.shouldProcessTokens(false, PaymentValidatorConst.processTokenPaymentResponse, PaymentValidatorConst.processTokenUpdatePaymentObj);
+  const result = paymentValidator.shouldProcessTokens(false, PaymentValidatorConst.processTokenPaymentResponse, PaymentValidatorConst.processTokenUpdatePaymentObj as any);
   t.is(result, false);
 })
 
 test.serial('Test Validate should process failed token', async (t) => {
-  const result = paymentValidator.shouldProcessFailedTokens(PaymentValidatorConst.processFailedTokenPaymentResponse, PaymentValidatorConst.processFailedTokenUpdatePaymentObj);
+  const result = paymentValidator.shouldProcessFailedTokens(PaymentValidatorConst.processFailedTokenPaymentResponse, PaymentValidatorConst.processFailedTokenUpdatePaymentObj as any);
   t.is(result, true);
 })
 
 test.serial('Test Validate should process failed token with invalid tokenAlias', async (t) => {
   PaymentValidatorConst.processFailedTokenUpdatePaymentObj.custom.fields.isv_tokenAlias = '';
-  const result = paymentValidator.shouldProcessFailedTokens(PaymentValidatorConst.processFailedTokenPaymentResponse, PaymentValidatorConst.processFailedTokenUpdatePaymentObj);
+  const result = paymentValidator.shouldProcessFailedTokens(PaymentValidatorConst.processFailedTokenPaymentResponse, PaymentValidatorConst.processFailedTokenUpdatePaymentObj as any);
   t.is(result, false);
 })

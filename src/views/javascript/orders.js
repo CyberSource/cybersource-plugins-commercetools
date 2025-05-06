@@ -64,10 +64,10 @@ async function renderOrders(orderList) {
   const paymentDetailsBody = document.getElementById('paymentDetailsBody');
   paymentDetailsBody.textContent = '';
 
-  if (orderList && orderList.length > 0) {
+  if (orderList && 0 < orderList.length) {
     await Promise.all(
       orderList.map(async (order, index) => {
-        if (order.transactions.length !== 0) {
+        if (order.transactions.length) {
           const fractionDigits = order?.amountPlanned?.fractionDigits;
           const newRow = createTableRow(index, order.id, order.amountPlanned.currencyCode,
             amountConversion(order?.amountPlanned?.centAmount, fractionDigits),

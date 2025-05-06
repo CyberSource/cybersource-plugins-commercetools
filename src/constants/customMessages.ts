@@ -1,4 +1,5 @@
 export abstract class CustomMessages {
+
     static readonly SUCCESS_MSG_CAPTURE_SERVICE = 'Capture is completed successfully';
     static readonly SUCCESS_MSG_CARD_TOKENS_UPDATE = 'Successfully updated card tokens';
     static readonly SUCCESS_MSG_DECISION_SYNC_SERVICE = 'Successfully completed Decision sync';
@@ -8,6 +9,8 @@ export abstract class CustomMessages {
     static readonly SUCCESS_MSG_EXTENSION_CREATION = 'Successfully executed the script';
     static readonly SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS = 'Updated click to pay card details successfully';
     static readonly SUCCESS_MSG_UC_ADDRESS_DETAILS = 'Successfully updated cart address as the UC address';
+    static readonly SUCCESS_MSG_UPDATED_ADDRESS_DETAILS = 'Successfully updated address details';
+    static readonly SUCCESS_MSG_UPDATE_CARD_DETAILS = 'Successfully updated card details';
     static readonly SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN = 'Successfully updated customer token through webhooks API';
     static readonly SUCCESS_MSG_FAV_ICON = 'Resolving favicon.io';
     static readonly SUCCESS_MSG_CONNECTION_TEST = 'Your Cybersource connection is successful';
@@ -46,6 +49,7 @@ export abstract class CustomMessages {
     static readonly EXCEPTION_UPDATE_CUSTOMER_API = 'An exception occurred while updating a Customer';
     static readonly EXCEPTION_MSG_CUSTOMER_OBJECT = 'An exception occurred while fetching customer object';
     static readonly EXCEPTION_MSG_CONNECTION_ERROR = 'An exception occured while testing credentials';
+    static readonly EXCEPTION_MSG_ENV_VARIABLES_NOT_SET = 'Please configure the credentials in env file';
 
     //Error messages
     static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
@@ -110,7 +114,7 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_RETRY_TRANSACTION_SEARCH = 'Missing transaction details';
     static readonly ERROR_MSG_UC_ADDRESS_DETAILS = 'Unable to update the address as the UC address';
     static readonly ERROR_MSG_CAPTURE_CONTEXT = 'Failed to generate capture context';
-    static readonly ERROR_MSG_TRANSIENT_TOKEN_DATA = 'Unable to get transient token data';
+    static readonly ERROR_MSG_TRANSIENT_TOKEN_DATA = 'Unable to fetch transient token data';
     static readonly ERROR_MSG_INVALID_INSTRUMENT_ID_RESPONSE = 'Invalid instrument identifier response';
     static readonly ERROR_MSG_SIGNATURE_DOES_NOT_MATCH = 'Generated signature does not match with header signature';
     static readonly ERROR_MSG_UNHANDLED_REQUEST_METHOD = 'Unhandled request method';
@@ -123,6 +127,11 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_FILE_NOT_FOUND = 'File not found';
     static readonly ERROR_MSG_LIMIT_REACHED = 'You have exceeded your limit, please try again';
     static readonly ERROR_MSG_CUSTOM_FIELDS_NOT_FOUND = 'Custom Field not found';
+    static readonly ERROR_MSG_ADDRESS_NOT_FOUND_IN_TRANSACTION = 'Unable to fetch address from the transaction';
+    static readonly ERROR_MSG_FETCH_CERTIFICATE = 'There was an error fetching p12 certificate';
+    static readonly ERROR_MSG_JWT_ENV_VARIABLE_NOT_SET = 'Please configure the JWT credentials in env file to use Message Level Encryption';
+    static readonly ERROR_MSG_CERTIFICATE_NOT_SET = 'Please provide p12 certificate for the MID to use Message Level Encryption';
+    static readonly ERROR_MSG_INVALID_PATHNAME = 'Invalid Pathname';
 
     //Network token logs
     static readonly ERROR_MSG_INVALID_INSTRUMENT_IDENTIFIER = 'Invalid Instrument identifier';

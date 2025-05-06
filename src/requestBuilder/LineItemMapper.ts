@@ -1,10 +1,11 @@
+import { Cart, Payment } from '@commercetools/platform-sdk';
 import { Ptsv2paymentsidreversalsOrderInformationLineItems, Ptsv2paymentsOrderInformationLineItems } from 'cybersource-rest-client';
 
-import { Constants } from '../constants/constants';
 import { FunctionConstant } from '../constants/functionConstant';
-import { PaymentType } from "../types/Types";
+import { Constants } from '../constants/paymentConstants';
 import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
+
 
 /**
  * Factory class responsible for creating the appropriate line item object 
@@ -41,9 +42,10 @@ class LineItemMapper {
      * @param {number} quantity - The quantity of the product.
      * @param {number} [discountAmount] - The discount applied to the product.
      * @param {number} [taxRate] - The tax rate applied to the product.
-     * @returns {any} - The populated line item object.
+     * @returns {Ptsv2paymentsidreversalsOrderInformationLineItems | Ptsv2paymentsOrderInformationLineItems} - The populated line item object.
      */
-    static mapLineItemValues(functionName: string, lineItemTotalAmount: number, productName: string, productSku: string, productCode: string, unitPrice: number, quantity: number, discountAmount?: number, taxRate?: number) {
+    static mapLineItemValues(functionName: string, lineItemTotalAmount: number, productName: string, productSku: string, productCode: string,
+        unitPrice: number, quantity: number, discountAmount?: number, taxRate?: number): Ptsv2paymentsidreversalsOrderInformationLineItems | Ptsv2paymentsOrderInformationLineItems {
         let orderInformationLineItem = LineItemFactory.createLineItem(functionName);
         orderInformationLineItem.totalAmount = lineItemTotalAmount;
         orderInformationLineItem.productName = productName;
@@ -52,7 +54,7 @@ class LineItemMapper {
         orderInformationLineItem.unitPrice = unitPrice;
         orderInformationLineItem.quantity = quantity;
         orderInformationLineItem.discountAmount = discountAmount;
-        paymentValidator.setObjectValue(orderInformationLineItem, 'taxRate', taxRate, '', Constants.STR_STRING, false);
+        paymentValidator.setObjectValue(orderInformationLineItem, 'taxRate', taxRate, '', Constants.STR_NUMBER, false);
         return orderInformationLineItem;
     }
 }
@@ -69,10 +71,10 @@ export class LineItem {
     private unitPrice: number;
     private lineItemTotalAmount: number;
     private fractionDigits: number;
-    private paymentObj: PaymentType | null;
+    private paymentObj: Payment | null;
     private lineItem: any;
     private item: any;
-    private cartObj: any;
+    private cartObj: Cart;
 
     /**
      * Constructor for the LineItem class, initializes line item properties.
@@ -81,14 +83,14 @@ export class LineItem {
      * @param {string} functionName - The name of the function being called.
      * @param {string} locale - The locale for the item.
      * @param {any} item - Additional item data.
-     * @param {PaymentType | null} paymentObj - The payment object for processing.
+     * @param {Payment | null} paymentObj - The payment object for processing.
      * @param {boolean} isShipping - Flag to indicate if the item is for shipping.
-     * @param {any} cartObj - The cart object containing item details.
+     * @param {Cart} cartObj - The cart object containing item details.
      * @param {boolean} isCustomLineItem - Flag to indicate if the item is a custom line item.
      * @param {boolean} isTotalPriceDiscount - Flag to indicate if the total price is discounted.
      * @param {number} lineItemTotalAmount - The total amount for the line item.
      */
-    constructor(lineItem: any, unitPrice: number, functionName: string, locale: string, item: any, paymentObj: PaymentType | null, isShipping: boolean, cartObj: any, isCustomLineItem: boolean, isTotalPriceDiscount: boolean, lineItemTotalAmount: number) {
+    constructor(lineItem: any, unitPrice: number, functionName: string, locale: string, item: any, paymentObj: Payment | null, isShipping: boolean, cartObj: Cart, isCustomLineItem: boolean, isTotalPriceDiscount: boolean, lineItemTotalAmount: number) {
         this.lineItem = lineItem;
         this.unitPrice = unitPrice;
         this.functionName = functionName;
@@ -120,7 +122,7 @@ export class LineItem {
         let discountPrice = 0;
         let unitPrice: number;
         let quantity: number;
-        let taxRate: number;
+        let taxRate = null;
         let item: any;
         let discountArray: any;
         if (isShipping) {
@@ -128,9 +130,9 @@ export class LineItem {
             discountArray = item?.discountedPrice?.includedDiscounts;
             unitPrice = this.unitPrice;
             quantity = 1;
-            taxRate = this.cartObj?.shipping && this.cartObj.shipping[0]?.shippingInfo?.taxRate?.includedInPrice
-                ? this.cartObj.shipping[0].shippingInfo.taxRate.amount
-                : undefined;
+            if (this.cartObj?.shipping && this.cartObj.shipping[0]?.shippingInfo?.taxRate?.includedInPrice) {
+                taxRate = this.cartObj.shipping[0].shippingInfo.taxRate.amount
+            }
         } else {
             item = this.item || this.lineItem;
             discountArray = item?.discountedPrice?.includedDiscounts;

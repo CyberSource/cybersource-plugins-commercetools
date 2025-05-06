@@ -1,9 +1,11 @@
-import { Constants } from "../../constants/constants";
+import { Cart, Payment } from "@commercetools/platform-sdk";
+
 import { CustomMessages } from "../../constants/customMessages";
 import { FunctionConstant } from "../../constants/functionConstant";
+import { Constants } from "../../constants/paymentConstants";
 import getTransaction from "../../service/payment/GetTransactionData";
 import getTransientTokenData from "../../service/payment/GetTransientTokenData";
-import { ActionType, PaymentType, VisaUpdateType } from "../../types/Types";
+import { ActionType, VisaUpdateType } from "../../types/Types";
 import paymentActions from "../PaymentActions";
 import paymentUtils from "../PaymentUtils";
 import commercetoolsApi from "../api/CommercetoolsApi";
@@ -29,11 +31,11 @@ const getCartDetailsByPaymentId = async (paymentId: string): Promise<any> => {
 /**
  * Updates the cart with address details obtained from transient token data.
  * 
- * @param {PaymentType} updatePaymentObj - The payment object containing updated payment details.
- * @param {any} cartObj - The cart object to be updated.
+ * @param {Payment} updatePaymentObj - The payment object containing updated payment details.
+ * @param {Cart} cartObj - The cart object to be updated.
  * @returns {Promise<any>} - The updated cart object.
  */
-const updateCartWithUCAddress = async (updatePaymentObj: PaymentType, cartObj: any): Promise<any> => {
+const updateCartWithUCAddress = async (updatePaymentObj: Payment, cartObj: Cart): Promise<any> => {
   let message = '';
   let paymentId = updatePaymentObj.id || '';
   let cartId = cartObj?.id;
@@ -64,12 +66,12 @@ const updateCartWithUCAddress = async (updatePaymentObj: PaymentType, cartObj: a
 /**
  * Updates card details for the payment using Visa checkout data.
  * 
- * @param {PaymentType} payment - The payment object.
+ * @param {Payment} payment - The payment object.
  * @param {number} paymentVersion - The version of the payment.
  * @param {string} transactionId - The transaction ID.
  * @returns {Promise<void>} - A promise that resolves when the update is complete.
  */
-const updateCardDetails = async (payment: PaymentType, paymentVersion: number, transactionId: string): Promise<void> => {
+const updateCardDetails = async (payment: Payment, paymentVersion: number, transactionId: string): Promise<void> => {
   let paymentId = payment.id || '';
   const visaObject = {
     transactionId: '',
@@ -78,8 +80,8 @@ const updateCardDetails = async (payment: PaymentType, paymentVersion: number, t
     cartVersion: null,
     paymentVersion: null,
   };
-  let actions: readonly Partial<ActionType>[] = [];
-  let syncVisaCardDetailsResponse: PaymentType | null = null;
+  let actions: Partial<ActionType>[] = [];
+  let syncVisaCardDetailsResponse: Payment | null = null;
   if (payment && paymentVersion) {
     visaObject.transactionId = transactionId;
     const visaCheckoutData = await getPaymentData(visaObject, payment)
@@ -115,10 +117,10 @@ const updateCardDetails = async (payment: PaymentType, paymentVersion: number, t
  * number of attempts with a specified delay between each attempt.
  * 
  * @param {any} paymentResponse - The response object from the payment process, which includes HTTP status and data.
- * @param {PaymentType} updatePaymentObj - The payment object that may contain necessary information for the transaction.
+ * @param {Payment} updatePaymentObj - The payment object that may contain necessary information for the transaction.
  * @returns {Promise<any>} - A promise that resolves to the cart details if successfully retrieved, or undefined if unsuccessful.
  */
-const getPaymentData = async (paymentResponse: any, updatePaymentObj: PaymentType) => {
+const getPaymentData = async (paymentResponse: any, updatePaymentObj: Payment) => {
   let cartDetails: any;
   const transactionId = paymentResponse?.transactionId;
   let getTransactionDataResponse = await getTransaction.getTransactionData(transactionId, updatePaymentObj, null);
@@ -130,10 +132,9 @@ const getPaymentData = async (paymentResponse: any, updatePaymentObj: PaymentTyp
   }
   return cartDetails;
 };
-
 export default {
   getCartDetailsByPaymentId,
   updateCartWithUCAddress,
   updateCardDetails,
-  getPaymentData
+  getPaymentData,
 }

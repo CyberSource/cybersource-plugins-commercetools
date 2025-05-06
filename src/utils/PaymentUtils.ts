@@ -1,22 +1,29 @@
+import fs from 'fs';
 import path from 'path';
+import url from 'url';
 
+import { CartPagedQueryResponse, Customer, Payment, Transaction } from '@commercetools/platform-sdk';
 import axios from 'axios';
 import { PtsV2PaymentsCapturesPost201Response, PtsV2PaymentsPost201Response, PtsV2PaymentsRefundPost201Response, PtsV2PaymentsReversalsPost201Response } from 'cybersource-rest-client';
 import createDOMPurify from 'dompurify';
 import { stringify } from 'flatted';
 import { JSDOM } from 'jsdom';
+import cache from 'memory-cache';
+import forge from 'node-forge';
 import winston from 'winston';
 import { format } from 'winston';
 import 'winston-daily-rotate-file';
 
-import { Constants } from '../constants/constants';
+
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
+import { Constants } from '../constants/paymentConstants';
 import { Token } from '../models/TokenModel';
-import { ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, CustomerType, ErrorType, LoggerConfigType, PaymentCustomFieldsType, PaymentTransactionType, PaymentType, TransactionObjectType } from '../types/Types';
+import { ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, ErrorType, LoggerConfigType, PaymentCustomFieldsType, PaymentTransactionType } from '../types/Types';
 
 import paymentValidator from './PaymentValidator';
 import commercetoolsApi from './api/CommercetoolsApi';
+
 
 const { combine, printf } = format;
 
@@ -59,7 +66,7 @@ const logData = (filePath: string, method: string, type: string, id: string, log
       message: logMessage,
     } as Partial<LoggerConfigType>;
     if (id) {
-      loggerConfig.id = id;
+      loggerConfig.id = encodeURI(id);
     }
     if (consolidatedTime) {
       loggerConfig.consolidatedTime = `${consolidatedTime} Ms`
@@ -191,7 +198,7 @@ const setTransactionId = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2P
  * @returns {{ action: string, state: string, transactionId: string }} - Change state data.
  */
 const changeState = (transactionDetail: Partial<PaymentTransactionType>, state: string) => {
-  const changeStateData = {
+  let changeStateData = {
     action: Constants.CHANGE_TRANSACTION_STATE,
     state: '',
     transactionId: '',
@@ -332,7 +339,7 @@ const invalidInputResponse = (): { actions: Partial<ActionType>[], errors: Error
  * @param {number} pendingTransactionAmount - The pending transaction amount.
  * @returns {Promise<Object>} - A refund response object.
  */
-const getRefundResponseObject = (transaction: Partial<PaymentTransactionType>, pendingTransactionAmount: number): { captureId: string, transactionId: string, pendingTransactionAmount: number } => {
+const getRefundResponseObject = (transaction: Transaction, pendingTransactionAmount: number): { captureId: string, transactionId: string, pendingTransactionAmount: number } => {
   const refundResponseAmountObject = {
     captureId: '',
     transactionId: '',
@@ -411,10 +418,10 @@ const getCertificatesData = async (url: string): Promise<{ status: number; data:
 /**
  * Retrieves the cart object associated with a payment.
  * 
- * @param {PaymentType} paymentObj - The payment object.
+ * @param {Payment} paymentObj - The payment object.
  * @returns {Promise<any>} - A promise containing the cart object.
  */
-const getCartObject = async (paymentObj: PaymentType): Promise<any> => {
+const getCartObject = async (paymentObj: Payment): Promise<CartPagedQueryResponse> => {
   let cartObj = null;
   cartObj = await commercetoolsApi.queryCartById(paymentObj.id, Constants.PAYMENT_ID);
   if (null === cartObj || (cartObj && 0 === cartObj.count)) {
@@ -431,15 +438,15 @@ const getCartObject = async (paymentObj: PaymentType): Promise<any> => {
  * Creates token data based on the provided parameters.
  * 
  * @param {CustomerCustomType} customFields - Custom fields associated with the customer.
- * @param {CustomerType} customerObj - The customer object.
+ * @param {Customer} customerObj - The customer object.
  * @param {string} paymentInstrumentId - The payment instrument ID.
  * @param {string} instrumentIdentifier - The instrument identifier.
  * @param {string} customerTokenId - The customer token ID.
  * @param {AddressType | null} billToFields - The billing address fields.
  * @returns {CustomerTokensType} - The token data.
  */
-const createTokenData = async (customFields: Partial<CustomerCustomType>, customerObj: Partial<CustomerType>, paymentInstrumentId: string, instrumentIdentifier: string, customerTokenId: string, billToFields: AddressType | null) => {
-  const address = Constants.UC_ADDRESS === customerObj.custom?.fields?.isv_addressId ? billToFields : {};
+const createTokenData = async (customFields: Partial<CustomerCustomType>, customerObj: Customer, paymentInstrumentId: string, instrumentIdentifier: string, customerTokenId: string, billToFields: Partial<AddressType> | null) => {
+  const address = Constants.UC_ADDRESS === customerObj.custom?.fields?.isv_addressId ? billToFields : null;
   return new Token(customFields, customerTokenId, paymentInstrumentId, instrumentIdentifier, customFields?.isv_addressId, address)
 };
 
@@ -475,23 +482,14 @@ const createFailedTokenData = async (customFields: Partial<CustomerCustomType>, 
  * @returns {TransactionObjectType} - The created transaction object.
  */
 const createTransactionObject = (version: number | undefined, amountPlanned: AmountPlannedType, transactionType: string | undefined, transactionState: string, interactionId: string | undefined, timeStamp: string | undefined) => {
-  const transactionObject: Partial<TransactionObjectType> = {
+  return {
     amount: amountPlanned,
     state: transactionState,
+    ...(version && { version }),
+    ...(transactionType && { type: transactionType }),
+    ...(interactionId && { interactionId }),
+    ...(timeStamp && { timestamp: timeStamp })
   };
-  if (version) {
-    transactionObject.version = version;
-  }
-  if (transactionType) {
-    transactionObject.type = transactionType;
-  }
-  if (interactionId) {
-    transactionObject.interactionId = interactionId;
-  }
-  if (timeStamp) {
-    transactionObject.timestamp = timeStamp;
-  }
-  return transactionObject;
 };
 
 /**
@@ -614,14 +612,14 @@ const extractTokenValue = (inputElement: any): string => {
  * Updates the parsed token object with new values.
  * 
  * @param {string} token - The token object in string format.
- * @param {CustomerCustomType} customFields - Custom fields related to the token.
+ * @param {Partial<CustomerCustomType>} customFields - Custom fields related to the token.
  * @param {string} paymentInstrumentId - The payment instrument ID.
  * @param {string} customerTokenId - The customer token ID.
  * @param {string} addressId - The address ID.
- * @param {AddressType | null} billToFields - Optional bill to fields.
- * @returns {CustomerTokensType} - The updated parsed token object.
+ * @param {Partial<AddressType>| null} billToFields - Optional bill to fields.
+ * @returns {Partial<CustomerTokensType>} - The updated parsed token object.
  */
-const updateParsedToken = (token: string, customFields: Partial<CustomerCustomType>, paymentInstrumentId: string, customerTokenId: string, addressId: string, billToFields?: AddressType | null): Partial<CustomerTokensType> => {
+const updateParsedToken = (token: string, customFields: Partial<CustomerCustomType>, paymentInstrumentId: string, customerTokenId: string, addressId: string, billToFields?: Partial<AddressType> | null): Partial<CustomerTokensType> => {
   let parsedToken = {} as Partial<CustomerTokensType>;
   if (token && customFields?.isv_tokenAlias && customerTokenId && paymentInstrumentId && customFields.isv_cardExpiryMonth && customFields.isv_cardExpiryYear && addressId) {
     parsedToken = JSON.parse(token);
@@ -752,10 +750,10 @@ const toBoolean = (value: string | undefined): boolean => value?.toLowerCase() =
 /**
  * Retrieves the interaction ID from the payment update object.
  *
- * @param {PaymentType} updatePaymentObj - The payment update object.
+ * @param {Payment} updatePaymentObj - The payment update object.
  * @returns {string} The interaction ID if found, otherwise an empty string.
  */
-const getInteractionId = (updatePaymentObj: PaymentType) => {
+const getInteractionId = (updatePaymentObj: Payment) => {
   let interactionId = '';
   for (let transaction of updatePaymentObj.transactions) {
     if (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION === transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS === transaction.state && transaction?.interactionId) {
@@ -792,6 +790,7 @@ const maskData = (obj: any) => {
   return JSON.stringify(logData);
 };
 
+
 const replaceChar = (logData: any) => {
   const replaceCharacterRegex = /./g;
   const payload = ['email', 'lastName', 'firstName', 'expirationYear', 'expirationMonth', 'phoneNumber', 'cvv', 'securityCode', 'address1', 'postalCode', 'locality', 'address2', 'ipAddress'];
@@ -804,6 +803,96 @@ const replaceChar = (logData: any) => {
       }
     }
   });
+};
+
+const setCertificatecache = async (url: string, keyPass: string, merchantId: string) => {
+  try {
+    const certificateFromCache = cache.get(`cert-${merchantId}`);
+    const filePath = path.resolve(__dirname, '../certificates/test.p12');
+    const stats = await fs.promises.stat(filePath);
+    const currentFileLastModifiedTime = stats.mtime;
+    if (certificateFromCache) {
+      setCache(certificateFromCache, currentFileLastModifiedTime);
+    }
+    else {
+      const response = await axios({
+        method: 'GET',
+        url: url,
+        responseType: 'arraybuffer'
+      });
+      if (Constants.HTTP_OK_STATUS_CODE === response.status && response.data) {
+        const p12Buffer = response.data;
+        const p12Der = forge.util.binary.raw.encode(new Uint8Array(p12Buffer));
+        const p12Asn1 = forge.asn1.fromDer(p12Der);
+        const certificate = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, keyPass);
+        setCache(certificate, currentFileLastModifiedTime);
+        cache.put(`cert-${merchantId}`, certificate);
+      } else {
+        logData(__filename, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_FETCH_CERTIFICATE);
+      }
+    }
+  } catch (exception: any) {
+    if (typeof exception === Constants.STR_OBJECT && exception.message) {
+      logExceptionData(__filename, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE, exception.message, exception, '', '', '',);
+    } else {
+      logExceptionData(__filename, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE, '', exception, '', '', '',);
+    }
+  }
+};
+
+const setCache = (certificate: any, timeStamp: Date) => {
+  cache.put("certificateLastModifideTimeStamp", timeStamp);
+  cache.put("certificateFromP12File", certificate);
+}
+
+const sanitize = (input: any) => {
+  if (typeof input === 'string') {
+    return input.replace(/[\n\r]/g, '');
+  }
+  return input;
+};
+
+const validatePathname = (pathname: any) => {
+  const validPathnamePattern = /^\/[a-zA-Z0-9\-/]+$/;
+  return validPathnamePattern.test(pathname);
+};
+
+const sanitizeAndValidateUrl = (req: any) => {
+  const originalUrl = url.parse(req.url, true);
+  if (!validatePathname(originalUrl.pathname || '')) {
+    logData(__filename, FunctionConstant.FUNC_SANITIZE_AND_VALIDATE_URL, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_INVALID_PATHNAME);
+    return null;
+  }
+  const sanitizedUrl: any = {
+    ...originalUrl,
+    pathname: sanitize(originalUrl.pathname || ''),
+    query: {}
+  };
+  if (originalUrl.query) {
+    Object.entries(originalUrl.query).forEach(([key, value]) => {
+      sanitizedUrl.query[key] = sanitize(String(value));
+    });
+  }
+  return sanitizedUrl;
+};
+/**
+ * Validates if the given path is an allowed redirect path.
+ * If the path is not in the allowed list, it defaults to "/orders".
+ *
+ * @param {string} path - The requested redirect path.
+ * @returns {string} - The validated redirect path (either an allowed path or "/orders").
+ */
+const validateRedirectPaths = (paths: string) => {
+  const allowedPaths = ['/orders', '/paymentDetails'];
+  if (!allowedPaths.some(path => paths.startsWith(path))) {
+    paths = '/orders';
+  }
+  return paths;
+}
+
+const validateId = (pathname: any) => {
+  const validPathnamePattern = /^[a-zA-Z0-9_-]+$/;
+  return validPathnamePattern.test(pathname);
 };
 
 export default {
@@ -842,5 +931,9 @@ export default {
   logRateLimitException,
   getInteractionId,
   validatePaymentId,
-  maskData
+  maskData,
+  setCertificatecache,
+  sanitizeAndValidateUrl,
+  validateRedirectPaths,
+  validateId
 };

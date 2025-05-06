@@ -1,7 +1,7 @@
-import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
-import { MidCredentialsType } from '../../types/Types';
+import { Constants } from '../../constants/paymentConstants';
+import { KeyCredentialsType, MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../PaymentUtils';
 
 /**
@@ -10,12 +10,8 @@ import paymentUtils from '../PaymentUtils';
  * @param {string} merchantId - The ID of the merchant.
  * @returns {Promise<MidCredentialsType>} A promise that resolves with the merchant credentials.
  */
-const getMidCredentials = (merchantId: string): MidCredentialsType => {
-  let midData: MidCredentialsType = {
-    merchantId: '',
-    merchantKeyId: '',
-    merchantSecretKey: '',
-  };
+const getMidCredentials = (merchantId: string) => {
+  let midData = {} as any;
   let allMidCredentials = [midData];
   if ('' === merchantId) {
     midData = {
@@ -39,7 +35,7 @@ const getMidCredentials = (merchantId: string): MidCredentialsType => {
  * @returns {MidCredentialsType[]} A promise that resolves with an array of merchant credentials.
  */
 const getAllMidDetails = (): MidCredentialsType[] => {
-  let secretKeyPrefix: string;
+  let merchantIdPrefix: string;
   let keyId: string;
   let secretKey: string;
   const environment = process?.env;
@@ -47,19 +43,19 @@ const getAllMidDetails = (): MidCredentialsType[] => {
   const midArray: MidCredentialsType[] = [];
   if (environment) {
     for (let variable in environment) {
-      if (variable.includes(Constants.STRING_SECRET_KEY) && 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY' !== variable) {
-        secretKeyIndex = variable.indexOf(Constants.STRING_SECRET_KEY);
-        secretKeyPrefix = variable.slice(0, secretKeyIndex);
-        keyId = process.env[secretKeyPrefix + '_KEY_ID'] || '';
+      if (variable.includes('_SECRET_KEY') && 'PAYMENT_GATEWAY_MERCHANT_SECRET_KEY' !== variable) {
+        secretKeyIndex = variable.indexOf('_SECRET_KEY');
+        merchantIdPrefix = variable.slice(0, secretKeyIndex);
+        keyId = process.env[merchantIdPrefix + '_KEY_ID'] || '';
         secretKey = process.env[variable] || '';
-        if (secretKeyPrefix && keyId && secretKey) {
+        if (merchantIdPrefix && keyId && secretKey) {
           midArray.push({
-            merchantId: secretKeyPrefix.toLowerCase(),
+            merchantId: merchantIdPrefix.toLowerCase(),
             merchantKeyId: keyId,
             merchantSecretKey: secretKey,
           });
         } else {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ALL_MID_DETAILS, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_ENV_VARIABLES_NOT_FOUND + secretKeyPrefix.toLowerCase());
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_ALL_MID_DETAILS, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_ENV_VARIABLES_NOT_FOUND + merchantIdPrefix.toLowerCase());
         }
       }
     }
@@ -67,7 +63,71 @@ const getAllMidDetails = (): MidCredentialsType[] => {
   return midArray;
 };
 
+/**
+ * Retrieves key credentials for a given merchant ID from environment variables.
+ *
+ * The function first checks if the default environment variables are set for the given merchant ID.
+ * If not, it searches for merchant-specific prefixed variables to construct the key credentials.
+ *
+ * @param merchantId - The merchant ID for which key credentials are to be retrieved.
+ * @returns An object containing key file name, key alias, key file URL, and key password.
+ */
+const getKeyCredentials = (merchantId: string): Partial<KeyCredentialsType> => {
+  let fileNamePrefix = '';
+  let keyFileName = '';
+  let keyAlias: string;
+  let keyFileUrl: string;
+  const environment = process?.env;
+  let fileNameIndex = 0;
+  let keyCredentials: Partial<KeyCredentialsType> = {
+    keyFileName: '',
+    keyAlias: '',
+    keyFileUrl: '',
+  };
+  const { PAYMENT_GATEWAY_MERCHANT_ID, PAYMENT_GATEWAY_KEY_FILE_NAME, PAYMENT_GATEWAY_KEY_ALIAS, PAYMENT_GATEWAY_KEY_FILE_URL, PAYMENT_GATEWAY_KEY_PASS } = process.env || '';
+  if (environment) {
+    if (PAYMENT_GATEWAY_MERCHANT_ID === merchantId && (PAYMENT_GATEWAY_KEY_FILE_NAME || PAYMENT_GATEWAY_KEY_FILE_URL) && PAYMENT_GATEWAY_KEY_PASS) {
+      keyCredentials = {
+        keyFileName: PAYMENT_GATEWAY_KEY_FILE_NAME,
+        keyAlias: PAYMENT_GATEWAY_KEY_ALIAS,
+        keyFileUrl: PAYMENT_GATEWAY_KEY_FILE_URL,
+        keyPass: PAYMENT_GATEWAY_KEY_PASS
+      };
+    } else {
+      for (let variable in environment) {
+        if ((variable.includes(Constants.STRING_FILE_NAME) && 'PAYMENT_GATEWAY_KEY_FILE_NAME' !== variable) || (variable.includes(Constants.STRING_FILE_URL) && 'PAYMENT_GATEWAY_KEY_FILE_URL' !== variable)) {
+          if (variable.indexOf(Constants.STRING_FILE_NAME)) {
+            fileNameIndex = variable.indexOf(Constants.STRING_FILE_NAME)
+          }
+          if (variable.indexOf(Constants.STRING_FILE_URL)) {
+            fileNameIndex = variable.indexOf(Constants.STRING_FILE_URL)
+          }
+          fileNamePrefix = variable.slice(0, fileNameIndex);
+          if (fileNamePrefix.toLowerCase() === merchantId) {
+            const keyPass = process.env[fileNamePrefix + '_KEY_PASS'] || '';
+            keyAlias = process.env[fileNamePrefix + '_KEY_ALIAS'] || '';
+            keyFileUrl = process.env[fileNamePrefix + '_KEY_FILE_URL'] || '';
+            keyFileName = process.env[fileNamePrefix + '_KEY_FILE_NAME'] || '';
+            if (keyPass && (keyFileName || keyFileUrl)) {
+              keyCredentials = {
+                keyFileName: keyFileName,
+                keyAlias: keyAlias,
+                keyFileUrl: keyFileUrl,
+                keyPass: keyPass
+              };
+            } else {
+              paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_KEY_CREDENTIALS, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_ENV_VARIABLES_NOT_FOUND + fileNamePrefix.toLowerCase());
+            }
+          }
+        }
+      }
+    }
+  }
+  return keyCredentials;
+};
+
 export default {
   getMidCredentials,
   getAllMidDetails,
+  getKeyCredentials
 };

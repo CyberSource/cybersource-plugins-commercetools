@@ -18,6 +18,7 @@ declare module "cybersource-rest-client" {
       logDirectory?: string;
       logFileMaxSize?: string;
     };
+    useMLEGlobally?: boolean;
   }
 
   export class ApiClient {
@@ -214,6 +215,7 @@ declare module "cybersource-rest-client" {
     processingInformation?: Ptsv2paymentsidreversalsProcessingInformation;
     orderInformation?: Ptsv2paymentsidreversalsOrderInformation;
     pointOfSaleInformation?: Ptsv2paymentsidreversalsPointOfSaleInformation;
+    paymentInformation?: Ptsv2paymentsPaymentInformation;
   }
   export interface CapturePaymentRequest {
     clientReferenceInformation?: Ptsv2paymentsClientReferenceInformation;
@@ -358,6 +360,27 @@ declare module "cybersource-rest-client" {
     acquirerInformation?: Ptsv2paymentsAcquirerInformation;
     recurringPaymentInformation?: Ptsv2paymentsRecurringPaymentInformation;
   }
+
+  export interface CheckStatusRequest {
+    processingInformation?: Ptsv2paymentsProcessingInformation;
+    paymentInformation?: Ptsv2paymentsPaymentInformation;
+  }
+
+  export interface CreateOrderRequest {
+    clientReferenceInformation?: Ptsv2paymentsClientReferenceInformation;
+    processingInformation?: Ptsv2paymentsProcessingInformation;
+    paymentInformation?: Ptsv2paymentsPaymentInformation;
+    orderInformation?: Ptsv2paymentsOrderInformation;
+  }
+
+  export interface CreateSessionRequest {
+    clientReferenceInformation?: Ptsv2paymentsClientReferenceInformation;
+    processingInformation?: Ptsv2paymentsProcessingInformation;
+    paymentInformation?: Ptsv2paymentsPaymentInformation;
+    orderInformation?: Ptsv2paymentsOrderInformation;
+    merchantInformation?: Ptsv2paymentsMerchantInformation;
+  }
+
   export interface CreateReportSubscriptionRequest {
     /**
      * Valid CyberSource organizationId
@@ -3885,7 +3908,7 @@ declare module "cybersource-rest-client" {
     /**
      * Your identifier for the customer.  When a subscription or customer profile is being created, the maximum length for this field for most processors is 30. Otherwise, the maximum length is 100.  #### Comercio Latino For recurring payments in Mexico, the value is the customer’s contract number. Note Before you request the authorization, you must inform the issuer of the customer contract numbers that will be used for recurring transactions.  #### Worldpay VAP For a follow-on credit with Worldpay VAP, CyberSource checks the following locations, in the order given, for a customer account ID value and uses the first value it finds: 1. `customer_account_id` value in the follow-on credit request 2. Customer account ID value that was used for the capture that is being credited 3. Customer account ID value that was used for the original authorization If a customer account ID value cannot be found in any of these locations, then no value is used.  For processor-specific information, see the `customer_account_id` field description in [Credit Card Services Using the SCMP API.](http://apps.cybersource.com/library/documentation/dev_guides/CC_Svcs_SCMP_API/html)
      */
-    merchantCustomerId?: string;
+    merchantCustomerID?: string;
     dateOfBirth?: string;
     /**
      * Customer’s government-assigned tax identification number.  #### Tax Calculation Optional for international and value added taxes only. Not applicable to U.S. and Canadian taxes.  For processor-specific information, see the purchaser_vat_registration_number field in [Level II and Level III Processing Using the SCMP API.](http://apps.cybersource.com/library/documentation/dev_guides/Level_2_3_SCMP_API/html)
@@ -4331,7 +4354,7 @@ declare module "cybersource-rest-client" {
     /**
      * Payment plan for the installments.  Possible values: - 0 (default): Regular installment. This value is not allowed for airline transactions. - 1: Installment payment with down payment. - 2: Installment payment without down payment. This value is supported only for airline transactions. - 3: Installment payment; down payment and boarding fee will follow. This value is supported only for airline transactions. - 4: Down payment only; regular installment payment will follow. - 5: Boarding fee only. This value is supported only for airline transactions.  This field is supported only for installment payments with Visa on CyberSource through VisaNet in Brazil.  For details, see \"Installment Payments on CyberSource through VisaNet\" in the [Credit Card Services Using the SCMP API Guide.](https://apps.cybersource.com/library/documentation/dev_guides/CC_Svcs_SCMP_API/html/)  The value for this field corresponds to the following data in the TC 33 capture file5: - Record: CP07 TCR1 - Position: 9 - Field: Merchant Installment Supporting Information
      */
-    paymentType?: string;
+    Payment?: string;
     /**
      * Indicates whether the authorization request is a Crediario eligibility inquiry.  For details, see \"Installment Payments on CyberSource through VisaNet\" in the [Credit Card Services Using the SCMP API Guide.](https://apps.cybersource.com/library/documentation/dev_guides/CC_Svcs_SCMP_API/html/)  Set the value for this field to `Crediario`.  This field is supported only for Crediario installment payments in Brazil on CyberSource through VisaNet.
      */
@@ -4400,6 +4423,10 @@ declare module "cybersource-rest-client" {
      * Use this field only if you are requesting payment with Payer Authentication serice together.  Your company’s name as you want it to appear to the customer in the issuing bank’s authentication form. This value overrides the value specified by your merchant bank.
      */
     merchantName?: string;
+
+    successUrl?: string;
+    cancelUrl?: string;
+    failureUrl?: string;
   }
   export interface Ptsv2paymentsMerchantInformationMerchantDescriptor {
     /**
@@ -5057,7 +5084,7 @@ declare module "cybersource-rest-client" {
     shippingAddress?: Ptsv2paymentsPaymentInformationShippingAddress;
     legacyToken?: Ptsv2paymentsPaymentInformationLegacyToken;
     bank?: Ptsv2paymentsPaymentInformationBank;
-    paymentType?: Ptsv2paymentsPaymentInformationPaymentType;
+    Payment?: Ptsv2paymentsPaymentInformationPaymentType;
     /**
      * Mastercard-defined code that indicates how the account information was obtained.  - `00` (default): Card - `01`: Removable secure element that is personalized for use with a mobile phone and controlled by the wireless service provider; examples: subscriber identity module (SIM), universal integrated circuit card (UICC) - `02`: Key fob - `03`: Watch - `04`: Mobile tag - `05`: Wristband - `06`: Mobile phone case or sleeve - `07`: Mobile phone with a non-removable, secure element that is controlled by the wireless service provider; for example, code division multiple access (CDMA) - `08`: Removable secure element that is personalized for use with a mobile phone and not controlled by the wireless service provider; example: memory card - `09`: Mobile phone with a non-removable, secure element that is not controlled by the wireless service provider - `10`: Removable secure element that is personalized for use with a tablet or e-book and is controlled by the wireless service provider; examples: subscriber identity module (SIM), universal integrated circuit card (UICC) - `11`: Tablet or e-book with a non-removable, secure element that is controlled by the wireless service provider - `12`: Removable secure element that is personalized for use with a tablet or e-book and is not controlled by the wireless service provider - `13`: Tablet or e-book with a non-removable, secure element that is not controlled by the wireless service provider  This field is supported only for Mastercard on CyberSource through VisaNet.  #### Used by **Authorization** Optional field.
      */
@@ -5455,6 +5482,7 @@ declare module "cybersource-rest-client" {
      * On PIN Debit Gateways: This U.S.-only field is optionally used by  participants (merchants and acquirers) to specify the network access priority. VisaNet checks to determine if there are issuer routing preferences for any of the networks specified by the sharing group code. If an issuer preference exists for one of the specified debit networks, VisaNet makes a routing selection based on the issuer’s preference. If an issuer preference exists for more than one of the specified debit networks, or if no issuer preference exists, VisaNet makes a selection based on the acquirer’s routing priorities.  #### PIN debit Priority order of the networks through which he transaction will be routed. Set this value to a series of one-character network codes in your preferred order. This is a list of the network codes:  | Network | Code | | --- | --- | | Accel | E | | AFFN | U | | Alaska Option | 3 | | CU24 | C | | Interlink | G | | Maestro | 8 | | NETS | P | | NYCE | F | | Pulse | H | | Shazam | 7 | | Star | M | | Visa | V |  For example, if the Star network is your first preference and Pulse is your second preference, set this field to a value of `MH`.  When you do not include this value in your PIN debit request, the list of network codes from your account is used. **Note** This field is supported only for businesses located in the U.S.  Optional field for PIN debit credit or PIN debit purchase.
      */
     networkRoutingOrder?: string;
+    intentsId?: string
   }
   export interface Ptsv2paymentsProcessingInformationAuthorizationOptions {
     /**
@@ -6744,7 +6772,7 @@ declare module "cybersource-rest-client" {
     /**
      * Payment plan for the installments.  Possible values: - 0 (default): Regular installment. This value is not allowed for airline transactions. - 1: Installment payment with down payment. - 2: Installment payment without down payment. This value is supported only for airline transactions. - 3: Installment payment; down payment and boarding fee will follow. This value is supported only for airline transactions. - 4: Down payment only; regular installment payment will follow. - 5: Boarding fee only. This value is supported only for airline transactions.  This field is supported only for installment payments with Visa on CyberSource through VisaNet in Brazil.  For details, see \"Installment Payments on CyberSource through VisaNet\" in the [Credit Card Services Using the SCMP API Guide.](https://apps.cybersource.com/library/documentation/dev_guides/CC_Svcs_SCMP_API/html/)  The value for this field corresponds to the following data in the TC 33 capture file5: - Record: CP07 TCR1 - Position: 9 - Field: Merchant Installment Supporting Information
      */
-    paymentType?: string;
+    Payment?: string;
     /**
      * Additional costs charged by the issuer to fund the installment payments.  This field is included in the authorization reply for the Crediario eligibility request when the issuer approves the cardholder's request for Crediario installment payments in Brazil.  For details, see \"Installment Payments on CyberSource through VisaNet\" in the [Credit Card Services Using the SCMP API Guide.](https://apps.cybersource.com/library/documentation/dev_guides/CC_Svcs_SCMP_API/html/)  This field is supported only for Crediario installment payments in Brazil on **CyberSource through VisaNet**.  The value for this field corresponds to the following data in the TC 33 capture file1: - Record: CP01 TCR9 - Position: 128-139 - Field: Total Other Costs
      */
@@ -7205,7 +7233,7 @@ declare module "cybersource-rest-client" {
     instrumentIdentifier?: Ptsv2paymentsPaymentInformationInstrumentIdentifier;
     shippingAddress?: Ptsv2paymentsPaymentInformationShippingAddress;
     legacyToken?: Ptsv2paymentsPaymentInformationLegacyToken;
-    paymentType?: Ptsv2paymentsPaymentInformationPaymentType;
+    Payment?: Ptsv2paymentsPaymentInformationPaymentType;
   }
   export interface Ptsv2paymentsidrefundsPaymentInformationCard {
     /**
@@ -7436,7 +7464,7 @@ declare module "cybersource-rest-client" {
     currency?: string;
   }
   export interface Ptsv2paymentsidvoidsPaymentInformation {
-    paymentType?: Ptsv2paymentsPaymentInformationPaymentType;
+    Payment?: Ptsv2paymentsPaymentInformationPaymentType;
   }
   export interface Ptsv2payoutsClientReferenceInformation {
     /**
@@ -8188,7 +8216,7 @@ declare module "cybersource-rest-client" {
     /**
      * Payment Type
      */
-    paymentType?: string;
+    Payment?: string;
     /**
      * Account Suffix
      */
@@ -9792,13 +9820,13 @@ declare module "cybersource-rest-client" {
      */
     'comments'?: string;
     'partner'?: Riskv1decisionsClientReferenceInformationPartner;
-     /**
+    /**
      * The name of the Connection Method client (such as Virtual Terminal or SOAP Toolkit API) that the merchant uses to send a transaction request to CyberSource.
      */
     'applicationName'?: string;
     /**
-     * Version of the CyberSource application or integration used for a transaction.
-     */
+    * Version of the CyberSource application or integration used for a transaction.
+    */
     'applicationVersion'?: string;
   }
   export interface Riskv1decisionsClientReferenceInformationPartner {
@@ -11803,7 +11831,7 @@ declare module "cybersource-rest-client" {
     shippingMethod?: string;
   }
   export interface TssV2TransactionsGet200ResponsePaymentInformation {
-    paymentType?: TssV2TransactionsGet200ResponsePaymentInformationPaymentType;
+    Payment?: TssV2TransactionsGet200ResponsePaymentInformationPaymentType;
     customer?: Riskv1authenticationsetupsPaymentInformationCustomer;
     card?: TssV2TransactionsGet200ResponsePaymentInformationCard;
     invoice?: TssV2TransactionsGet200ResponsePaymentInformationInvoice;
@@ -12365,7 +12393,7 @@ declare module "cybersource-rest-client" {
     phoneNumber?: string;
   }
   export interface TssV2TransactionsPost201ResponseEmbeddedPaymentInformation {
-    paymentType?: TssV2TransactionsPost201ResponseEmbeddedPaymentInformationPaymentType;
+    Payment?: TssV2TransactionsPost201ResponseEmbeddedPaymentInformationPaymentType;
     customer?: Riskv1authenticationsetupsPaymentInformationCustomer;
     card?: TssV2TransactionsPost201ResponseEmbeddedPaymentInformationCard;
   }
@@ -13511,6 +13539,7 @@ declare module "cybersource-rest-client" {
      * @param eventType The Event Type.
      * @param {*} [options] Override http request options.
      */
+    getWebhookSubscriptionsByOrg(organizationId: string, productId: string, eventType: string, callback?: any): InlineResponse2005
     // getWebhookSubscriptionsByOrg (organizationId: string, productId: string, eventType: string, callback?: any) : Array&lt;InlineResponse2004&gt;;
     /**
      * Store and manage certificates that will be used to preform Message Level Encryption (MLE). Each new webhook will need its own unique asymmetric certificate. You can either use a digital certificate issued/signed by a CA or self-sign your own using the documentation available on the Developer Guide. 
@@ -14412,6 +14441,24 @@ declare module "cybersource-rest-client" {
       incrementAuthRequest: IncrementAuthRequest,
       callback?: any,
     ): PtsV2IncrementalAuthorizationPatch201Response;
+
+
+    refreshPaymentStatus(
+      id: string,
+      checkStatusRequest: CheckStatusRequest,
+      callback?: any,
+    ): PtsV2PaymentsPost201Response;
+
+    createOrderRequest(
+      createOrderRequest: CreateOrderRequest,
+      id: string,
+      callback?: any,
+    ): PtsV2PaymentsPost201Response;
+
+    createSessionRequest(
+      createSessionRequest: CreateSessionRequest,
+      callback?: any,
+    ): PtsV2PaymentsPost201Response;
   }
 
   export class PayoutsApi {

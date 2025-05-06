@@ -1,7 +1,9 @@
 import crypto from 'crypto';
 
-import { Constants } from '../../constants/constants';
+import { CustomObjectPagedQueryResponse } from '@commercetools/platform-sdk';
+
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import paymentUtils from "../PaymentUtils";
 import commercetoolsApi from '../api/CommercetoolsApi';
 
@@ -76,7 +78,7 @@ const authenticateNetToken = async (signature: any, notification: any): Promise<
                 const timeStamp = signatureInfo[0].split('=')[1].trim();
                 const keyId = signatureInfo[1].split('=')[1].trim();
                 const sign = signatureInfo[2].split('sig=')[1].trim();
-                const getCustomObjectSubscriptions = await commercetoolsApi.retrieveCustomObjectByContainer(Constants.CUSTOM_OBJECT_CONTAINER);
+                const getCustomObjectSubscriptions: CustomObjectPagedQueryResponse = await commercetoolsApi.retrieveCustomObjectByContainer(Constants.CUSTOM_OBJECT_CONTAINER);
                 if (0 < getCustomObjectSubscriptions?.results?.length) {
                     const subscriptionData = await getCustomObjectSubscriptions?.results[0]?.value?.find((customObject: any) => notification?.webhookId === customObject?.webhookId && keyId === customObject?.keyId);
                     if (timeStamp && keyId && sign && payloadBody && subscriptionData?.key) {

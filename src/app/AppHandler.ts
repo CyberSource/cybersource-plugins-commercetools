@@ -4,9 +4,9 @@ import url from 'url';
 
 import cors from 'cors';
 
-import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
+import { Constants } from '../constants/paymentConstants';
 import paymentUtils from '../utils/PaymentUtils';
 
 import { RouterHandler } from './RouterHandler';
@@ -74,19 +74,9 @@ export class AppHandler extends RouterHandler {
               }
               break;
             }
-            case '/billingImage.png': {
-              if (parsedUrl.path) {
-                this._serveStaticFile(parsedUrl.href, parsedUrl.path, rootDir + '/views/images/billingImage.png', res);
-              }
-              break;
-            }
-            case '/shippingImage.png': {
-              this._serveStaticFile(parsedUrl.href, parsedUrl.pathname, rootDir + '/views/images/shippingImage.png', res);
-              break;
-            }
             case '/favicon.ico': {
               paymentUtils.logData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, Constants.LOG_INFO, '', CustomMessages.SUCCESS_MSG_FAV_ICON);
-              res.statusCode = 400;
+              res.statusCode = 204;
               res.end();
               break;
             }

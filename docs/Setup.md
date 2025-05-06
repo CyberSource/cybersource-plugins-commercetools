@@ -49,7 +49,6 @@ The bulk of integration works when using the Cybersource-Commercetools Extension
 
 For setting up client-side application on any of the payment methods, use the following guide:
 - Card Payment - [Microform Setup](Microform-Setup.md)
-- Visa Click to Pay - [Visa Click to Pay Setup](Visa-ClicktoPay-Setup.md)
 - Google Pay - [Google Pay Setup](GooglePay-Setup.md)
 - Apple Pay - [Apple Pay Setup](ApplePay-Setup.md)
 - eCheck - [eCheck Setup](eCheck-Setup.md)

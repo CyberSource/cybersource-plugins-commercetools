@@ -1,14 +1,14 @@
+import { Payment } from '@commercetools/platform-sdk';
 import { Ptsv2paymentsidrefundsPaymentInformation, Ptsv2paymentsPaymentInformation, Ptsv2paymentsPaymentInformationBank, Ptsv2paymentsPaymentInformationBankAccount, Ptsv2paymentsPaymentInformationCard, Ptsv2paymentsPaymentInformationCustomer, Ptsv2paymentsPaymentInformationFluidData, Riskv1authenticationsetupsPaymentInformation } from 'cybersource-rest-client';
 
-import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
-import { CustomTokenType, PaymentCustomFieldsType, PaymentType } from '../types/Types';
+import { Constants } from '../constants/paymentConstants';
+import { CustomTokenType, PaymentCustomFieldsType } from '../types/Types';
 import paymentUtils from '../utils/PaymentUtils';
 import paymentValidator from '../utils/PaymentValidator';
 
 export class PaymentInformationModel {
-
     /**
      * Maps payment information based on the function and payment method.
      * @param functionName - The function being processed (e.g. authorization, refund).
@@ -17,16 +17,16 @@ export class PaymentInformationModel {
      * @param customerTokenId - Tokenized customer ID.
      * @returns The mapped payment information object based on the function.
      */
-    public mapPaymentInformation(functionName: string, resourceObj: PaymentType | null, cardTokens: CustomTokenType | null, customerTokenId: string | null) {
+    public mapPaymentInformation(functionName: string, resourceObj: Payment | null, cardTokens: CustomTokenType | null, customerTokenId: string | null) {
         let paymentInformation: any;
-        if ((FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName || FunctionConstant.FUNC_GET_REFUND_DATA === functionName) && resourceObj?.paymentMethodInfo?.method) {
+        if (Constants.MAP_PAYMENT_INFORMATION_FUNCTIONS.includes(functionName) && resourceObj?.paymentMethodInfo?.method) {
             paymentInformation = functionName === FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE ? {} as Ptsv2paymentsPaymentInformation
                 : {} as Ptsv2paymentsidrefundsPaymentInformation;
             const customFields = resourceObj?.custom?.fields;
             switch (resourceObj.paymentMethodInfo.method) {
                 case Constants.ECHECK:
                     paymentInformation.bank = this.setPaymentInformationBankDetails(customFields);
-                    paymentInformation.paymentType = { name: Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE };
+                    paymentInformation.Payment = { name: Constants.PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE };
                     break;
                 case Constants.GOOGLE_PAY:
                     paymentInformation.fluidData = this.setFluidData(customFields?.isv_token || '');
@@ -39,9 +39,6 @@ export class PaymentInformationModel {
                     if (customFields?.isv_savedToken) {
                         paymentInformation.customer = this.setPaymentInformationCustomerDetails(cardTokens?.customerTokenId);
                         paymentInformation.paymentInstrument = { id: cardTokens?.paymentInstrumentId };
-                        if (customFields?.isv_securityCode) {
-                            paymentInformation.card = this.setPaymentInformationCardDetails(customFields.isv_securityCode);
-                        }
                     } else {
                         if (cardTokens?.customerTokenId) {
                             paymentInformation.customer = this.setPaymentInformationCustomerDetails(cardTokens.customerTokenId);
@@ -79,9 +76,8 @@ export class PaymentInformationModel {
      * @param securityCode - Optional security code for the card.
      * @returns The mapped card object.
      */
-    private setPaymentInformationCardDetails(securityCode?: number) {
+    private setPaymentInformationCardDetails() {
         const card = {} as Ptsv2paymentsPaymentInformationCard
-        paymentValidator.setObjectValue(card, 'securityCode', securityCode, '', Constants.STR_NUMBER, false);
         card.typeSelectionIndicator = 1;
         return card;
     }

@@ -1,7 +1,7 @@
 import restApi from 'cybersource-rest-client';
 
-import { Constants } from '../../constants/constants';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { KeyResponse, MidCredentialsType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
@@ -23,7 +23,7 @@ const getKeyGenerationResponse = async (midCredentials: MidCredentialsType): Pro
   };
   let opts: any;
   const apiClient = new restApi.ApiClient();
-  const configObject = prepareFields.getConfigObject(FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, midCredentials, null, null);
+  const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, midCredentials, null, null);
   if (configObject) {
     merchantId = configObject.merchantID;
     opts = {
@@ -39,31 +39,36 @@ const getKeyGenerationResponse = async (midCredentials: MidCredentialsType): Pro
       },
     };
   }
-  const createNewWebhooksApiInstance = configObject && new restApi.CreateNewWebhooksApi(configObject, apiClient);
-  const startTime = new Date().getTime();
-  return await new Promise<KeyResponse>((resolve, reject) => {
-    if (createNewWebhooksApiInstance) {
-      createNewWebhooksApiInstance.saveSymEgressKey(merchantId, vCPermissions, opts, function (error: any, data: any, response: any) {
-        const endTime = new Date().getTime();
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, Constants.LOG_DEBUG, '', paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
-        if (data) {
-          keyResponse.httpCode = response.status;
-          keyResponse.organizationId = data.keyInformation.organizationId;
-          keyResponse.key = data.keyInformation.key;
-          keyResponse.keyId = data.keyInformation.keyId;
-          keyResponse.keyExpiration = data.keyInformation.expirationDate;
-          resolve(keyResponse);
-        } else if (error) {
-          keyResponse.httpCode = error.status;
-          reject(keyResponse);
-        } else {
-          reject(keyResponse);
-        }
-      });
-    }
-  }).catch((error) => {
-    return error;
-  });
+  try {
+    const createNewWebhooksApiInstance = configObject && new restApi.CreateNewWebhooksApi(configObject, apiClient);
+    const startTime = new Date().getTime();
+    return await new Promise<KeyResponse>((resolve, reject) => {
+      if (createNewWebhooksApiInstance) {
+        createNewWebhooksApiInstance.saveSymEgressKey(merchantId, vCPermissions, opts, function (error: any, data: any, response: any) {
+          const endTime = new Date().getTime();
+          paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, Constants.LOG_DEBUG, '', paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
+          if (data) {
+            keyResponse.httpCode = response.status;
+            keyResponse.organizationId = data.keyInformation.organizationId;
+            keyResponse.key = data.keyInformation.key;
+            keyResponse.keyId = data.keyInformation.keyId;
+            keyResponse.keyExpiration = data.keyInformation.expirationDate;
+            resolve(keyResponse);
+          } else if (error) {
+            keyResponse.httpCode = error.status;
+            reject(keyResponse);
+          } else {
+            reject(keyResponse);
+          }
+        });
+      }
+    }).catch((error) => {
+      return error;
+    });
+  } catch (exception) {
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, '', exception, '', '', '');
+    return keyResponse;
+  }
 };
 
 export default { getKeyGenerationResponse };

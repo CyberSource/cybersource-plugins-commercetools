@@ -1,9 +1,11 @@
-import { Constants } from "../../constants/constants";
+import { Cart, Customer, Payment } from "@commercetools/platform-sdk";
+
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from "../../constants/paymentConstants";
 import paymentAuthSetUp from '../../service/payment/PayerAuthenticationSetupService';
 import paymentAuthorization from '../../service/payment/PaymentAuthorizationService';
-import { ActionResponseType, CustomerType, CustomTokenType, PaymentCustomFieldsType, PaymentType, TokenCreateFlagType } from '../../types/Types';
+import { ActionResponseType, CustomTokenType, PaymentCustomFieldsType, TokenCreateFlagType } from '../../types/Types';
 import paymentActions from '../PaymentActions';
 import paymentUtils from "../PaymentUtils";
 import paymentValidator from '../PaymentValidator';
@@ -16,16 +18,16 @@ import tokenHelper from "./TokenHelper";
 /**
  * Processes the payer authentication enroll tokens.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
  * @param {TokenCreateFlagType} tokenCreateResponse - Token create response.
  * @param {PaymentCustomFieldsType} customFields - Custom fields.
  * @param {string} cardinalReferenceId - Cardinal reference ID.
- * @param {any} cartObj - Cart object.
+ * @param {Cart} cartObj - Cart object.
  * @param {CustomTokenType} cardTokens - Card tokens.
  * @param {string} orderNo - Order number.
  * @returns {Promise<ActionResponseType>} - Action response for payer authentication enrollment.
  */
-const getEnrollResponseForPayerAuthentication = async (updatePaymentObj: PaymentType, tokenCreateResponse: TokenCreateFlagType, customFields: Partial<PaymentCustomFieldsType>, cardinalReferenceId: string, cartObj: any, cardTokens: CustomTokenType, orderNo: string): Promise<ActionResponseType> => {
+const getEnrollResponseForPayerAuthentication = async (updatePaymentObj: Payment, tokenCreateResponse: TokenCreateFlagType, customFields: Partial<PaymentCustomFieldsType>, cardinalReferenceId: string, cartObj: Cart, cardTokens: CustomTokenType, orderNo: string): Promise<ActionResponseType> => {
     let isSaveToken = false;
     let payerAuthMandateFlag = false;
     isSaveToken = tokenCreateResponse.isSaveToken;
@@ -33,13 +35,13 @@ const getEnrollResponseForPayerAuthentication = async (updatePaymentObj: Payment
     if (Constants.HTTP_SUCCESS_STATUS_CODE === customFields?.isv_payerEnrollHttpCode && Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED === customFields?.isv_payerEnrollStatus) {
         payerAuthMandateFlag = true;
     }
-    const enrollServiceResponse = await paymentAuthorization.getAuthorizationResponse(updatePaymentObj, cartObj.results[0], Constants.STRING_ENROLL_CHECK, cardTokens, isSaveToken, payerAuthMandateFlag, orderNo);
+    const enrollServiceResponse = await paymentAuthorization.getAuthorizationResponse(updatePaymentObj, cartObj, Constants.STRING_ENROLL_CHECK, cardTokens, isSaveToken, payerAuthMandateFlag, orderNo);
     if (enrollServiceResponse && enrollServiceResponse.httpCode) {
         enrollServiceResponse.cardinalReferenceId = cardinalReferenceId;
         enrollResponse = paymentActions.createEnrollResponseActions(enrollServiceResponse, updatePaymentObj);
         const enrollAuthResponse = paymentHelper.getAuthResponse(enrollServiceResponse, null);
         paymentValidator.validateActionsAndPush(enrollAuthResponse.actions, enrollResponse.actions);
-        enrollResponse = await tokenHelper.setCustomerTokenData(cardTokens, enrollServiceResponse, enrollResponse, false, updatePaymentObj, cartObj.results[0]);
+        enrollResponse = await tokenHelper.setCustomerTokenData(cardTokens, enrollServiceResponse, enrollResponse, false, updatePaymentObj, cartObj);
     }
     return enrollResponse;
 };
@@ -47,10 +49,10 @@ const getEnrollResponseForPayerAuthentication = async (updatePaymentObj: Payment
 /**
  * Retrieves the payer authentication validation response.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
  * @returns {Promise<ActionResponseType>} - Action response for payer authentication validation.
  */
-const getPayerAuthValidateResponse = async (updatePaymentObj: PaymentType): Promise<ActionResponseType> => {
+const getPayerAuthValidateResponse = async (updatePaymentObj: Payment): Promise<ActionResponseType> => {
     let isSaveToken = false;
     let paymentInstrumentToken = '';
     let paymentId = updatePaymentObj?.id || '';
@@ -59,7 +61,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj: PaymentType): Prom
         isSaveToken: false,
         isError: false,
     };
-    let customerInfo: Partial<CustomerType> | null = null;
+    let customerInfo: Customer | null = null;
     let cardTokens: CustomTokenType = { customerTokenId: '', paymentInstrumentId: '' };
     let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
     if (updatePaymentObj && updatePaymentObj?.custom && (updatePaymentObj.custom?.fields?.isv_token || updatePaymentObj.custom?.fields?.isv_savedToken || updatePaymentObj.custom?.fields?.isv_transientToken)) {
@@ -106,10 +108,10 @@ const getPayerAuthValidateResponse = async (updatePaymentObj: PaymentType): Prom
 /**
  * Retrieves the payer authentication setup response.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
  * @returns {Promise<ActionResponseType>} - Action response containing payer authentication setup.
  */
-const getPayerAuthSetUpResponse = async (updatePaymentObj: PaymentType): Promise<ActionResponseType> => {
+const getPayerAuthSetUpResponse = async (updatePaymentObj: Payment): Promise<ActionResponseType> => {
     let paymentInstrumentToken = '';
     let paymentId = updatePaymentObj?.id || '';
     let customerId = updatePaymentObj?.customer?.id || '';
@@ -149,31 +151,35 @@ const getPayerAuthSetUpResponse = async (updatePaymentObj: PaymentType): Promise
 /**
  * Retrieves the payer authentication enrollment response.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
  * @returns {Promise<ActionResponseType>} - Action response for payer authentication enrollment.
  */
-const getPayerAuthEnrollResponse = async (updatePaymentObj: PaymentType): Promise<ActionResponseType> => {
+const getPayerAuthEnrollResponse = async (updatePaymentObj: Payment): Promise<ActionResponseType> => {
     let paymentId = updatePaymentObj?.id || '';
     let customerId = updatePaymentObj?.customer?.id || '';
     let orderNo = null;
     let cardTokens: CustomTokenType = { customerTokenId: '', paymentInstrumentId: '' };
     let customFields: Partial<PaymentCustomFieldsType>;
-    let customerInfo: Partial<CustomerType> | null = null;
+    let customerInfo: Customer | null = null;
     let enrollResponse: ActionResponseType = paymentUtils.invalidInputResponse();
+    let paymentInstrument = '';
     if (updatePaymentObj?.custom?.fields) {
         customFields = updatePaymentObj.custom.fields;
         if (customFields?.isv_cardinalReferenceId && (customFields?.isv_token || customFields?.isv_savedToken || customFields?.isv_transientToken)) {
             const cardinalReferenceId = customFields.isv_cardinalReferenceId || '';
-            const cartObj = await paymentUtils.getCartObject(updatePaymentObj);
-            if (cartObj && cartObj?.count) {
-                if (updatePaymentObj.customer?.id && customFields?.isv_savedToken) {
-                    customerInfo = await commercetoolsApi.getCustomer(customerId);
-                    cardTokens = await tokenHelper.getCardTokens(customerInfo, customFields.isv_savedToken);
+            const cartObjResponse = await paymentUtils.getCartObject(updatePaymentObj);
+            if (cartObjResponse && cartObjResponse?.count) {
+                if (customFields?.isv_savedToken) {
+                    paymentInstrument = customFields.isv_savedToken;
                 }
-                const cartId = cartObj?.results[0]?.id;
+                if (updatePaymentObj.customer?.id) {
+                    customerInfo = await commercetoolsApi.getCustomer(customerId);
+                    cardTokens = await tokenHelper.getCardTokens(customerInfo, paymentInstrument);
+                }
+                const cartId = cartObjResponse?.results[0]?.id;
                 orderNo = await paymentUtils.getOrderId(cartId, paymentId);
                 const tokenCreateResponse = await tokenHelper.evaluateTokenCreation(customerInfo, updatePaymentObj, FunctionConstant.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE);
-                enrollResponse = !tokenCreateResponse.isError ? await getEnrollResponseForPayerAuthentication(updatePaymentObj, tokenCreateResponse, customFields, cardinalReferenceId, cartObj, cardTokens, orderNo) : paymentUtils.getEmptyResponse();
+                enrollResponse = !tokenCreateResponse.isError ? await getEnrollResponseForPayerAuthentication(updatePaymentObj, tokenCreateResponse, customFields, cardinalReferenceId, cartObjResponse?.results[0], cardTokens, orderNo) : paymentUtils.getEmptyResponse();
             }
         }
     } else {
@@ -189,11 +195,11 @@ const getPayerAuthEnrollResponse = async (updatePaymentObj: PaymentType): Promis
  * depending on the presence of specific custom fields related to payer authentication. It returns the appropriate 
  * response based on the current state of the authentication process.
  * 
- * @param {PaymentType} paymentObj - The payment object containing details about the payment and authentication fields.
+ * @param {Payment} paymentObj - The payment object containing details about the payment and authentication fields.
  * @returns {Promise<ActionResponseType>} - A promise that resolves to an action response object reflecting the 
  *         outcome of the payer authentication process.
  */
-const processPayerAuthentication = async (paymentObj: PaymentType) => {
+const processPayerAuthentication = async (paymentObj: Payment) => {
     let payerAuthResponse = paymentUtils.getEmptyResponse();
     const { isv_cardinalReferenceId, isv_payerAuthenticationTransactionId, isv_payerAuthenticationRequired, isv_payerEnrollStatus, isv_payerEnrollTransactionId } = paymentObj.custom?.fields || {};
     if (!isv_cardinalReferenceId) {

@@ -1,4 +1,4 @@
-import { Constants } from "../constants/constants";
+import { Constants } from "../constants/paymentConstants";
 import { CustomerCustomType } from "../types/Types";
 import PaymentUtils from "../utils/PaymentUtils";
 import paymentValidator from "../utils/PaymentValidator";

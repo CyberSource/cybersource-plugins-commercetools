@@ -2,8 +2,8 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../constants/constants';
 import { CustomMessages } from '../../../constants/customMessages';
+import { Constants } from '../../../constants/paymentConstants';
 import paymentUtils from '../../../utils/PaymentUtils';
 import unit from '../../JSON/unit.json';
 import ApiControllerConst from '../../const/ApiControllerConst';
@@ -26,7 +26,7 @@ test.serial('get the order id', async (t: any) => {
       t.is(i, 0);
     }
   } else {
-    t.pass();
+    t.fail();
   }
 });
 
@@ -42,10 +42,10 @@ test.serial('Get certificate data ', async (t: any) => {
     if (200 == result.status) {
       t.is(result.status, 200);
     } else {
-      t.not(result.status, 200);
+      t.fail(`Unexpected status code: ${result.status}`);
     }
   } else {
-    t.pass();
+    t.fail('Provide Apple Pay Certificate Path');
   }
 });
 
@@ -164,21 +164,21 @@ test.serial('get invalid input response ', async (t) => {
 });
 
 test.serial('get Refund Response Object ', async (t) => {
-  let result = await paymentUtils.getRefundResponseObject(PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom, 12);
+  let result = await paymentUtils.getRefundResponseObject(PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom as any, 12);
   t.is(result.captureId, PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom.interactionId);
   t.is(result.transactionId, PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom.id);
   t.is(result.pendingTransactionAmount, 12);
 });
 
 test.serial('get Refund Response Object when pending amount is 0', async (t) => {
-  let result = await paymentUtils.getRefundResponseObject(PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom, 0);
+  let result = await paymentUtils.getRefundResponseObject(PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom as any, 0);
   t.is(result.captureId, PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom.interactionId);
   t.is(result.transactionId, PaymentServiceConst.retrieveAddRefundResponseObjectTransactionWithNoCustom.id);
   t.is(result.pendingTransactionAmount, 0);
 });
 
 test.serial('get cart object', async (t) => {
-  let result = await paymentUtils.getCartObject(PaymentAuthorizationServiceConstCC.payment);
+  let result: any = await paymentUtils.getCartObject(PaymentAuthorizationServiceConstCC.payment as any);
   if (result && result?.count > 0) {
     t.is(result.count, 1);
     t.is(result.results[0].type, 'Cart');
@@ -332,13 +332,13 @@ test.serial('Extract token value', (t) => {
 
 test.serial('create transaction object', (t) => {
   const result = paymentUtils.createTransactionObject(PaymentCaptureServiceConstCC.payment.version, PaymentCaptureServiceConstCC.payment.amountPlanned, PaymentCaptureServiceConstCC.payment.transactions[0].type, PaymentCaptureServiceConstCC.payment.transactions[0].state as any, PaymentCaptureServiceConstCC.payment.transactions[0].interactionId, new Date(Date.now()).toISOString());
-  t.is(result?.amount?.centAmount, 100);
+  t.is(result?.amount?.centAmount, 502800);
   t.is(result.state, 'Success');
   t.is(result.type, 'Authorization');
 })
 
 test.serial('Get InterationID', (t) => {
-  const result = paymentUtils.getInteractionId(PaymentServiceConst.getAuthorizedAmountCapturePaymentObj);
+  const result = paymentUtils.getInteractionId(PaymentServiceConst.getAuthorizedAmountCapturePaymentObj as any);
   t.is(result, '6805192636456088103954')
 })
 

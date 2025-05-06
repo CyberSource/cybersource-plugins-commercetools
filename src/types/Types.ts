@@ -1,21 +1,5 @@
+import { Payment } from "@commercetools/platform-sdk";
 import { Ptsv2creditsProcessingInformationBankTransferOptions, Ptsv2paymentsidcapturesOrderInformation, Ptsv2paymentsidrefundsOrderInformation, Ptsv2paymentsidrefundsProcessingInformation, Ptsv2paymentsidreversalsOrderInformation, Ptsv2paymentsidreversalsProcessingInformation, Ptsv2paymentsOrderInformation, Ptsv2paymentsProcessingInformation, Ptsv2paymentsProcessingInformationAuthorizationOptions, Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator, Upv1capturecontextsOrderInformation } from "cybersource-rest-client";
-
-export type PaymentType = {
-  id: string;
-  version: number;
-  amountPlanned: AmountPlannedType;
-  paymentMethodInfo: {
-    method: string;
-  };
-  custom?: {
-    fields: Partial<PaymentCustomFieldsType>;
-  };
-  transactions: Partial<PaymentTransactionType>[];
-  customer?: {
-    id: string;
-  };
-  anonymousId?: string;
-};
 
 export type AmountPlannedType = {
   type: string;
@@ -24,22 +8,51 @@ export type AmountPlannedType = {
   fractionDigits: number;
 };
 
-export type TransactionObjectType = {
-  version?: number;
-  amount: AmountPlannedType;
-  type?: string;
+export type ActionType = {
+  action: string;
+  name: string;
+  value: string | boolean | number | string[] | null;
+  type?: {
+    key?: string;
+    typeId?: string;
+  };
+  fields: Partial<ConsumerAuthenticationInformationType>;
+  address: Partial<AddressType>;
   state: string;
-  interactionId?: string;
-  timestamp?: string;
+  interactionId: string;
+  transactionId: string;
 };
+
+export type AddressType = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  address1: string;
+  address2: string;
+  buildingNumber: string;
+  streetName: string;
+  streetNumber: string;
+  locality: string;
+  administrativeArea: string;
+  postalCode: string;
+  city: string;
+  region: string;
+  country: string;
+  phone: string;
+  phoneNumber: string;
+  email: string;
+  additionalStreetInfo: string;
+  mobile: string;
+};
+
 export type PaymentCustomFieldsType = {
   isv_token: string;
   isv_tokenAlias: string;
   isv_savedToken: string;
   isv_tokenVerificationContext: string;
   isv_tokenCaptureContextSignature: string;
-  isv_clientLibrary:string;
-  isv_clientLibraryIntegrity:string;
+  isv_clientLibrary: string;
+  isv_clientLibraryIntegrity: string;
   isv_cardType: string;
   isv_maskedPan: string;
   isv_cardExpiryMonth: string;
@@ -70,7 +83,6 @@ export type PaymentCustomFieldsType = {
   isv_accountType: string;
   isv_routingNumber: string;
   isv_merchantId: string;
-  isv_securityCode: number;
   isv_transientToken: string;
   isv_customerId: string;
   isv_screenHeight: number;
@@ -84,8 +96,9 @@ export type PaymentCustomFieldsType = {
   isv_responseCode: string;
   isv_dmpaFlag: boolean;
   isv_shippingMethod?: string;
-  isv_metadata?: string; //type added for metadata
+  isv_metadata?: string;
 };
+
 export type PaymentTransactionType = {
   id: string;
   timestamp: string;
@@ -113,7 +126,7 @@ export type OrderResultType = {
     offset: number;
     count: number;
     total: number;
-    results: PaymentType[];
+    results: Payment[];
   };
   statusCode: number;
 };
@@ -123,85 +136,12 @@ export type ActionResponseType = {
   actions: Partial<ActionType>[];
   errors: ErrorType[];
 };
-export type ActionType = {
-  action: string;
-  name: string;
-  value: string | boolean | number | string[] | null;
-  type?: {
-    key?: string;
-    typeId?: string;
-  };
-  fields: Partial<ConsumerAuthenticationInformationType>;
-  address: Partial<AddressType>;
-  state: string;
-  interactionId: string;
-  transactionId: string;
-};
 
 export type ErrorType = {
   code: string;
   message: string;
 };
 
-//Cutsomer Object
-export type CustomerType = {
-  id: string;
-  version: number;
-  lastMessageSequenceNumber: number;
-  createdAt: string;
-  lastModifiedAt: string;
-  lastModifiedBy: {
-    clientId: string;
-    isPlatformClient: boolean;
-    customer: {
-      typeId: string;
-      id: string;
-    };
-  };
-  createdBy: {
-    clientId: string;
-    isPlatformClient: boolean;
-    customer: {
-      typeId: string;
-      id: string;
-    };
-  };
-  email: string;
-  firstName: string;
-  lastName: string;
-  addresses: AddressType[];
-  shippingAddressIds: string[];
-  billingAddressIds: string[];
-  isEmailVerified: boolean;
-  custom: {
-    fields: Partial<CustomerCustomType>;
-    type: {
-      typeId: string;
-      id: string;
-    };
-  }
-};
-export type AddressType = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  address1: string;
-  address2: string;
-  buildingNumber: string;
-  streetName: string;
-  streetNumber: string;
-  locality: string;
-  administrativeArea: string;
-  postalCode: string;
-  city: string;
-  region: string;
-  country: string;
-  phone: string;
-  phoneNumber: string;
-  email: string;
-  additionalStreetInfo: string;
-  mobile: string;
-};
 export type CustomerCustomType = {
   isv_tokens: string[];
   isv_token: string;
@@ -222,6 +162,7 @@ export type CustomerCustomType = {
   isv_tokenAction: string | null;
   isv_failedTokens: string[];
 };
+
 export type CustomerTokensType = {
   alias: string;
   value: string;
@@ -236,13 +177,19 @@ export type CustomerTokensType = {
   timeStamp: string;
   address: Partial<AddressType>;
 };
-
 //Mid credentials object
 export type MidCredentialsType = {
   merchantId: string | undefined;
   merchantKeyId: string | undefined;
   merchantSecretKey: string | undefined;
 };
+
+export type KeyCredentialsType = {
+  keyFileName: string | undefined;
+  keyAlias: string | undefined;
+  keyFileUrl: string | undefined;
+  keyPass: string | undefined;
+}
 
 export type CustomTokenType = {
   customerTokenId: string;
@@ -272,19 +219,21 @@ export type ReportResponseType = {
 };
 
 export type SecurityCodeType = {
-  securityCodePresent: boolean;
   transactionId: string;
   amountPlanned: {
     currencyCode: string;
     centAmount: number;
   };
 };
+
 export type ReportSyncType = SecurityCodeType & Partial<PaymentTransactionType>;
+
 export type VisaUpdateType = {
   id: string;
   version: number;
   actions: Partial<ActionType>[];
 };
+
 export type ConsumerAuthenticationInformationType = {
   cavv: string;
   eciRaw: string;
@@ -371,6 +320,7 @@ export type CybsAddressType = {
   email: string;
   phoneNumber: string;
 };
+
 export type OrderInformationLineItemsType = {
   productName: string;
   quantity: number;
@@ -379,6 +329,7 @@ export type OrderInformationLineItemsType = {
   discountAmount: number;
   unitPrice: number;
 };
+
 export type ResponseType = {
   httpCode: number;
   transactionId: string;
@@ -394,10 +345,12 @@ export type ResponseType = {
   referenceId: string;
   deviceDataCollectionUrl: string;
 };
+
 export type PaymentResponse = {
   httpCode: number;
   status: string;
 };
+
 export type InstrumentIdResponse = {
   httpCode: number;
   instrumentIdentifier: string;
@@ -466,4 +419,5 @@ export type MetaDataType = {
   value: string,
 }
 export type ProcessingInformationType = Ptsv2creditsProcessingInformationBankTransferOptions | Ptsv2paymentsidrefundsProcessingInformation | Ptsv2paymentsidreversalsProcessingInformation | Ptsv2paymentsProcessingInformation | Ptsv2paymentsProcessingInformationAuthorizationOptions | Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator;
+
 export type OrderInformation = Ptsv2paymentsidcapturesOrderInformation | Ptsv2paymentsidrefundsOrderInformation | Ptsv2paymentsidreversalsOrderInformation | Ptsv2paymentsOrderInformation | Upv1capturecontextsOrderInformation;

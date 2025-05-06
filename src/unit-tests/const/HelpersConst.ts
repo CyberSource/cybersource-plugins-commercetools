@@ -1,10 +1,10 @@
-import { CardAddressGroupType, CustomerType, PaymentType, ReportSyncType } from '../../types/Types';
+import { CardAddressGroupType, ReportSyncType } from '../../types/Types';
 import clickToPay from '../JSON/clickToPay.json';
 import creditCard from '../JSON/creditCard.json';
 import googlePay from '../JSON/googlePay.json';
 import unit from '../JSON/unit.json';
 
- let visaCardDetailsActionVisaCheckoutData : any= {
+let visaCardDetailsActionVisaCheckoutData: any = {
   httpCode: 200,
   billToFieldGroup: {
     firstName: 'john',
@@ -38,7 +38,7 @@ import unit from '../JSON/unit.json';
   message: null,
 };
 
- const visaCardDetailsActionVisaCheckoutEmptyData : Partial<CardAddressGroupType>= {
+const visaCardDetailsActionVisaCheckoutEmptyData: Partial<CardAddressGroupType> = {
   httpCode: 200,
   billToFieldGroup: {
     id: '',
@@ -59,7 +59,7 @@ import unit from '../JSON/unit.json';
     mobile: '',
     buildingNumber: '',
     streetName: '',
-    streetNumber: ''
+    streetNumber: '',
   },
   shipToFieldGroup: {
     id: '',
@@ -80,7 +80,7 @@ import unit from '../JSON/unit.json';
     mobile: '',
     buildingNumber: '',
     streetName: '',
-    streetNumber: ''
+    streetNumber: '',
   },
   cardFieldGroup: {
     suffix: '',
@@ -91,21 +91,21 @@ import unit from '../JSON/unit.json';
   },
 };
 
- const getOMServiceResponsePaymentResponse = {
+const getOMServiceResponsePaymentResponse = {
   httpCode: 201,
   transactionId: '6420561530596093703954',
   status: 'PENDING',
   message: undefined,
 };
 
- const getOMServiceResponsePaymentResponseObject = {
+const getOMServiceResponsePaymentResponseObject = {
   httpCode: 400,
   transactionId: null,
   status: 'INVALID_REQUEST',
   message: undefined,
 };
 
- const getOMServiceResponseTransactionDetail = {
+const getOMServiceResponseTransactionDetail = {
   id: 'bf72a390-77e6-4748-b099-f253ba0744d9',
   timestamp: '2022-01-13T06:42:30.259Z',
   type: 'Charge',
@@ -118,7 +118,7 @@ import unit from '../JSON/unit.json';
   state: 'Initial',
 };
 
- const getAuthResponsePaymentResponse = {
+const getAuthResponsePaymentResponse = {
   httpCode: 201,
   transactionId: '6424036020586494403954',
   status: 'AUTHORIZED',
@@ -184,7 +184,7 @@ import unit from '../JSON/unit.json';
   },
 };
 
- const getAuthResponsePaymentResponseObject = {
+const getAuthResponsePaymentResponseObject = {
   httpCode: 201,
   transactionId: '6424036020586494403954',
   status: 'AUTHORIZED_PENDING_REVIEW',
@@ -254,7 +254,7 @@ import unit from '../JSON/unit.json';
   },
 };
 
- const getAuthResponsePaymentDeclinedResponse = {
+const getAuthResponsePaymentDeclinedResponse = {
   httpCode: 201,
   transactionId: '6437973031316274803954',
   status: 'DECLINED',
@@ -300,7 +300,7 @@ import unit from '../JSON/unit.json';
   },
 };
 
- const getAuthResponseTransactionDetail = {
+const getAuthResponseTransactionDetail = {
   id: 'fa4185f4-3e11-49f8-bbbe-9982e1f7ab68',
   timestamp: '2022-01-17T07:13:19.814Z',
   type: 'Authorization',
@@ -313,7 +313,7 @@ import unit from '../JSON/unit.json';
   state: 'Initial',
 };
 
- const getAuthResponsePaymentSuccessResponse = {
+const getAuthResponsePaymentSuccessResponse = {
   httpCode: 201,
   transactionId: 'B4ZCm7bmq3v7RZ333Yj0',
   status: 'AUTHENTICATION_SUCCESSFUL',
@@ -340,7 +340,7 @@ import unit from '../JSON/unit.json';
   cardinalReferenceId: 'aa5120d4-d5f7-4b9d-bea2-1db7aaa6f07c',
 };
 
- const getAuthResponsePaymentCompleteResponse = {
+const getAuthResponsePaymentCompleteResponse = {
   accessToken:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmYzhhMzBmNy1jNGEyLTQ0M2YtYmJhNC0wNDQ1M2I3YzE2NmYiLCJpYXQiOjE2NDM3OTY5MTUsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY0MzgwMDUxNSwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiJhYTUxMjBkNC1kNWY3LTRiOWQtYmVhMi0xZGI3YWFhNmYwN2MifQ.U5MB8c1PMJRJEnYbY78pWg8Ky4XbPTlVSCUuzmV0r6M',
   referenceId: 'aa5120d4-d5f7-4b9d-bea2-1db7aaa6f07c',
@@ -350,7 +350,7 @@ import unit from '../JSON/unit.json';
   status: 'COMPLETED',
 };
 
- const getAuthResponsePaymentPendingResponse = {
+const getAuthResponsePaymentPendingResponse = {
   httpCode: 201,
   transactionId: 'NsuSvxr0fOA2eL4b9Uj0',
   status: 'PENDING_AUTHENTICATION',
@@ -386,7 +386,7 @@ import unit from '../JSON/unit.json';
   cardinalReferenceId: '8f0d726c-3c21-447e-a936-d9a5dfc5e57b',
 };
 
- const getCapturedAmountRefundPaymentObj = {
+const getCapturedAmountRefundPaymentObj = {
   id: '5bfd0e66-7243-4359-9891-7fce264aaa30',
   version: 33,
   lastMessageSequenceNumber: 7,
@@ -485,7 +485,7 @@ import unit from '../JSON/unit.json';
   ],
 };
 
- const getCapturedZeroAmountRefundPaymentObj = {
+const getCapturedZeroAmountRefundPaymentObj = {
   id: '5bfd0e66-7243-4359-9891-7fce264aaa30',
   version: 33,
   lastMessageSequenceNumber: 7,
@@ -584,7 +584,7 @@ import unit from '../JSON/unit.json';
   ],
 };
 
- const payerAuthActionsResponse = {
+const payerAuthActionsResponse = {
   isv_payerAuthenticationPaReq:
     'eNpVUV1vgjAUfe+vMGbP9APEaa5NdGyZZhhl6p5ZaSaJfFhgiL9+LcLc+nTP7bntOefC7qik9N6lqJTk4MuiCL/kII5mw2bxZgdXetqNndJbsf12Q8iQw2YeyDOHb6mKOEs5tYjFAPcQ6SeUOIZpySEU58VyzR13wqgLuIMIEqmWHrcd6jDmMHI7gG9tBGmYSF7HucpOZQS4hQhEVqWlavijo6k9QFCpEz+WZV5MMa7r2hLNp1aSVUpIS2QJYENAgO+qNpWpCm32Ekdc7le+T1eu/3HZr68BCZ6z5nB42frefAbYMBBEYSk5I4wR2yYDSqcOmRpDbR9BmBg1/MGdWGOtrYMIcvPR/Ibcibn629GOKqVkKnpLPUIgL3mWSs3Ruf7W2sNd+dOrSVeUOq8Rc1w6GZt4W9yOxzobNiK0nY/boLCZwd3ycLdnXf3b/w9MkKjU',
   isv_payerAuthenticationTransactionId: 'yBL3Rz1lT74tDJ2UQP00',
@@ -606,7 +606,7 @@ import unit from '../JSON/unit.json';
   directoryServerTransactionId: undefined,
 };
 
- const payerAuthActionsEmptyResponse = {
+const payerAuthActionsEmptyResponse = {
   isv_payerAuthenticationPaReq: '',
   isv_payerAuthenticationTransactionId: '',
   stepUpUrl: '',
@@ -623,7 +623,7 @@ import unit from '../JSON/unit.json';
   directoryServerTransactionId: undefined,
 };
 
- const payerEnrollActionsResponse = {
+const payerEnrollActionsResponse = {
   httpCode: 201,
   transactionId: '6486429828526882404951',
   status: 'PENDING_AUTHENTICATION',
@@ -673,10 +673,10 @@ import unit from '../JSON/unit.json';
   },
   cardinalReferenceId: 'b0c79f37-281e-4f09-a7a1-8ed01a459f20',
 };
- let payerEnrollActionsUpdatePaymentObj : PaymentType= {
+let payerEnrollActionsUpdatePaymentObj: any = {
   id: unit.paymentId,
   version: 15,
-  customer: { id: 'b0c50186-fc83-4a97-9ea3-47bab58b3cc6' },
+  customer: { id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   amountPlanned: {
     type: 'centPrecision',
     currencyCode: 'USD',
@@ -711,23 +711,20 @@ import unit from '../JSON/unit.json';
   transactions: [],
 };
 
- const getUpdateTokenActionsActions = [
+const getUpdateTokenActionsActions = [
   '{"alias":"4111card","value":"DB0B315B52BABC38E053AF598E0A8268","paymentToken":"DB0B3127886FBB46E053AF598E0AF2A5","instrumentIdentifier":"7010000000121591111","cardType":"001","cardName":"001","cardNumber":"411111XXXXXX1111","cardExpiryMonth":"01","cardExpiryYear":"2026","flag":"updated"}',
   '{"alias":"1091card","value":"DB0B315B52BABC38E053AF598E0A8268","paymentToken":"DB476FB611F49979E053AF598E0A0DE1","instrumentIdentifier":"7020000000005531091","cardType":"001","cardName":"001","cardNumber":"400000XXXXXX1091","cardExpiryMonth":"01","cardExpiryYear":"2026","flag":"updated"}',
 ];
 
- const getUpdateInvalidTokenActionsActions = [
-'*@&*&*(*(&^%^',
-'%^&(&*&^%&((('
-];
+const getUpdateInvalidTokenActionsActions = ['*@&*&*(*(&^%^', '%^&(&*&^%&((('];
 
- const deleteTokenResponse = {
+const deleteTokenResponse = {
   httpCode: 204,
   message: '',
   deletedToken: 'DC2417E36C42D8ADE053AF598E0A1705',
 };
 
- const deleteTokenCustomerObj: CustomerType = {
+const deleteTokenCustomerObj: any = {
   id: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
   version: 6,
   lastMessageSequenceNumber: 1,
@@ -738,7 +735,7 @@ import unit from '../JSON/unit.json';
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: 'b0c50186-fc83-4a97-9ea3-47bab58b3cc6',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   createdBy: {
@@ -746,7 +743,7 @@ import unit from '../JSON/unit.json';
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: 'b0c50186-fc83-4a97-9ea3-47bab58b3cc6',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   email: 'sp@gmail.com',
@@ -765,12 +762,12 @@ import unit from '../JSON/unit.json';
     },
     type: {
       typeId: '',
-      id: ''
-    }
-  }
+      id: '',
+    },
+  },
 };
 
- const getAuthorizedAmountCapturePaymentObj = {
+const getAuthorizedAmountCapturePaymentObj = {
   id: '14666485-c56b-4fa8-9ec7-668dc4141245',
   version: 21,
   versionModifiedAt: '2023-04-03T13:50:54.890Z',
@@ -864,7 +861,7 @@ import unit from '../JSON/unit.json';
   anonymousId: 'baaf0387-930b-440d-be81-2ef80e23e251',
 };
 
- const getAuthorizedZeroAmountCapturePaymentObj = {
+const getAuthorizedZeroAmountCapturePaymentObj = {
   id: '14666485-c56b-4fa8-9ec7-668dc4141245',
   version: 21,
   versionModifiedAt: '2023-04-03T13:50:54.890Z',
@@ -958,7 +955,7 @@ import unit from '../JSON/unit.json';
   anonymousId: 'baaf0387-930b-440d-be81-2ef80e23e251',
 };
 
- const getRefundResponseUpdatePaymentObj = {
+const getRefundResponseUpdatePaymentObj = {
   id: 'e014e68a-c453-494e-9692-ed4daca9cf4d',
   version: 15,
   versionModifiedAt: '2023-08-11T08:57:47.643Z',
@@ -1068,7 +1065,7 @@ import unit from '../JSON/unit.json';
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
- const getRefundResponseUpdateTransactions = {
+const getRefundResponseUpdateTransactions = {
   id: 'c68616f7-eaba-4307-9d5b-2117929be514',
   timestamp: '2023-08-11T08:57:50.043Z',
   type: 'Refund',
@@ -1081,31 +1078,31 @@ import unit from '../JSON/unit.json';
   state: 'Initial',
 };
 
- const addRefundActionAmount = {
+const addRefundActionAmount = {
   type: 'centPrecision',
   currencyCode: 'USD',
   centAmount: 100,
   fractionDigits: 2,
 };
 
- const addRefundActionZeroAmount = {
+const addRefundActionZeroAmount = {
   type: 'centPrecision',
   currencyCode: 'USD',
   centAmount: 0,
   fractionDigits: 2,
 };
 
- const addRefundActionOrderResponse = {
+const addRefundActionOrderResponse = {
   httpCode: 201,
   transactionId: creditCard.refundId,
   status: 'PENDING',
 };
 
- const state = 'Success';
+const state = 'Success';
 
- const getCreditCardResponseUpdatePaymentObj: any = {
-  id: 'b18ec6af-6802-4638-8f75-d387d2977177',
-  version: 12,
+const getCreditCardResponseUpdatePaymentObj: any = {
+  id: '8432cc4b-5595-4760-98a0-5092afbbd463',
+  version: 30,
   versionModifiedAt: '2023-08-11T12:24:39.887Z',
   lastMessageSequenceNumber: 2,
   createdAt: '2023-08-11T12:23:58.555Z',
@@ -1151,6 +1148,7 @@ import unit from '../JSON/unit.json';
       isv_tokenVerificationContext:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJHQ3k4SzBKbzJpNVRUdDVNSVcxSGxSQUFFS3AxeGMrSmtNa2ZFL2VvNWlraG91UU9hVk5pMXUyZWlwWkZaSFovd0tKWUlLakhoOXJ1M3V5aGcvU2tzc1dENWRkQVVTNXlKQ2JhcW5DSlJFYkhiVzVQRVg3VHlCOC9hOFF2L2cxYXluR2QiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiIzdzhia0lfbG1kaGx4Qzg2Nl82dktUQ1VkTzZzWUNvN2hsX0IzYlVmNk01YmRRbmhrTG14QUhLQ1R0alhWaE1TLVJDbTBJUmVOX2xCYnpzLVpMZU5PMHc5LVJKWW44WUlDcDdOeFV6MmRuRnpNMExpV21MUjhieV9CWEcxdnpMSDY5a3FGMjFiQ1h1NFVZV1ZtUEhzZno5QzJhdS1vTFc1X282b0x0VjgwU3U0QWoxaGVVdVJXSEpNcTUwem96Rm9LMldrRUp5dU5pclFVQzZSdVFFSmFtVTh2ekk5Sm1jVzRSUk84ZFJ4UmcydjhNd3RhWUgzYXN3dzNFQ1Z2bHItejV4TkstZkpTNHVXNzU1SWdJMWx4Ni1qTGNuQW5CcTRjdTVSMDdUVG5JcWZpelFYUUw5RUJPQnRxb1pfc09zZS1jNE0ydGR5TWpkaXc2YmFIeEVFdVEiLCJraWQiOiIwOHhnSzhGZGwxWDBPSUc3RHFCZjNJUnJpSXMzSm1RNiJ9fSwiY3R4IjpbeyJkYXRhIjp7ImNsaWVudExpYnJhcnkiOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbS9taWNyb2Zvcm0vYnVuZGxlL3YxL2ZsZXgtbWljcm9mb3JtLm1pbi5qcyIsInRhcmdldE9yaWdpbnMiOlsiaHR0cHM6Ly9sb2NhbGhvc3Q6ODA4MCJdLCJtZk9yaWdpbiI6Imh0dHBzOi8vdGVzdGZsZXguY3liZXJzb3VyY2UuY29tIn0sInR5cGUiOiJtZi0xLjAuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2OTE3NTc1MzgsImlhdCI6MTY5MTc1NjYzOCwianRpIjoiVHhMZThmTHlMejZvdG42RyJ9.HRrLioN2q7fbFKyHWiiLMriKcwkoVb4nwcu3UBpeYUw',
       isv_cardExpiryYear: '2026',
+      isv_transientToken: creditCard.isv_transientToken,
     },
   },
   paymentStatus: {},
@@ -1172,274 +1170,352 @@ import unit from '../JSON/unit.json';
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
- const getCreditCardResponseCartObj = {
-  type: 'Cart',
-  id: '56414cc7-5e77-4fd9-9d6a-edad661dd95b',
-  version: 12,
-  versionModifiedAt: '2023-08-11T13:09:35.169Z',
-  lastMessageSequenceNumber: 1,
-  createdAt: '2023-08-11T13:08:57.901Z',
-  lastModifiedAt: '2023-08-11T13:09:35.169Z',
-  lastModifiedBy: {
-    clientId: 'vjOtikmRR04ldgMx3H3Dgc63',
-    isPlatformClient: false,
-    anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
+const getCreditCardResponseCartObj = {
+  "type": "Cart",
+  "id": "bd2e5134-9cdf-4059-81f4-392bdbe58b0d",
+  "version": 23,
+  "versionModifiedAt": "2025-03-14T05:31:20.980Z",
+  "lastMessageSequenceNumber": 1,
+  "createdAt": "2025-03-14T05:30:20.024Z",
+  "lastModifiedAt": "2025-03-14T05:31:20.974Z",
+  "lastModifiedBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "10012614-ad9e-40cc-bd42-b4b900925b37"
   },
-  createdBy: {
-    clientId: 'vjOtikmRR04ldgMx3H3Dgc63',
-    isPlatformClient: false,
-    anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
+  "createdBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "10012614-ad9e-40cc-bd42-b4b900925b37"
   },
-  anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
-  locale: 'en',
-  lineItems: [
-    {
-      id: '1da7495a-70f8-49ea-b443-3625ce8e9366',
-      productId: 'ad0cf3f4-fe64-4517-b7d0-c028d64e04ef',
-      name: {
-        'de-DE': 'Bridal Lahenga',
-        'es-CL': 'Bridal Lahenga',
-        ja: 'Bridal Lahenga',
-        'en-GB': 'Bridal Lahenga',
-        en: 'Bridal Lahenga',
-        'en-US': 'Bridal Lahenga',
-        'ar-BH': 'Bridal Lahenga',
-      },
-      productType: {
-        typeId: 'product-type',
-        id: '526d8919-fe8f-4e26-8e60-35ecceec9284',
-        version: 1,
-      },
-      productSlug: {
-        en: 'a16',
-      },
-      variant: {
-        id: 1,
-        sku: 'SKU-16',
-        prices: [
-          {
-            id: '1bf0d8f5-c3f3-47bd-aa51-0c55b4366c7c',
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'EUR',
-              centAmount: 1580,
-              fractionDigits: 2,
-            },
-            country: 'DE',
+  "anonymousId": "10012614-ad9e-40cc-bd42-b4b900925b37",
+  "locale": "en",
+  "lineItems": [
+      {
+          "id": "3ec3e225-2991-4594-9596-0c9217d6ea7e",
+          "productId": "c93d1d93-79bc-4bfd-ad62-706ce06e2b90",
+          "name": {
+              "en": "Mexicon-Hat",
+              "en-US": "Hat"
           },
-          {
-            id: '6cca5967-3537-4ee9-9447-5dc5c08f69b9',
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'USD',
-              centAmount: 5000,
-              fractionDigits: 2,
-            },
-            country: 'US',
+          "productType": {
+              "typeId": "product-type",
+              "id": "20efa170-91df-4d8a-bbd0-610e6a532773",
+              "version": 1
           },
-          {
-            id: 'd0f0ab75-4f61-4417-84c3-14c5d0cbc40d',
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'JPY',
-              centAmount: 50,
-              fractionDigits: 0,
-            },
-            country: 'JP',
+          "productSlug": {
+              "en": "Mexicon-Hat"
           },
-          {
-            id: 'c1dd6377-a92c-4a3c-8922-a38b15a3873f',
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'CLP',
-              centAmount: 50,
-              fractionDigits: 0,
-            },
-            country: 'CL',
+          "variant": {
+              "id": 1,
+              "sku": "SKU-1",
+              "prices": [
+                  {
+                      "id": "6c414313-280a-4d57-bc61-96d212aa7b9b",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "EUR",
+                          "centAmount": 4200,
+                          "fractionDigits": 2
+                      },
+                      "validFrom": "2025-03-02T18:30:00.000Z",
+                      "validUntil": "2026-03-18T18:30:00.000Z"
+                  },
+                  {
+                      "id": "b1feaabf-a309-4805-bf44-f42e1c59760a",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "USD",
+                          "centAmount": 501900,
+                          "fractionDigits": 2
+                      },
+                      "key": "US",
+                      "validFrom": "2025-03-02T18:30:00.000Z",
+                      "validUntil": "2026-03-05T18:30:00.000Z"
+                  }
+              ],
+              "images": [
+                  {
+                      "url": "https://th.bing.com/th/id/OIP.SihGuijrQqicDgOjJIzg7gHaGD?w=207&h=180&c=7&r=0&o=5&dpr=2&pid=1.7",
+                      "label": "Hat",
+                      "dimensions": {
+                          "w": 414,
+                          "h": 360
+                      }
+                  }
+              ],
+              "attributes": [],
+              "assets": []
           },
-          {
-            id: 'be7e1c2a-0d06-4151-a3ce-6d41df9e9809',
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'BHD',
-              centAmount: 50000,
-              fractionDigits: 3,
-            },
-            country: 'BH',
+          "price": {
+              "id": "b1feaabf-a309-4805-bf44-f42e1c59760a",
+              "value": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 501900,
+                  "fractionDigits": 2
+              },
+              "key": "US",
+              "validFrom": "2025-03-02T18:30:00.000Z",
+              "validUntil": "2026-03-05T18:30:00.000Z"
           },
-          {
-            id: '9a2a70a3-9c6f-4ccf-b5c6-f076d238e8b0',
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'GBP',
-              centAmount: 6000,
-              fractionDigits: 2,
-            },
-            country: 'GB',
+          "quantity": 1,
+          "discountedPricePerQuantity": [],
+          "taxRate": {
+              "name": "en",
+              "amount": 0.1,
+              "includedInPrice": false,
+              "country": "US",
+              "id": "sfOR5PDn",
+              "subRates": []
           },
-        ],
-        images: [
-          {
-            url: 'https://img.weddingbazaar.com/shaadisaga_production/photos/pictures/000/923/067/new_large/the_wedding_conteurs3.jpg?1560777936',
-            dimensions: {
-              w: 300,
-              h: 375,
-            },
+          "perMethodTaxRate": [],
+          "addedAt": "2025-03-14T05:30:20.417Z",
+          "lastModifiedAt": "2025-03-14T05:30:20.417Z",
+          "state": [
+              {
+                  "quantity": 1,
+                  "state": {
+                      "typeId": "state",
+                      "id": "bbbd6d42-e1ed-47ba-98ee-8759da290bbe"
+                  }
+              }
+          ],
+          "priceMode": "Platform",
+          "lineItemMode": "Standard",
+          "totalPrice": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 501900,
+              "fractionDigits": 2
           },
-        ],
-        attributes: [],
-        assets: [],
-      },
-      price: {
-        id: '6cca5967-3537-4ee9-9447-5dc5c08f69b9',
-        value: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 5000,
-          fractionDigits: 2,
-        },
-        country: 'US',
-      },
-      quantity: 1,
-      discountedPricePerQuantity: [],
-      taxRate: {
-        name: 'test-taxes-category',
-        amount: 0.2,
-        includedInPrice: true,
-        country: 'US',
-        id: '4C4h3IUy',
-        subRates: [],
-      },
-      perMethodTaxRate: [],
-      addedAt: '2023-08-11T13:08:58.537Z',
-      lastModifiedAt: '2023-08-11T13:08:58.537Z',
-      state: [
-        {
-          quantity: 1,
-          state: {
-            typeId: 'state',
-            id: '16817240-b167-4ddd-82ce-6772851db76a',
+          "taxedPrice": {
+              "totalNet": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 501900,
+                  "fractionDigits": 2
+              },
+              "totalGross": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 552090,
+                  "fractionDigits": 2
+              },
+              "taxPortions": [
+                  {
+                      "rate": 0.1,
+                      "amount": {
+                          "type": "centPrecision",
+                          "currencyCode": "USD",
+                          "centAmount": 50190,
+                          "fractionDigits": 2
+                      },
+                      "name": "en"
+                  }
+              ],
+              "totalTax": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 50190,
+                  "fractionDigits": 2
+              }
           },
-        },
-      ],
-      priceMode: 'Platform',
-      lineItemMode: 'Standard',
-      totalPrice: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 5000,
-        fractionDigits: 2,
-      },
-      taxedPrice: {
-        totalNet: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 4167,
-          fractionDigits: 2,
-        },
-        totalGross: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 5000,
-          fractionDigits: 2,
-        },
-        totalTax: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 833,
-          fractionDigits: 2,
-        },
-      },
-      taxedPricePortions: [],
-    },
+          "taxedPricePortions": []
+      }
   ],
-  cartState: 'Active',
-  totalPrice: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: 5000,
-    fractionDigits: 2,
+  "cartState": "Ordered",
+  "totalPrice": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 501900,
+      "fractionDigits": 2
   },
-  taxedPrice: {
-    totalNet: {
-      type: 'centPrecision',
-      currencyCode: 'USD',
-      centAmount: 4167,
-      fractionDigits: 2,
-    },
-    totalGross: {
-      type: 'centPrecision',
-      currencyCode: 'USD',
-      centAmount: 5000,
-      fractionDigits: 2,
-    },
-    taxPortions: [
-      {
-        rate: 0.2,
-        amount: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 833,
-          fractionDigits: 2,
-        },
-        name: 'test-taxes-category',
+  "taxedPrice": {
+      "totalNet": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 501900,
+          "fractionDigits": 2
       },
-    ],
-    totalTax: {
-      type: 'centPrecision',
-      currencyCode: 'USD',
-      centAmount: 833,
-      fractionDigits: 2,
-    },
-  },
-  country: 'US',
-  shippingMode: 'Single',
-  shippingAddress: {
-    firstName: 'john',
-    lastName: 'doe',
-    streetName: '1295 Charleston Road',
-    postalCode: '94043',
-    city: 'Mountain View',
-    region: 'CA',
-    country: 'US',
-    phone: '9876543210',
-    email: 'john.doe@wipro.com',
-  },
-  shipping: [],
-  customLineItems: [],
-  discountCodes: [],
-  directDiscounts: [],
-  paymentInfo: {
-    payments: [
-      {
-        typeId: 'payment',
-        id: 'b5bc1c23-627b-4466-95fb-3ef5b5cc07cc',
+      "totalGross": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 552090,
+          "fractionDigits": 2
       },
-    ],
+      "taxPortions": [
+          {
+              "rate": 0.1,
+              "amount": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 50190,
+                  "fractionDigits": 2
+              },
+              "name": "en"
+          }
+      ],
+      "totalTax": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 50190,
+          "fractionDigits": 2
+      }
   },
-  inventoryMode: 'None',
-  taxMode: 'Platform',
-  taxRoundingMode: 'HalfEven',
-  taxCalculationMode: 'LineItemLevel',
-  deleteDaysAfterLastModification: 90,
-  refusedGifts: [],
-  origin: 'Customer',
-  billingAddress: {
-    firstName: 'john',
-    lastName: 'doe',
-    streetName: '1295 Charleston Road',
-    postalCode: '94043',
-    city: 'Mountain View',
-    region: 'CA',
-    country: 'US',
-    phone: '9876543210',
-    email: 'john.doe@wipro.com',
+  "country": "US",
+  "taxedShippingPrice": {
+      "totalNet": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      },
+      "totalGross": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      },
+      "taxPortions": [
+          {
+              "rate": 0.1,
+              "amount": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 0,
+                  "fractionDigits": 2
+              },
+              "name": "en"
+          }
+      ],
+      "totalTax": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      }
   },
-  itemShippingAddresses: [],
-  totalLineItemQuantity: 1,
+  "shippingMode": "Single",
+  "shippingInfo": {
+      "shippingMethodName": "DHL",
+      "price": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      },
+      "shippingRate": {
+          "price": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          },
+          "tiers": []
+      },
+      "taxRate": {
+          "name": "en",
+          "amount": 0.1,
+          "includedInPrice": false,
+          "country": "US",
+          "id": "sfOR5PDn",
+          "subRates": []
+      },
+      "taxCategory": {
+          "typeId": "tax-category",
+          "id": "5a01f7c3-73fd-44e3-8c7f-c89a62bbc7bc"
+      },
+      "deliveries": [],
+      "shippingMethod": {
+          "typeId": "shipping-method",
+          "id": "3d2780f9-f22b-4710-bb5c-b14dd6a27a2c"
+      },
+      "taxedPrice": {
+          "totalNet": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          },
+          "totalGross": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          },
+          "taxPortions": [
+              {
+                  "rate": 0.1,
+                  "amount": {
+                      "type": "centPrecision",
+                      "currencyCode": "USD",
+                      "centAmount": 0,
+                      "fractionDigits": 2
+                  },
+                  "name": "en"
+              }
+          ],
+          "totalTax": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          }
+      },
+      "shippingMethodState": "MatchesCart"
+  },
+  "shippingAddress": {
+      "firstName": "test",
+      "lastName": "t",
+      "streetName": "123 ch rd",
+      "additionalStreetInfo": "",
+      "postalCode": "94045",
+      "city": "CA",
+      "region": "AL",
+      "country": "US",
+      "phone": "9876543210",
+      "email": "test@gmail.com"
+  },
+  "shipping": [],
+  "customLineItems": [],
+  "discountCodes": [],
+  "directDiscounts": [],
+  "paymentInfo": {
+      "payments": [
+          {
+              "typeId": "payment",
+              "id": "e67902d8-95e3-49ab-bad9-cad6026d8433"
+          }
+      ]
+  },
+  "inventoryMode": "None",
+  "taxMode": "Platform",
+  "taxRoundingMode": "HalfEven",
+  "taxCalculationMode": "LineItemLevel",
+  "deleteDaysAfterLastModification": 90,
+  "refusedGifts": [],
+  "origin": "Customer",
+  "billingAddress": {
+      "firstName": "test",
+      "lastName": "t",
+      "streetName": "123 ch rd",
+      "additionalStreetInfo": "",
+      "postalCode": "94045",
+      "city": "CA",
+      "region": "AL",
+      "country": "US",
+      "phone": "9876543210",
+      "email": "test@gmail.com"
+  },
+  "itemShippingAddresses": [],
+  "discountTypeCombination": {
+      "type": "Stacking"
+  },
+  "totalLineItemQuantity": 1
 };
 
- const getGooglePayResponseUpdatePaymentObj = {
+const getGooglePayResponseUpdatePaymentObj = {
   id: '9d727280-43f8-46cf-90dd-b2a4909b761f',
   version: 2,
   versionModifiedAt: '2023-08-11T13:30:01.153Z',
@@ -1502,7 +1578,7 @@ import unit from '../JSON/unit.json';
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
- const getClickToPayResponseUpdatePaymentObj = {
+const getClickToPayResponseUpdatePaymentObj = {
   id: '6a29a73d-7ade-4d52-a0a3-3b52c15c59a0',
   version: 2,
   versionModifiedAt: '2023-08-11T13:52:25.234Z',
@@ -1565,7 +1641,7 @@ import unit from '../JSON/unit.json';
   anonymousId: '9f414dca-2701-400f-86ad-f1af98d6a81a',
 };
 
- const tokenCreateFlagCustomerInfo = {
+const tokenCreateFlagCustomerInfo = {
   id: '19357cc7-8edf-4e19-ad10-37d9ecd26398',
   version: 1,
   versionModifiedAt: '2023-10-06T06:41:47.315Z',
@@ -1589,10 +1665,10 @@ import unit from '../JSON/unit.json';
   shippingAddressIds: [],
   billingAddressIds: [],
   isEmailVerified: false,
-  stores: []
+  stores: [],
 };
 
- const tokenCreateFlagPaymentObj: PaymentType = {
+const tokenCreateFlagPaymentObj: any = {
   id: 'a16d2aa2-4e89-404d-ac45-2c048e4e8cda',
   version: 14,
   customer: { id: '19357cc7-8edf-4e19-ad10-37d9ecd26398' },
@@ -1636,27 +1712,27 @@ import unit from '../JSON/unit.json';
   ],
 };
 
- const tokenCreateFlagFunctionName = 'FuncGetCreditCardResponse';
+const tokenCreateFlagFunctionName = 'FuncGetCreditCardResponse';
 
- const createResponseSetTransaction = {
+const createResponseSetTransaction = {
   action: 'changeTransactionInteractionId',
   interactionId: '7017763034976210803954',
   transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
 };
 
- const createTransactionSetCustomField = {
+const createTransactionSetCustomField = {
   action: 'changeTransactionState',
   state: 'Success',
   transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
 };
 
- const createTransactionSetFailedCustomField = {
+const createTransactionSetFailedCustomField = {
   action: 'changeTransactionState',
   state: 'Failure',
   transactionId: '7c53c4d8-a463-49ad-a50e-a4e639513066',
 };
 
- const getTransactionSummariesUpdatePaymentObj = {
+const getTransactionSummariesUpdatePaymentObj = {
   id: '4cb11292-d00f-45db-8505-caa387cb1fdc',
   version: 12,
   versionModifiedAt: '2023-12-05T12:29:38.507Z',
@@ -1726,7 +1802,7 @@ import unit from '../JSON/unit.json';
   anonymousId: 'ad4acd03-8ada-4b90-9d2d-6eb7a611e213',
 };
 
- const checkAuthReversalTriggeredPaymentResponse = {
+const checkAuthReversalTriggeredPaymentResponse = {
   httpCode: 201,
   transactionId: '7018441973826257903954',
   status: 'AUTHORIZED_RISK_DECLINED',
@@ -1809,7 +1885,7 @@ import unit from '../JSON/unit.json';
   },
 };
 
- const checkAuthReversalTriggeredUpdateActions = {
+const checkAuthReversalTriggeredUpdateActions = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -1830,7 +1906,7 @@ import unit from '../JSON/unit.json';
   errors: [],
 };
 
- let runSyncAddTransactionSyncUpdateObject: ReportSyncType = {
+let runSyncAddTransactionSyncUpdateObject: ReportSyncType = {
   id: unit.paymentId,
   transactionId: '',
   version: 32,
@@ -1840,11 +1916,10 @@ import unit from '../JSON/unit.json';
     centAmount: 2000,
   },
   type: 'Refund',
-  state: '',
-  securityCodePresent: false,
+  state: ''
 };
 
- let runSyncAddTransactionSyncUpdateEmptyObject: ReportSyncType = {
+let runSyncAddTransactionSyncUpdateEmptyObject: ReportSyncType = {
   id: unit.paymentId,
   transactionId: '',
   version: 32,
@@ -1854,11 +1929,10 @@ import unit from '../JSON/unit.json';
     centAmount: 1,
   },
   type: '',
-  state: '',
-  securityCodePresent: false,
+  state: ''
 };
 
- const runSyncUpdateCaptureAmountUpdatePaymentObj = {
+const runSyncUpdateCaptureAmountUpdatePaymentObj = {
   id: unit.paymentId,
   version: 38,
   versionModifiedAt: '2023-12-07T06:33:01.682Z',
@@ -2105,108 +2179,270 @@ import unit from '../JSON/unit.json';
   anonymousId: 'ad4acd03-8ada-4b90-9d2d-6eb7a611e213',
 };
 
- const customerCardTokens = {
+const customerCardTokens = {
   customerTokenId: '',
   paymentInstrumentId: '',
 };
 
- const retrieveSyncResponseTransactionElement: any = {
-  id: '7077198716926378103955',
-  submitTimeUtc: '2024-02-12T06:37:51Z',
-  merchantId: 'visa_isv_opencart_pmt_dm',
-  applicationInformation: {
-    reasonCode: '100',
-    rCode: '1',
-    rFlag: 'SOK',
-    applications: [
+const retrieveSyncResponseTransactionElement: any = {
+  "id": "7417713525626563504805",
+  "rootId": "7417713525626563504805",
+  "reconciliationId": "4121953234",
+  "submitTimeUTC": "2025-03-12T09:22:32Z",
+  "merchantId": "wiproltd",
+  "applicationInformation": {
+    "reasonCode": 100,
+    "applications": [
       {
-        name: 'ics_auth',
-        reasonCode: '100',
-        rCode: '1',
-        rFlag: 'SOK',
-        reconciliationId: '74986830LRZD8MPI',
-        rMessage: 'Request was processedsuccessfully.',
-        returnCode: 1010000,
+        "name": "ics_auth",
+        "reasonCode": "100",
+        "rCode": "1",
+        "rFlag": "SOK",
+        "reconciliationId": "4121953234",
+        "rMessage": "Request was processed successfully.",
+        "returnCode": 1010000
+      }
+    ]
+  },
+  "buyerInformation": {},
+  "clientReferenceInformation": {
+    "code": "8432cc4b-5595-4760-98a0-5092afbbd463",
+    "applicationName": "Commercetools(REST)",
+    "applicationVersion": "25.2.0",
+    "partner": {
+      "solutionId": "GD1GCCBN"
+    }
+  },
+  "consumerAuthenticationInformation": {
+    "eciRaw": "7",
+    "strongAuthentication": {}
+  },
+  "deviceInformation": {
+    "ipAddress": "192.168.1.1"
+  },
+  "errorInformation": {
+    "message": "Request was processed successfully."
+  },
+  "installmentInformation": {},
+  "fraudMarkingInformation": {},
+  "merchantDefinedInformation": [
+    {
+      "key": "1",
+      "value": "testValue1"
+    },
+    {
+      "key": "2",
+      "value": "testValue2"
+    }
+  ],
+  "merchantInformation": {
+    "merchantDescriptor": {
+      "name": "wiproltd"
+    }
+  },
+  "orderInformation": {
+    "billTo": {
+      "firstName": "TEST",
+      "lastName": "T",
+      "address1": "123 ch rd",
+      "locality": "CA",
+      "administrativeArea": "AL",
+      "postalCode": "94045",
+      "email": "test@gmail.com",
+      "country": "US",
+      "phoneNumber": "9876543210"
+    },
+    "shipTo": {
+      "firstName": "JOHN",
+      "lastName": "DOE",
+      "address1": "Example Street",
+      "address2": "1295,Charelston Road",
+      "locality": "Mountain View",
+      "administrativeArea": "CA",
+      "postalCode": "94043",
+      "country": "US",
+      "phoneNumber": "9876543210"
+    },
+    "amountDetails": {
+      "totalAmount": "5045.8",
+      "currency": "USD",
+      "taxAmount": "0",
+      "authorizedAmount": "5045.8"
+    },
+    "shippingDetails": {},
+    "invoiceDetails": {},
+    "lineItems": [
+      {
+        "productCode": "default",
+        "productName": "Mexicon-Hat",
+        "productSku": "SKU-1",
+        "taxAmount": 0,
+        "quantity": 1,
+        "unitPrice": 5019,
+        "fulfillmentType": "P "
       },
-    ],
+      {
+        "productCode": "shipping_and_handling",
+        "productName": "DHL",
+        "productSku": "shipping_and_handling",
+        "taxAmount": 0,
+        "quantity": 1,
+        "unitPrice": 9,
+        "fulfillmentType": "P "
+      },
+      {
+        "productCode": "shipping_and_handling",
+        "productName": "Express",
+        "productSku": "shipping_and_handling",
+        "taxAmount": 0,
+        "quantity": 1,
+        "unitPrice": 9.9,
+        "fulfillmentType": "P "
+      },
+      {
+        "productCode": "shipping_and_handling",
+        "productName": "Standard",
+        "productSku": "shipping_and_handling",
+        "taxAmount": 0,
+        "quantity": 1,
+        "unitPrice": 7.9,
+        "fulfillmentType": "P "
+      }
+    ]
   },
-  buyerInformation: {},
-  clientReferenceInformation: {
-    code: '16ecff99-397e-4248-9776-fb34cd8c4e91',
-    applicationName: 'REST API',
-    partner: {
-      solutionId: '42EA2Y58',
+  "paymentInformation": {
+    "customer": {},
+    "paymentInstrument": {},
+    "instrumentIdentifier": {},
+    "shippingAddress": {},
+    "paymentType": {
+      "name": "omnipaydirect",
+      "type": "credit card",
+      "method": "VI"
     },
-  },
-  consumerAuthenticationInformation: {
-    eciRaw: '7',
-  },
-  deviceInformation: {
-    ipAddress: '223.186.21.112',
-  },
-  errorInformation: {},
-  fraudMarkingInformation: {},
-  merchantInformation: {
-    resellerId: 'cybs_plugins',
-  },
-  orderInformation: {
-    billTo: {
-      firstName: 'john',
-      lastName: 'P',
-      address1: '1295 road',
-      email: 'sp@gmail.com',
-      country: 'US',
+    "card": {
+      "suffix": "1111",
+      "prefix": "411111",
+      "expirationMonth": "01",
+      "expirationYear": "29  ",
+      "type": "001"
     },
-    shipTo: {
-      firstName: 'john',
-      lastName: 'P',
-      address1: '1295 road',
-      country: 'US',
+    "invoice": {},
+    "accountFeatures": {},
+    "fluidData": {},
+    "issuerInformation": {
+      "country": "PL"
     },
-    amountDetails: {
-      totalAmount: '45.00',
-      currency: 'USD',
+    "paymentAccountInformation": {
+      "card": {},
+      "features": {},
+      "network": {}
+    }
+  },
+  "paymentInsightsInformation": {
+    "responseInsights": {},
+    "ruleResults": {}
+  },
+  "payoutInformation": {
+    "pushFunds": {},
+    "pullFunds": {}
+  },
+  "payoutOptions": {},
+  "processingInformation": {
+    "paymentSolution": "Visa",
+    "commerceIndicator": "7",
+    "commerceIndicatorLabel": "internet",
+    "authorizationOptions": {
+      "authType": "O",
+      "initiator": {
+        "merchantInitiatedTransaction": {}
+      },
+      "cardVerificationIndicator": false
     },
-  },
-  paymentInformation: {
-    paymentType: {
-      type: 'credit card',
-      method: 'VI',
+    "bankTransferOptions": {},
+    "japanPaymentOptions": {},
+    "fundingOptions": {
+      "firstRecurringPayment": false
     },
-    customer: {},
-    card: {
-      suffix: '1111',
-      prefix: '411111',
-      type: '001',
+    "ecommerceIndicator": "7",
+    "reconciliationId": "4121953234",
+    "captureOptions": {}
+  },
+  "processorInformation": {
+    "processor": {
+      "name": "omnipaydirect"
     },
-  },
-  processingInformation: {
-    commerceIndicator: '7',
-    commerceIndicatorLabel: 'internet',
-  },
-  processorInformation: {
-    processor: {
-      name: 'smartpay',
+    "approvalCode": "831000",
+    "responseCode": "00",
+    "avs": {
+      "code": "1"
     },
-    approvalCode: '888888',
-  },
-  pointOfSaleInformation: {
-    terminalId: '123456',
-    partner: {},
-    emv: {},
-  },
-  riskInformation: {
-    providers: {},
-  },
-  _links: {
-    transactionDetail: {
-      href: 'https://apitest.cybersource.com/tss/v2/transactions/7077198716926378103955',
-      method: 'GET',
+    "cardVerification": {
+      "resultCode": "3"
     },
+    "achVerification": {
+      "resultCodeRaw": "00"
+    },
+    "electronicVerificationResults": {}
   },
+  "pointOfSaleInformation": {
+    "terminalId": "CYBS0001"
+  },
+  "riskInformation": {
+    "score": {}
+  },
+  "recipientInformation": {},
+  "senderInformation": {
+    "paymentInformation": {
+      "customer": {},
+      "paymentType": {
+        "name": "omnipaydirect",
+        "type": "credit card",
+        "method": "VI"
+      },
+      "card": {
+        "suffix": "1111",
+        "expirationMonth": "01",
+        "expirationYear": "29  ",
+        "type": "001"
+      },
+      "invoice": {},
+      "accountFeatures": {},
+      "fluidData": {},
+      "issuerInformation": {},
+      "paymentAccountInformation": {}
+    }
+  },
+  "tokenInformation": {},
+  "_links": {
+    "self": {
+      "href": "https://apitest.cybersource.com/tss/v2/transactions/7417713525626563504805",
+      "method": "GET"
+    },
+    "relatedTransactions": [
+      {
+        "href": "https://apitest.cybersource.com/tss/v2/transactions/7417714911926596304805",
+        "method": "GET"
+      },
+      {
+        "href": "https://apitest.cybersource.com/tss/v2/transactions/7418425044816489404807",
+        "method": "GET"
+      },
+      {
+        "href": "https://apitest.cybersource.com/tss/v2/transactions/7417714923986287104807",
+        "method": "GET"
+      },
+      {
+        "href": "https://apitest.cybersource.com/tss/v2/transactions/7418425040056716704806",
+        "method": "GET"
+      }
+    ]
+  },
+  "recurringPaymentInformation": {},
+  "unscheduledPaymentInformation": {}
 };
 
- const retrieveSyncAmountDetailsApplicationResponse = {
+const retrieveSyncAmountDetailsApplicationResponse = {
   authPresent: true,
   authReasonCodePresent: true,
   capturePresent: false,
@@ -2215,7 +2451,7 @@ import unit from '../JSON/unit.json';
   refundPresent: false,
 };
 
- const retrieveAddRefundResponseObjectTransaction = {
+const retrieveAddRefundResponseObjectTransaction = {
   id: '21f9e6e5-4851-496d-ad9d-dc78f4d9645a',
   timestamp: '2024-02-12T12:11:52.422Z',
   type: 'Charge',
@@ -2238,7 +2474,7 @@ import unit from '../JSON/unit.json';
   },
 };
 
- const retrieveAddRefundResponseObjectTransactionWithNoCustom = {
+const retrieveAddRefundResponseObjectTransactionWithNoCustom = {
   id: '21f9e6e5-4851-496d-ad9d-dc78f4d9645a',
   timestamp: '2024-02-12T12:11:52.422Z',
   type: 'Charge',
@@ -2252,7 +2488,7 @@ import unit from '../JSON/unit.json';
   state: 'Success',
 };
 
- const captureResponse = {
+const captureResponse = {
   id: '21f9e6e5-4851-496d-ad9d-dc78f4d9645a',
   timestamp: '2024-02-12T12:11:52.422Z',
   type: 'Charge',
@@ -2275,7 +2511,7 @@ import unit from '../JSON/unit.json';
   },
 };
 
- const customFields = {
+const customFields = {
   isv_deviceFingerprintId: 'acc334ea-a883-4280-98de-6be782780ae7',
   isv_token:
     'eyJraWQiOiIwOHZhTlBiWXRqTTNRTHhOUkxPU0Mzejc2bjhSUVFPbCIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzA4IiwiZXhwIjoxNzA3ODkxNjczLCJ0eXBlIjoibWYtMi4wLjAiLCJpYXQiOjE3MDc4OTA3NzMsImp0aSI6IjFFNFY2U05WN0JRRzNGNEJOVEo5VkE5QTVXNlFBWkxIOUNZUzVFR0JBMDVWVVFWWkJVNkE2NUNDNUJEOTE0NUUiLCJjb250ZW50Ijp7InBheW1lbnRJbmZvcm1hdGlvbiI6eyJjYXJkIjp7ImV4cGlyYXRpb25ZZWFyIjp7InZhbHVlIjoiMjAzMiJ9LCJudW1iZXIiOnsiZGV0ZWN0ZWRDYXJkVHlwZXMiOlsiMDAxIl0sIm1hc2tlZFZhbHVlIjoiWFhYWFhYWFhYWFhYMTExMSIsImJpbiI6IjQxMTExMSJ9LCJzZWN1cml0eUNvZGUiOnt9LCJleHBpcmF0aW9uTW9udGgiOnsidmFsdWUiOiIwMSJ9fX19fQ.MftUQ5bugFPilh3YLyHuPpuRhwdTRHt0C13gjNBwIRTe8s8CbS_lACIMdQycd8VB1gXfbnsuEbbWp_iUjjdOlrYb5fBI5ogLX1rcZGCagu-NUWcCm1AASOc43dJTdq3xYdAqgFaJ5LqjXQiHaofTtSgZjV-f-9VQ5JD5T9LUsEmkTgULY1fUrPjBd4_ZrQJDFX-rt3f3hD3DYclrgKfVD5MeCayvPQjQOlKoAX6UwJujC-7LQ65UVi-sCxiUNNSNvTNDPvrFnBD5VUYEIif986A2NryhJ6qC7yYGTL4y71589Qf5mjyqFsFWFzhRmjh9WnnftbxuU4PFFu9Qs030qQ',
@@ -2299,7 +2535,7 @@ import unit from '../JSON/unit.json';
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiI2RVAzYldPTHdqMWUzM3h2WWpoeWVoQUFFRmo3Q1VJWkZ0cU1VZCtCazRLL3B0VFJiTmNJMmRLTld6TGJXWk42ZWt5dHRnUVVTbXMrZXB5MUpKNUpUQXpYUmFVeE1HSU00c01HUVBBM0dFRnBmNWw4U0hsa1o0V1Q1VldaN3JJeGFUWVIiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJsbFZrVEo2bEMwZW52Q24xNldQU21waXM2QU9pZ0pITVNBUGdyUnN1b1NGd0hKT2pkQU82dUNHaVRJSWJTdkt5aU9lR0tfUGo5c0JTdG9PZkx1Q0pUY2Z3X1pQa09sYWNPWUV5bkZBalRsY2txWmZhanBfWUdKbXhjRkQ5NWk5NTYxTXdhazhpeU43SlFkQks5Q3Y1bFNQSGVoVDJRYUdXVDN2ZWhpUk4zeEJlUEpUd1JELTluckozY0dLU0ZzM19kUWl3SmNnZUs4WFJPQ28xZlBmdVJCMjhhMkhDcmRLRHFWUE5NdVlKRk00QVpESjg4VjZaOFlXZnhBNTB2RFcyd2Vzc0NueDZHR2lDUjFORGJrYklKNGhyVVVxeFVEUGMzeE5vQlBuU0lEcUw3RjVzSWFMaGFLVUpQUlB1ZnNSbk1wbVBHRkczUnR2RzJ6czVtQjl4RHciLCJraWQiOiIwOHZhTlBiWXRqTTNRTHhOUkxPU0Mzejc2bjhSUVFPbCJ9fSwiY3R4IjpbeyJkYXRhIjp7ImNsaWVudExpYnJhcnkiOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbS9taWNyb2Zvcm0vYnVuZGxlL3YyLjAvZmxleC1taWNyb2Zvcm0ubWluLmpzIiwiYWxsb3dlZENhcmROZXR3b3JrcyI6WyJWSVNBIiwiTUFTVEVSQ0FSRCIsIkFNRVgiLCJNQUVTVFJPIiwiQ0FSVEVTQkFOQ0FJUkVTIiwiQ1VQIiwiSkNCIiwiRElORVJTQ0xVQiIsIkRJU0NPVkVSIl0sInRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgyIiwiaHR0cHM6Ly9ibzItY3QuaXN2cGx1Z2lucy5jb20iLCJodHRwOi8vbG9jYWxob3N0OjgwODAiXSwibWZPcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSJ9LCJ0eXBlIjoibWYtMi4wLjAifV0sImlzcyI6IkZsZXggQVBJIiwiZXhwIjoxNzA3ODkxNjU5LCJpYXQiOjE3MDc4OTA3NTksImp0aSI6IkNYTHNKbmh2MXBuc3QyRzgifQ.8JHhM4JcSmdPFQE87BdosLhqrC8PWB4aAOLpxXQekHM',
 };
 
- const getPresentApplications = [
+const getPresentApplications = [
   {
     name: 'ics_auth',
     reasonCode: '100',
@@ -2311,12 +2547,12 @@ import unit from '../JSON/unit.json';
   },
 ];
 
- const tokenResponse = {
+const tokenResponse = {
   notSaveToken: false,
   isError: false,
 };
 
- const authResponse = {
+const authResponse = {
   actions: [
     {
       action: 'setCustomField',
@@ -2352,7 +2588,7 @@ import unit from '../JSON/unit.json';
   errors: [],
 };
 
- const handleAuthApplication = {
+const handleAuthApplication = {
   name: 'ics_auth',
   reasonCode: '100',
   rCode: '1',
@@ -2362,7 +2598,7 @@ import unit from '../JSON/unit.json';
   returnCode: 1010000,
 };
 
- const handleAuthReversalResponseUpdateActions = {
+const handleAuthReversalResponseUpdateActions = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -2398,58 +2634,483 @@ import unit from '../JSON/unit.json';
   errors: [],
 };
 
- const processTokensCustomerCardTokensObject = {
+const processTokensCustomerCardTokensObject = {
   customerTokenId: '116C393967840ACDE063AF598E0ADE72',
   paymentInstrumentId: '116C475A535C411BE063AF598E0A3DC8',
 };
 
- const processTokensCustomerInvalidCardTokensObject = {
+const processTokensCustomerInvalidCardTokensObject = {
   customerTokenId: '@#%^@RW^Y&',
   paymentInstrumentId: '&YY#&DBGV(I',
 };
 
- const processTokensInstrumentIdentifier = '703000000002660108812';
+const processTokensInstrumentIdentifier = '703000000002660108812';
 
- const searchSubscriptionResponse = {
+const searchSubscriptionResponse = {
   httpCode: 200,
   webhookId: '1208e4c6-fb85-94d8-e063-9c588e0a4bf0',
   webhookUrl: 'https://iyi6rylvc8.execute-api.us-east-1.amazonaws.com/netTokenNotification',
 };
 
- const invalidSearchSubscriptionResponse = {
+const invalidSearchSubscriptionResponse = {
   httpCode: 404,
   webhookId: '',
   webhookUrl: '',
 };
 
- const invalidSubscriptionResponse = {
+const invalidSubscriptionResponse = {
   httpCode: 0,
   webhookId: '@*&^@&*U@*',
   webhookUrl: '(@*^&(!@&^',
 };
 
- const createTransactionPaymentFailure = {
+const createTransactionPaymentFailure = {
   action: 'addInterfaceInteraction',
-  type: { 
-    key: 'isv_payment_failure' 
+  type: {
+    key: 'isv_payment_failure',
   },
   fields: {
     reasonCode: '400',
-    transactionId: 'fada81af-f217-4279-ab08-1bd1300c19d8'
-  }
-} 
+    transactionId: 'fada81af-f217-4279-ab08-1bd1300c19d8',
+  },
+};
 
- const createTransactionSetCustomType = {
+const createTransactionSetCustomType = {
   action: 'setTransactionCustomType',
-  type: { 
-    key: 'isv_transaction_data', 
-    typeId: 'type' 
+  type: {
+    key: 'isv_transaction_data',
+    typeId: 'type',
   },
-  fields: { 
-    isv_availableCaptureAmount: 0 
+  fields: {
+    isv_availableCaptureAmount: 0,
   },
-  transactionId: '1e53fc0c-1109-4850-bd75-41da1b1108a5'
-}
+  transactionId: '1e53fc0c-1109-4850-bd75-41da1b1108a5',
+};
+
+let payment = {
+  id: unit.paymentId,
+  version: 13,
+  lastMessageSequenceNumber: 2,
+  createdAt: '2021-12-06T10:19:24.257Z',
+  lastModifiedAt: '2021-12-06T10:19:53.227Z',
+  lastModifiedBy: {
+    clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
+    isPlatformClient: false,
+    customer: {
+      typeId: 'customer',
+      id: unit.customerId,
+    },
+  },
+  createdBy: {
+    clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
+    isPlatformClient: false,
+    customer: {
+      typeId: 'customer',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
+    },
+  },
+  customer: {
+    typeId: 'customer',
+    id: unit.customerId,
+  },
+  amountPlanned: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 5980,
+    fractionDigits: 2,
+  },
+  paymentMethodInfo: {
+    paymentInterface: 'cybersource',
+    method: 'creditCard',
+    name: {
+      en: 'Credit Card',
+    },
+  },
+  custom: {
+    type: {
+      typeId: 'type',
+      id: '87b9d9db-74a3-45d7-8e60-dde669866808',
+    },
+    fields: {
+      isv_tokenCaptureContextSignature:
+        'eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJxUC9kSU5ZcFozTmIzcjhnNlgzckpSQUFFTHY4VHRrTC9xdzE1RC9jcktJOWIzdERGbnpnZ01yMEk5OTJrUVdnSWFRU0VKTzRpQ0JiZERBN1RNMmd2VHZnUGgwdW80Q2dETG5xU25qQmYxTzh5cVltQXI2VGFTR2VxR1NickdHRXpaZ0IiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJnNmZyWlZSTHJ2bnNsdm9SX2ktM2FadThkWGM1UEhZZU5iN3J0aC1UQW11d2pLVWl4cnBfdkloSGs2VTRGREpWY0xIc2k2ZlNYT1VQeno5SzY1WnRqWGlnd3hDeTVQelBBRVFKNzRxZllKeG1qalhWUXVWdmthZUpiRDdVSU0xWXc5OGl2Y3Y0c09KRnpvS2Zvc00ySFdJVjJjbkVpaGJVbmVtekJwSDNsRXh1UFU1S0R5LXVyZzJzeWpLRjQ4aExXcGpxYnRHemVkV1VfWnp1QW9EU3pqcUtaTHoxb2RUdnoyNFVWcW1NMVZjLWhBcEIyWXdUam1vVE9MdnVPVkdrelY0cXRIUi1ULXFOLVRwRVRKLTJJbDJoU1Y0OHJkSjRiM1FWU0VHTzJzUm5nLWpHQmtlX2dMbmVNNjAxR1ZHVHZYc2lJZnN2V2xXZ1piUFowSnRZT3ciLCJraWQiOiIwODhlczJHVVpRN1I4WkU0WlBESDJoZnRCMFQwekM0UyJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2MzcyMzUwNzgsImlhdCI6MTYzNzIzNDE3OCwianRpIjoiOGRVbk1lNTNndUVlZXRPMSJ9.SHGohwgLRbk3AiRLSKQz0-NOLBwheay1Y9nSc7K-IctK6AHbTbTSG1d0yFa_PNUo_bLawyvwpvnJgFlccI1rgJR9VoBJhL8BZmwK2nBIrQyoKJyuAuIet0BZjzJ_0PWu9fr7mDdAJ5OAqtvw6AW4pFIri_1mV4AhAwBYSThlQOFFcGuRAsSFdK29TRMsqa31lkQ9tTUsXEteEHhHFGATXgTHqv3_wwWYoPx1IF--BpiCFE_tbkEldaQt6shemv69Y2mdGjskdm_KR1zKk0B7pwchZlzl4y5DhgVHxHcd1W1ej8flFuVvEI8EhVQ8zuOVE4zabUXGS6mdTv_8Pwp0gA',
+      isv_deviceFingerprintId: 'ecdce16c-7eee-45bc-8809-978623fb1272',
+      isv_cardExpiryYear: '2030',
+      isv_token: creditCard.isv_token,
+      isv_customerIpAddress: '171.76.13.221',
+      isv_maskedPan: '411111XXXXXX1111',
+      isv_cardExpiryMonth: '01',
+      isv_acceptHeader: '*/*',
+      isv_cardType: '001',
+      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
+      isv_tokenVerificationContext:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJxUC9kSU5ZcFozTmIzcjhnNlgzckpSQUFFTHY4VHRrTC9xdzE1RC9jcktJOWIzdERGbnpnZ01yMEk5OTJrUVdnSWFRU0VKTzRpQ0JiZERBN1RNMmd2VHZnUGgwdW80Q2dETG5xU25qQmYxTzh5cVltQXI2VGFTR2VxR1NickdHRXpaZ0IiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJnNmZyWlZSTHJ2bnNsdm9SX2ktM2FadThkWGM1UEhZZU5iN3J0aC1UQW11d2pLVWl4cnBfdkloSGs2VTRGREpWY0xIc2k2ZlNYT1VQeno5SzY1WnRqWGlnd3hDeTVQelBBRVFKNzRxZllKeG1qalhWUXVWdmthZUpiRDdVSU0xWXc5OGl2Y3Y0c09KRnpvS2Zvc00ySFdJVjJjbkVpaGJVbmVtekJwSDNsRXh1UFU1S0R5LXVyZzJzeWpLRjQ4aExXcGpxYnRHemVkV1VfWnp1QW9EU3pqcUtaTHoxb2RUdnoyNFVWcW1NMVZjLWhBcEIyWXdUam1vVE9MdnVPVkdrelY0cXRIUi1ULXFOLVRwRVRKLTJJbDJoU1Y0OHJkSjRiM1FWU0VHTzJzUm5nLWpHQmtlX2dMbmVNNjAxR1ZHVHZYc2lJZnN2V2xXZ1piUFowSnRZT3ciLCJraWQiOiIwODhlczJHVVpRN1I4WkU0WlBESDJoZnRCMFQwekM0UyJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2MzcyMzUwNzgsImlhdCI6MTYzNzIzNDE3OCwianRpIjoiOGRVbk1lNTNndUVlZXRPMSJ9.ldSihdIQRJf7ukEacugVNiNWdOvV4o17MPU8S26J0A8',
+      isv_merchantId: '',
+      isv_payerAuthenticationTransactionId:'AftqasS2lskIPXS4Q2q0',
+      isv_payerAuthenticationPaReq:'eyJtZXNzYWdlVHlwZSI6IkNSZXEiLCJtZXNzYWdlVmVyc2lvbiI6IjIuMi4wIiwidGhyZWVEU1NlcnZlclRyYW5zSUQiOiI1MjNkNzRiOS1kMWMwLTQ2MGItYWE5NC0yMDg4MTg1MmI2NGYiLCJhY3NUcmFuc0lEIjoiMGFmZmQ5NWEtZWYzZC00ZDM2LWI1YTEtNGFkNGE1YmU1MDI4IiwiY2hhbGxlbmdlV2luZG93U2l6ZSI6IjAyIn0',
+      isv_cardinalReferenceId :'520d7555-8563-4819-899c-bed098ceeded',
+      isv_metadata:"{\"1\":\"testValue1\",\"2\":\"testValue2\"}"
+    },
+  },
+  paymentStatus: {},
+  transactions: [],
+  interfaceInteractions: [],
+};
+
+let cart = {
+  type: 'Cart',
+  id: '3d09ed42-1b1b-450a-b670-269437683939',
+  version: 10,
+  lastMessageSequenceNumber: 1,
+  createdAt: '2022-04-11T09:08:17.675Z',
+  lastModifiedAt: '2022-04-11T09:10:51.071Z',
+  lastModifiedBy: {
+    clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
+    isPlatformClient: false,
+    customer: {
+      typeId: 'customer',
+      id: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
+    },
+  },
+  createdBy: {
+    clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
+    isPlatformClient: false,
+    customer: {
+      typeId: 'customer',
+      id: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
+    },
+  },
+  customerId: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
+  locale: 'en-US',
+  lineItems: [
+    {
+      id: '321ea068-968a-431c-a7a5-98615b74cda3',
+      productId: '7e3ccfc6-36ee-4995-ab1d-bb5095b08bbe',
+      name: {
+        en: 'Sherwani',
+      },
+      productType: {
+        typeId: 'product-type',
+        id: '31d56c4e-d578-4dab-a313-780b5f1e7556',
+        version: 1,
+      },
+      productSlug: {
+        en: 'a1',
+      },
+      variant: {
+        id: 1,
+        sku: 'SKU-1',
+        prices: [
+          {
+            id: '1fbaed84-99cc-4922-9776-c1ea3cd553e6',
+            value: {
+              type: 'centPrecision',
+              currencyCode: 'EUR',
+              centAmount: 15845,
+              fractionDigits: 2,
+            },
+            country: 'US',
+          },
+          {
+            id: '68018b50-2c8a-4304-b67a-ae15389be32d',
+            value: {
+              type: 'centPrecision',
+              currencyCode: 'USD',
+              centAmount: 5980,
+              fractionDigits: 2,
+            },
+            country: 'US',
+          },
+        ],
+        images: [
+          {
+            url: 'https://ik.imagekit.io/ldqsn9vvwgg/images/505833.jpg',
+            dimensions: {
+              w: 300,
+              h: 375,
+            },
+          },
+        ],
+        attributes: [],
+        assets: [],
+      },
+      price: {
+        id: '68018b50-2c8a-4304-b67a-ae15389be32d',
+        value: {
+          type: 'centPrecision',
+          currencyCode: 'USD',
+          centAmount: 5980,
+          fractionDigits: 2,
+        },
+        country: 'US',
+      },
+      quantity: 1,
+      discountedPricePerQuantity: [],
+      taxRate: {
+        name: 'test-tax-category',
+        amount: 0.2,
+        includedInPrice: true,
+        country: 'US',
+        id: 'HxMyojUT',
+        subRates: [],
+      },
+      addedAt: '2022-04-11T09:08:17.982Z',
+      lastModifiedAt: '2022-04-11T09:08:17.982Z',
+      state: [
+        {
+          quantity: 1,
+          state: {
+            typeId: 'state',
+            id: '438c0901-36c4-41ec-9a86-2853d6c73d0d',
+          },
+        },
+      ],
+      priceMode: 'Platform',
+      totalPrice: {
+        type: 'centPrecision',
+        currencyCode: 'USD',
+        centAmount: 5980,
+        fractionDigits: 2,
+      },
+      taxedPrice: {
+        totalNet: {
+          type: 'centPrecision',
+          currencyCode: 'USD',
+          centAmount: 4983,
+          fractionDigits: 2,
+        },
+        totalGross: {
+          type: 'centPrecision',
+          currencyCode: 'USD',
+          centAmount: 5980,
+          fractionDigits: 2,
+        },
+        totalTax: {
+          type: 'centPrecision',
+          currencyCode: 'USD',
+          centAmount: 997,
+          fractionDigits: 2,
+        },
+      },
+      lineItemMode: 'Standard',
+    },
+  ],
+  cartState: 'Active',
+  totalPrice: {
+    type: 'centPrecision',
+    currencyCode: 'USD',
+    centAmount: 5980,
+    fractionDigits: 2,
+  },
+  taxedPrice: {
+    totalNet: {
+      type: 'centPrecision',
+      currencyCode: 'USD',
+      centAmount: 4983,
+      fractionDigits: 2,
+    },
+    totalGross: {
+      type: 'centPrecision',
+      currencyCode: 'USD',
+      centAmount: 5980,
+      fractionDigits: 2,
+    },
+    taxPortions: [
+      {
+        rate: 0.2,
+        amount: {
+          type: 'centPrecision',
+          currencyCode: 'USD',
+          centAmount: 997,
+          fractionDigits: 2,
+        },
+        name: 'test-tax-category',
+      },
+    ],
+    totalTax: {
+      type: 'centPrecision',
+      currencyCode: 'USD',
+      centAmount: 997,
+      fractionDigits: 2,
+    },
+  },
+  country: 'US',
+  shippingMode: 'Multiple',
+  shipping: [
+    {
+      shippingKey: 'shippingKey123',
+      shippingInfo: {
+        shippingMethodName: 'UHL',
+        price: {
+          type: 'centPrecision',
+          currencyCode: 'USD',
+          centAmount: 990,
+          fractionDigits: 2,
+        },
+        shippingRate: {
+          price: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 990,
+            fractionDigits: 2,
+          },
+          tiers: [],
+        },
+        taxRate: {
+          name: 'test-taxes-category',
+          amount: 0.2,
+          includedInPrice: true,
+          country: 'US',
+          id: 'yo5l4O7M',
+          subRates: [],
+        },
+        taxCategory: {
+          typeId: 'tax-category',
+          id: '9ed4dda8-d050-4f6b-90a8-34901c33b6f8',
+        },
+        deliveries: [],
+        shippingMethod: {
+          typeId: 'shipping-method',
+          id: '793cc3e5-20fa-4931-a22d-0bb7c9db8be3',
+        },
+        taxedPrice: {
+          totalNet: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 825,
+            fractionDigits: 2,
+          },
+          totalGross: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 990,
+            fractionDigits: 2,
+          },
+          totalTax: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 165,
+            fractionDigits: 2,
+          },
+        },
+        shippingMethodState: 'MatchesCart',
+      },
+      shippingAddress: {
+        firstName: 'john',
+        lastName: 'doe',
+        streetName: 'ABC Street',
+        streetNumber: '1234',
+        postalCode: '94043',
+        city: 'Mountain Views',
+        region: 'CA',
+        country: 'US',
+        key: 'addressKeyOne',
+      },
+    },
+    {
+      shippingKey: 'myUniqueKey23455',
+      shippingInfo: {
+        shippingMethodName: 'DHL',
+        price: {
+          type: 'centPrecision',
+          currencyCode: 'USD',
+          centAmount: 1190,
+          fractionDigits: 2,
+        },
+        shippingRate: {
+          price: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 1190,
+            fractionDigits: 2,
+          },
+          tiers: [],
+        },
+        taxRate: {
+          name: 'test-taxes-category',
+          amount: 0.2,
+          includedInPrice: true,
+          country: 'US',
+          id: 'yo5l4O7M',
+          subRates: [],
+        },
+        taxCategory: {
+          typeId: 'tax-category',
+          id: '9ed4dda8-d050-4f6b-90a8-34901c33b6f8',
+        },
+        deliveries: [],
+        shippingMethod: {
+          typeId: 'shipping-method',
+          id: 'c80f6822-8b9d-476e-b4ac-3125fa789af2',
+        },
+        taxedPrice: {
+          totalNet: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 992,
+            fractionDigits: 2,
+          },
+          totalGross: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 1190,
+            fractionDigits: 2,
+          },
+          totalTax: {
+            type: 'centPrecision',
+            currencyCode: 'USD',
+            centAmount: 198,
+            fractionDigits: 2,
+          },
+        },
+        shippingMethodState: 'MatchesCart',
+      },
+      shippingAddress: {
+        streetName: 'PRB Nagar',
+        streetNumber: '1234',
+        postalCode: '94043',
+        city: 'Mountain Views',
+        region: 'CA',
+        country: 'US',
+        key: 'addressKeyTwo',
+      },
+    },
+  ],
+  customLineItems: [],
+  discountCodes: [],
+  directDiscounts: [],
+  inventoryMode: 'None',
+  taxMode: 'Platform',
+  taxRoundingMode: 'HalfEven',
+  taxCalculationMode: 'LineItemLevel',
+  deleteDaysAfterLastModification: 90,
+  refusedGifts: [],
+  origin: 'Customer',
+  shippingAddress: {
+    firstName: 'john',
+    lastName: 'doe',
+    streetName: '1295 Charleston Road',
+    postalCode: '94043',
+    city: 'Mountain View',
+    region: 'CA',
+    country: 'US',
+    phone: '9876543210',
+    email: 'john.doe@wipro.com',
+  },
+  billingAddress: {
+    firstName: 'john',
+    lastName: 'doe',
+    streetName: '1295 Charleston Road',
+    postalCode: '94043',
+    city: 'Mountain View',
+    region: 'CA',
+    country: 'US',
+    phone: '9876543210',
+    email: 'john.doe@wipro.com',
+  },
+  itemShippingAddresses: [],
+  totalLineItemQuantity: 1,
+};
 
 export default {
   visaCardDetailsActionVisaCheckoutData,
@@ -2517,5 +3178,7 @@ export default {
   invalidSearchSubscriptionResponse,
   invalidSubscriptionResponse,
   createTransactionPaymentFailure,
-  createTransactionSetCustomType
-}
+  createTransactionSetCustomType,
+  payment,
+  cart
+};
