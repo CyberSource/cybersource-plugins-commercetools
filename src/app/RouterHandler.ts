@@ -1,8 +1,9 @@
 import fs from 'fs';
+import http from 'http';
 import _path from 'path';
 
-import { Constants } from '../constants/constants';
 import { CustomMessages } from '../constants/customMessages';
+import { Constants } from '../constants/paymentConstants';
 /**
  * Handles routing and serving static files.
  */
@@ -34,22 +35,25 @@ export class RouterHandler {
    * @param {string} folderPath - The folder path where the file is located.
    * @param {http.ServerResponse} response - The HTTP response object.
    */
-  _serveStaticFile(url: string, path: string, folderPath: any, response: any) {
+  _serveStaticFile(url: string, path: string, folderPath: string, response: http.ServerResponse) {
     if (null !== url && '' !== url && null !== path && '' !== path && null !== folderPath && '' !== folderPath) {
       const indexOfPath = url.indexOf(path);
       let fileUrl = '';
-      if (indexOfPath !== -1) {
+      if (-1 !== indexOfPath) {
         fileUrl = url.substring(indexOfPath + path.length);
       } else {
         throw { url, path, folderPath };
       }
-      const filePath = _path.join(folderPath, fileUrl);
-      const mimePath = _path.extname(filePath);
+      const resolvedPath = _path.resolve(folderPath, fileUrl);
+      if (!resolvedPath.startsWith(_path.resolve(folderPath))) {
+        return this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_NOT_FOUND);
+      }
+      const mimePath = _path.extname(resolvedPath);
       const mimeType = this.mimeType[mimePath];
       if (!mimeType) {
         return this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_NOT_FOUND);
       }
-      fs.readFile(filePath, (err, data) => {
+      fs.readFile(resolvedPath, (err, data) => {
         if (err) {
           'ENOENT' === err.code ? this.sendResponse(response, Constants.HTTP_NOT_FOUND_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_NOT_FOUND) : this.sendResponse(response, Constants.HTTP_SERVER_ERROR_STATUS_CODE, 'text/plain', CustomMessages.ERROR_MSG_INTERNAL_SERVER_ERROR);
           return;
@@ -68,10 +72,18 @@ export class RouterHandler {
    * @param {string} contentType - The content type of the response.
    * @param {any} content - The content of the response.
    */
-  sendResponse(res: any, statusCode: number, contentType: string, content: any) {
+  sendResponse(res: http.ServerResponse, statusCode: number, contentType: any, content: any, headerData?: any) {
     res.statusCode = statusCode;
-    res.setHeader('Content-Type', contentType);
-    res.end(content);
+    if (headerData?.header && headerData?.view) {
+      res.setHeader(headerData.header, headerData.view);
+    } else {
+      res.setHeader('Content-Type', contentType);
+    }
+    if (content) {
+      res.end(content);
+    } else {
+      res.end();
+    }
   }
 
   /**

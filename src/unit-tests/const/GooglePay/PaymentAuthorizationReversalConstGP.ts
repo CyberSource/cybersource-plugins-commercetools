@@ -1,402 +1,422 @@
 import googlePay from '../../JSON/googlePay.json';
 const payment = {
-  id: '6b3158a4-6c72-403e-bda1-48d95367cb02',
-  version: 5,
-  lastMessageSequenceNumber: 4,
-  createdAt: '2021-12-22T07:46:52.751Z',
-  lastModifiedAt: '2021-12-22T07:46:57.983Z',
-  lastModifiedBy: {
-    clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
-    isPlatformClient: false,
-    customer: {
-      typeId: 'customer',
-      id: '88c278f9-82d9-427c-96df-f98a4f23e543',
-    },
+  "id": "4ee29ff0-a37d-47c2-95c1-5fff829e4310",
+  "version": 12,
+  "versionModifiedAt": "2025-03-13T07:08:43.128Z",
+  "lastMessageSequenceNumber": 3,
+  "createdAt": "2025-03-13T07:08:38.576Z",
+  "lastModifiedAt": "2025-03-13T07:08:43.128Z",
+  "lastModifiedBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
   },
-  createdBy: {
-    clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
-    isPlatformClient: false,
-    customer: {
-      typeId: 'customer',
-      id: '88c278f9-82d9-427c-96df-f98a4f23e543',
-    },
+  "createdBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
   },
-  customer: {
-    typeId: 'customer',
-    id: '88c278f9-82d9-427c-96df-f98a4f23e543',
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 501900,
+      "fractionDigits": 2
   },
-  amountPlanned: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: googlePay.centAmount,
-    fractionDigits: 2,
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "googlePay",
+      "name": {
+          "en": "Google Pay"
+      }
   },
-  paymentMethodInfo: {
-    paymentInterface: 'cybersource',
-    method: 'googlePay',
-    name: {
-      en: 'Google Pay',
-    },
-  },
-  custom: {
-    type: {
-      typeId: 'type',
-      id: '87b9d9db-74a3-45d7-8e60-dde669866808',
-    },
-    fields: {
-      isv_deviceFingerprintId: '8a22fb00-dc63-496b-b0de-9f1d1fd36a50',
-      isv_cardExpiryYear: '2027',
-      isv_token:
-        'eyJzaWduYXR1cmUiOiJNRVFDSURrbGkxSVQzTHpmOGlaVHJqRndyUERudy9PVzB0bzVhQ05MTnZyNFh1Z0NBaUFHMTJCeU1QNXhuTHhhVGErSzBDVFl6TGVycjQ4cmgwN3pFWmJvS3NRRTNnXHUwMDNkXHUwMDNkIiwicHJvdG9jb2xWZXJzaW9uIjoiRUN2MSIsInNpZ25lZE1lc3NhZ2UiOiJ7XCJlbmNyeXB0ZWRNZXNzYWdlXCI6XCJmdGhBZDBzeHg5TzBzWlpSSm5zeWdnTWlkK3E1dFFFZmhvT3kvSTFWUUxYcWRQTVVuN2NWbXR3S3hMU0FhQzVtMWpCbmVDbXNNVUdJbzBEU1VpRFV3cHh0MmE0czlIUFpacU93VE1QOFcrMTFjcy8rSzRXSVh2cEFSSis0RTRRa1pmcEdEYkRUL0N3Q2EyTkhnYnFjU0d3RjlOMkhVY0JJWm1qeGRONE4zeFRXUTYxVitSUnBSd2ZKTVlFZkZqemRSakJsNE1KWXFDbWVyMWh3eUZGemdabTQ5YWtYKzRiRHdzZWlCUWI2L2xIdWljNENlVUlqb296Yml3a092aTVvTkVBeDhWTXp1TURob3FHSnlhdVZDbEVaYjJBZnF4dXlaQk1ZaUFrQSt4SHRzTXdqdUR3bWZBd2NoZTMwSmRxd2V6cXpuNDQyS1didHZROVN4ZGk4U3ZWa1FraVVPVk01V1JTdnBDYW9LTTJMKzN5MyszamRxV0NDVFA1QTZZRWphSExpNHJaSEY2L3VWUVRWZGtEeS80d0lKdkx4KzdvYUJwMVVLTjRXbXNrVEM1MHNmKzFDaUhqSkUxWHZoMzdGODZHK1wiLFwiZXBoZW1lcmFsUHVibGljS2V5XCI6XCJCS3JRSXdQNHRoWkdpNGxoN01seU4xSXlPNTdNb3hoenRJdmU3b2tOd1FaQTB0dk5FZjdoclB1TDEyWGtnWitvc1FxRzJaK3VQNWQ2c3FMV1pVUExkS0VcXHUwMDNkXCIsXCJ0YWdcIjpcInpIUmdWOXVXZ0FkUlk3T1ZTQUpWQUt0b0pLSlZIa01CdGxDVTVJTWtLTW9cXHUwMDNkXCJ9In0=',
-      isv_customerIpAddress: '106.202.150.94',
-      isv_maskedPan: '411111XXXXXX1111',
-      isv_cardExpiryMonth: '12',
-      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
-      isv_acceptHeader: '*/*',
-      isv_cardType: '001',
-    },
-  },
-  paymentStatus: {},
-  transactions: [
-    {
-      id: '3b141bbf-574d-4c6a-80bd-4bf875762805',
-      timestamp: '2021-12-22T07:46:57.530Z',
-      type: 'Authorization',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 5980,
-        fractionDigits: 2,
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
-      interactionId: googlePay.authReversalId,
-      state: 'Success',
-    },
+      "fields": {
+          "isv_deviceFingerprintId": "6e94aa2c-3289-48c5-9256-3212f9a597af",
+          "isv_token": "eyJzaWduYXR1cmUiOiJNRVVDSVFESmgzRGl3NXJxemt6OUcwTjhjM3U1MDNhZkhNK0dOVFMvR0pJMHhGeGxhUUlnTWpvKzZqZVFnL29QSTllbTgvNkl6ZnJXcTBrTXkrZUVZclJhUDE5RXZqZ1x1MDAzZCIsInByb3RvY29sVmVyc2lvbiI6IkVDdjEiLCJzaWduZWRNZXNzYWdlIjoie1wiZW5jcnlwdGVkTWVzc2FnZVwiOlwidGNoMW9DTVFlZ1JpdC96dmJyR1M3Qk5NSm1YMjZ2dGM0MHhIM2lBUkpYb1RWL2pWUVBIV016MWFsaVl2blZPeVhpaXJrK2Zkb2UzMGxidWliSkRScktFTTc2amdpYWN3enpob09Jcytxc2EyMGN6OTZBMUlmNk9pcUFEY2xBMTBDQW05MlRMQU9oS3dIOW1ucmEyb3FORE54dWNzYWxiNUMxeHdvUlNtZUExSFNTM1ozOFRJL2Z3NktYc0RxOUN0TGU2cWl4dk1NVXlqV0NJTjZhYld0ZDZhbzVkZG9lMU9DeEkvT0JRRmp3QnNlQ1A0STJrR3lLSmx4a0Raa2w5cm5uSjl5YjRsVXI4a1FaVGRrQnJOVXVmbUE5YUxqK2w5aUlvUTJmdXdlbWJpdTluTHZRenZHY2ZObWprRkl1d0xyTno0ZjVRdUFqU2Z5WVFiaDRqbjUrN3V2QnBwUXpSWlVxbDlZOWpBdTduZDUvbGdoa0pwRlh5Rlg4N1Q3SDh2aXNIUnpGUGlhajNUVm5nQnVQRU9tbzAwRkhXVVQvMHN5ZEJZL3E4XFx1MDAzZFwiLFwiZXBoZW1lcmFsUHVibGljS2V5XCI6XCJCRXJjWkJJSEZBQll6cktaQWh5Y3Z2YmF3MWhSTjF3cDdhQWp2N3E2bEdFYUVaRmNsSDRIWk1iNm5zNytNQXdRS0FHMmNXN2ppY0dHbVhiTWszV25yVFFcXHUwMDNkXCIsXCJ0YWdcIjpcIjRRdkxKVDZtUkEyR04wb3ZVTGkwUUJnUmtmR3BjditBcmlMN0VKVEVmTVlcXHUwMDNkXCJ9In0=",
+          "isv_saleEnabled": false,
+          "isv_shippingMethod": "SINGLE",
+          "isv_customerIpAddress": "192.168.1.1",
+          "isv_maskedPan": "400000XXXXXX1000",
+          "isv_AVSResponse": "1",
+          "isv_metadata": "{\"1\":\"testValue1\",\"2\":\"testValue2\"}",
+          "isv_responseCode": "00",
+          "isv_responseDateAndTime": "2025-03-13T07:08:42Z",
+          "isv_userAgentHeader": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0",
+          "isv_cardExpiryYear": "2027",
+          "isv_merchantId": "",
+          "isv_acceptHeader": "*/*",
+          "isv_cardType": "001",
+          "isv_authorizationStatus": "AUTHORIZED",
+          "isv_cardExpiryMonth": "01"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "ef010891-90a1-43b6-8cf9-6fc4f290e278",
+          "timestamp": "2025-03-13T07:08:41.897Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 501900,
+              "fractionDigits": 2
+          },
+          "interactionId": googlePay.authReversalId,
+          "state": "Success"
+      }
   ],
-  interfaceInteractions: [],
+  "interfaceInteractions": [],
+  "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
 };
 
 const cart = {
-  limit: 20,
-  offset: 0,
-  count: 1,
-  total: 1,
-  results: [
-    {
-      type: 'Cart',
-      id: 'ecddb55a-646d-4120-a8b8-9f900476dfe5',
-      version: 20,
-      lastMessageSequenceNumber: 1,
-      createdAt: '2022-04-11T08:33:23.168Z',
-      lastModifiedAt: '2022-04-11T08:34:17.468Z',
-      lastModifiedBy: {
-        clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
-        isPlatformClient: false,
-        customer: {
-          typeId: 'customer',
-          id: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
-        },
-      },
-      createdBy: {
-        clientId: '0GrQ8c2D9t1iSjzJF8E3Ygu3',
-        isPlatformClient: false,
-        customer: {
-          typeId: 'customer',
-          id: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
-        },
-      },
-      customerId: 'def6c669-eed5-4c57-ba2e-5fb04bfed1fa',
-      locale: 'en-US',
-      lineItems: [
-        {
-          id: '72dd04a7-918e-40d8-be33-1c4de9bfcdbd',
-          productId: '7e3ccfc6-36ee-4995-ab1d-bb5095b08bbe',
-          name: {
-            en: 'Sherwani',
+  "type": "Cart",
+  "id": "23ea2a8e-0588-4be6-8bec-65efd3d611dc",
+  "version": 16,
+  "versionModifiedAt": "2025-03-13T07:08:43.794Z",
+  "lastMessageSequenceNumber": 1,
+  "createdAt": "2025-03-13T07:08:18.907Z",
+  "lastModifiedAt": "2025-03-13T07:08:43.790Z",
+  "lastModifiedBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
+  },
+  "createdBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
+  },
+  "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075",
+  "locale": "en",
+  "lineItems": [
+      {
+          "id": "02f99105-a118-4239-bb90-14f5a39a39c5",
+          "productId": "c93d1d93-79bc-4bfd-ad62-706ce06e2b90",
+          "name": {
+              "en": "Mexicon-Hat",
+              "en-US": "Hat"
           },
-          productType: {
-            typeId: 'product-type',
-            id: '31d56c4e-d578-4dab-a313-780b5f1e7556',
-            version: 1,
+          "productType": {
+              "typeId": "product-type",
+              "id": "20efa170-91df-4d8a-bbd0-610e6a532773",
+              "version": 1
           },
-          productSlug: {
-            en: 'a1',
+          "productSlug": {
+              "en": "Mexicon-Hat"
           },
-          variant: {
-            id: 1,
-            sku: 'SKU-1',
-            prices: [
+          "variant": {
+              "id": 1,
+              "sku": "SKU-1",
+              "prices": [
+                  {
+                      "id": "6c414313-280a-4d57-bc61-96d212aa7b9b",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "EUR",
+                          "centAmount": 4200,
+                          "fractionDigits": 2
+                      },
+                      "validFrom": "2025-03-02T18:30:00.000Z",
+                      "validUntil": "2026-03-18T18:30:00.000Z"
+                  },
+                  {
+                      "id": "b1feaabf-a309-4805-bf44-f42e1c59760a",
+                      "value": {
+                          "type": "centPrecision",
+                          "currencyCode": "USD",
+                          "centAmount": 501900,
+                          "fractionDigits": 2
+                      },
+                      "key": "US",
+                      "validFrom": "2025-03-02T18:30:00.000Z",
+                      "validUntil": "2026-03-05T18:30:00.000Z"
+                  }
+              ],
+              "images": [
+                  {
+                      "url": "https://th.bing.com/th/id/OIP.SihGuijrQqicDgOjJIzg7gHaGD?w=207&h=180&c=7&r=0&o=5&dpr=2&pid=1.7",
+                      "label": "Hat",
+                      "dimensions": {
+                          "w": 414,
+                          "h": 360
+                      }
+                  }
+              ],
+              "attributes": [],
+              "assets": []
+          },
+          "price": {
+              "id": "b1feaabf-a309-4805-bf44-f42e1c59760a",
+              "value": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 501900,
+                  "fractionDigits": 2
+              },
+              "key": "US",
+              "validFrom": "2025-03-02T18:30:00.000Z",
+              "validUntil": "2026-03-05T18:30:00.000Z"
+          },
+          "quantity": 1,
+          "discountedPricePerQuantity": [],
+          "taxRate": {
+              "name": "en",
+              "amount": 0.1,
+              "includedInPrice": false,
+              "country": "US",
+              "id": "sfOR5PDn",
+              "subRates": []
+          },
+          "perMethodTaxRate": [],
+          "addedAt": "2025-03-13T07:08:19.234Z",
+          "lastModifiedAt": "2025-03-13T07:08:19.234Z",
+          "state": [
               {
-                id: '1fbaed84-99cc-4922-9776-c1ea3cd553e6',
-                value: {
-                  type: 'centPrecision',
-                  currencyCode: 'EUR',
-                  centAmount: 15845,
-                  fractionDigits: 2,
-                },
-                country: 'US',
-                discounted: {
-                  value: {
-                    type: 'centPrecision',
-                    currencyCode: 'EUR',
-                    centAmount: 7922,
-                    fractionDigits: 2,
-                  },
-                  discount: {
-                    typeId: 'product-discount',
-                    id: '9360ab21-ba82-4dca-8c39-ae0577547c8e',
-                  },
-                },
-              },
-              {
-                id: '68018b50-2c8a-4304-b67a-ae15389be32d',
-                value: {
-                  type: 'centPrecision',
-                  currencyCode: 'USD',
-                  centAmount: 5980,
-                  fractionDigits: 2,
-                },
-                country: 'US',
-                discounted: {
-                  value: {
-                    type: 'centPrecision',
-                    currencyCode: 'USD',
-                    centAmount: 2990,
-                    fractionDigits: 2,
-                  },
-                  discount: {
-                    typeId: 'product-discount',
-                    id: '9360ab21-ba82-4dca-8c39-ae0577547c8e',
-                  },
-                },
-              },
-            ],
-            images: [
-              {
-                url: 'https://ik.imagekit.io/ldqsn9vvwgg/images/505833.jpg',
-                dimensions: {
-                  w: 300,
-                  h: 375,
-                },
-              },
-            ],
-            attributes: [],
-            assets: [],
-          },
-          price: {
-            id: '68018b50-2c8a-4304-b67a-ae15389be32d',
-            value: {
-              type: 'centPrecision',
-              currencyCode: 'USD',
-              centAmount: 5980,
-              fractionDigits: 2,
-            },
-            country: 'US',
-            discounted: {
-              value: {
-                type: 'centPrecision',
-                currencyCode: 'USD',
-                centAmount: 2990,
-                fractionDigits: 2,
-              },
-              discount: {
-                typeId: 'product-discount',
-                id: '9360ab21-ba82-4dca-8c39-ae0577547c8e',
-              },
-            },
-          },
-          quantity: 1,
-          discountedPricePerQuantity: [],
-          taxRate: {
-            name: 'test-tax-category',
-            amount: 0.2,
-            includedInPrice: true,
-            country: 'US',
-            id: 'HxMyojUT',
-            subRates: [],
-          },
-          addedAt: '2022-04-11T08:33:23.498Z',
-          lastModifiedAt: '2022-04-11T08:33:23.498Z',
-          state: [
-            {
-              quantity: 1,
-              state: {
-                typeId: 'state',
-                id: '438c0901-36c4-41ec-9a86-2853d6c73d0d',
-              },
-            },
+                  "quantity": 1,
+                  "state": {
+                      "typeId": "state",
+                      "id": "bbbd6d42-e1ed-47ba-98ee-8759da290bbe"
+                  }
+              }
           ],
-          priceMode: 'Platform',
-          totalPrice: {
-            type: 'centPrecision',
-            currencyCode: 'USD',
-            centAmount: 2990,
-            fractionDigits: 2,
+          "priceMode": "Platform",
+          "lineItemMode": "Standard",
+          "totalPrice": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 501900,
+              "fractionDigits": 2
           },
-          taxedPrice: {
-            totalNet: {
-              type: 'centPrecision',
-              currencyCode: 'USD',
-              centAmount: 2492,
-              fractionDigits: 2,
-            },
-            totalGross: {
-              type: 'centPrecision',
-              currencyCode: 'USD',
-              centAmount: 2990,
-              fractionDigits: 2,
-            },
-            totalTax: {
-              type: 'centPrecision',
-              currencyCode: 'USD',
-              centAmount: 498,
-              fractionDigits: 2,
-            },
+          "taxedPrice": {
+              "totalNet": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 501900,
+                  "fractionDigits": 2
+              },
+              "totalGross": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 552090,
+                  "fractionDigits": 2
+              },
+              "taxPortions": [
+                  {
+                      "rate": 0.1,
+                      "amount": {
+                          "type": "centPrecision",
+                          "currencyCode": "USD",
+                          "centAmount": 50190,
+                          "fractionDigits": 2
+                      },
+                      "name": "en"
+                  }
+              ],
+              "totalTax": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 50190,
+                  "fractionDigits": 2
+              }
           },
-          lineItemMode: 'Standard',
-        },
-      ],
-      cartState: 'Ordered',
-      totalPrice: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 3980,
-        fractionDigits: 2,
-      },
-      taxedPrice: {
-        totalNet: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 3317,
-          fractionDigits: 2,
-        },
-        totalGross: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 3980,
-          fractionDigits: 2,
-        },
-        taxPortions: [
-          {
-            rate: 0.2,
-            amount: {
-              type: 'centPrecision',
-              currencyCode: 'USD',
-              centAmount: 663,
-              fractionDigits: 2,
-            },
-            name: 'test-tax-category',
-          },
-        ],
-        totalTax: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 663,
-          fractionDigits: 2,
-        },
-      },
-      country: 'US',
-      shippingInfo: {
-        shippingMethodName: 'UHL',
-        price: {
-          type: 'centPrecision',
-          currencyCode: 'USD',
-          centAmount: 990,
-          fractionDigits: 2,
-        },
-        shippingRate: {
-          price: {
-            type: 'centPrecision',
-            currencyCode: 'USD',
-            centAmount: 990,
-            fractionDigits: 2,
-          },
-          tiers: [],
-        },
-        taxRate: {
-          name: 'test-tax-category',
-          amount: 0.2,
-          includedInPrice: true,
-          country: 'US',
-          id: 'HxMyojUT',
-          subRates: [],
-        },
-        taxCategory: {
-          typeId: 'tax-category',
-          id: '44e3081f-e822-44cc-918a-e79240a7284f',
-        },
-        deliveries: [],
-        shippingMethod: {
-          typeId: 'shipping-method',
-          id: 'd7a87341-36bb-4fe2-96a9-5d5d1eada503',
-        },
-        taxedPrice: {
-          totalNet: {
-            type: 'centPrecision',
-            currencyCode: 'USD',
-            centAmount: 825,
-            fractionDigits: 2,
-          },
-          totalGross: {
-            type: 'centPrecision',
-            currencyCode: 'USD',
-            centAmount: 990,
-            fractionDigits: 2,
-          },
-          totalTax: {
-            type: 'centPrecision',
-            currencyCode: 'USD',
-            centAmount: 165,
-            fractionDigits: 2,
-          },
-        },
-        shippingMethodState: 'MatchesCart',
-      },
-      customLineItems: [],
-      discountCodes: [],
-      directDiscounts: [],
-      paymentInfo: {
-        payments: [
-          {
-            typeId: 'payment',
-            id: '029bd8ed-ea47-480f-8bd0-959c1805604d',
-          },
-        ],
-      },
-      inventoryMode: 'None',
-      taxMode: 'Platform',
-      taxRoundingMode: 'HalfEven',
-      taxCalculationMode: 'LineItemLevel',
-      deleteDaysAfterLastModification: 90,
-      refusedGifts: [],
-      origin: 'Customer',
-      shippingAddress: {
-        firstName: 'john',
-        lastName: 'doe',
-        streetName: '1295 Charleston Road',
-        additionalStreetInfo: '5th lane',
-        postalCode: '94043',
-        city: 'Mountain View',
-        region: 'CA',
-        country: 'US',
-        phone: '9876543210',
-        email: 'john.doe@wipro.com',
-      },
-      billingAddress: {
-        firstName: 'john',
-        lastName: 'doe',
-        streetName: '1295 Charleston Road',
-        additionalStreetInfo: '5th lane',
-        postalCode: '94043',
-        city: 'Mountain View',
-        region: 'CA',
-        country: 'US',
-        phone: '9876543210',
-        email: 'john.doe@wipro.com',
-      },
-      itemShippingAddresses: [],
-      totalLineItemQuantity: 1,
-    },
+          "taxedPricePortions": []
+      }
   ],
+  "cartState": "Ordered",
+  "totalPrice": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 501900,
+      "fractionDigits": 2
+  },
+  "taxedPrice": {
+      "totalNet": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 501900,
+          "fractionDigits": 2
+      },
+      "totalGross": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 552090,
+          "fractionDigits": 2
+      },
+      "taxPortions": [
+          {
+              "rate": 0.1,
+              "amount": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 50190,
+                  "fractionDigits": 2
+              },
+              "name": "en"
+          }
+      ],
+      "totalTax": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 50190,
+          "fractionDigits": 2
+      }
+  },
+  "country": "US",
+  "taxedShippingPrice": {
+      "totalNet": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      },
+      "totalGross": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      },
+      "taxPortions": [
+          {
+              "rate": 0.1,
+              "amount": {
+                  "type": "centPrecision",
+                  "currencyCode": "USD",
+                  "centAmount": 0,
+                  "fractionDigits": 2
+              },
+              "name": "en"
+          }
+      ],
+      "totalTax": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      }
+  },
+  "shippingMode": "Single",
+  "shippingInfo": {
+      "shippingMethodName": "DHL",
+      "price": {
+          "type": "centPrecision",
+          "currencyCode": "USD",
+          "centAmount": 0,
+          "fractionDigits": 2
+      },
+      "shippingRate": {
+          "price": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          },
+          "tiers": []
+      },
+      "taxRate": {
+          "name": "en",
+          "amount": 0.1,
+          "includedInPrice": false,
+          "country": "US",
+          "id": "sfOR5PDn",
+          "subRates": []
+      },
+      "taxCategory": {
+          "typeId": "tax-category",
+          "id": "5a01f7c3-73fd-44e3-8c7f-c89a62bbc7bc"
+      },
+      "deliveries": [],
+      "shippingMethod": {
+          "typeId": "shipping-method",
+          "id": "3d2780f9-f22b-4710-bb5c-b14dd6a27a2c"
+      },
+      "taxedPrice": {
+          "totalNet": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          },
+          "totalGross": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          },
+          "taxPortions": [
+              {
+                  "rate": 0.1,
+                  "amount": {
+                      "type": "centPrecision",
+                      "currencyCode": "USD",
+                      "centAmount": 0,
+                      "fractionDigits": 2
+                  },
+                  "name": "en"
+              }
+          ],
+          "totalTax": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 0,
+              "fractionDigits": 2
+          }
+      },
+      "shippingMethodState": "MatchesCart"
+  },
+  "shippingAddress": {
+      "firstName": "test",
+      "lastName": "t",
+      "streetName": "123 ch rd",
+      "additionalStreetInfo": "",
+      "postalCode": "94045",
+      "city": "CA",
+      "region": "AL",
+      "country": "US",
+      "phone": "9876543210",
+      "email": "test@gmail.com"
+  },
+  "shipping": [],
+  "customLineItems": [],
+  "discountCodes": [],
+  "directDiscounts": [],
+  "paymentInfo": {
+      "payments": [
+          {
+              "typeId": "payment",
+              "id": "4ee29ff0-a37d-47c2-95c1-5fff829e4310"
+          }
+      ]
+  },
+  "inventoryMode": "None",
+  "taxMode": "Platform",
+  "taxRoundingMode": "HalfEven",
+  "taxCalculationMode": "LineItemLevel",
+  "deleteDaysAfterLastModification": 90,
+  "refusedGifts": [],
+  "origin": "Customer",
+  "billingAddress": {
+      "firstName": "test",
+      "lastName": "t",
+      "streetName": "123 ch rd",
+      "additionalStreetInfo": "",
+      "postalCode": "94045",
+      "city": "CA",
+      "region": "AL",
+      "country": "US",
+      "phone": "9876543210",
+      "email": "test@gmail.com"
+  },
+  "itemShippingAddresses": [],
+  "discountTypeCombination": {
+      "type": "Stacking"
+  },
+  "totalLineItemQuantity": 1
 };
 
 const authReversalId = googlePay.authReversalId;
@@ -773,61 +793,78 @@ const shippingCart = {
 };
 
 const multipleShippingPayment = {
-  id: 'd5c67aab-2880-4cba-8431-4cb90f9c6fd9',
-  version: 2,
-  lastMessageSequenceNumber: 2,
-  createdAt: '2021-10-13T07:07:39.945Z',
-  lastModifiedAt: '2021-10-13T07:07:39.945Z',
-  lastModifiedBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '47d6586f-6c7a-4d0e-93bb-344b25600a8a',
+  "id": "4146a797-2136-42c5-bd52-dde2cb71a138",
+  "version": 12,
+  "versionModifiedAt": "2025-03-13T06:38:28.778Z",
+  "lastMessageSequenceNumber": 3,
+  "createdAt": "2025-03-13T06:38:24.526Z",
+  "lastModifiedAt": "2025-03-13T06:38:28.778Z",
+  "lastModifiedBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
   },
-  createdBy: {
-    clientId: '4OdEsQlt0ZNkkwpineHHUy3h',
-    isPlatformClient: false,
-    anonymousId: '47d6586f-6c7a-4d0e-93bb-344b25600a8a',
+  "createdBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
   },
-  amountPlanned: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: googlePay.centAmount,
-    fractionDigits: 2,
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 501900,
+      "fractionDigits": 2
   },
-  paymentMethodInfo: { paymentInterface: 'cybersource', method: 'googlePay' },
-  custom: {
-    type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
-    fields: {
-      isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
-      isv_cardExpiryYear: '2030',
-      isv_token:
-        'eyJraWQiOiIwOG5aU1BESXFHRnZpaElMWEVxcEdkUG5lbUVUZXkySCIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAzMCIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTYzNTIzMTM5NCwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTYzNTIzMDQ5NCwianRpIjoiMUU2NTZWNThZVjVUS0hQUU1aTFdaMVlPWU1NNjhWWFNSOEpQTllGOFVFSTAzWFlYTTNCRDYxNzdBNkEyMEU5MiIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDMwIn0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.U-4A01seF4P9kXQLcNTivdWgYokoRUkjus9pujmNjVx4UOWSxRdp_FnCnt93H7_cEH7eZ46grEiYwyDwbCLYmar4zvzadhaMw0LG3L2_nchCO8GDUoroqpChMdgJ269iKg5EsFTQffMYGCc4FfNkHPn1E1_s_n47VDcqKvidAhryQvb16EsOVoheREE_d8fh8ltad32zwSnXcAyXKu_Zj2XFdhzIyq9Yf_ZTN1vlkMCyDEqpGZ-IX-sWdNFrsoU8L7RDeCNnknzl7JUy4usLo6lIf4vq-BgFrHc3b2W_q2CBqMvylixNlblDGChkB743TXXKR9iFrs3ajYXjHdZztA',
-      isv_customerIpAddress: '106.202.150.94',
-      isv_maskedPan: '411111XXXXXX1111',
-      isv_cardExpiryMonth: '01',
-      isv_acceptHeader: '*/*',
-      isv_cardType: '001',
-      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
-      isv_tokenVerificationContext:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiI3cUE5TzduOU81YjEremZ5c2VyWUloQUFFQ0hDMFhiaVZDY3o2a0plQ0VxMjdMNHZFbnV5MHdGclFyTkhGTkVYRWdGcE1sak43MG8rNy9KNjkvdWhTK3gyTFB2a0FvKzZRdUxja1JhM01nbmRNN0FQb3VSV1BqWkEzaG9yeWJ6MGNlWFAiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJrYlU5MXBmTVR0U1htUDBlMjN4dnFtaDdmdFZyS3Q4WEFHaEhIX3pYbGFqSnBxbG1sTklYUHJOaTA1Q0FSS1hiSVc5cHNaU2xPUEUwMGNlSEtsVXhWWkVnbVVxZHZtczItbk5wZzgxeE1XLTU2Q2tHaG53N281Vk9RdllVakhCcDl5MzFPNjMzaHRqeFZkMGEyRG9WX3kyNHIxNFZzcTFVaFVzX0VEdUY2U0pLQ0pnODlKVzhXcW1SblB0VTVDb2hHRUNqWm5NSVYtM3ByUkNUY3U5VTZtWko5SlhQYktjeUZvZ3NRakozeWs4OVRQOTE4bm5Mc3ozbzRXZTNnWFpvOWFScXBPem5EWlRTbkJ3akNneUNfSUtqNm5XV2Vvc0VHc21NZ3B1VnUwbVJzSDNhdG01OGo5SW5qN2dmcVc5MXdYenZWVElpWjU4aW4wSW9MU3BOSXciLCJraWQiOiIwODV3dGJMZXN5dlJFMVc2QllTV3BISERtQk9LMTVReCJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2MzQxMDk3MzksImlhdCI6MTYzNDEwODgzOSwianRpIjoiM2pTZVZLR3R2UGZ5QU1DaSJ9.A9Ek14fsuCEr63DRuihOx6nVUTb4I5PF91Jcnfbn5YI',
-    },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "googlePay",
+      "name": {
+          "en": "Google Pay"
+      }
   },
-  paymentStatus: {},
-  transactions: [
-    {
-      id: '176a50bb-3e71-4e4b-98a1-2c17e804ef00',
-      type: 'Authorization',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 6970,
-        fractionDigits: 2,
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
-      interactionId: googlePay.multipleShippingAuthReversalId,
-      state: 'Success',
-    },
+      "fields": {
+          "isv_deviceFingerprintId": "a2b9b7b2-a26b-4910-977b-d1a1c4c39fb7",
+          "isv_token": "eyJzaWduYXR1cmUiOiJNRVVDSUZRaWZQRWtKMUxxdkRVQm45cTByZVpwOTlYV2VDQStITEIvdmhoalNVMU9BaUVBdms3Y3Rick9PUlF3ejV3SXJNS25oMzFvdmgyUnQxdWJGOW9tWElXalpLZ1x1MDAzZCIsInByb3RvY29sVmVyc2lvbiI6IkVDdjEiLCJzaWduZWRNZXNzYWdlIjoie1wiZW5jcnlwdGVkTWVzc2FnZVwiOlwiUUFTbGNad3JHR2loOEJPT1E5WjhJNFhGVWp3Qk01aTA5VWpvUzd6aU81bC90TFRRWkx5OVVWRlNpMVhsUmpSaWd3d3lHSHJFYWlqN0RnSGtiVGptZmxkS3EyR2o1TXkyS0xpWUFoNVNTZ0QvWGhWNmVlSmNEVWJhcEcrRmhmQmd4d2lIQ2d4cE9BWG5MRXdTeEc2SGluL3NqVGNVUFFDL0J5Ny9WWFlzdVBSSjh5NDcvdDdSMzhSdFd5RnhLS1ZvQTBzK1UwU2s2OVlpSUlNT3lrMkV2anVRZzFRVTlxcGo3QklPWkRRL3BZMmNWbmNUbUUrWnBlSjFlb3ZiVEVrZVUwVnRxSU41aytkVjhkYndZa3VOZ1FJMGNxcWpqUUFmQ3FqVUpsNlE3QncxRjNBK1hXcW9VOWxRdVNwTEVFNml3M1N2Q00zbDFwMU5kaHA0a0YxQUtnNkExV1lYcm1XeXNZMTlhZ2hNUnRVVzFCNld5aFNFMGtHQ05SenRXRU1CRklKZkhiWmhTY09YYStmQUdWSU5DWHR4Q3VnWktIQ0JaQ1UrMHFFXFx1MDAzZFwiLFwiZXBoZW1lcmFsUHVibGljS2V5XCI6XCJCRHh5YzRkeTBSaE1qU1V2WkJpRDFzczlxaVQxd3BkaGFwMkQ2NTdlMTV3Q1JZOGsrN3NxMndKMGlRVHZFeld1OWNhN1BoaHpzak5iekZqU0JWUG5DcXdcXHUwMDNkXCIsXCJ0YWdcIjpcIlk5WExxd3pSbitsNStLSnAzYnZOL2huMkNEMzZ1QURUZ2hWVHhleGFxcUFcXHUwMDNkXCJ9In0=",
+          "isv_saleEnabled": false,
+          "isv_shippingMethod": "SINGLE",
+          "isv_customerIpAddress": "192.168.1.1",
+          "isv_maskedPan": "400000XXXXXX1000",
+          "isv_AVSResponse": "1",
+          "isv_metadata": "{\"1\":\"testValue1\",\"2\":\"testValue2\"}",
+          "isv_responseCode": "00",
+          "isv_responseDateAndTime": "2025-03-13T06:38:28Z",
+          "isv_userAgentHeader": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0",
+          "isv_cardExpiryYear": "2027",
+          "isv_merchantId": "",
+          "isv_acceptHeader": "*/*",
+          "isv_cardType": "001",
+          "isv_authorizationStatus": "AUTHORIZED",
+          "isv_cardExpiryMonth": "01"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "c9efa9e9-b7da-495c-bfe7-4667e3b5a5cf",
+          "timestamp": "2025-03-13T06:38:27.533Z",
+          "type": "Authorization",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 501900,
+              "fractionDigits": 2
+          },
+          "interactionId": googlePay.multipleShippingAuthReversalId,
+          "state": "Success"
+      }
   ],
-  interfaceInteractions: [],
+  "interfaceInteractions": [],
+  "anonymousId": "7e97baa2-a5bc-4a46-90ec-ecb3c02d8075"
 };
 
 const multipleShippingReversalId = googlePay.multipleShippingAuthReversalId;

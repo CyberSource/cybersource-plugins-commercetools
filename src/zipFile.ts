@@ -1,7 +1,7 @@
 import DirArchiver from 'dir-archiver';
 
-import { Constants } from './constants/constants';
 import { FunctionConstant } from './constants/functionConstant';
+import { Constants } from './constants/paymentConstants';
 import paymentUtils from './utils/PaymentUtils';
 
 /**

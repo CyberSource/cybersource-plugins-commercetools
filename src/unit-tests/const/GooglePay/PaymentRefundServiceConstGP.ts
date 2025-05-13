@@ -1,80 +1,81 @@
 import googlePay from '../../JSON/googlePay.json';
 const payment = {
-  id: '33e68f3d-8143-4d07-ac13-2314c7039251',
-  version: 8,
-  lastMessageSequenceNumber: 6,
-  createdAt: '2021-12-21T10:19:02.132Z',
-  lastModifiedAt: '2021-12-21T12:43:55.994Z',
-  lastModifiedBy: {
-    clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
-    isPlatformClient: false,
+  "id": "b5aab355-aac2-4c07-81f5-f16edf11ab52",
+  "version": 13,
+  "versionModifiedAt": "2025-03-07T09:31:28.778Z",
+  "lastMessageSequenceNumber": 3,
+  "createdAt": "2025-03-07T09:30:14.279Z",
+  "lastModifiedAt": "2025-03-07T09:31:28.778Z",
+  "lastModifiedBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "5c7f6567-1d8f-43ed-bb0b-6092cd8ec77c"
   },
-  createdBy: {
-    clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
-    isPlatformClient: false,
-    anonymousId: 'ad175f34-543f-4a33-956a-39c30cd0aa61',
+  "createdBy": {
+      "clientId": "xxSiPKLouCf3CRkqu20Byd0N",
+      "isPlatformClient": false,
+      "anonymousId": "5c7f6567-1d8f-43ed-bb0b-6092cd8ec77c"
   },
-  amountPlanned: {
-    type: 'centPrecision',
-    currencyCode: 'USD',
-    centAmount: 5980,
-    fractionDigits: 2,
+  "customer": {
+      "typeId": "customer",
+      "id": "acbdb445-015d-4770-a6ef-dea8ed456cf6"
   },
-  paymentMethodInfo: {
-    paymentInterface: 'cybersource',
-    method: 'googlePay',
-    name: {
-      en: 'Google Pay',
-    },
+  "amountPlanned": {
+      "type": "centPrecision",
+      "currencyCode": "USD",
+      "centAmount": 45600,
+      "fractionDigits": 2
   },
-  custom: {
-    type: {
-      typeId: 'type',
-      id: '87b9d9db-74a3-45d7-8e60-dde669866808',
-    },
-    fields: {
-      isv_deviceFingerprintId: '8a22fb00-dc63-496b-b0de-9f1d1fd36a50',
-      isv_cardExpiryYear: '2027',
-      isv_token:
-        'eyJzaWduYXR1cmUiOiJNRVFDSUQ0RmI3YTJNUndKMjJGL3BCRVBZaFA2ZHdtN2R6VWt4bVQ2MGVKMEpPOHRBaUJyOFNvZVd5TTRxTmt5N3ltbDZOektqMjlFSzNoZlk2SGs4bURTbm1YRmF3XHUwMDNkXHUwMDNkIiwicHJvdG9jb2xWZXJzaW9uIjoiRUN2MSIsInNpZ25lZE1lc3NhZ2UiOiJ7XCJlbmNyeXB0ZWRNZXNzYWdlXCI6XCJYNFluRmpqeFMzRk92Z2NxYkh5OGFpdC93N2UvMmZJcG5kWlVXZ3pmR2FiUE9kbHhKRWFKK3JnL2xCWWU4dVh6RkZEb2loQWU1bnJlSFN0RUVVR2dBcEVZMW1uWkxmWkplZTB0WXNLOWVZeTVBYVkvNEdQR2s3ZVZ3TlllTWhCY01ZeWUwMjN5bUZOL1VzMmtNeUFqRFlGNkFPQkRRK0tUNTQrbzMwNGptdFkzdzV0R1NYOWtPZnFuU3V0aFFYMFlXVVVHUU0wSmdQL2duMW5WSDFJeFNyTmpmbHFtY1k5MWlWSk5ZTXB1a1E1WmFieEhlaTQvcDFYVXppNUcyVEZSN1RhaEM3UTJGRWpqeGs2d3o3cWJkMUhBNlg0RUE3TnEzMjFHTm1LaFAyQVZPVmtqRy9ZVW5VSWNJQlNMb3BmZVhPYWxMVFVsdnR2ZDN1QkUzTDhRcTFyVHIxSnE2UCtVaFJSY1doRXlsVVNvbkxURGlqM0cxVFNCSTJ1UVZUd2U4RXVjbThaNDYzZnJUOVNpQjlCc0NGeVZzM25mNC9aa0pIckNmemVvSFVzdTVkYklrNFMzNDRqRG1iZVhSM3hVSjVlNVwiLFwiZXBoZW1lcmFsUHVibGljS2V5XCI6XCJCQ3hCRk5LV3NBZUwyQ0NGR2hVRWptOFBVbmxVZWdmYlFYNWRQdy9KSGIvUGVPL3QxZ3FuYlpoYlRrU2tlOE93akU5UUwraFBiNzNEN0llQlNKMDNkN0FcXHUwMDNkXCIsXCJ0YWdcIjpcIkYvMzJpb2o4blNtdU5ZU3JIYUdTeEkzYWR5a3pSSVNQUmMvQVlHSldoREVcXHUwMDNkXCJ9In0=',
-      isv_customerIpAddress: '106.202.150.94',
-      isv_maskedPan: '411111XXXXXX1111',
-      isv_cardExpiryMonth: '12',
-      isv_userAgentHeader: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
-      isv_acceptHeader: '*/*',
-      isv_cardType: '001',
-    },
+  "paymentMethodInfo": {
+      "paymentInterface": "cybersource",
+      "method": "googlePay",
+      "name": {
+          "en": "Google Pay"
+      }
   },
-  paymentStatus: {},
-  transactions: [
-    {
-      id: '35d5cf3c-fe39-4940-87b0-64e3fe849edb',
-      timestamp: '2021-12-21T10:19:06.683Z',
-      type: 'Authorization',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 5980,
-        fractionDigits: 2,
+  "custom": {
+      "type": {
+          "typeId": "type",
+          "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
-      interactionId: '6400819464486462703955',
-      state: 'Success',
-    },
-    {
-      id: '2cf6a334-5091-422a-8fa8-87724aa53e86',
-      timestamp: '2021-12-21T12:43:54.748Z',
-      type: 'Charge',
-      amount: {
-        type: 'centPrecision',
-        currencyCode: 'USD',
-        centAmount: 5980,
-        fractionDigits: 2,
-      },
-      interactionId: googlePay.captureId,
-      state: 'Success',
-    },
+      "fields": {
+          "isv_deviceFingerprintId": "9d1d6fcd-0d51-48db-a013-12592c5b92dd",
+          "isv_token": "eyJzaWduYXR1cmUiOiJNRVVDSUdmYzQ2U3RST0tUY0VKTE5PZHZpeE9DK1psMHlSUUZuM0UvdHdmVXdMZkdBaUVBMmV0MWRZUVRXR3k2ZisvSDFvN3R2UFpVaGxJelY5c0pDVnVkUENlaW9aY1x1MDAzZCIsInByb3RvY29sVmVyc2lvbiI6IkVDdjEiLCJzaWduZWRNZXNzYWdlIjoie1wiZW5jcnlwdGVkTWVzc2FnZVwiOlwiajhseXRhZTE2eHNtZngrUTkwWVVTd21uUXhOb0M2RnQxOEFSd3FKMUVmZGliZlp3cnlUa2dXNVpMTWExUmNjYVl2WVFHTDUyNzVKNG5rNExsYVlGcFA5WXRoZGhibVV1aTd4b3phNnFaOHVSUDJOUEgwWm1qTFI2akVFZG1hVmxka0x5OEZsTFE3WnpadXhZOWVhMmp6V3QxWnE5Yjd4UDRCb285NzVGVC8xMFRJODEzekFOTHg5OWwreWJteng1SFJrdUxsS0FmdHRBMFkxOXFENWFXcDRFbzc5OXBRNm1HSUU5MnJhTTBtUUxFS05UWko4bDVybmlNRDlTanIva1NaOVkzT3JzRTdPTkphYmZvTjBXc0tSOWJsNGNTak5lMUhnbXExOFdXRytNUXhiVlk0YnN1bjY5enFlT1ZMUXFSQkFOejV0ajBiR0VQaUNaYnBhcEFaSDU1OEtvL3dtaHZObktIWDQweHdySVJMSXdIZFBFd2toK2hlRU95NlRGOU5QVkRyeXUyNjVBaWZrUTJITGpmNHdCZnJzdkwxb3pWeFJzdDhvXFx1MDAzZFwiLFwiZXBoZW1lcmFsUHVibGljS2V5XCI6XCJCRjNmdVNDVnIxN3NGakw1TnVUdnpBRGFZcCtCMkdtUGhBVzNwVzVqb1I0QXpjT2dzTXNDUWVNWE5XbTRLeWhMSTdoOEpHMGNMWEpTd1hTN0thZXg5QUVcXHUwMDNkXCIsXCJ0YWdcIjpcIkJBUm5BS3MzN29QMk5VYzJoSTZmcS9YMSthU0VST1dMTzdRUUlneTdpelFcXHUwMDNkXCJ9In0=",
+          "isv_saleEnabled": true,
+          "isv_shippingMethod": "",
+          "isv_customerIpAddress": "192.168.1.1",
+          "isv_maskedPan": "400000XXXXXX1000",
+          "isv_AVSResponse": "1",
+          "isv_metadata": "{\"1\":\"testValue1\",\"2\":\"testValue2\"}",
+          "isv_responseCode": "00",
+          "isv_responseDateAndTime": "2025-03-07T09:30:23Z",
+          "isv_userAgentHeader": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0",
+          "isv_cardExpiryYear": "2027",
+          "isv_merchantId": "",
+          "isv_acceptHeader": "*/*",
+          "isv_cardType": "001",
+          "isv_authorizationStatus": "AUTHORIZED",
+          "isv_cardExpiryMonth": "01"
+      }
+  },
+  "paymentStatus": {},
+  "transactions": [
+      {
+          "id": "edae9199-010d-4dbf-921d-980cf9e26e74",
+          "timestamp": "2025-03-07T09:30:22.518Z",
+          "type": "Charge",
+          "amount": {
+              "type": "centPrecision",
+              "currencyCode": "USD",
+              "centAmount": 45600,
+              "fractionDigits": 2
+          },
+          "interactionId": googlePay.captureId,
+          "state": "Success"
+      }
   ],
-  interfaceInteractions: [],
+  "interfaceInteractions": [],
+  "anonymousId": "5c7f6567-1d8f-43ed-bb0b-6092cd8ec77c"
 };
 
 const captureId = googlePay.captureId;

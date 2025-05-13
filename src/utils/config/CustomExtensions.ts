@@ -1,6 +1,6 @@
-import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import customerUpdateJson from '../../resources/customer_update_extension.json';
 import paymentCreateJson from '../../resources/payment_create_extension.json';
 import paymentUpdateJson from '../../resources/payment_update_extension.json';

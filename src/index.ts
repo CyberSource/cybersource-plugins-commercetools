@@ -3,6 +3,7 @@ import http from 'http';
 import path from 'path';
 import url from 'url';
 
+import { Payment } from '@commercetools/platform-sdk';
 import dotenv from 'dotenv';
 import { JSDOM } from 'jsdom';
 import moment from 'moment';
@@ -11,11 +12,10 @@ import serverless from 'serverless-http';
 import apiHandler from './apiController';
 import { AppHandler } from './app/AppHandler';
 import { RouterHandler } from './app/RouterHandler';
-import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
+import { Constants } from './constants/paymentConstants';
 import { testApiConnection } from './testConnection';
-import { PaymentType } from './types/Types';
 import paymentActions from './utils/PaymentActions';
 import paymentHandler from './utils/PaymentHandler';
 import paymentUtils from './utils/PaymentUtils';
@@ -145,8 +145,8 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
 * @returns {Promise<void>} - A promise resolving to void.
 */
 const handleRequest = async (req: any, res: any): Promise<void> => {
-  const parsedUrl = url.parse(req.url, true);
-  const pathName = paymentValidator.validateWhiteListEndPoints(parsedUrl.pathname || '') ? parsedUrl.pathname : '';
+  const parsedUrl = paymentUtils.sanitizeAndValidateUrl(req);
+  const pathName = paymentValidator.validateWhiteListEndPoints(parsedUrl?.pathname || '') ? parsedUrl?.pathname : '';
   const methodHandlers: Record<string, Record<string, (req: any, res: any) => Promise<void>>> = {
     'GET': {
       '/orders': handleOrders,
@@ -167,7 +167,7 @@ const handleRequest = async (req: any, res: any): Promise<void> => {
       '/api/extension/payment/create': handlePaymentCreate,
       '/api/extension/customer/update': handleCustomerUpdate,
       '/netTokenNotification': handlePostNetTokenNotification,
-      '/captureContext': handleCaptureContext,
+      '/captureContext': handleCaptureContext
     }
   };
   if (!pathName) {
@@ -288,7 +288,7 @@ const handleOrders = async (_req: any, res: any): Promise<void> => {
 const handleOrdersData = async (_req: any, res: any): Promise<void> => {
   errorMessage = '';
   successMessage = '';
-  const orderPage: { count: number; orderList: PaymentType[]; total: number; moment: any; amountConversion: any; orderErrorMessage: string; orderSuccessMessage: string } = {
+  const orderPage: { count: number; orderList: Payment[]; total: number; moment: any; amountConversion: any; orderErrorMessage: string; orderSuccessMessage: string } = {
     count: 0,
     orderList: [],
     total: 0,
@@ -336,7 +336,7 @@ const handlePaymentCreate = async (req: any, res: any): Promise<void> => {
     }
   } catch (exception) {
     const paymentId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE, '', exception, paymentId, Constants.PAYMENT_ID, '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE, '', exception, encodeURI(paymentId), Constants.PAYMENT_ID, '');
     response = paymentUtils.invalidOperationResponse();
   }
   const paymentCreateResponse = JSON.stringify(response);
@@ -360,7 +360,7 @@ const handlePaymentUpdate = async (req: any, res: any): Promise<void> => {
     }
   } catch (exception) {
     const paymentId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_UPDATE, '', exception, paymentId, 'PaymentId : ', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_UPDATE, '', exception, encodeURI(paymentId), 'PaymentId : ', '');
     updateResponse = paymentUtils.invalidOperationResponse();
   }
   const paymentUpdateResponse = JSON.stringify(updateResponse);
@@ -384,7 +384,7 @@ const handleCustomerUpdate = async (req: any, res: any): Promise<void> => {
       response = await apiHandler.customerUpdateApi(customerObj);
     } catch (exception) {
       const customerId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CUSTOMER_UPDATE, '', exception, customerId, 'CustomerId : ', '');
+      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CUSTOMER_UPDATE, '', exception, encodeURI(customerId), 'CustomerId : ', '');
     }
   }
   //If an exception or an error occurs, return the received customer object back
@@ -421,7 +421,9 @@ const handleAuthReversal = async (req: any, res: any): Promise<void> => {
         authReverseApiResponse = await apiHandler.orderManagementApi(paymentId, undefined, Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION);
         errorMessage = authReverseApiResponse.errorMessage;
         successMessage = authReverseApiResponse.successMessage;
-        viewData = `/paymentDetails?id=${paymentId}`;
+        if (paymentUtils.validateId(paymentId)) {
+          viewData = `/paymentDetails?id=${encodeURIComponent(paymentId)}`;
+        }
       }
     } else {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
@@ -430,9 +432,7 @@ const handleAuthReversal = async (req: any, res: any): Promise<void> => {
     paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_AUTH_REVERSAL, '', exception, '', '', '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
-  res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
-  res.setHeader('Location', viewData);
-  res.end();
+  route.sendResponse(res, Constants.HTTP_REDIRECT_STATUS_CODE, '', '', { header: 'Location', view: viewData });
 };
 
 /**
@@ -459,7 +459,9 @@ const handleCapture = async (req: any, res: any): Promise<void> => {
         captureApiResponse = await apiHandler.orderManagementApi(paymentId, captureAmount, Constants.CT_TRANSACTION_TYPE_CHARGE);
         errorMessage = captureApiResponse.errorMessage;
         successMessage = captureApiResponse.successMessage;
-        viewData = `/paymentDetails?id=${paymentId}`;
+        if (paymentUtils.validateId(paymentId)) {
+          viewData = `/paymentDetails?id=${encodeURIComponent(paymentId)}`;
+        }
       }
     } else {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
@@ -468,9 +470,7 @@ const handleCapture = async (req: any, res: any): Promise<void> => {
     paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CAPTURE, '', exception, '', '', '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
-  res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
-  res.setHeader('Location', viewData);
-  res.end();
+  route.sendResponse(res, Constants.HTTP_REDIRECT_STATUS_CODE, '', '', { header: 'Location', view: viewData });
 };
 
 /**
@@ -497,7 +497,9 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
         refundApiResponse = await apiHandler.orderManagementApi(paymentId, refundAmount, Constants.CT_TRANSACTION_TYPE_REFUND);
         errorMessage = refundApiResponse.errorMessage;
         successMessage = refundApiResponse.successMessage;
-        viewData = `/paymentDetails?id=${paymentId}`;
+        if (paymentUtils.validateId(paymentId)) {
+          viewData = `/paymentDetails?id=${encodeURIComponent(paymentId)}`;
+        }
       }
     } else {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
@@ -507,7 +509,7 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
-  res.setHeader('Location', viewData);
+  res.setHeader('Location', paymentUtils.validateRedirectPaths(viewData));
   res.end();
 };
 

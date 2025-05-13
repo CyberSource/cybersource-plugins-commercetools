@@ -1,13 +1,14 @@
+import { Payment, TransactionDraft } from '@commercetools/platform-sdk';
 import jwt from 'jsonwebtoken';
 
-import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
+import { Constants } from './constants/paymentConstants';
 import captureContext from './service/payment/CaptureContextService';
 import flexKeys from './service/payment/FlexKeys';
 import getCardByInstrument from './service/payment/GetCardByInstrumentId';
 import keyVerification from './service/payment/GetPublicKeys';
-import { ActionResponseType, PaymentTransactionType, PaymentType } from './types/Types';
+import { ActionResponseType, AmountPlannedType } from './types/Types';
 import paymentActions from './utils/PaymentActions';
 import paymentHandler from './utils/PaymentHandler';
 import paymentUtils from './utils/PaymentUtils';
@@ -17,13 +18,14 @@ import payerAuthHelper from './utils/helpers/PayerAuthHelper';
 import paymentHelper from './utils/helpers/PaymentHelper';
 
 
+
 /**
  * Handles the creation of payment.
  * 
- * @param {PaymentType} paymentObj - The payment object containing payment information.
+ * @param {Payment} paymentObj - The payment object containing payment information.
  * @returns {Promise<ActionResponseType>} - A promise resolving to an action response type.
  */
-const paymentCreateApi = async (paymentObj: PaymentType): Promise<ActionResponseType> => {
+const paymentCreateApi = async (paymentObj: Payment): Promise<ActionResponseType> => {
   let response: ActionResponseType = paymentUtils.getEmptyResponse();
   if (paymentObj?.paymentMethodInfo?.method) {
     const paymentMethod = paymentObj.paymentMethodInfo.method;
@@ -60,18 +62,20 @@ const paymentCreateApi = async (paymentObj: PaymentType): Promise<ActionResponse
 /**
  * Handles the update of a payment.
  * 
- * @param {PaymentType} paymentObj - The payment object containing payment information.
+ * @param {Payment} paymentObj - The payment object containing payment information.
  * @returns {Promise<ActionResponseType>} - A promise resolving to an action response type.
  */
-const paymentUpdateApi = async (paymentObj: PaymentType): Promise<ActionResponseType> => {
+const paymentUpdateApi = async (paymentObj: Payment): Promise<ActionResponseType> => {
   let updateResponse: ActionResponseType = paymentUtils.getEmptyResponse();
   if (paymentObj?.id && paymentObj.paymentMethodInfo?.method && paymentObj?.transactions) {
     const paymentMethod = paymentObj.paymentMethodInfo.method;
     const transactionLength = paymentObj.transactions?.length;
     if (paymentObj?.custom?.fields) {
       try {
-        if (Constants.CC_PAYER_AUTHENTICATION === paymentMethod && 0 === transactionLength) {
-          updateResponse = await payerAuthHelper.processPayerAuthentication(paymentObj);
+        if (0 === transactionLength) {
+          if (Constants.CC_PAYER_AUTHENTICATION === paymentMethod) {
+            updateResponse = await payerAuthHelper.processPayerAuthentication(paymentObj);
+          }
         }
         if (0 < transactionLength) {
           updateResponse = await paymentHelper.processTransaction(paymentObj);
@@ -136,7 +140,7 @@ const customerUpdateApi = async (customerObj: any): Promise<ActionResponseType> 
 *   pendingAuthorizedAmount: number;
 *   pendingCaptureAmount: number;
 *   errorMessage: string;
-*   paymentDetails: PaymentType;
+*   paymentDetails: Payment;
 *   cartData: any;
 *   orderNo: string;
 * }>} - A promise resolving to an object containing payment details.
@@ -153,8 +157,8 @@ const paymentDetailsApi = async (paymentId: string) => {
     cartData: {},
     orderNo: ''
   };
-  let paymentDetails: PaymentType | null = null;
-  let refundTransaction: readonly Partial<PaymentTransactionType>[];
+  let paymentDetails: Payment | null = null;
+  let refundTransaction: readonly TransactionDraft[];
   try {
     if (typeof paymentId === Constants.STR_STRING && paymentId) {
       paymentDetailsResponse.paymentId = paymentId.replace(Constants.FORMAT_PAYMENT_ID_REGEX, '');
@@ -187,11 +191,11 @@ const paymentDetailsApi = async (paymentId: string) => {
           }
         }
       } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_PAYMENT_DETAILS_API, Constants.LOG_ERROR, 'PaymentId :' + paymentDetailsResponse?.paymentId || '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_PAYMENT_DETAILS_API, Constants.LOG_ERROR, 'PaymentId :' + encodeURI(paymentDetailsResponse?.paymentId) || '', CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS);
       }
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_PAYMENT_DETAILS_API, '', exception, 'PaymentId :' + paymentDetailsResponse?.paymentId || '', '', '');
+    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_PAYMENT_DETAILS_API, '', exception, 'PaymentId :' + encodeURI(paymentDetailsResponse?.paymentId) || '', '', '');
   }
   return paymentDetailsResponse;
 };
@@ -212,7 +216,8 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
   successMessage: string;
 }> => {
   let pendingAmount;
-  let paymentObject: PaymentType | null = null;
+  let paymentObject: Payment | null = null;
+  let amountPlanned = {} as AmountPlannedType;
   const apiResponse = {
     errorMessage: '',
     successMessage: '',
@@ -236,7 +241,8 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
           apiResponse.errorMessage = paymentUtils.handleOMErrorMessage(1, transactionType);
         } else {
           if (transactionAmount) {
-            paymentObject.amountPlanned.centAmount = paymentUtils.convertAmountToCent(transactionAmount, fractionDigits);
+            amountPlanned = paymentObject.amountPlanned;
+            amountPlanned.centAmount = paymentUtils.convertAmountToCent(transactionAmount, fractionDigits)
           }
           const transactionObject = paymentUtils.createTransactionObject(paymentObject.version, paymentObject.amountPlanned, transactionType, Constants.CT_TRANSACTION_STATE_INITIAL, undefined, undefined);
           const addTransaction = await commercetoolsApi.addTransaction(transactionObject, paymentId);
@@ -288,7 +294,7 @@ const captureContextApi = async (requestObj: any): Promise<any> => {
       captureContextResponse = await captureContext.generateCaptureContext(null, country, locale, currencyCode, merchantId, 'MyAccounts');
     }
     let decodedCaptureContext = jwt.decode(captureContextResponse);
-    if(captureContextResponse && decodedCaptureContext?.ctx?.[0]?.data?.clientLibrary && decodedCaptureContext?.ctx?.[0].data.clientLibraryIntegrity){
+    if (captureContextResponse && decodedCaptureContext?.ctx?.[0]?.data?.clientLibrary && decodedCaptureContext?.ctx?.[0].data.clientLibraryIntegrity) {
       response = {
         captureContextData: captureContextResponse,
         clientLibrary: decodedCaptureContext?.ctx?.[0].data.clientLibrary,

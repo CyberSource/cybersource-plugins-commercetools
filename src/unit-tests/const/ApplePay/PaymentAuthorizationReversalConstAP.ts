@@ -1,6 +1,7 @@
 import applePay from '../../JSON/applePay.json';
+
 const payment = {
-  id: '8efb864e-e0e9-4cd2-aebd-983ef3358633',
+  id: '7c63d3c4-6741-499a-80bb-52c1b9f21d95',
   version: 15,
   lastMessageSequenceNumber: 4,
   createdAt: '2022-01-25T09:34:33.160Z',
@@ -53,7 +54,7 @@ const payment = {
       amount: {
         type: 'centPrecision',
         currencyCode: 'USD',
-        centAmount: 6970,
+        centAmount: applePay.centAmountValue,
         fractionDigits: 2,
       },
       interactionId: applePay.authReversalId,
@@ -388,12 +389,12 @@ const cart = {
   ],
 };
 
-const authReversalId = applePay.authReversalId;
+const authId = applePay.authReversalId;
 
 const authReversalID = '64311367635468863039';
 
 const payments = {
-  id: '8efb864e-e0e9-4cd2-aebd-983ef3358633',
+  id: '7c63d3c4-6741-499a-80bb-52c1b9f21d95',
   version: 15,
   lastMessageSequenceNumber: 4,
   createdAt: '2022-01-25T09:34:33.160Z',
@@ -446,7 +447,7 @@ const payments = {
       amount: {
         type: 'centPrecision',
         currencyCode: 'USD',
-        centAmount: 6970,
+        centAmount: applePay.centAmount,
         fractionDigits: 2,
       },
       interactionId: applePay.authReversalId,
@@ -798,7 +799,7 @@ const multipleShippingPayment = {
       amount: {
         type: 'centPrecision',
         currencyCode: 'USD',
-        centAmount: 6970,
+        centAmount: applePay.centAmount,
         fractionDigits: 2,
       },
       interactionId: applePay.multipleShippingAuthReversalId,
@@ -813,10 +814,10 @@ const multipleShippingReversalId = applePay.multipleShippingAuthReversalId;
 export default {
   payment,
   cart,
-  authReversalId,
+  authId,
   authReversalID,
   payments,
   shippingCart,
   multipleShippingPayment,
-  multipleShippingReversalId
-}
+  multipleShippingReversalId,
+};

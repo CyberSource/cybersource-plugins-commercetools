@@ -52,22 +52,22 @@ export class AddressMapper {
  * This class provides a common mapping method to transfer common address fields
  * from a source address object to a target address object.
  */
-class CommonAddressMapper { 
+class CommonAddressMapper {
     /**
      * Maps common address fields from the source address to the target address object.
      * @param {Partial<AddressType>} sourceAddress - The source address object containing the address details.
-     * @param {any} targetAddress - The target address object to which the address details will be mapped.
+     * @param {Ptsv2paymentsOrderInformationBillTo | Ptsv2paymentsOrderInformationShipTo} targetAddress - The target address object to which the address details will be mapped.
      */
-    static mapCommonAddressFields(sourceAddress: Partial<AddressType>, targetAddress: any): void {
-        targetAddress.firstName = sourceAddress?.firstName;
-        targetAddress.lastName = sourceAddress?.lastName;
-        targetAddress.address1 = sourceAddress?.streetName || sourceAddress?.address1;
-        targetAddress.address2 = sourceAddress?.additionalStreetInfo || sourceAddress?.streetNumber || sourceAddress?.buildingNumber;
-        targetAddress.locality = sourceAddress?.city || sourceAddress?.locality;
-        targetAddress.administrativeArea = sourceAddress?.region || sourceAddress?.administrativeArea;
-        targetAddress.postalCode = sourceAddress?.postalCode;
-        targetAddress.country = sourceAddress?.country;
-        targetAddress.email = sourceAddress?.email;
-        targetAddress.phoneNumber = sourceAddress?.phone || sourceAddress?.mobile;
+    static mapCommonAddressFields(sourceAddress: Partial<AddressType>, targetAddress: Ptsv2paymentsOrderInformationBillTo | Ptsv2paymentsOrderInformationShipTo): void {
+        targetAddress.firstName = sourceAddress?.firstName || '';
+        targetAddress.lastName = sourceAddress?.lastName || '';
+        targetAddress.address1 = sourceAddress?.streetName || sourceAddress?.address1 || '';
+        targetAddress.address2 = sourceAddress?.additionalStreetInfo || sourceAddress?.streetNumber || sourceAddress?.buildingNumber || '';
+        targetAddress.locality = sourceAddress?.city || sourceAddress?.locality || '';
+        targetAddress.administrativeArea = sourceAddress?.region || sourceAddress?.administrativeArea || '';
+        targetAddress.postalCode = sourceAddress?.postalCode || '';
+        targetAddress.country = sourceAddress?.country || '';
+        targetAddress.email = sourceAddress?.email || '';
+        targetAddress.phoneNumber = sourceAddress?.phone || sourceAddress?.mobile || '';
     }
 }

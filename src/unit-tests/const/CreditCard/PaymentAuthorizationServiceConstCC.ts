@@ -20,7 +20,7 @@ let payment = {
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   customer: {
@@ -139,7 +139,7 @@ let payments = {
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   createdBy: {
@@ -147,12 +147,12 @@ let payments = {
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   customer: {
     typeId: 'customer',
-    id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+    id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
   },
   amountPlanned: {
     type: 'centPrecision',
@@ -576,7 +576,7 @@ let paymentInvalidToken = {
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   createdBy: {
@@ -584,12 +584,12 @@ let paymentInvalidToken = {
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   customer: {
     typeId: 'customer',
-    id: 'de2127f2-1e51-429e-90fd-47521b95108c',
+    id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
   },
   amountPlanned: {
     type: 'centPrecision',

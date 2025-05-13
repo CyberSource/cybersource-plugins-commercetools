@@ -1,6 +1,6 @@
-import { Constants } from "../../constants/constants";
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from "../../constants/paymentConstants";
 import createWebhookSubscription from '../../service/payment/CreateWebhookSubscription';
 import deleteWebhookSubscriptionService from '../../service/payment/DeleteWebhookSubscriptionService';
 import getWebhookSubscriptionDetails from '../../service/payment/GetWebhookSubscriptionDetails';

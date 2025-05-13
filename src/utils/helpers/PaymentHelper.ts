@@ -1,11 +1,12 @@
+import { Cart, Customer, Payment } from "@commercetools/platform-sdk";
 import { PtsV2PaymentsPost201Response } from "cybersource-rest-client";
 
-import { Constants } from "../../constants/constants";
 import { CustomMessages } from "../../constants/customMessages";
 import { FunctionConstant } from "../../constants/functionConstant";
+import { Constants } from "../../constants/paymentConstants";
 import { PayerAuthData } from "../../models/PayerAuthDataModel";
 import paymentAuthorization from '../../service/payment/PaymentAuthorizationService';
-import { ActionResponseType, ActionType, CardAddressGroupType, CustomerType, CustomTokenType, PaymentTransactionType, PaymentType } from "../../types/Types";
+import { ActionResponseType, ActionType, CardAddressGroupType, CustomTokenType, PaymentTransactionType } from "../../types/Types";
 import paymentActions from "../PaymentActions";
 import paymentHandler from "../PaymentHandler";
 import paymentUtils from "../PaymentUtils";
@@ -14,18 +15,19 @@ import commercetoolsApi from "../api/CommercetoolsApi";
 
 import cartHelper from "./CartHelper";
 import tokenHelper from "./TokenHelper";
+
 /**
  * Retrieves the credit card authorization response.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
- * @param {CustomerType | null} customerInfo - Customer information.
- * @param {any} cartObj - Cart object.
- * @param {PaymentTransactionType} updateTransactions - Updated transaction details.
+ * @param {Payment} updatePaymentObj - Updated payment object.
+ * @param {Customer | null} customerInfo - Customer information.
+ * @param {Cart} cartObj - Cart object.
+ * @param {Partial<PaymentTransactionType>} updateTransactions - Updated transaction details.
  * @param {CustomTokenType} cardTokens - Card tokens.
  * @param {string} orderNo - Order number.
  * @returns {Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }>} - Object containing error flag, payment response, and authorization response.
  */
-const getPaymentResponse = async (updatePaymentObj: PaymentType, customerInfo: Partial<CustomerType> | null, cartObj: any, updateTransactions: Partial<PaymentTransactionType>, cardTokens: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
+const getPaymentResponse = async (updatePaymentObj: Payment, customerInfo: Customer | null, cartObj: Cart, updateTransactions: Partial<PaymentTransactionType>, cardTokens: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
     let isSaveToken = false;
     let isError = false;
     let paymentResponse;
@@ -64,14 +66,14 @@ const getPaymentResponse = async (updatePaymentObj: PaymentType, customerInfo: P
 /**
  * Retrieves the response for Click to Pay.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
- * @param {any} cartObj - Cart object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
+ * @param {Cart} cartObj - Cart object.
  * @param {PaymentTransactionType} updateTransactions - Updated transactions.
  * @param {CustomTokenType} customerTokenId - Customer token ID.
  * @param {string} orderNo - Order number.
  * @returns {Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }>} - Response containing error flag, payment response, and authentication response.
  */
-const getClickToPayResponse = async (updatePaymentObj: PaymentType, cartObj: any, updateTransactions: Partial<PaymentTransactionType>, customerTokenId: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
+const getClickToPayResponse = async (updatePaymentObj: Payment, cartObj: Cart, updateTransactions: Partial<PaymentTransactionType>, customerTokenId: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
     let isError = false;
     let paymentId = updatePaymentObj?.id || '';
     let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
@@ -88,11 +90,6 @@ const getClickToPayResponse = async (updatePaymentObj: PaymentType, cartObj: any
             if (visaCheckoutData) {
                 actions = paymentActions.cardDetailsActions(visaCheckoutData);
                 paymentValidator.validateActionsAndPush(actions, authResponse.actions);
-                if (!updatePaymentObj?.custom?.fields?.isv_transientToken) {
-                    const cartUpdate = await commercetoolsApi.updateCartByPaymentId(cartObj.id, paymentId, cartObj.version, visaCheckoutData);
-                    const clickToPayUpdateMessage = cartUpdate ? CustomMessages.SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS : CustomMessages.ERROR_MSG_UPDATE_CART;
-                    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CLICK_TO_PAY_RESPONSE, Constants.LOG_INFO, 'PaymentId : ' + paymentId, clickToPayUpdateMessage);
-                }
             } else {
                 paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CLICK_TO_PAY_RESPONSE, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA);
             }
@@ -108,14 +105,14 @@ const getClickToPayResponse = async (updatePaymentObj: PaymentType, cartObj: any
 /**
  * Retrieves the response for Google Pay.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
- * @param {any} cartObj - Cart object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
+ * @param {Cart} cartObj - Cart object.
  * @param {PaymentTransactionType} updateTransactions - Updated transactions.
  * @param {CustomTokenType} customerTokens - Customer tokens.
  * @param {string} orderNo - Order number.
  * @returns {Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }>} - Response containing error flag, payment response, and authentication response.
  */
-const getGooglePayResponse = async (updatePaymentObj: PaymentType, cartObj: any, updateTransactions: Partial<PaymentTransactionType>, customerTokens: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
+const getGooglePayResponse = async (updatePaymentObj: Payment, cartObj: Cart, updateTransactions: Partial<PaymentTransactionType>, customerTokens: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
     let isError = false;
     let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
     const cardDetails: Partial<CardAddressGroupType> = {
@@ -229,12 +226,12 @@ const getAuthResponse = (paymentResponse: PtsV2PaymentsPost201Response | any, tr
  * the transaction state accordingly. The function returns a response indicating 
  * the result of the transaction processing.
  * 
- * @param {PaymentType} paymentObj - The payment object containing transaction 
+ * @param {Payment} paymentObj - The payment object containing transaction 
  * details and associated metadata.
  * @returns {Promise<any>} - A promise that resolves to the update response 
  * from the transaction processing, which may include actions or state updates.
  */
-const processTransaction = async (paymentObj: PaymentType) => {
+const processTransaction = async (paymentObj: Payment) => {
     const transactionLength = paymentObj.transactions?.length;
     const updatePaymentId = paymentObj.id;
     const paymentMethod = paymentObj.paymentMethodInfo?.method;
@@ -257,19 +254,15 @@ const processTransaction = async (paymentObj: PaymentType) => {
             paymentResponse.httpCode = Number(paymentCustomFields.isv_payerEnrollHttpCode);
             paymentResponse.status = paymentCustomFields.isv_payerEnrollStatus;
             paymentResponse.transactionId = paymentCustomFields.isv_payerEnrollTransactionId;
-            updateResponse = getAuthResponse(paymentResponse, updateTransactions);
-            if (updateResponse?.actions && 0 < updateResponse.actions?.length && paymentCustomFields.isv_securityCode) {
-                const isv_securityCode = 0;
-                updateResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_securityCode }));
-            }
+            updateResponse = getAuthResponse(paymentResponse, updateTransactions as Partial<PaymentTransactionType>);
             if (paymentResponse && Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === paymentResponse.status) {
                 updateResponse = await paymentHandler.handlePayerAuthReversal(paymentObj, paymentResponse, updateResponse);
             }
         } else {
-            updateResponse = await paymentHandler.handleAuthorization(paymentObj, updateTransactions);
+            updateResponse = await paymentHandler.handleAuthorization(paymentObj, updateTransactions as Partial<PaymentTransactionType>);
         }
     } else {
-        updateResponse = await paymentHandler.handleOrderManagement(updatePaymentId, paymentObj, updateTransactions);
+        updateResponse = await paymentHandler.handleOrderManagement(updatePaymentId, paymentObj, updateTransactions as Partial<PaymentTransactionType>);
     }
     return updateResponse;
 };

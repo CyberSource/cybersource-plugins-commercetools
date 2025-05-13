@@ -1,8 +1,9 @@
+import { CustomObjectDraft } from '@commercetools/platform-sdk';
 import dotenv from 'dotenv';
 
-import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
+import { Constants } from './constants/paymentConstants';
 import { MidCredentialsType, SubscriptionInformationType } from './types/Types';
 import paymentUtils from './utils/PaymentUtils';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
@@ -72,7 +73,7 @@ const createWebhookSubscription = async (): Promise<any> => {
       }
     }
     if (0 < subscriptionInformationArray.length) {
-      const setCustomObjectRequest = {
+      const setCustomObjectRequest: CustomObjectDraft = {
         container: Constants.CUSTOM_OBJECT_CONTAINER,
         key: Constants.CUSTOM_OBJECT_KEY,
         value: subscriptionInformationArray,

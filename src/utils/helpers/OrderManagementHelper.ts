@@ -1,9 +1,10 @@
+import { Cart, Payment, Transaction } from "@commercetools/platform-sdk";
 import { PtsV2PaymentsCapturesPost201Response, PtsV2PaymentsReversalsPost201Response } from "cybersource-rest-client";
 
-import { Constants } from "../../constants/constants";
+import { Constants } from "../../constants/paymentConstants";
 import paymentAuthorizationReversal from "../../service/payment/PaymentAuthorizationReversal";
 import paymentRefund from "../../service/payment/PaymentRefundService";
-import { ActionResponseType, ActionType, AmountPlannedType, PaymentTransactionType, PaymentType } from "../../types/Types";
+import { ActionResponseType, ActionType, PaymentTransactionType } from "../../types/Types";
 import paymentActions from "../PaymentActions";
 import paymentUtils from "../PaymentUtils";
 import paymentValidator from "../PaymentValidator";
@@ -20,12 +21,12 @@ import paymentHelper from "./PaymentHelper";
  * @returns {ActionResponseType} - Object containing actions and errors.
  */
 const getOMServiceResponse = (paymentResponse: PtsV2PaymentsCapturesPost201Response, transactionDetail: Partial<PaymentTransactionType>, captureId: string, pendingAmount: number): ActionResponseType => {
-    let setCustomField: Partial<ActionType>;
+    let setCustomField: Partial<ActionType> | null;
     let paymentFailure: Partial<ActionType> | null = null;
     let setCustomType: Partial<ActionType> | null = null;
-    let response: ActionResponseType = paymentUtils.getEmptyResponse();
+    let response = paymentUtils.getEmptyResponse();
     if (paymentResponse && transactionDetail) {
-        if (Constants.API_STATUS_PENDING === paymentResponse.status || Constants.API_STATUS_REVERSED === paymentResponse.status) {
+        if (Constants.API_STATUS_PENDING === paymentResponse.status || Constants.API_STATUS_REVERSED === paymentResponse.status || Constants.API_STATUS_AUTH_REVERSED === paymentResponse.status) {
             setCustomField = paymentUtils.changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
             if (captureId && 0 <= pendingAmount) {
                 setCustomType = paymentHelper.setTransactionCustomType(captureId, pendingAmount);
@@ -44,14 +45,14 @@ const getOMServiceResponse = (paymentResponse: PtsV2PaymentsCapturesPost201Respo
 /**
  * Calculates the pending capture amount based on the refund payment object.
  * 
- * @param {PaymentType} refundPaymentObj - Refund payment object.
+ * @param {Payment} refundPaymentObj - Refund payment object.
  * @returns {number} - Pending capture amount.
  */
-const getCapturedAmount = (refundPaymentObj: PaymentType): number => {
+const getCapturedAmount = (refundPaymentObj: Payment): number => {
     let capturedAmount = 0;
     let refundedAmount = 0.0;
     let pendingCaptureAmount = 0;
-    let refundTransaction: readonly Partial<PaymentTransactionType>[];
+    let refundTransaction: Transaction[];
     if (refundPaymentObj) {
         const fractionDigits = refundPaymentObj.amountPlanned.fractionDigits;
         refundTransaction = refundPaymentObj.transactions;
@@ -80,16 +81,16 @@ const getCapturedAmount = (refundPaymentObj: PaymentType): number => {
 /**
  * Calculates the pending authorized amount based on the capture payment object.
  * 
- * @param {PaymentType} capturePaymentObj - Capture payment object.
+ * @param {Payment} capturePaymentObj - Capture payment object.
  * @returns {number} - Pending authorized amount.
  */
-const getAuthorizedAmount = (capturePaymentObj: PaymentType): number => {
+const getAuthorizedAmount = (capturePaymentObj: Payment): number => {
     let capturedAmount = 0.0;
     let pendingAuthorizedAmount = 0;
     if (capturePaymentObj) {
         const captureTransaction = capturePaymentObj.transactions;
         const fractionDigits = capturePaymentObj.amountPlanned.fractionDigits;
-        const indexValue = captureTransaction.findIndex((transaction, index) => {
+        const indexValue = captureTransaction.findIndex((transaction: Transaction, index: number) => {
             if (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION === transaction.type) {
                 return true;
             }
@@ -97,7 +98,7 @@ const getAuthorizedAmount = (capturePaymentObj: PaymentType): number => {
         });
         if (0 <= indexValue) {
             const authorizedAmount = Number(captureTransaction[indexValue]?.amount?.centAmount);
-            captureTransaction.forEach((transaction) => {
+            captureTransaction.forEach((transaction: Transaction) => {
                 if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS === transaction.state) {
                     capturedAmount = capturedAmount + Number(transaction?.amount?.centAmount);
                 }
@@ -112,13 +113,13 @@ const getAuthorizedAmount = (capturePaymentObj: PaymentType): number => {
 /**
  * Handles authorization reversal response for the given payment update.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
- * @param {any} cartObj - Cart object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
+ * @param {Cart} cartObj - Cart object.
  * @param {any} paymentResponse - Payment response.
  * @param {ActionResponseType} updateActions - Updated actions.
  * @returns {Promise<ActionResponseType>} - Updated actions response.
  */
-const handleAuthReversalResponse = async (updatePaymentObj: PaymentType, cartObj: any, paymentResponse: PtsV2PaymentsReversalsPost201Response | any, updateActions: ActionResponseType): Promise<ActionResponseType> => {
+const handleAuthReversalResponse = async (updatePaymentObj: Payment, cartObj: Cart, paymentResponse: PtsV2PaymentsReversalsPost201Response | any, updateActions: ActionResponseType): Promise<ActionResponseType> => {
     const reversalAction = {
         action: 'addTransaction',
         transaction: {
@@ -149,21 +150,21 @@ const handleAuthReversalResponse = async (updatePaymentObj: PaymentType, cartObj
 /**
  * Retrieves the refund response for the given payment update.
  * 
- * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
  * @param {PaymentTransactionType} updateTransactions - Updated transactions.
  * @param {string} orderNo - Order number.
  * @returns {Promise<ActionResponseType>} - Refund actions response.
  */
-const getRefundResponse = async (updatePaymentObj: PaymentType, updateTransactions: Partial<PaymentTransactionType>, orderNo: string): Promise<ActionResponseType> => {
+const getRefundResponse = async (updatePaymentObj: Payment, updateTransactions: Partial<PaymentTransactionType>, orderNo: string): Promise<ActionResponseType> => {
     let transactionState = Constants.CT_TRANSACTION_STATE_FAILURE;
     let iterateRefundAmount = 0;
     let pendingTransactionAmount = 0;
     let amountToBeRefunded = 0;
     let iterateRefund = 0;
-    let availableCaptureAmount = 0;
     let chargeAmount = 0;
     let pendingAmount = 0;
     let refundAmount: number;
+    let withEqualAmount = false;
     let refundAction;
     let refundActions: ActionResponseType = paymentUtils.getEmptyResponse();
     let refundResponseObject = {
@@ -181,56 +182,82 @@ const getRefundResponse = async (updatePaymentObj: PaymentType, updateTransactio
                 if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS === transaction.state && transaction?.amount && transaction?.interactionId && transaction?.id) {
                     if (refundAmount === transaction.amount.centAmount && !(Constants.STRING_CUSTOM in transaction)) {
                         pendingAmount = transaction.amount.centAmount - refundAmount;
+                        withEqualAmount = true;
+                        refundResponseObject = paymentUtils.getRefundResponseObject(transaction, pendingAmount);
                         break;
                     } else if (transaction?.custom?.fields?.isv_availableCaptureAmount && refundAmount === transaction.custom.fields.isv_availableCaptureAmount) {
+                        withEqualAmount = true;
                         pendingAmount = transaction.custom.fields.isv_availableCaptureAmount - refundAmount;
+                        refundResponseObject = paymentUtils.getRefundResponseObject(transaction, pendingAmount);
                         break;
                     }
-                    refundResponseObject = paymentUtils.getRefundResponseObject(transaction, pendingAmount);
                 }
             }
-            if (!refundResponseObject.captureId) {
+            if (!withEqualAmount) {
                 for (let transaction of updatePaymentObj.transactions) {
+                    let amount = {
+                        type: '',
+                        currencyCode: '',
+                        centAmount: 0,
+                        fractionDigits: 0,
+                    };
                     refundResponseObject.captureId = '';
-                    const successfulChargeTransaction = paymentValidator.isSuccessFulChargeTransaction(transaction);
-                    if (successfulChargeTransaction) {
-                        availableCaptureAmount = transaction?.custom?.fields?.isv_availableCaptureAmount || 0;
-                        chargeAmount = availableCaptureAmount || transaction?.amount?.centAmount || 0;
-                        amountToBeRefunded = Math.min(iterateRefundAmount, chargeAmount);
-                        updateTransactions.amount.centAmount = amountToBeRefunded;
-                        refundResponseObject = paymentUtils.getRefundResponseObject(transaction, amountToBeRefunded);
-                        pendingTransactionAmount = chargeAmount - amountToBeRefunded;
-                        iterateRefundAmount -= amountToBeRefunded;
-                        iterateRefund++;
-                        const orderResponse = await paymentRefund.getRefundData(updatePaymentObj, refundResponseObject.captureId, updateTransactions, orderNo);
-                        if (orderResponse && orderResponse.httpCode) {
-                            if (1 === iterateRefund && 0 === iterateRefundAmount) {
-                                refundActions = getOMServiceResponse(orderResponse, updateTransactions, refundResponseObject.transactionId, pendingTransactionAmount);
-                            } else {
-                                if (Constants.API_STATUS_PENDING === orderResponse.status) {
-                                    transactionState = Constants.CT_TRANSACTION_STATE_SUCCESS;
-                                    setAction = paymentHelper.setTransactionCustomType(refundResponseObject.transactionId, pendingTransactionAmount);
-                                } else {
-                                    setAction = paymentUtils.failureResponse(orderResponse, updateTransactions);
-                                }
-                                if (setAction) {
-                                    refundActions.actions.push(setAction);
-                                }
-                                const amount = {
-                                    type: updateTransactions.amount?.type,
-                                    currencyCode: updateTransactions.amount?.currencyCode,
-                                    fractionDigits: updateTransactions.amount?.fractionDigits,
-                                    centAmount: amountToBeRefunded,
-                                } as AmountPlannedType
-                                refundAction = paymentActions.addRefundAction(amount, orderResponse, transactionState);
-                                if (refundAction) {
-                                    refundActions.actions.push(refundAction);
+                    if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS === transaction.state && transaction?.amount && transaction?.interactionId && transaction?.id) {
+                        chargeAmount = transaction.amount.centAmount;
+                        if (0 !== iterateRefundAmount) {
+                            if (transaction?.custom && 0 !== transaction?.custom?.fields?.isv_availableCaptureAmount) {
+                                chargeAmount = transaction.custom.fields.isv_availableCaptureAmount;
+                            }
+                            if (iterateRefundAmount === chargeAmount && 0 !== transaction?.custom?.fields?.isv_availableCaptureAmount) {
+                                updateTransactions.amount.centAmount = chargeAmount;
+                                refundResponseObject = paymentUtils.getRefundResponseObject(transaction, chargeAmount);
+                                amountToBeRefunded = chargeAmount;
+                                iterateRefundAmount -= iterateRefundAmount;
+                                iterateRefund++;
+                            } else if (iterateRefundAmount > chargeAmount && 0 !== transaction?.custom?.fields?.isv_availableCaptureAmount) {
+                                updateTransactions.amount.centAmount = chargeAmount;
+                                refundResponseObject = paymentUtils.getRefundResponseObject(transaction, chargeAmount);
+                                amountToBeRefunded = chargeAmount;
+                                iterateRefundAmount -= chargeAmount;
+                                iterateRefund++;
+                            } else if (iterateRefundAmount < chargeAmount && 0 !== transaction?.custom?.fields?.isv_availableCaptureAmount) {
+                                updateTransactions.amount.centAmount = iterateRefundAmount;
+                                refundResponseObject = paymentUtils.getRefundResponseObject(transaction, iterateRefundAmount);
+                                pendingTransactionAmount = chargeAmount - iterateRefundAmount;
+                                amountToBeRefunded = iterateRefundAmount;
+                                iterateRefundAmount -= iterateRefundAmount;
+                                iterateRefund++;
+                            }
+                            if (refundResponseObject?.captureId) {
+                                const orderResponse = await paymentRefund.getRefundData(updatePaymentObj, refundResponseObject.captureId, updateTransactions, orderNo);
+                                if (orderResponse && orderResponse.httpCode) {
+                                    if (1 === iterateRefund && 0 === iterateRefundAmount) {
+                                        refundActions = getOMServiceResponse(orderResponse, updateTransactions, refundResponseObject.transactionId, pendingTransactionAmount);
+                                    } else {
+                                        if (Constants.API_STATUS_PENDING === orderResponse.status) {
+                                            transactionState = Constants.CT_TRANSACTION_STATE_SUCCESS;
+                                            setAction = paymentHelper.setTransactionCustomType(refundResponseObject.transactionId, pendingTransactionAmount);
+                                        } else {
+                                            setAction = paymentUtils.failureResponse(orderResponse, updateTransactions);
+                                        }
+                                        if (setAction) {
+                                            refundActions.actions.push(setAction);
+                                        }
+                                        amount.type = updateTransactions.amount?.type;
+                                        amount.currencyCode = updateTransactions.amount?.currencyCode;
+                                        amount.fractionDigits = updateTransactions.amount?.fractionDigits;
+                                        amount.centAmount = amountToBeRefunded;
+                                        refundAction = paymentActions.addRefundAction(amount, orderResponse, transactionState);
+                                        if (refundAction) {
+                                            refundActions.actions.push(refundAction);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            } else if (refundResponseObject?.captureId) {
+            } else if (withEqualAmount && refundResponseObject?.captureId) {
                 const orderResponse = await paymentRefund.getRefundData(updatePaymentObj, refundResponseObject.captureId, updateTransactions, orderNo);
                 if (orderResponse && orderResponse.httpCode) {
                     refundActions = getOMServiceResponse(orderResponse, updateTransactions, refundResponseObject.transactionId, pendingTransactionAmount);

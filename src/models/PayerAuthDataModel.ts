@@ -1,6 +1,6 @@
 import { PtsV2PaymentsPost201ResponseConsumerAuthenticationInformation } from "cybersource-rest-client";
 
-import { Constants } from "../constants/constants";
+import { Constants } from "../constants/paymentConstants";
 import paymentValidator from "../utils/PaymentValidator";
 
 export class PayerAuthData {

@@ -148,7 +148,6 @@ Fields
 | isv_accountType                      | String  | false    ||
 | isv_routingNumber                    | String  | false    ||
 | isv_merchantId                       | String  | false    ||
-| isv_securityCode                     | Number  | false    ||
 | isv_screenWidth                      | String  | false    ||
 | isv_screenHeight                     | String  | false    ||
 | isv_responseDateAndTime              | String  | false    ||
@@ -161,6 +160,7 @@ Fields
 | isv_dmpaFlag                         | Boolean | false    ||
 | isv_shippingMethod                   | String  | false    || 
 | isv_metadata                         | String  | false    ||
+| isv_accountPurchaseCount             | Number  | false    ||
 
 ### Payer Authentication enrolment check
 

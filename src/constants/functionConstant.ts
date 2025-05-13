@@ -40,6 +40,7 @@ export abstract class FunctionConstant {
   static readonly FUNC_FIELD_MAPPER_NULL = 'FuncFieldMapperNull';
   static readonly FUNC_GENERATE_DIGEST = 'FuncGenerateDigest';
   static readonly FUNC_GET_ALL_MID_DETAILS = 'FuncGetAllMidDetails';
+  static readonly FUNC_GET_KEY_CREDENTIALS = 'FuncGetKeyCredentials';
   static readonly FUNC_GET_APPLICATIONS_PRESENT = 'FuncGetApplicationsPresent';
   static readonly FUNC_GET_AUTH_RESPONSE = 'FuncGetAuthResponse';
   static readonly FUNC_GET_CAPTURED_AMOUNT = 'FuncGetCapturedAmount';
@@ -117,6 +118,8 @@ export abstract class FunctionConstant {
   static readonly FUNC_HANDLE_PAYMENT_AUTH = 'FuncHandlePaymentAuth';
   static readonly FUNC_TEST_API_CONNECTION = 'FuncTestApiConnection';
   static readonly FUNC_HANDLE_TEST_CONNECTION = 'FuncHandleTestConnection';
+  static readonly FUNC_GET_MISSING_PAYMENT_DETAILS = 'FuncGetMissingPaymentDetails';
+  static readonly FUNC_SYNC_PAYMENT_AND_ADDRESS_DETAILS = 'FuncSyncPaymentAndAddressDetails';
 
   //requestBuilder Functions
   static readonly FUNC_GET_CONFIG_OBJECT = 'FuncGetConfigObject';
@@ -137,6 +140,8 @@ export abstract class FunctionConstant {
   static readonly FUNC_GET_REQUEST_OBJ = 'FuncGetRequestObj';
   static readonly FUNC_SET_OBJECT_VALUE = 'FuncSetObjectValue';
   static readonly FUNC_ADD_CUSTOM_TYPE = 'FuncAddCustomType';
+  static readonly FUNC_SET_CERTIFICATE_CACHE = 'FuncSetCertificateCache';
+  static readonly FUNC_SANITIZE_AND_VALIDATE_URL = 'FuncSanitizeAndValidateUrl';
 
   //Controller Functions
   static readonly FUNC_PAYMENT_CREATE_API = 'FuncPaymentCreateApi';
@@ -158,4 +163,5 @@ export abstract class FunctionConstant {
   static readonly FUNC_HANDLE_CAPTURE_CONTEXT = 'FuncHandleCaptureContext';
   static readonly FUNC_CREATE_WEBHOOK_SUBSCRIPTION = 'FuncCreateWebhookSubscription';
   static readonly FUNC_ORDER_MANAGEMENT_API = 'FuncOrderManagementApi';
+  static readonly FUNC_CREATE_ORDER = 'FunCreateOrderResponse';
 }

@@ -1,27 +1,29 @@
+import { _BaseAddress, Cart, Customer, FieldContainer, Payment } from '@commercetools/platform-sdk';
 import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
 
-import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import { Token } from '../../models/TokenModel';
 import getTransientTokenData from '../../service/payment/GetTransientTokenData';
-import { ActionResponseType, AddressType, CustomerTokensType, CustomerType, CustomTokenType, PaymentCustomFieldsType, PaymentType } from '../../types/Types';
+import { ActionResponseType, AddressType, CustomerTokensType, CustomTokenType, PaymentCustomFieldsType } from '../../types/Types';
 import paymentActions from '../PaymentActions';
 import paymentUtils from '../PaymentUtils';
 import paymentValidator from '../PaymentValidator';
 import commercetoolsApi from '../api/CommercetoolsApi';
 
+
 /**
  * Processes a valid card response, updating or creating token data based on the card response.
  * 
- * @param {any} customFields - The custom fields related to the card and customer.
+ * @param {FieldContainer} customFields - The custom fields related to the card and customer.
  * @param {any} cardTokens - The current card tokens available.
  * @param {any} cardResponse - The response object from the card processing service.
- * @param {CustomerType} customerObj - The customer object containing relevant customer information.
- * @param {AddressType | null} billToFields - The billing address fields, if available.
+ * @param {Customer} customerObj - The customer object containing relevant customer information.
+ * @param {_BaseAddress | null} billToFields - The billing address fields, if available.
  * @returns {Promise<ActionResponseType>} - A promise that resolves to an action response containing updated token actions.
  */
-const processValidCardResponse = async (customFields: any, cardTokens: any, cardResponse: any, customerObj: CustomerType, billToFields: AddressType | null): Promise<ActionResponseType> => {
+const processValidCardResponse = async (customFields: FieldContainer, cardTokens: any, cardResponse: any, customerObj: Customer, billToFields: Partial<AddressType> | null): Promise<ActionResponseType> => {
     const { customerTokenId, paymentInstrumentId, instrumentIdentifier } = getTokenIds(cardResponse, cardTokens);
     let finalTokenIndex = -1;
     let existingTokens = customFields?.isv_tokens || [];
@@ -60,12 +62,12 @@ const getTokenIds = (cardResponse: any, cardTokens: any) => {
 /**
  * Processes an invalid card response, logging the error and updating token actions.
  * 
- * @param {any} customFields - The custom fields related to the card and customer.
- * @param {CustomerType} customerObj - The customer object containing relevant customer information.
+ * @param {FieldContainer} customFields - The custom fields related to the card and customer.
+ * @param {Customer} customerObj - The customer object containing relevant customer information.
  * @param {string} customerId - The ID of the customer for logging purposes.
  * @returns {Promise<ActionResponseType>} - A promise that resolves to an action response containing updated token actions.
  */
-const processInvalidCardResponse = async (customFields: any, customerObj: CustomerType, customerId: string): Promise<ActionResponseType> => {
+const processInvalidCardResponse = async (customFields: FieldContainer, customerObj: Customer, customerId: string): Promise<ActionResponseType> => {
     const addressIdField = customFields?.isv_addressId === Constants.UC_ADDRESS ? '' : customFields.isv_addressId || '';
     let existingTokens = customerObj?.custom?.fields?.isv_tokens || [];
     let existingFailedTokens: string[] = [];
@@ -80,12 +82,12 @@ const processInvalidCardResponse = async (customFields: any, customerObj: Custom
 /**
  * Retrieves billing address fields based on custom fields and customer information.
  * 
- * @param {any} customFields - The custom fields related to the card and customer.
- * @param {readonly AddressType[]} addressObj - An array of address objects associated with the customer.
- * @param {CustomerType} customerObj - The customer object containing relevant customer information.
- * @returns {Promise<AddressType | null>} - A promise that resolves to the billing address fields or null if not found.
+ * @param {FieldContainer} customFields - The custom fields related to the card and customer.
+ * @param {readonly _BaseAddress[]} addressObj - An array of address objects associated with the customer.
+ * @param {Customer} customerObj - The customer object containing relevant customer information.
+ * @returns {Promise<_BaseAddress | null>} - A promise that resolves to the billing address fields or null if not found.
  */
-const getBillToFields = async (customFields: any, addressObj: readonly AddressType[], customerObj: CustomerType): Promise<AddressType | null> => {
+const getBillToFields = async (customFields: FieldContainer, addressObj: readonly _BaseAddress[], customerObj: Customer): Promise<Partial<AddressType> | null> => {
     let billToFields = null;
     if (Constants.UC_ADDRESS === customFields?.isv_addressId) {
         const ucAddressData = await getTransientTokenData.getTransientTokenDataResponse(customerObj, 'MyAccounts');
@@ -101,12 +103,12 @@ const getBillToFields = async (customFields: any, addressObj: readonly AddressTy
 /**
  * Counts the number of tokens added within a specific time interval.
  * 
- * @param {CustomerType | null} customerObj - Customer object.
+ * @param {Customer | null} customerObj - Customer object.
  * @param {string} startTime - Start time of the interval.
  * @param {string} endTime - End time of the interval.
  * @returns {number} - Number of tokens added within the interval.
  */
-const getRateLimiterTokenCount = async (customerObj: Partial<CustomerType> | null, startTime: string, endTime: string): Promise<number> => {
+const getRateLimiterTokenCount = async (customerObj: Partial<Customer> | null, startTime: string, endTime: string): Promise<number> => {
     let count = 0;
     let existingTokens: string[];
     let existingFailedTokens: string[];
@@ -124,12 +126,12 @@ const getRateLimiterTokenCount = async (customerObj: Partial<CustomerType> | nul
 /**
  * Checks whether to create a token.
  * 
- * @param {CustomerType | null} customerInfo - Customer information.
- * @param {PaymentType | null} paymentObj - Payment object.
+ * @param {Customer | null} customerInfo - Customer information.
+ * @param {Payment | null} paymentObj - Payment object.
  * @param {string} functionName - Name of the calling function.
  * @returns {Promise<{ isSaveToken: boolean, isError: boolean }>} - Object containing flag indicating whether to save the token and error flag.
  */
-const evaluateTokenCreation = async (customerInfo: Partial<CustomerType> | null, paymentObj: PaymentType | null, functionName: string): Promise<{ isSaveToken: boolean, isError: boolean }> => {
+const evaluateTokenCreation = async (customerInfo: Partial<Customer> | null, paymentObj: Payment | null, functionName: string): Promise<{ isSaveToken: boolean, isError: boolean }> => {
     let cardRate = 0;
     let cardRateCount = 0;
     const tokenCreateObj = {
@@ -162,17 +164,17 @@ const evaluateTokenCreation = async (customerInfo: Partial<CustomerType> | null,
 /**
  * Handles the creation of a payment token for a customer, retrieving relevant billing address fields if necessary.
  * 
- * @param {Partial<CustomerType>} customerObj - The customer object containing details for token creation.
- * @param {readonly AddressType[]} addressObj - An array of address objects associated with the customer.
+ * @param {Partial<Customer>} customerObj - The customer object containing details for token creation.
+ * @param {readonly _BaseAddress[]} addressObj - An array of address objects associated with the customer.
  * @param {string | undefined} isv_addressId - The identifier for the address to be used.
- * @returns {Promise<{ isSaveToken: boolean, cardTokens: any, billToFields: AddressType | null }>} - A promise that resolves to an object containing:
+ * @returns {Promise<{ isSaveToken: boolean, cardTokens: any, billToFields: _BaseAddress | null }>} - A promise that resolves to an object containing:
  *  - isSaveToken: A boolean indicating if the token should be saved.
  *  - cardTokens: The retrieved card tokens for the customer.
  *  - billToFields: The billing address fields, or null if not found.
  */
-const handleTokenCreation = async (customerObj: Partial<CustomerType>, addressObj: readonly AddressType[], isv_addressId: string | undefined): Promise<{ isSaveToken: boolean, cardTokens: any, billToFields: AddressType | null }> => {
+const handleTokenCreation = async (customerObj: Partial<Customer>, addressObj: readonly _BaseAddress[], isv_addressId: string | undefined): Promise<{ isSaveToken: boolean, cardTokens: any, billToFields: _BaseAddress | null }> => {
     const tokenCreateResponse = await evaluateTokenCreation(customerObj, null, FunctionConstant.FUNC_HANDLE_CARD_ADDITION);
-    let billToFields: AddressType | null = null;
+    let billToFields: _BaseAddress | null = null;
     const isSaveToken = tokenCreateResponse.isSaveToken;
     const cardTokens = getCardTokens(customerObj, '');
     if (!tokenCreateResponse.isError) {
@@ -197,18 +199,18 @@ const handleTokenCreation = async (customerObj: Partial<CustomerType>, addressOb
  * 
  * @param {string} customerTokenId - Customer token ID.
  * @param {string} instrumentIdentifier - Instrument identifier.
- * @param {PaymentType} updatePaymentObj - Updated payment object.
+ * @param {Payment} updatePaymentObj - Updated payment object.
  * @param {string} addressId - Address ID.
- * @returns {Promise<CustomerType | null>} - Indicates if the token already exists.
+ * @returns {Promise<Customer | null>} - Indicates if the token already exists.
  */
-const processTokens = async (customerTokenId: string, paymentInstrumentId: string, instrumentIdentifier: string, updatePaymentObj: PaymentType, addressId: string): Promise<Partial<CustomerType> | null> => {
+const processTokens = async (customerTokenId: string, paymentInstrumentId: string, instrumentIdentifier: string, updatePaymentObj: Payment, addressId: string): Promise<Partial<Customer> | null> => {
     let isExistingCardFlag = false;
     const customerId = updatePaymentObj?.customer?.id;
     const customFields = updatePaymentObj?.custom?.fields;
     let finalTokenIndex = -1;
     let existingTokens: string[];
     let parsedTokens: Partial<CustomerTokensType>;
-    let updateTokenResponse: Partial<CustomerType> | null = null;
+    let updateTokenResponse: Partial<Customer> | null = null;
     if (customerId) {
         const customerInfo = await commercetoolsApi.getCustomer(customerId);
         if (customerInfo) {
@@ -245,11 +247,11 @@ const processTokens = async (customerTokenId: string, paymentInstrumentId: strin
 /**
  * Retrieves card tokens from customer information.
  * 
- * @param {CustomerType | null} customerInfo - Customer information.
+ * @param {Customer | null} customerInfo - Customer information.
  * @param {string} isvSavedToken - Saved token.
  * @returns {Promise<CustomTokenType>} - Card tokens.
  */
-const getCardTokens = async (customerInfo: Partial<CustomerType> | null, isvSavedToken: string): Promise<CustomTokenType> => {
+const getCardTokens = async (customerInfo: Partial<Customer> | null, paymentToken: string): Promise<CustomTokenType> => {
     let currentIndex = 0;
     const cardTokens: CustomTokenType = {
         customerTokenId: '',
@@ -258,11 +260,11 @@ const getCardTokens = async (customerInfo: Partial<CustomerType> | null, isvSave
     if (customerInfo && customerInfo?.custom?.fields?.isv_tokens && 0 < customerInfo.custom.fields.isv_tokens?.length) {
         const existingTokens = customerInfo.custom.fields.isv_tokens;
         const tokenLength = customerInfo.custom.fields.isv_tokens.length;
-        const existingTokensMap = existingTokens.map((item) => item);
-        existingTokensMap.forEach((token) => {
+        const existingTokensMap = existingTokens.map((item: any) => item);
+        existingTokensMap.forEach((token: any) => {
             const newToken = JSON.parse(token);
             currentIndex++;
-            if (isvSavedToken === newToken.paymentToken && cardTokens) {
+            if (paymentToken === newToken.paymentToken && cardTokens) {
                 cardTokens.customerTokenId = newToken.value;
                 cardTokens.paymentInstrumentId = newToken.paymentToken;
             }
@@ -277,15 +279,16 @@ const getCardTokens = async (customerInfo: Partial<CustomerType> | null, isvSave
 /**
  * Retrieves the customer's address ID.
  * 
- * @param {any} cartObj - Cart object.
+ * @param {Cart} cartObj - Cart object.
  * @returns {Promise<ActionResponseType>} - Address ID.
  */
-const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse: PtsV2PaymentsPost201Response | any, authResponse: ActionResponseType, isError: boolean, updatePaymentObj: PaymentType, cartObj: any): Promise<ActionResponseType> => {
+const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse: PtsV2PaymentsPost201Response | any, authResponse: ActionResponseType, isError: boolean, updatePaymentObj: Payment, cartObj: Cart): Promise<ActionResponseType> => {
     let customerTokenId = '';
     let addressId = '';
     let customerId = updatePaymentObj?.customer?.id || '';
-    let customerTokenResponse: Partial<CustomerType> | null = null;
-    let customerInfo: Partial<CustomerType> | null = null;
+    let customerTokenResponse: Partial<Customer> | null = null;
+    let customerInfo: Partial<Customer> | null = null;
+
     if (cartObj && cartObj?.billingAddress?.id) {
         addressId = cartObj.billingAddress.id;
     }
@@ -295,8 +298,19 @@ const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse
         } else if (cartObj && updatePaymentObj.custom?.fields?.isv_transientToken) {
             customerInfo = await addTokenAddressForUC(updatePaymentObj, cartObj);
         }
+        if (customerInfo && !customerInfo?.addresses?.length && cartObj?.billingAddress) {
+            customerInfo = await commercetoolsApi.addCustomerAddress(customerId, cartObj.billingAddress);
+        }
         if (customerInfo?.addresses?.length) {
-            addressId = customerInfo.addresses[customerInfo.addresses.length - 1].id as string;
+            let customerAddress = customerInfo.addresses[customerInfo.addresses.length - 1]
+            if (customerAddress.firstName === cartObj?.billingAddress?.firstName && customerAddress.lastName === cartObj?.billingAddress?.lastName) {
+                addressId = customerInfo.addresses[customerInfo.addresses.length - 1].id as string;
+            } else if (cartObj?.billingAddress) {
+                customerInfo = await commercetoolsApi.addCustomerAddress(customerId, cartObj.billingAddress);
+                if (customerInfo?.addresses?.length) {
+                    addressId = customerInfo.addresses[customerInfo.addresses.length - 1].id as string;
+                }
+            }
         }
     }
     const processTokenData = paymentValidator.shouldProcessTokens(isError, paymentResponse, updatePaymentObj);
@@ -329,18 +343,18 @@ const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse
 /**
  * Sets customer failed token data.
  * 
- * @param {PaymentType} updatePaymentObj - The payment object containing updated payment details.
- * @param {PaymentCustomFieldsType} customFields - The custom fields associated with the payment.
+ * @param {Payment} updatePaymentObj - The payment object containing updated payment details.
+ * @param {FieldContainer} customFields - The custom fields associated with the payment.
  * @param {string} addressId - The address ID.
- * @returns {Promise<CustomerType | null>} - The updated customer token response.
+ * @returns {Promise<Customer | null>} - The updated customer token response.
  */
-const setCustomerFailedTokenData = async (updatePaymentObj: PaymentType, customFields: Partial<PaymentCustomFieldsType>, addressId: string): Promise<Partial<CustomerType> | null> => {
+const setCustomerFailedTokenData = async (updatePaymentObj: Payment, customFields: FieldContainer, addressId: string): Promise<Partial<Customer> | null> => {
     const customerId = updatePaymentObj?.customer?.id;
     let failedTokenLength = 0;
     let existingTokens: string[] = [];
     let existingFailedTokensMap: string[] = [];
-    let customerInfo: Partial<CustomerType> | null = null;
-    let customerTokenResponse: Partial<CustomerType> | null = null;
+    let customerInfo: Partial<Customer> | null = null;
+    let customerTokenResponse: Partial<Customer> | null = null;
     if (customerId) {
         customerInfo = await commercetoolsApi.getCustomer(customerId);
     }
@@ -376,18 +390,18 @@ const setCustomerFailedTokenData = async (updatePaymentObj: PaymentType, customF
 /**
  * Adds billing address for UC token.
  * 
- * @param {PaymentType} updatePaymentObj - The payment object containing updated payment details.
- * @param {any} cartObj - The cart object.
- * @returns {Promise<CustomerType | null>} - The updated customer address.
+ * @param {Payment} updatePaymentObj - The payment object containing updated payment details.
+ * @param {Cart} cartObj - The cart object.
+ * @returns {Promise<Customer | null>} - The updated customer address.
  */
-const addTokenAddressForUC = async (updatePaymentObj: PaymentType, cartObj: any): Promise<Partial<CustomerType> | null> => {
+const addTokenAddressForUC = async (updatePaymentObj: Payment, cartObj: Cart): Promise<Partial<Customer> | null> => {
     let customerId = updatePaymentObj?.customer?.id || '';
     let transientTokenData: {
         readonly httpCode: number;
         readonly data: any;
         readonly status: string;
     };
-    let customerAddress: Partial<CustomerType> | null = null;
+    let customerAddress: Partial<Customer> | null = null;
     if (updatePaymentObj && 'FULL' === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
         transientTokenData = await getTransientTokenData.getTransientTokenDataResponse(updatePaymentObj, 'Payments');
         if (transientTokenData.httpCode && Constants.HTTP_OK_STATUS_CODE === transientTokenData.httpCode && customerId) {

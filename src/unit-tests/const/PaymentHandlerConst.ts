@@ -1,4 +1,4 @@
-import { CustomerType } from '../../types/Types';
+// import { CustomerType } from '../../types/Types';
 import applePay from '../JSON/applePay.json';
 import cpay from '../JSON/clickToPay.json';
 import creditCard from '../JSON/creditCard.json';
@@ -6,7 +6,7 @@ import googlePay from '../JSON/googlePay.json';
 import unit from '../JSON/unit.json';
 import updateToken from '../JSON/updateToken.json';
 
- const updateCardHandlerTokens = {
+const updateCardHandlerTokens = {
   alias: updateToken.alias,
   value: updateToken.value,
   cardType: updateToken.cardType,
@@ -19,7 +19,7 @@ import updateToken from '../JSON/updateToken.json';
   addressId: 'gMgqUiw_',
 };
 
- const updateCardHandlerInvalidTokens = {
+const updateCardHandlerInvalidTokens = {
   alias: '&@Y&^&#*#',
   value: '&@Y&^&#*#',
   cardType: '&@Y&^&#*#',
@@ -32,10 +32,10 @@ import updateToken from '../JSON/updateToken.json';
   addressId: 'gMgqUiw_',
 };
 
- const updateCardHandlerCustomerId = unit.customerId;
+const updateCardHandlerCustomerId = unit.customerId;
 
- const updateCardHandlerCustomerObj : Partial<CustomerType>= {
-  id: 'dc510eec-fc6f-48c3-a82a-098cf946f8e6',
+const updateCardHandlerCustomerObj: any = {
+  id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
   version: 533,
   lastMessageSequenceNumber: 23,
   createdAt: '2022-05-25T08:44:21.150Z',
@@ -53,7 +53,7 @@ import updateToken from '../JSON/updateToken.json';
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: '2167e970-b3af-40b7-97f2-e29f2ea27fd3',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   email: 'sp54@gmail.com',
@@ -546,9 +546,9 @@ import updateToken from '../JSON/updateToken.json';
   }
 };
 
- const orderManagementHandlerPaymentId = unit.paymentId;
+const orderManagementHandlerPaymentId = unit.paymentId;
 
- const orderManagementHandlerUpdateTransactions = {
+const orderManagementHandlerUpdateTransactions = {
   id: '8d3dab83-6024-4c50-ba0e-c387a89762be',
   timestamp: '2022-01-11T06:37:11.153Z',
   type: 'Charge',
@@ -561,7 +561,7 @@ import updateToken from '../JSON/updateToken.json';
   state: 'Initial',
 };
 
- const orderManagementHandlerRefundUpdateTransactions = {
+const orderManagementHandlerRefundUpdateTransactions = {
   id: '6c0edcd0-c02b-4993-a08a-200124b6072a',
   timestamp: '2022-07-05T10:45:45.338Z',
   type: 'Refund',
@@ -574,7 +574,7 @@ import updateToken from '../JSON/updateToken.json';
   state: 'Initial',
 };
 
- const applePaySessionHandlerFields = {
+const applePaySessionHandlerFields = {
   isv_deviceFingerprintId: '2cd0221d-e31e-42d3-9d6b-aaeedd0eb62c',
   isv_applePayValidationUrl: 'https://apple-pay-gateway-cert.apple.com/paymentservices/startSession',
   isv_acceptHeader: '*/*',
@@ -582,7 +582,7 @@ import updateToken from '../JSON/updateToken.json';
   isv_userAgentHeader: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15',
 };
 
- const applePaySessionHandlerEmptyFields = {
+const applePaySessionHandlerEmptyFields = {
   isv_deviceFingerprintId: '',
   isv_applePayValidationUrl: '',
   isv_acceptHeader: '',
@@ -590,7 +590,7 @@ import updateToken from '../JSON/updateToken.json';
   isv_userAgentHeader: '',
 };
 
- const applePaySessionHandlerInvalidFields = {
+const applePaySessionHandlerInvalidFields = {
   isv_deviceFingerprintId: '$R!^&@UI(',
   isv_applePayValidationUrl: '*@U*&@@&&*@U*@',
   isv_acceptHeader: '*@&^@%',
@@ -598,7 +598,7 @@ import updateToken from '../JSON/updateToken.json';
   isv_userAgentHeader: '(@*&@^%#^&@**@',
 };
 
- const authorizationHandlerGPUpdatePaymentObject = {
+const authorizationHandlerGPUpdatePaymentObject = {
   id: unit.paymentId,
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -609,7 +609,7 @@ import updateToken from '../JSON/updateToken.json';
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: '88c278f9-82d9-427c-96df-f98a4f23e543',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   createdBy: {
@@ -617,12 +617,12 @@ import updateToken from '../JSON/updateToken.json';
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: '88c278f9-82d9-427c-96df-f98a4f23e543',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   customer: {
     typeId: 'customer',
-    id: '88c278f9-82d9-427c-96df-f98a4f23e543',
+    id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
   },
   amountPlanned: {
     type: 'centPrecision',
@@ -655,7 +655,7 @@ import updateToken from '../JSON/updateToken.json';
   interfaceInteractions: [],
 };
 
- const authorizationHandlerUpdateTransactions = {
+const authorizationHandlerUpdateTransactions = {
   id: '6f2129cc-76fc-441f-a1ae-cfa940184f6d',
   timestamp: '2022-02-01T09:27:30.561Z',
   type: 'Authorization',
@@ -668,7 +668,7 @@ import updateToken from '../JSON/updateToken.json';
   state: 'Initial',
 };
 
- const authorizationHandlerVSUpdatePaymentObject = {
+const authorizationHandlerVSUpdatePaymentObject = {
   id: unit.paymentId,
   version: 2,
   lastMessageSequenceNumber: 2,
@@ -677,14 +677,14 @@ import updateToken from '../JSON/updateToken.json';
   lastModifiedBy: {
     clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
     isPlatformClient: false,
-    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+    customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   },
   createdBy: {
     clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
     isPlatformClient: false,
-    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+    customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   },
-  customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+  customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   amountPlanned: {
     type: 'centPrecision',
     currencyCode: 'USD',
@@ -711,7 +711,7 @@ import updateToken from '../JSON/updateToken.json';
   interfaceInteractions: [],
 };
 
- const authorizationHandlerCCUpdatePaymentObject = {
+const authorizationHandlerCCUpdatePaymentObject = {
   id: unit.paymentId,
   version: 12,
   lastMessageSequenceNumber: 2,
@@ -720,14 +720,14 @@ import updateToken from '../JSON/updateToken.json';
   lastModifiedBy: {
     clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
     isPlatformClient: false,
-    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+    customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   },
   createdBy: {
     clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
     isPlatformClient: false,
-    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+    customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   },
-  customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+  customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   amountPlanned: {
     type: 'centPrecision',
     currencyCode: 'USD',
@@ -762,7 +762,7 @@ import updateToken from '../JSON/updateToken.json';
   interfaceInteractions: [],
 };
 
- const authorizationHandler3DSUpdatePaymentObject = {
+const authorizationHandler3DSUpdatePaymentObject = {
   id: unit.paymentId,
   version: 17,
   lastMessageSequenceNumber: 2,
@@ -771,14 +771,14 @@ import updateToken from '../JSON/updateToken.json';
   lastModifiedBy: {
     clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
     isPlatformClient: false,
-    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+    customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   },
   createdBy: {
     clientId: 'iFOAd29Lew5ADrpakIhQkz_N',
     isPlatformClient: false,
-    customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+    customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   },
-  customer: { typeId: 'customer', id: '88c278f9-82d9-427c-96df-f98a4f23e543' },
+  customer: { typeId: 'customer', id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f' },
   amountPlanned: {
     type: 'centPrecision',
     currencyCode: 'USD',
@@ -817,7 +817,7 @@ import updateToken from '../JSON/updateToken.json';
   interfaceInteractions: [],
 };
 
- const authorizationHandlerAPUpdatePaymentObject = {
+const authorizationHandlerAPUpdatePaymentObject = {
   id: unit.paymentId,
   version: 15,
   lastMessageSequenceNumber: 4,
@@ -879,7 +879,7 @@ import updateToken from '../JSON/updateToken.json';
   anonymousId: '033cd1c3-801d-4d2b-9729-fef0064dd3be',
 };
 
- const authorizationHandlerECUpdatePaymentObject = {
+const authorizationHandlerECUpdatePaymentObject = {
   id: unit.paymentId,
   version: 2,
   versionModifiedAt: '2023-01-06T09:47:40.393Z',
@@ -930,7 +930,7 @@ import updateToken from '../JSON/updateToken.json';
   anonymousId: 'e2738776-3238-4d9a-933f-6e41e6c0e941',
 };
 
- const getPayerAuthEnrollResponseUpdatePaymentObj = {
+const getPayerAuthEnrollResponseUpdatePaymentObj = {
   id: unit.paymentId,
   version: 15,
   lastMessageSequenceNumber: 1,
@@ -999,7 +999,7 @@ import updateToken from '../JSON/updateToken.json';
   interfaceInteractions: [],
 };
 
- const getPayerAuthValidateResponseUpdatePaymentObj = {
+const getPayerAuthValidateResponseUpdatePaymentObj = {
   id: unit.paymentId,
   version: 27,
   lastMessageSequenceNumber: 2,
@@ -1010,7 +1010,7 @@ import updateToken from '../JSON/updateToken.json';
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: '88c278f9-82d9-427c-96df-f98a4f23e543',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   createdBy: {
@@ -1018,12 +1018,12 @@ import updateToken from '../JSON/updateToken.json';
     isPlatformClient: false,
     customer: {
       typeId: 'customer',
-      id: '88c278f9-82d9-427c-96df-f98a4f23e543',
+      id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
     },
   },
   customer: {
     typeId: 'customer',
-    id: '88c278f9-82d9-427c-96df-f98a4f23e543',
+    id: '5917bbf8-2b3a-4934-9dcc-cbda0778719f',
   },
   amountPlanned: {
     type: 'centPrecision',
@@ -1095,7 +1095,7 @@ import updateToken from '../JSON/updateToken.json';
   ],
 };
 
- const getPayerAuthValidateResponseUpdatePaymentObjGuest = {
+const getPayerAuthValidateResponseUpdatePaymentObjGuest = {
   id: '95b4f7da-de4e-48c6-9928-940a30d0505a',
   version: 28,
   lastMessageSequenceNumber: 2,
@@ -1188,7 +1188,7 @@ import updateToken from '../JSON/updateToken.json';
   anonymousId: '710d994b-76e3-4873-b4c0-f584f60480a9',
 };
 
- const setTokenNullHandlerAuthResponse = {
+const setTokenNullHandlerAuthResponse = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -1204,7 +1204,7 @@ import updateToken from '../JSON/updateToken.json';
   errors: [],
 };
 
- const payerAuthPaymentObject = {
+const payerAuthPaymentObject = {
   id: '94ef1ba1-36c6-41f7-9e83-9a91d9213e64',
   version: 22,
   versionModifiedAt: '2024-02-16T13:38:58.333Z',
@@ -1283,7 +1283,7 @@ import updateToken from '../JSON/updateToken.json';
   anonymousId: 'fd49b7dd-2bd9-46d4-bc9b-d06d81291f83',
 };
 
- const payerAuthReversalHandlerUpdateActions = {
+const payerAuthReversalHandlerUpdateActions = {
   actions: [
     {
       action: 'changeTransactionInteractionId',
@@ -1299,7 +1299,7 @@ import updateToken from '../JSON/updateToken.json';
   errors: [],
 };
 
- const retrieveTokenDetailsResponse = {
+const retrieveTokenDetailsResponse = {
   httpCode: 200,
   instrumentIdentifier: '7036349999987050572',
   state: 'ACTIVE',

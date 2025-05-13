@@ -1,8 +1,8 @@
 import fs from 'fs';
 
-import { Constants } from '../../constants/constants';
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
+import { Constants } from '../../constants/paymentConstants';
 import paymentCustomJson from '../../resources/isv_payment_data_type.json';
 import paymentErrorJson from '../../resources/isv_payment_error_type.json';
 import paymentFailureJson from '../../resources/isv_payment_failure_type.json';
@@ -53,7 +53,7 @@ const createTransactionCustomType = async () => {
   return syncCustomType(transactionCustomJson);
 };
 
-const createAdditionalCustomType = async () => { //sudharsan review comment
+const createAdditionalCustomType = async () => {
   let customTypeCreated = false;
   let filePath = Constants.ADDITIONAL_CUSTOM_TYPE_FILE_PATH;
   if (!fs.existsSync(filePath)) {

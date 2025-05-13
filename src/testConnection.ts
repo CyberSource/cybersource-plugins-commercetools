@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 
-import { Constants } from './constants/constants';
 import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
+import { Constants } from './constants/paymentConstants';
 import createTransactionSearchRequest from './service/payment/CreateTransactionSearchRequest';
 import paymentUtils from './utils/PaymentUtils';
 import MultiMid from './utils/config/MultiMid';
