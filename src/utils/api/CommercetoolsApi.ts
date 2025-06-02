@@ -16,6 +16,7 @@ import { Constants } from '../../constants/paymentConstants';
 import { Address } from '../../models/AddressModel';
 import { Token } from '../../models/TokenModel';
 import { AmountPlannedType, CardAddressGroupType, PaymentTransactionType, ReportSyncType, VisaUpdateType } from '../../types/Types';
+import { ApiError, errorHandler, PaymentProcessingError } from '../ErrorHandler';
 import paymentUtils from '../PaymentUtils';
 dotenv.config();
 
@@ -48,7 +49,7 @@ const getClient = async () => {
       .build();
     return createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
   } catch (error) {
-    paymentUtils.logData(__filename, 'FuncInitializeCommercetoolsClient', Constants.LOG_ERROR, '', CustomMessages.EXCEPTION_MSG_COMMERCETOOLS_CONNECT, '');
+    errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_COMMERCETOOLS_CONNECT,error,FunctionConstant.FUNC_INITIALIZE_COMMERCETOOLS_CLIENT),__filename,'');
   }
   return client;
 }
@@ -183,8 +184,12 @@ const retrievePayment = async (paymentId: string): Promise<any> => {
       const query = client.payments().withId({ ID: paymentId }).get();
       retrievePaymentResponse = await makeCommercetoolsRequest(query);
       paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, '', '', `${retrievePaymentResponse.consolidatedTime}`);
-    } catch (exception) {
-      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT, exception, '', '', '');
+    } catch (exception:any) {
+      if (typeof exception === Constants.STR_OBJECT && exception.message) {
+        errorHandler.logError(new PaymentProcessingError(exception.message, exception,FunctionConstant.FUNC_RETRIEVE_PAYMENT),__filename,'');
+      } else {
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT, exception,FunctionConstant.FUNC_RETRIEVE_PAYMENT),__filename,'');
+      }
     }
   }
   return retrievePaymentResponse;
@@ -472,9 +477,9 @@ const addCustomTypes = async (customType: TypeDraft): Promise<any> => {
       const endTime = new Date().getTime();
       paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPES, Constants.LOG_INFO, '', '', `${endTime - startTime} `);
     }
-  } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', '');
+  } catch (exception:any) {
     data = exception;
+    errorHandler.logError(errorHandler.createErrorFromHttpStatus(data?.statusCode,CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception,FunctionConstant.FUNC_ADD_CUSTOM_TYPE),__filename,'');
     if (Constants.HTTP_BAD_REQUEST_STATUS_CODE === data.statusCode && Constants.HTTP_BAD_REQUEST_STATUS_CODE === data?.body?.statusCode && Constants.STRING_DUPLICATE_FIELD === data?.body?.errors[0]?.code) {
       addCustomTypeResponse = data;
     }

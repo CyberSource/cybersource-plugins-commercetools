@@ -2,7 +2,7 @@ import DirArchiver from 'dir-archiver';
 
 import { FunctionConstant } from './constants/functionConstant';
 import { Constants } from './constants/paymentConstants';
-import paymentUtils from './utils/PaymentUtils';
+import { errorHandler, SystemError } from './utils/ErrorHandler';
 
 /**
  * Creates a ZIP file asynchronously using DirArchiver.
@@ -16,7 +16,7 @@ const setupZipFile = async (): Promise<boolean> => {
     archive.createZip();
     isZipCompleted = true;
   } catch (error) {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_UP_ZIP_FILE, Constants.LOG_ERROR, '', JSON.stringify(error));
+    errorHandler.logError(new SystemError('', JSON.stringify(error) ,FunctionConstant.FUNC_SET_UP_ZIP_FILE),__filename, '');
   }
   return isZipCompleted;
 };

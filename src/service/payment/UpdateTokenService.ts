@@ -1,9 +1,11 @@
 import restApi, { PatchCustomerPaymentInstrumentRequest, Tmsv2customersEmbeddedDefaultPaymentInstrumentCard, Tmsv2customersEmbeddedDefaultPaymentInstrumentInstrumentIdentifier } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { AddressType, CustomerTokensType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -72,7 +74,7 @@ const getUpdateTokenResponse = async (tokens: Partial<CustomerTokensType>, newEx
       return tokenResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE),__filename,'');
     return tokenResponse;
   }
 };

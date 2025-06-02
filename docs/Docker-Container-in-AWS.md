@@ -140,7 +140,7 @@ DNS name will available in AWS console under respective LoadBalancer details in 
 
 You can see all your logs in AWS Cloudwatch, for that you need to perform below steps.
 
-- Before you could create the image of the extension, the  `logData` function in paymentUtils.ts file should be updated with console.log statements, which will log the extension logs properly
+- Before you could create the image of the extension, the `logData` function in PaymentUtils.ts file and the `logError` method in ErrorHandler.ts should be updated with console.log statements, which will log the extension logs properly
 
 ## Troubleshoot
  - When using `docker compose up` command, if you get the following error `pulling from host <accountId>.dkr.ecr.<region>.amazonaws.com failed with status code [manifests latest]: 403 Forbidden`, it means that authentication is expired. Refer [Authenticate-to-default-registry](#step-2-authenticate-the-docker-cli-to-your-default-registry) to authenticate again.

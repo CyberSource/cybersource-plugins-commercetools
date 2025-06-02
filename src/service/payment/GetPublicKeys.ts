@@ -10,6 +10,7 @@ import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 import multiMid from '../../utils/config/MultiMid';
 
@@ -64,15 +65,15 @@ const getPublicKeys = async (captureContext: string, paymentObj: Payment): Promi
                 pemPublicKey = jwkToPem(data);
                 isSignatureValid = jwt.verify(captureContext, pemPublicKey);
               } catch (exception) {
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + exception);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION, exception ,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,'PaymentId : ' + paymentId);
               }
               isSignatureValid?.flx?.data ? resolve(true) : reject(false);
             } else {
               if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text, error ,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,'PaymentId : ' + paymentId);
               } else {
                 errorData = error?.response?.text ? error.response.text : JSON.stringify(error);
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + errorData);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text, error ,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,'PaymentId : ' + paymentId);
               }
               reject(errorData);
             }
@@ -85,7 +86,7 @@ const getPublicKeys = async (captureContext: string, paymentObj: Payment): Promi
       return false;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, '', exception, paymentObj.id, 'PaymentId : ', '');
+    errorHandler.logError(new PaymentProcessingError('', exception,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,paymentObj.id);
     return false;
   }
 };

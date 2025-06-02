@@ -5,7 +5,9 @@ import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
+import { AuthenticationError, errorHandler } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
+import isvApi from '../../utils/api/isvApi';
 
 /**
  * Deletes a webhook subscription.
@@ -21,11 +23,9 @@ const deleteWebhookSubscriptionResponse = async (midCredentials: MidCredentialsT
     if (midCredentials?.merchantId && midCredentials?.merchantKeyId && midCredentials?.merchantSecretKey && webhookId) {
       const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, midCredentials, null, null);
       const apiClient = new restApi.ApiClient();
-      const manageWebhooksApiInstance = configObject && new restApi.ManageWebhooksApi(configObject, apiClient);
       const startTime = new Date().getTime();
       return await new Promise<any>(function (resolve, reject) {
-        if (manageWebhooksApiInstance) {
-          manageWebhooksApiInstance.deleteWebhookSubscription(webhookId, (error: any, data: any, response: any) => {
+          isvApi.deleteWebhookSubscription(apiClient,configObject,webhookId, (error: any, data: any, response: any) => {
             const endTime = new Date().getTime();
             paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, 'webhookId : ' + webhookId, 'deleteWebhookSubscriptionResponse = ' + JSON.stringify(response), `${endTime - startTime}`);
             paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, '', 'Delete subscription data = ' + data);
@@ -39,17 +39,15 @@ const deleteWebhookSubscriptionResponse = async (midCredentials: MidCredentialsT
               reject(deleteResponse);
             }
           });
-        } else {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_ERROR, 'webhookId : ' + webhookId, CustomMessages.ERROR_MSG_SERVICE_PROCESS);
-        }
       }).catch((error: any) => {
+        errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, '',FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE),__filename,  'webhookId : ' + webhookId);
         return error;
       });
     } else {
       return deleteResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_DELETE_WEBHOOK_SUBSCRIPTION_RESPONSE, '', exception, webhookId || '', 'WebhookId : ', '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.EXCEPTION_MSG_DELETE_TOKEN, exception,FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN),__filename, '');
     return deleteResponse;
   }
 };

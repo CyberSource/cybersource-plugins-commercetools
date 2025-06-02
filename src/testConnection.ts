@@ -4,6 +4,7 @@ import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
 import { Constants } from './constants/paymentConstants';
 import createTransactionSearchRequest from './service/payment/CreateTransactionSearchRequest';
+import { ApiError, errorHandler } from './utils/ErrorHandler';
 import paymentUtils from './utils/PaymentUtils';
 import MultiMid from './utils/config/MultiMid';
 dotenv.config();
@@ -47,7 +48,7 @@ const testApiConnection = async (): Promise<string> => {
         }
     } catch (exception) {
         connectionMessage = CustomMessages.EXCEPTION_MSG_CONNECTION_ERROR;
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_TEST_API_CONNECTION, '', exception, '', '', '');
+        errorHandler.logError( new ApiError( connectionMessage, exception,   FunctionConstant.FUNC_TEST_API_CONNECTION ),__filename,'');
     }
     return connectionMessage;
 };

@@ -1,9 +1,11 @@
 import restApi from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { InstrumentIdResponse } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -58,7 +60,7 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
       return getCardResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, exception,FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE),__filename,'');
     return getCardResponse;
   }
 };

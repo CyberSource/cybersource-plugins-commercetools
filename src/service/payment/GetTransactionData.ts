@@ -6,6 +6,7 @@ import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -55,7 +56,7 @@ const getTransactionData = async (transactionId: string, payment: Payment | null
       return visaCheckoutData;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_DATA, '', exception, paymentId, 'PaymentId : ', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_TRANSACTION_SEARCH, exception,FunctionConstant.FUNC_GET_TRANSACTION_DATA),__filename,'PaymentId : ' + paymentId);
     return visaCheckoutData;
   }
 };

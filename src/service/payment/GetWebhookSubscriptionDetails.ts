@@ -1,10 +1,13 @@
 import restApi, { InlineResponse2013 } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
+import { AuthenticationError, errorHandler } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
+import isvApi from '../../utils/api/isvApi';
 
 /**
 * Retrieves webhook subscription details for a mid.
@@ -21,12 +24,14 @@ const getWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType
     if (midCredentials?.merchantId && midCredentials?.merchantKeyId && midCredentials?.merchantSecretKey) {
       const apiClient = new restApi.ApiClient();
       const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_WEBHOOK_SUBSCRIPTION_RESPONSE, midCredentials, null, null);
-      const productId = 'ctNetworkTokenSubscription';
-      const eventType = Constants.NETWORK_TOKEN_EVENT;
       const startTime = new Date().getTime();
-      const getWebhookSubscriptionInstance = configObject && new restApi.ManageWebhooksApi(configObject, apiClient);
+      const opts = {
+        eventType: Constants.NETWORK_TOKEN_EVENT,
+        productId: 'ctNetworkTokenSubscription',
+        organizationId: configObject?.merchantID
+      };
       return await new Promise<InlineResponse2013>((resolve, reject) => {
-        getWebhookSubscriptionInstance?.getWebhookSubscriptionsByOrg(configObject?.merchantID || '', productId, eventType, (error: any, data: any, response: any) => {
+        isvApi?.getSubscriptionDetails(apiClient,configObject, opts, (error: any, data: any, response: any) => {
           const endTime = new Date().getTime();
           paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, '', 'Get webhooks subscription details response is = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
           if (data) {
@@ -48,7 +53,7 @@ const getWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType
       return subscriptionDetailResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_WEBHOOK_SUBSCRIPTION_RESPONSE, '', exception, '', '', '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, exception, FunctionConstant.FUNC_GET_WEBHOOK_SUBSCRIPTION_RESPONSE), __filename, '');
     return subscriptionDetailResponse;
   }
 };

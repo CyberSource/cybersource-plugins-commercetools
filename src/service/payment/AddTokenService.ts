@@ -1,10 +1,12 @@
 import { Customer } from '@commercetools/platform-sdk';
 import restApi, { CreatePaymentRequest, Ptsv2paymentsOrderInformation, PtsV2PaymentsPost201Response, Ptsv2paymentsProcessingInformation, Ptsv2paymentsTokenInformation } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { AddressType, CustomTokenType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -79,7 +81,7 @@ const getAddTokenResponse = async (customerId: string, customerObj: Customer, ad
       return paymentResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, '', exception, customerId, 'CustomerId : ', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_ADDING_A_CARD, exception,FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE),__filename, customerId);
     return paymentResponse;
   }
 };

@@ -1,9 +1,11 @@
 import { Payment } from '@commercetools/platform-sdk';
 import restApi, { PayerAuthSetupRequest, RiskV1AuthenticationSetupsPost201Response, Riskv1authenticationsetupsTokenInformation } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -60,7 +62,7 @@ const getPayerAuthSetupData = async (payment: Payment, customerTokenId: string):
               resolve(paymentResponse);
             } else if (error) {
               if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, error.response.text);
+                errorHandler.logError(new PaymentProcessingError(error.response.text, error ,FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA),__filename,'PaymentId : ' + paymentId );
                 errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
                 if (errorData?.id && errorData?.status) {
                   paymentResponse.transactionId = errorData.id;
@@ -69,7 +71,7 @@ const getPayerAuthSetupData = async (payment: Payment, customerTokenId: string):
               } else {
                 let errorDataObj;
                 typeof error === Constants.STR_OBJECT ? (errorDataObj = JSON.stringify(error)) : (errorDataObj = error);
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, errorDataObj);
+                errorHandler.logError(new PaymentProcessingError(errorDataObj, error ,FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA),__filename,'PaymentId : ' + paymentId );
               }
               paymentResponse.httpCode = error.status;
               reject(paymentResponse);
@@ -85,7 +87,7 @@ const getPayerAuthSetupData = async (payment: Payment, customerTokenId: string):
       return paymentResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA),__filename,'');
     return paymentResponse;
   }
 };

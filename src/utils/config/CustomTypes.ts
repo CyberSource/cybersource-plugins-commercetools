@@ -10,7 +10,7 @@ import customerTokensJson from '../../resources/isv_payments_customer_tokens_typ
 import enrollCheckJson from '../../resources/isv_payments_payer_authentication_enrolment_check_type.json';
 import enrollValidateJson from '../../resources/isv_payments_payer_authentication_validate_result_type.json';
 import transactionCustomJson from '../../resources/isv_transaction_data_type.json';
-import paymentUtils from '../PaymentUtils';
+import { errorHandler, ValidationError } from '../ErrorHandler';
 import commercetoolsApi from '../api/CommercetoolsApi';
 import paymentHelper from '../helpers/PaymentHelper';
 
@@ -106,12 +106,12 @@ const syncCustomType = async (paymentCustomType: any) => {
           }
           isCustomTypesSynced = true;
         } else {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_CUSTOM_TYPE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message);
+          errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message ,'',FunctionConstant.FUNC_SYNC_CUSTOM_TYPE),__filename,'');
         }
       }
     }
   } catch (err) {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_CUSTOM_TYPE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message);
+    errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message ,err,FunctionConstant.FUNC_SYNC_CUSTOM_TYPE),__filename,'');
   }
   return isCustomTypesSynced;
 };

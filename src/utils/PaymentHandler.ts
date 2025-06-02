@@ -8,6 +8,7 @@ import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
 import { Constants } from '../constants/paymentConstants';
+import { PaymentMethodFactory } from '../models/PaymentMethodFactory';
 import addTokenService from '../service/payment/AddTokenService';
 import createSearchRequest from '../service/payment/CreateTransactionSearchRequest';
 import conversion from '../service/payment/DecisionSyncService';
@@ -17,13 +18,13 @@ import paymentCapture from '../service/payment/PaymentCaptureService';
 import updateToken from '../service/payment/UpdateTokenService';
 import { ActionResponseType, CustomerTokensType, CustomTokenType, InstrumentIdResponse, PaymentCustomFieldsType, PaymentTransactionType, ReportResponseType } from '../types/Types';
 
+import { errorHandler, NotFoundError, PaymentProcessingError, SystemError } from './ErrorHandler';
 import paymentActions from './PaymentActions';
 import paymentUtils from './PaymentUtils';
 import paymentValidator from './PaymentValidator';
 import commercetoolsApi from './api/CommercetoolsApi';
 import multiMid from './config/MultiMid';
 import orderManagementHelper from './helpers/OrderManagementHelper';
-import paymentHelper from './helpers/PaymentHelper';
 import syncHelper from './helpers/SyncHelper';
 import tokenHelper from './helpers/TokenHelper';
 
@@ -73,11 +74,11 @@ const handleAuthorization = async (updatePaymentObj: Payment, updateTransactions
         authResponse = await syncHelper.checkAuthReversalTriggered(updatePaymentObj, results[0], paymentResponse, authResponse);
       }
     } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_AUTHORIZATION, Constants.LOG_ERROR, paymentId, CustomMessages.ERROR_MSG_EMPTY_CART);
+      errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_EMPTY_CART, '' ,FunctionConstant.FUNC_HANDLE_AUTHORIZATION),__filename,'PaymentId : ' + paymentId );
       isError = true;
     }
   } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_AUTHORIZATION, Constants.LOG_ERROR, paymentId, CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '' ,FunctionConstant.FUNC_HANDLE_AUTHORIZATION),__filename,paymentId);
     isError = true;
   }
   if (isError) {
@@ -127,33 +128,20 @@ const handleSetTokenToNull = async (customFields: Partial<PaymentCustomFieldsTyp
  * @returns {Promise<{ isError: boolean; paymentResponse: any; authResponse: ActionResponseType }>} - The service response.
  */
 const handlePaymentAuth = async (paymentMethod: string, updatePaymentObj: Payment, customerInfo: Customer | null, cartInfo: Cart, updateTransactions: Partial<PaymentTransactionType>, cardTokens: CustomTokenType, orderNo: string) => {
-  let serviceResponse: { isError: boolean; paymentResponse: any; authResponse: ActionResponseType };
-  switch (paymentMethod) {
-    case Constants.CREDIT_CARD: {
-      serviceResponse = await paymentHelper.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
-      break;
-    }
-    case Constants.CLICK_TO_PAY: {
-      serviceResponse = await paymentHelper.getClickToPayResponse(updatePaymentObj, cartInfo, updateTransactions, cardTokens, orderNo);
-      break;
-    }
-    case Constants.GOOGLE_PAY: {
-      serviceResponse = await paymentHelper.getGooglePayResponse(updatePaymentObj, cartInfo, updateTransactions, cardTokens, orderNo);
-      break;
-    }
-    case Constants.APPLE_PAY: {
-      serviceResponse = await paymentHelper.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
-      break;
-    }
-    case Constants.ECHECK: {
-      serviceResponse = await paymentHelper.getPaymentResponse(updatePaymentObj, customerInfo, cartInfo, updateTransactions, cardTokens, orderNo);
-      break;
-    }
-    default: {
-      return { paymentResponse: null, authResponse: null, isError: true };
-    }
+  try {
+    const paymentMethodStrategy = PaymentMethodFactory.getPaymentMethod(paymentMethod);
+    return await paymentMethodStrategy.processAuthorization(
+      updatePaymentObj,
+      customerInfo,
+      cartInfo,
+      updateTransactions,
+      cardTokens,
+      orderNo
+    );
+  } catch (error) {
+    errorHandler.logError(new PaymentProcessingError(`${CustomMessages.ERROR_MSG_PAYMENT_PROCESSING} ${paymentMethod}`,'',FunctionConstant.FUNC_HANDLE_PAYMENT_AUTH),__filename,'PaymentId : ' + updatePaymentObj?.id);
+    return { paymentResponse: null, authResponse: null, isError: true };
   }
-  return serviceResponse;
 };
 
 /**
@@ -198,7 +186,7 @@ const handleApplePaySession = async (fields: Partial<PaymentCustomFieldsType>): 
       if (Constants.HTTP_OK_STATUS_CODE === certData?.status && certData.data && Constants.HTTP_OK_STATUS_CODE === keyData.status && keyData.data) {
         httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: certData.data, key: keyData.data });
       } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_ACCESSING_CERTIFICATES);
+        errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_ACCESSING_CERTIFICATES, '' ,FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION),__filename,'');
       }
     } else {
       httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: fs.readFileSync(certificateString), key: fs.readFileSync(keyString) });
@@ -367,13 +355,13 @@ const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId:
             existingTokens[finalTokenIndex] = JSON.stringify(parsedTokens);
             returnResponse = paymentActions.getUpdateTokenActions(existingTokens, isv_failedTokens, isError, customerObj, null);
           } else {
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_UPDATE_CARD, Constants.LOG_ERROR, CustomMessages.ERROR_MSG_NO_TOKENS_UPDATE, 'CustomerId : ' + customerId);
+            errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_NO_TOKENS_UPDATE, '' ,FunctionConstant.FUNC_HANDLE_UPDATE_CARD),__filename,'CustomerId : ' + customerId);
           }
         }
       }
     }
   } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_UPDATE_CARD, Constants.LOG_ERROR, CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, 'CustomerId : ' + customerId);
+    errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, '' ,FunctionConstant.FUNC_HANDLE_UPDATE_CARD),__filename,'CustomerId : ' + customerId);
   }
   return returnResponse;
 };
@@ -409,7 +397,7 @@ const handleCardDeletion = async (updateCustomerObj: Partial<CustomerTokensType>
       }
     }
   } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_CARD_DELETION, Constants.LOG_ERROR, 'CustomerId : ' + customerId, CustomMessages.ERROR_MSG_CUSTOMER_DETAILS);
+    errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, '' ,FunctionConstant.FUNC_HANDLE_CARD_DELETION),__filename,'CustomerId : ' + customerId);
   }
   return customerTokenHandlerResponse;
 };

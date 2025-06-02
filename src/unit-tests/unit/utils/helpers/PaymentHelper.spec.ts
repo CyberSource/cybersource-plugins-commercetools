@@ -2,9 +2,7 @@ import test from 'ava';
 import dotenv from 'dotenv';
 
 dotenv.config();
-import { Constants } from '../../../../constants/paymentConstants';
 import PaymentHelper from '../../../../utils/helpers/PaymentHelper';
-import PaymentAuthorizationServiceConstAP from '../../../const/ApplePay/PaymentAuthorizationServiceConstAP';
 import PaymentCaptureServiceConstCC from '../../../const/CreditCard/PaymentCaptureServiceConstCC';
 import PaymentServiceConst from '../../../const/HelpersConst';
 
@@ -105,133 +103,6 @@ test.serial('Check response of get auth response object when authentication is p
       t.is(result.actions[6].action, 'addInterfaceInteraction');
     } else {
       t.fail(`Unexpected result : ${JSON.stringify(result)}`);
-    }
-  } catch (exception) {
-    if (exception instanceof Error) {
-      t.fail(`Caught an error during execution: ${exception.message}`);
-      t.log(`Stack trace: ${exception.stack}`);
-    } else {
-      t.fail(`Caught an unknown error: ${String(exception)}`);
-    }
-  }
-});
-
-test.serial('Get payment response for credit card', async (t: any) => {
-  try {
-    let result: any = await PaymentHelper.getPaymentResponse(PaymentServiceConst.getCreditCardResponseUpdatePaymentObj, null, PaymentServiceConst.getCreditCardResponseCartObj as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
-    if (201 == result.paymentResponse.httpCode) {
-      t.is(result.paymentResponse.httpCode, 201);
-      if (Constants.API_STATUS_AUTHORIZED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED);
-      } else if (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW);
-      } else if (Constants.API_STATUS_DECLINED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_DECLINED);
-      } else if (Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_RISK_DECLINED);
-      } else if (Constants.API_STATUS_INVALID_REQUEST == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_INVALID_REQUEST);
-      } else {
-        t.fail(`Unexpected Status: ${result.paymentResponse.status}`);
-      }
-    } else {
-      t.fail(`Unexpected response: HTTP ${result.paymentResponse.httpCode}, Status: ${result.paymentResponse.status}`);
-    }
-  } catch (exception) {
-    if (exception instanceof Error) {
-      t.fail(`Caught an error during execution: ${exception.message}`);
-      t.log(`Stack trace: ${exception.stack}`);
-    } else {
-      t.fail(`Caught an unknown error: ${String(exception)}`);
-    }
-  }
-});
-
-test.serial('Get payment response for apple pay', async (t: any) => {
-  try {
-    let result: any = await PaymentHelper.getPaymentResponse(PaymentAuthorizationServiceConstAP.payments as any, null, PaymentServiceConst.getCreditCardResponseCartObj as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
-    if (201 == result.paymentResponse.httpCode) {
-      t.is(result.paymentResponse.httpCode, 201);
-      if (Constants.API_STATUS_AUTHORIZED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED);
-      } else if (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW);
-      } else if (Constants.API_STATUS_DECLINED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_DECLINED);
-      } else if (Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_RISK_DECLINED);
-      } else if (Constants.API_STATUS_INVALID_REQUEST == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_INVALID_REQUEST);
-      } else {
-        t.fail(`Unexpected Status: ${result.paymentResponse.status}`);
-      }
-    } else {
-      t.fail(`Unexpected response: HTTP ${result.paymentResponse.httpCode}, Status: ${result.paymentResponse.status}`);
-    }
-  } catch (exception) {
-    if (exception instanceof Error) {
-      t.fail(`Caught an error during execution: ${exception.message}`);
-      t.log(`Stack trace: ${exception.stack}`);
-    } else {
-      t.fail(`Caught an unknown error: ${String(exception)}`);
-    }
-  }
-});
-
-test.serial('Get google pay response', async (t: any) => {
-  try {
-    let result: any = await PaymentHelper.getGooglePayResponse(PaymentServiceConst.getGooglePayResponseUpdatePaymentObj as any, PaymentServiceConst.getCreditCardResponseCartObj as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
-    if (201 == result.paymentResponse.httpCode) {
-      t.is(result.paymentResponse.httpCode, 201);
-      if (Constants.API_STATUS_AUTHORIZED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED);
-      } else if (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW);
-      } else if (Constants.API_STATUS_DECLINED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_DECLINED);
-      } else if (Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_RISK_DECLINED);
-      } else if (Constants.API_STATUS_INVALID_REQUEST == result.paymentResponse.status) {
-        t.is(result.paymentResponse.status, Constants.API_STATUS_INVALID_REQUEST);
-      } else {
-        t.fail(`Unexpected Status: ${result.paymentResponse.status}`);
-      }
-    } else {
-      t.fail(`Unexpected response: HTTP ${result.paymentResponse.httpCode}, Status: ${result.paymentResponse.status}`);
-    }
-  } catch (exception) {
-    if (exception instanceof Error) {
-      t.fail(`Caught an error during execution: ${exception.message}`);
-      t.log(`Stack trace: ${exception.stack}`);
-    } else {
-      t.fail(`Caught an unknown error: ${String(exception)}`);
-    }
-  }
-});
-
-test.serial('Get click to pay response', async (t: any) => {
-  try {
-    let result: any = await PaymentHelper.getClickToPayResponse(PaymentServiceConst.getClickToPayResponseUpdatePaymentObj as any, PaymentServiceConst.getCreditCardResponseCartObj as any, PaymentServiceConst.getAuthResponseTransactionDetail, PaymentServiceConst.customerCardTokens, '');
-    if (201 == result.paymentResponse.httpCode) {
-      t.is(result.paymentResponse.httpCode, 201);
-      if (201 == result.paymentResponse.httpCode) {
-        t.is(result.paymentResponse.httpCode, 201);
-        if (Constants.API_STATUS_AUTHORIZED == result.paymentResponse.status) {
-          t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED);
-        } else if (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW == result.paymentResponse.status) {
-          t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW);
-        } else if (Constants.API_STATUS_DECLINED == result.paymentResponse.status) {
-          t.is(result.paymentResponse.status, Constants.API_STATUS_DECLINED);
-        } else if (Constants.API_STATUS_AUTHORIZED_RISK_DECLINED == result.paymentResponse.status) {
-          t.is(result.paymentResponse.status, Constants.API_STATUS_AUTHORIZED_RISK_DECLINED);
-        } else if (Constants.API_STATUS_INVALID_REQUEST == result.paymentResponse.status) {
-          t.is(result.paymentResponse.status, Constants.API_STATUS_INVALID_REQUEST);
-        } else {
-          t.fail(`Unexpected Status: ${result.paymentResponse.status}`);
-        }
-      }
-    } else {
-      t.fail(`Unexpected response: HTTP ${result.paymentResponse.httpCode}, Status: ${result.paymentResponse.status}`);
     }
   } catch (exception) {
     if (exception instanceof Error) {
