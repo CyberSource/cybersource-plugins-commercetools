@@ -1,4 +1,4 @@
-import { Cart,Payment, Transaction } from '@commercetools/platform-sdk';
+import { Cart, Payment, Transaction } from '@commercetools/platform-sdk';
 import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
 
 import { CustomMessages } from '../../constants/customMessages';
@@ -510,7 +510,7 @@ const getTransactionSummaries = async (updatePaymentObj: Payment, retryCount: nu
                 };
                 resolve(transactionSummaryObject);
             } else {
-                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH ,'',FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES),__filename,'PaymentId : ' + updatePaymentObj.id);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH, '', FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES), __filename, 'PaymentId : ' + updatePaymentObj.id);
                 reject(transactionSummaryObject);
             }
         }, 1500);
@@ -518,7 +518,7 @@ const getTransactionSummaries = async (updatePaymentObj: Payment, retryCount: nu
         if (error) {
             errorData = typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : error;
         }
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH + errorData ,error,FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES),__filename,'PaymentId : ' + paymentId);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH + errorData, error, FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES), __filename, 'PaymentId : ' + paymentId);
         return transactionSummaryObject;
     });
 };
@@ -661,7 +661,7 @@ const getMissingPaymentDetails = async () => {
                                 break;
                             }
                         } catch (exception) {
-                            errorHandler.logError(new ApiError('', exception,FunctionConstant.FUNC_GET_MISSING_PAYMENT_DETAILS),__filename,'');
+                            errorHandler.logError(new ApiError('', exception, FunctionConstant.FUNC_GET_MISSING_PAYMENT_DETAILS), __filename, '');
                         }
                     }
                 }
@@ -691,8 +691,8 @@ const syncPaymentDetails = async (dataActions: Partial<ActionType>[], currentPay
                 actions: dataActions,
                 id: currentPaymentObject.id,
                 version: currentPaymentObject.version,
-           };
-        commercetoolsApi.syncVisaCardDetails(updateObject);
+            };
+            commercetoolsApi.syncVisaCardDetails(updateObject);
         }
     }
 }

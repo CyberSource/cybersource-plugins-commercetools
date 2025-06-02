@@ -54,7 +54,7 @@ const paymentCreateApi = async (paymentObj: Payment): Promise<ActionResponseType
         response = await paymentHandler.handleApplePaySession(paymentObj.custom.fields);
       }
     } else {
-      errorHandler.logError( new ApiError( CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '',FunctionConstant.FUNC_PAYMENT_CREATE_API ),__filename,'');
+      errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_PAYMENT_CREATE_API), __filename, '');
     }
   }
   return response;
@@ -82,7 +82,7 @@ const paymentUpdateApi = async (paymentObj: Payment): Promise<ActionResponseType
           updateResponse = await paymentHelper.processTransaction(paymentObj);
         }
       } catch (exception) {
-        errorHandler.logError( new PaymentProcessingError( CustomMessages.EXCEPTION_UPDATE_PAYMENT_API, exception,   FunctionConstant.FUNC_PAYMENT_UPDATE_API ),__filename,'');
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_UPDATE_PAYMENT_API, exception, FunctionConstant.FUNC_PAYMENT_UPDATE_API), __filename, '');
       }
     }
   }
@@ -126,7 +126,7 @@ const customerUpdateApi = async (customerObj: any): Promise<ActionResponseType> 
       }
     }
   } catch (exception) {
-    errorHandler.logError( new PaymentProcessingError( CustomMessages.EXCEPTION_UPDATE_CUSTOMER_API, exception,   FunctionConstant.FUNC_CUSTOMER_UPDATE_API ),__filename,'');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_UPDATE_CUSTOMER_API, exception, FunctionConstant.FUNC_CUSTOMER_UPDATE_API), __filename, '');
   }
   return response;
 };
@@ -192,11 +192,11 @@ const paymentDetailsApi = async (paymentId: string) => {
           }
         }
       } else {
-        errorHandler.logError( new PaymentProcessingError( CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS, '',   FunctionConstant.FUNC_PAYMENT_DETAILS_API ),__filename,'PaymentId :' + encodeURI(paymentDetailsResponse?.paymentId) || '');
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_RETRIEVE_PAYMENT_DETAILS, '', FunctionConstant.FUNC_PAYMENT_DETAILS_API), __filename, 'PaymentId :' + encodeURI(paymentDetailsResponse?.paymentId) || '');
       }
     }
   } catch (exception) {
-    errorHandler.logError( new PaymentProcessingError( CustomMessages.EXCEPTION_MSG_PAYMENT_DETAILS_API, exception,FunctionConstant.FUNC_PAYMENT_DETAILS_API ),__filename, encodeURI(paymentDetailsResponse?.paymentId));
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PAYMENT_DETAILS_API, exception, FunctionConstant.FUNC_PAYMENT_DETAILS_API), __filename, encodeURI(paymentDetailsResponse?.paymentId));
   }
   return paymentDetailsResponse;
 };
@@ -266,7 +266,7 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
       }
     }
   } catch (exception) {
-    errorHandler.logError( new PaymentProcessingError( CustomMessages.ERROR_MSG_API_EXECUTION,exception,FunctionConstant.FUNC_ORDER_MANAGEMENT_API ),__filename, '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_API_EXECUTION, exception, FunctionConstant.FUNC_ORDER_MANAGEMENT_API), __filename, '');
   }
   return apiResponse;
 };
@@ -303,10 +303,10 @@ const captureContextApi = async (requestObj: any): Promise<any> => {
       }
     }
     if (!response) {
-      errorHandler.logError( new PaymentProcessingError( CustomMessages.ERROR_MSG_CAPTURE_CONTEXT, '',FunctionConstant.FUNC_CAPTURE_CONTEXT_API ),__filename, 'CartId : ' + cartId); 
+      errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CAPTURE_CONTEXT, '', FunctionConstant.FUNC_CAPTURE_CONTEXT_API), __filename, 'CartId : ' + cartId);
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError( CustomMessages.EXCEPTION_MSG_CAPTURE_CONTEXT_API, exception,FunctionConstant.FUNC_CAPTURE_CONTEXT_API ),__filename, '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_CAPTURE_CONTEXT_API, exception, FunctionConstant.FUNC_CAPTURE_CONTEXT_API), __filename, '');
   }
   return response;
 };
@@ -350,7 +350,7 @@ const notificationApi = async (notification: any): Promise<{ errorMessage: strin
         }
       }
     } catch (exception) {
-      errorHandler.logError(new ApiError( CustomMessages.EXCEPTION_MSG_NOTIFICATION_API, exception,FunctionConstant.FUNC_NOTIFICATION_API ),__filename, '');
+      errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_NOTIFICATION_API, exception, FunctionConstant.FUNC_NOTIFICATION_API), __filename, '');
     }
   } else {
     notificationApiResponse.errorMessage = CustomMessages.ERROR_MSG_INVALID_NOTIFICATION_DATA;

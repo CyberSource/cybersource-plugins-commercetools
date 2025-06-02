@@ -102,7 +102,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj: Payment): Promise<
             }
         }
     } else {
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_NO_CARD_DETAILS ,'',FunctionConstant.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE),__filename,'PaymentId : ' + paymentId);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_NO_CARD_DETAILS, '', FunctionConstant.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE), __filename, 'PaymentId : ' + paymentId);
     }
     return authResponse;
 };
@@ -145,7 +145,7 @@ const getPayerAuthSetUpResponse = async (updatePaymentObj: Payment): Promise<Act
             }
         }
     } else {
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA ,'',FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE),__filename,'PaymentId : ' + paymentId);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE), __filename, 'PaymentId : ' + paymentId);
     }
     return setUpActionResponse;
 };
@@ -185,7 +185,7 @@ const getPayerAuthEnrollResponse = async (updatePaymentObj: Payment): Promise<Ac
             }
         }
     } else {
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA ,'',FunctionConstant.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE),__filename,'PaymentId : ' + paymentId);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE), __filename, 'PaymentId : ' + paymentId);
     }
     return enrollResponse;
 };

@@ -106,12 +106,12 @@ const syncCustomType = async (paymentCustomType: any) => {
           }
           isCustomTypesSynced = true;
         } else {
-          errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message ,'',FunctionConstant.FUNC_SYNC_CUSTOM_TYPE),__filename,'');
+          errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message, '', FunctionConstant.FUNC_SYNC_CUSTOM_TYPE), __filename, '');
         }
       }
     }
   } catch (err) {
-    errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message ,err,FunctionConstant.FUNC_SYNC_CUSTOM_TYPE),__filename,'');
+    errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_CREATE_CUSTOM_TYPE + Constants.REGEX_HYPHEN + paymentCustomType.key + Constants.STRING_HYPHEN + scriptResponse?.message, err, FunctionConstant.FUNC_SYNC_CUSTOM_TYPE), __filename, '');
   }
   return isCustomTypesSynced;
 };

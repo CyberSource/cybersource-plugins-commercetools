@@ -80,7 +80,7 @@ const getRefundData = async (payment: Payment, captureId: string, updateTransact
       return paymentResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_REFUND_DATA),__filename,payment?.id);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_REFUND_DATA), __filename, payment?.id);
     return paymentResponse;
   }
 };

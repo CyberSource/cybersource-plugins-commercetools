@@ -23,7 +23,7 @@ export class ClickToPayPaymentMethod extends AbstractPaymentMethod {
    * @inheritdoc
    */
   protected getPaymentType(): string {
-    return 'visa';
+    return Constants.STRING_VISA;
   }
 
   /**
@@ -45,10 +45,10 @@ export class ClickToPayPaymentMethod extends AbstractPaymentMethod {
         const actions: Partial<ActionType>[] = paymentActions.cardDetailsActions(visaCheckoutData);
         paymentValidator.validateActionsAndPush(actions, authResponse.actions);
       } else {
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST,'',FunctionConstant.FUNC_HANDLE_POST_AUTHORIZATION),__filename,'PaymentId : ' + paymentId);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, '', FunctionConstant.FUNC_HANDLE_POST_AUTHORIZATION), __filename, 'PaymentId : ' + paymentId);
       }
     } catch (error) {
-      errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST,error,FunctionConstant.FUNC_HANDLE_POST_AUTHORIZATION),__filename,'PaymentId : ' + paymentId);
+      errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, error, FunctionConstant.FUNC_HANDLE_POST_AUTHORIZATION), __filename, 'PaymentId : ' + paymentId);
     }
 
     return authResponse;

@@ -81,7 +81,7 @@ const getAddTokenResponse = async (customerId: string, customerObj: Customer, ad
       return paymentResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_ADDING_A_CARD, exception,FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE),__filename, customerId);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_ADDING_A_CARD, exception, FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE), __filename, customerId);
     return paymentResponse;
   }
 };

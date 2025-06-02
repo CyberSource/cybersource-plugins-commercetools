@@ -31,7 +31,7 @@ const getWebhookSubscriptionResponse = async (midCredentials: MidCredentialsType
         organizationId: configObject?.merchantID
       };
       return await new Promise<InlineResponse2013>((resolve, reject) => {
-        isvApi?.getSubscriptionDetails(apiClient,configObject, opts, (error: any, data: any, response: any) => {
+        isvApi?.getSubscriptionDetails(apiClient, configObject, opts, (error: any, data: any, response: any) => {
           const endTime = new Date().getTime();
           paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_WEBHOOK_SUBSCRIPTION_RESPONSE, Constants.LOG_DEBUG, '', 'Get webhooks subscription details response is = ' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
           if (data) {

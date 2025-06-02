@@ -18,7 +18,7 @@ export class GooglePayPaymentMethod extends AbstractPaymentMethod {
    * @inheritdoc
    */
   protected getPaymentType(): string {
-    return 'googlePay';
+    return Constants.STRING_GOOGLE_PAY;
   }
 
   /**

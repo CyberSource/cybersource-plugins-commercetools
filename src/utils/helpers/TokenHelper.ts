@@ -75,7 +75,7 @@ const processInvalidCardResponse = async (customFields: FieldContainer, customer
         existingFailedTokens = await paymentUtils.createFailedTokenData(customFields, addressIdField);
     }
     const response = paymentActions.getUpdateTokenActions(existingTokens, existingFailedTokens, true, customerObj, null);
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_SERVICE_PROCESS ,'',FunctionConstant.FUNC_PROCESS_INVALID_CARD_RESPONSE),__filename,'CustomerId : ' + customerId);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, '', FunctionConstant.FUNC_PROCESS_INVALID_CARD_RESPONSE), __filename, 'CustomerId : ' + customerId);
     return response;
 };
 
@@ -408,13 +408,13 @@ const addTokenAddressForUC = async (updatePaymentObj: Payment, cartObj: Cart): P
             const transientTokenDataObj = transientTokenData.data;
             customerAddress = await commercetoolsApi.addCustomerAddress(customerId, transientTokenDataObj.orderInformation.billTo);
         } else {
-           errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_UC_ADDRESS_DETAILS ,'',FunctionConstant.FUNC_ADD_TOKEN_ADDRESS_FOR_UC),__filename,'');
+            errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_UC_ADDRESS_DETAILS, '', FunctionConstant.FUNC_ADD_TOKEN_ADDRESS_FOR_UC), __filename, '');
         }
     } else if (updatePaymentObj && ('NONE' === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || 'PARTIAL' === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE)) {
         if (cartObj && cartObj?.billingAddress && customerId) {
             customerAddress = await commercetoolsApi.addCustomerAddress(customerId, cartObj.billingAddress);
         } else {
-           errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CUSTOMER_UPDATE ,'',FunctionConstant.FUNC_ADD_TOKEN_ADDRESS_FOR_UC),__filename,'');
+            errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CUSTOMER_UPDATE, '', FunctionConstant.FUNC_ADD_TOKEN_ADDRESS_FOR_UC), __filename, '');
         }
     }
     return customerAddress;

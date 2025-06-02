@@ -52,7 +52,7 @@ const deleteCustomerToken = async (customerTokenObj: Partial<CustomerTokensType>
       return customerTokenDeleteResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new AuthenticationError(CustomMessages.EXCEPTION_MSG_DELETE_TOKEN, exception,FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN),__filename, '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.EXCEPTION_MSG_DELETE_TOKEN, exception, FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN), __filename, '');
     return customerTokenDeleteResponse;
   }
 };

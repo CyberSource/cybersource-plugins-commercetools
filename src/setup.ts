@@ -28,7 +28,7 @@ const setupExtensionResources = async (): Promise<boolean> => {
       paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_SETUP_RESOURCES);
     }
   } catch (exception) {
-    errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_SETUP_RESOURCES, exception,FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE),__filename, '');
+    errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_SETUP_RESOURCES, exception, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE), __filename, '');
   }
   return isExtensionSetupComplete;
 };
@@ -88,7 +88,7 @@ const createWebhookSubscription = async (): Promise<any> => {
       }
     }
   } catch (exception) {
-    errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_API_EXECUTION, exception,FunctionConstant.FUNC_CREATE_WEBHOOK_SUBSCRIPTION),__filename, '');
+    errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_API_EXECUTION, exception, FunctionConstant.FUNC_CREATE_WEBHOOK_SUBSCRIPTION), __filename, '');
     return;
   }
   return setCustomObjectResponse;

@@ -25,7 +25,7 @@ const getCartDetailsByPaymentId = async (paymentId: string): Promise<any> => {
       cartDetails = cartResponse.results[0];
     }
   } else {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PAYMENT_DETAILS ,'',FunctionConstant.FUNC_GET_CART_DETAILS_BY_PAYMENT_ID),__filename,`${Constants.PAYMENT_ID} : ${paymentId}`);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PAYMENT_DETAILS, '', FunctionConstant.FUNC_GET_CART_DETAILS_BY_PAYMENT_ID), __filename, `${Constants.PAYMENT_ID} : ${paymentId}`);
   }
   return cartDetails;
 };

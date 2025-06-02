@@ -63,10 +63,10 @@ const getTransientTokenDataResponse = async (resourceObj: any, service: string):
             } else if (error) {
               if (error?.response && error?.response?.text && 0 < error?.response?.text.length) {
                 errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
-                errorHandler.logError(new PaymentProcessingError(errorData, error ,FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE),__filename,logInput );
+                errorHandler.logError(new PaymentProcessingError(errorData, error, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE), __filename, logInput);
               } else {
                 typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : (errorData = error);
-                errorHandler.logError(new PaymentProcessingError(error.response.text, error ,FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE),__filename,logInput );
+                errorHandler.logError(new PaymentProcessingError(error.response.text, error, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE), __filename, logInput);
               }
               paymentResponse.httpCode = error.status;
               reject(paymentResponse);
@@ -82,7 +82,7 @@ const getTransientTokenDataResponse = async (resourceObj: any, service: string):
       return paymentResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_TRANSIENT_TOKEN_DATA, exception,FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE),__filename,'');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_TRANSIENT_TOKEN_DATA, exception, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE), __filename, '');
     return paymentResponse;
   }
 };

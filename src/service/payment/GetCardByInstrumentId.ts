@@ -60,7 +60,7 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
       return getCardResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, exception,FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE),__filename,'');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, exception, FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE), __filename, '');
     return getCardResponse;
   }
 };

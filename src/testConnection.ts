@@ -48,7 +48,7 @@ const testApiConnection = async (): Promise<string> => {
         }
     } catch (exception) {
         connectionMessage = CustomMessages.EXCEPTION_MSG_CONNECTION_ERROR;
-        errorHandler.logError( new ApiError( connectionMessage, exception,   FunctionConstant.FUNC_TEST_API_CONNECTION ),__filename,'');
+        errorHandler.logError(new ApiError(connectionMessage, exception, FunctionConstant.FUNC_TEST_API_CONNECTION), __filename, '');
     }
     return connectionMessage;
 };

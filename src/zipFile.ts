@@ -16,7 +16,7 @@ const setupZipFile = async (): Promise<boolean> => {
     archive.createZip();
     isZipCompleted = true;
   } catch (error) {
-    errorHandler.logError(new SystemError('', JSON.stringify(error) ,FunctionConstant.FUNC_SET_UP_ZIP_FILE),__filename, '');
+    errorHandler.logError(new SystemError('', JSON.stringify(error), FunctionConstant.FUNC_SET_UP_ZIP_FILE), __filename, '');
   }
   return isZipCompleted;
 };

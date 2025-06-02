@@ -41,7 +41,7 @@ const addCustomType = async (): Promise<void> => {
       paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_CUSTOM_FIELD_SETUP);
     }
   } catch (exception) {
-    errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception,FunctionConstant.FUNC_ADD_CUSTOM_TYPE),__filename, '');
+    errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, FunctionConstant.FUNC_ADD_CUSTOM_TYPE), __filename, '');
   }
 }
 

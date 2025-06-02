@@ -53,7 +53,7 @@ export abstract class CustomMessages {
     static readonly EXCEPTION_MSG_PAYMENT_DETAILS_API = 'An exception occured while retrieving payment';
     static readonly EXCEPTION_MSG_CAPTURE_CONTEXT_API = 'An exception occured while generating capture context';
     static readonly EXCEPTION_MSG_NOTIFICATION_API = 'An exception occurred while updating a token';
-    static readonly EXCEPTION_MSG_DELETE_TOKEN = 'An exception occurred while deleting token';
+    static readonly EXCEPTION_MSG_DELETE_TOKEN = 'An exception occurred while deleting a token';
     static readonly EXCEPTION_MSG_PROCESSING_REQUEST = 'An exception occurred while processing your request';
 
     //Error messages

@@ -68,7 +68,7 @@ const getKeyGenerationResponse = async (midCredentials: MidCredentialsType): Pro
       return error;
     });
   } catch (exception) {
-    errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, exception,FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE),__filename, '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, exception, FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE), __filename, '');
     return keyResponse;
   }
 };

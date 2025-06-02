@@ -74,7 +74,7 @@ const getUpdateTokenResponse = async (tokens: Partial<CustomerTokensType>, newEx
       return tokenResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE),__filename,'');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE), __filename, '');
     return tokenResponse;
   }
 };

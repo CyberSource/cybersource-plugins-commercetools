@@ -47,12 +47,12 @@ const getConversionDetails = async (midCredentials: MidCredentialsType): Promise
               resolve(conversionDetailResponse);
             } else if (error) {
               if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                errorHandler.logError(new PaymentProcessingError('', error.response.text,FunctionConstant.FUNC_GET_CONVERSION_DETAILS),__filename,'');
+                errorHandler.logError(new PaymentProcessingError('', error.response.text, FunctionConstant.FUNC_GET_CONVERSION_DETAILS), __filename, '');
                 const errorResponse = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
                 conversionDetailResponse.status = errorResponse.status;
               } else {
                 typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : (errorData = error);
-                errorHandler.logError(new PaymentProcessingError('', errorData ,FunctionConstant.FUNC_GET_CONVERSION_DETAILS),__filename,'');
+                errorHandler.logError(new PaymentProcessingError('', errorData, FunctionConstant.FUNC_GET_CONVERSION_DETAILS), __filename, '');
               }
               conversionDetailResponse.httpCode = error.status;
               reject(conversionDetailResponse);
@@ -68,7 +68,7 @@ const getConversionDetails = async (midCredentials: MidCredentialsType): Promise
       return conversionDetailResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_DECISION_SYNC, exception,FunctionConstant.FUNC_GET_CONVERSION_DETAILS),__filename, '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_DECISION_SYNC, exception, FunctionConstant.FUNC_GET_CONVERSION_DETAILS), __filename, '');
     return conversionDetailResponse;
   }
 };

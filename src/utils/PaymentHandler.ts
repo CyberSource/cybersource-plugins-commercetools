@@ -74,11 +74,11 @@ const handleAuthorization = async (updatePaymentObj: Payment, updateTransactions
         authResponse = await syncHelper.checkAuthReversalTriggered(updatePaymentObj, results[0], paymentResponse, authResponse);
       }
     } else {
-      errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_EMPTY_CART, '' ,FunctionConstant.FUNC_HANDLE_AUTHORIZATION),__filename,'PaymentId : ' + paymentId );
+      errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_EMPTY_CART, '', FunctionConstant.FUNC_HANDLE_AUTHORIZATION), __filename, 'PaymentId : ' + paymentId);
       isError = true;
     }
   } else {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '' ,FunctionConstant.FUNC_HANDLE_AUTHORIZATION),__filename,paymentId);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '', FunctionConstant.FUNC_HANDLE_AUTHORIZATION), __filename, paymentId);
     isError = true;
   }
   if (isError) {
@@ -139,7 +139,7 @@ const handlePaymentAuth = async (paymentMethod: string, updatePaymentObj: Paymen
       orderNo
     );
   } catch (error) {
-    errorHandler.logError(new PaymentProcessingError(`${CustomMessages.ERROR_MSG_PAYMENT_PROCESSING} ${paymentMethod}`,'',FunctionConstant.FUNC_HANDLE_PAYMENT_AUTH),__filename,'PaymentId : ' + updatePaymentObj?.id);
+    errorHandler.logError(new PaymentProcessingError(`${CustomMessages.ERROR_MSG_PAYMENT_PROCESSING} ${paymentMethod}`, '', FunctionConstant.FUNC_HANDLE_PAYMENT_AUTH), __filename, 'PaymentId : ' + updatePaymentObj?.id);
     return { paymentResponse: null, authResponse: null, isError: true };
   }
 };
@@ -186,7 +186,7 @@ const handleApplePaySession = async (fields: Partial<PaymentCustomFieldsType>): 
       if (Constants.HTTP_OK_STATUS_CODE === certData?.status && certData.data && Constants.HTTP_OK_STATUS_CODE === keyData.status && keyData.data) {
         httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: certData.data, key: keyData.data });
       } else {
-        errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_ACCESSING_CERTIFICATES, '' ,FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION),__filename,'');
+        errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_ACCESSING_CERTIFICATES, '', FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION), __filename, '');
       }
     } else {
       httpsAgent = new https.Agent({ rejectUnauthorized: true, cert: fs.readFileSync(certificateString), key: fs.readFileSync(keyString) });
@@ -355,13 +355,13 @@ const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId:
             existingTokens[finalTokenIndex] = JSON.stringify(parsedTokens);
             returnResponse = paymentActions.getUpdateTokenActions(existingTokens, isv_failedTokens, isError, customerObj, null);
           } else {
-            errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_NO_TOKENS_UPDATE, '' ,FunctionConstant.FUNC_HANDLE_UPDATE_CARD),__filename,'CustomerId : ' + customerId);
+            errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_NO_TOKENS_UPDATE, '', FunctionConstant.FUNC_HANDLE_UPDATE_CARD), __filename, 'CustomerId : ' + customerId);
           }
         }
       }
     }
   } else {
-    errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, '' ,FunctionConstant.FUNC_HANDLE_UPDATE_CARD),__filename,'CustomerId : ' + customerId);
+    errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, '', FunctionConstant.FUNC_HANDLE_UPDATE_CARD), __filename, 'CustomerId : ' + customerId);
   }
   return returnResponse;
 };
@@ -397,7 +397,7 @@ const handleCardDeletion = async (updateCustomerObj: Partial<CustomerTokensType>
       }
     }
   } else {
-    errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, '' ,FunctionConstant.FUNC_HANDLE_CARD_DELETION),__filename,'CustomerId : ' + customerId);
+    errorHandler.logError(new NotFoundError(CustomMessages.ERROR_MSG_CUSTOMER_DETAILS, '', FunctionConstant.FUNC_HANDLE_CARD_DELETION), __filename, 'CustomerId : ' + customerId);
   }
   return customerTokenHandlerResponse;
 };

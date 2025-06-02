@@ -55,15 +55,15 @@ const syncExtensions = async (extension: any) => {
         extension.destination.authentication.headerValue = 'Bearer' + ' ' + headerValue;
         const scriptResponse = await commercetoolsApi.addExtensions(extension);
         if (scriptResponse && Constants.HTTP_SUCCESS_STATUS_CODE !== parseInt(scriptResponse.statusCode)) {
-          errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_FULL_COLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message,'',FunctionConstant.FUNC_SYNC_EXTENSIONS),__filename,'');
+          errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_FULL_COLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message, '', FunctionConstant.FUNC_SYNC_EXTENSIONS), __filename, '');
         }
         isExtensionsSynced = true;
       } else {
-        errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER ,'',FunctionConstant.FUNC_SYNC_EXTENSIONS),__filename,'');
+        errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER, '', FunctionConstant.FUNC_SYNC_EXTENSIONS), __filename, '');
       }
     }
   } catch (err) {
-    errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.REGEX_HYPHEN + extension.key ,err ,FunctionConstant.FUNC_SYNC_EXTENSIONS),__filename,'');
+    errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.REGEX_HYPHEN + extension.key, err, FunctionConstant.FUNC_SYNC_EXTENSIONS), __filename, '');
   }
   return isExtensionsSynced;
 };

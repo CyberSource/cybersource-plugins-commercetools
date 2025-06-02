@@ -163,7 +163,7 @@ const setTransactionCustomType = (transactionId: string, pendingAmount: number):
     paymentValidator.setObjectValue(returnResponse, Constants.TRANSACTION_ID, transactionId, '', Constants.STR_STRING, false);
     paymentValidator.setObjectValue(returnResponse.fields, 'isv_availableCaptureAmount', pendingAmount, '', 'number', false);
     if (!returnResponse.fields.isv_availableCaptureAmount || !returnResponse.transactionId) {
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS ,'',FunctionConstant.FUNC_SET_TRANSACTION_CUSTOM_TYPE),__filename,'');
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '', FunctionConstant.FUNC_SET_TRANSACTION_CUSTOM_TYPE), __filename, '');
     }
     return returnResponse;
 };
@@ -196,7 +196,7 @@ const updateCustomField = async (customFields: any, getCustomObj: any, typeId: s
             }
         }
     } catch (exception) {
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception,FunctionConstant.FUNC_UPDATE_CUSTOM_FIELDS),__filename,'');
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception, FunctionConstant.FUNC_UPDATE_CUSTOM_FIELDS), __filename, '');
     }
 };
 

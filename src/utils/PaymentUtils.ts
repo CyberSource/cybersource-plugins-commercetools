@@ -153,7 +153,7 @@ const setTransactionId = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2P
   paymentValidator.setObjectValue(transactionIdData, 'interactionId', paymentResponse, 'transactionId', Constants.STR_STRING, false);
   paymentValidator.setObjectValue(transactionIdData, 'transactionId', transactionDetail, 'id', Constants.STR_STRING, false);
   if (!transactionIdData.interactionId || !transactionIdData.transactionId) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '' ,FunctionConstant.FUNC_SET_TRANSACTION_ID),__filename,'');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '', FunctionConstant.FUNC_SET_TRANSACTION_ID), __filename, '');
   }
   return transactionIdData;
 };
@@ -373,7 +373,7 @@ const getCertificatesData = async (url: string): Promise<{ status: number; data:
           }
         })
         .catch(function (exception: string) {
-          errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_FETCH_CERTIFICATE, exception ,FunctionConstant.FUNC_GET_CERTIFICATES_DATA),__filename,'');
+          errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_FETCH_CERTIFICATE, exception, FunctionConstant.FUNC_GET_CERTIFICATES_DATA), __filename, '');
           reject(certificateResponse);
         });
     }).catch((error) => {
@@ -556,7 +556,7 @@ const getRequestObj = (body: any): any => {
   let requestObj;
   if (body) {
     const requestBody = JSON.parse(body.toString());
-    (requestBody?.resource?.obj) ? requestObj = requestBody?.resource?.obj : errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_INVALID_REQUEST, '' ,FunctionConstant.FUNC_GET_REQUEST_OBJ),__filename,'');
+    (requestBody?.resource?.obj) ? requestObj = requestBody?.resource?.obj : errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_INVALID_REQUEST, '', FunctionConstant.FUNC_GET_REQUEST_OBJ), __filename, '');
   }
   return requestObj;
 };
@@ -700,10 +700,10 @@ const logErrorMessage = (error: any, functionName: string, id: string) => {
       errorMessage = CustomMessages.ERROR_MSG_FLEX_TOKEN_KEYS + Constants.STRING_HYPHEN;
   }
   if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-    errorHandler.logError(new PaymentProcessingError(errorMessage, error.response.text,functionName),__filename,idValue);
+    errorHandler.logError(new PaymentProcessingError(errorMessage, error.response.text, functionName), __filename, idValue);
   } else {
     typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : (errorData = error);
-    errorHandler.logError(new PaymentProcessingError(errorMessage + errorData, '',functionName),__filename,idValue);
+    errorHandler.logError(new PaymentProcessingError(errorMessage + errorData, '', functionName), __filename, idValue);
   }
 };
 
@@ -796,14 +796,14 @@ const setCertificatecache = async (url: string, keyPass: string, merchantId: str
         setCache(certificate, currentFileLastModifiedTime);
         cache.put(`cert-${merchantId}`, certificate);
       } else {
-        errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_FETCH_CERTIFICATE,'',FunctionConstant.FUNC_SET_CERTIFICATE_CACHE),__filename,'');
+        errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_FETCH_CERTIFICATE, '', FunctionConstant.FUNC_SET_CERTIFICATE_CACHE), __filename, '');
       }
     }
   } catch (exception: any) {
     if (typeof exception === Constants.STR_OBJECT && exception.message) {
-      errorHandler.logError(new PaymentProcessingError(exception.message, exception,FunctionConstant.FUNC_SET_CERTIFICATE_CACHE),__filename,'');
+      errorHandler.logError(new PaymentProcessingError(exception.message, exception, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE), __filename, '');
     } else {
-      errorHandler.logError(new PaymentProcessingError('', exception,FunctionConstant.FUNC_SET_CERTIFICATE_CACHE),__filename,'');
+      errorHandler.logError(new PaymentProcessingError('', exception, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE), __filename, '');
     }
   }
 };
@@ -828,7 +828,7 @@ const validatePathname = (pathname: any) => {
 const sanitizeAndValidateUrl = (req: any) => {
   const originalUrl = url.parse(req.url, true);
   if (!validatePathname(originalUrl.pathname || '')) {
-    errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_INVALID_PATHNAME,'',FunctionConstant.FUNC_SANITIZE_AND_VALIDATE_URL),__filename,'');
+    errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_INVALID_PATHNAME, '', FunctionConstant.FUNC_SANITIZE_AND_VALIDATE_URL), __filename, '');
     return null;
   }
   const sanitizedUrl: any = {

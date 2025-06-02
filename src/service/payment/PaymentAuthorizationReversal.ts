@@ -70,7 +70,7 @@ const getAuthReversalResponse = async (payment: Payment, cart: Cart, authReversa
       return paymentResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE),__filename,'');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE), __filename, '');
     return paymentResponse;
   }
 };

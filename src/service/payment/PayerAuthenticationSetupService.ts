@@ -62,7 +62,7 @@ const getPayerAuthSetupData = async (payment: Payment, customerTokenId: string):
               resolve(paymentResponse);
             } else if (error) {
               if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                errorHandler.logError(new PaymentProcessingError(error.response.text, error ,FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA),__filename,'PaymentId : ' + paymentId );
+                errorHandler.logError(new PaymentProcessingError(error.response.text, error, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA), __filename, 'PaymentId : ' + paymentId);
                 errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
                 if (errorData?.id && errorData?.status) {
                   paymentResponse.transactionId = errorData.id;
@@ -71,7 +71,7 @@ const getPayerAuthSetupData = async (payment: Payment, customerTokenId: string):
               } else {
                 let errorDataObj;
                 typeof error === Constants.STR_OBJECT ? (errorDataObj = JSON.stringify(error)) : (errorDataObj = error);
-                errorHandler.logError(new PaymentProcessingError(errorDataObj, error ,FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA),__filename,'PaymentId : ' + paymentId );
+                errorHandler.logError(new PaymentProcessingError(errorDataObj, error, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA), __filename, 'PaymentId : ' + paymentId);
               }
               paymentResponse.httpCode = error.status;
               reject(paymentResponse);
@@ -87,7 +87,7 @@ const getPayerAuthSetupData = async (payment: Payment, customerTokenId: string):
       return paymentResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA),__filename,'');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA), __filename, '');
     return paymentResponse;
   }
 };

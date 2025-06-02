@@ -56,7 +56,7 @@ const getTransactionData = async (transactionId: string, payment: Payment | null
       return visaCheckoutData;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_TRANSACTION_SEARCH, exception,FunctionConstant.FUNC_GET_TRANSACTION_DATA),__filename,'PaymentId : ' + paymentId);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_TRANSACTION_SEARCH, exception, FunctionConstant.FUNC_GET_TRANSACTION_DATA), __filename, 'PaymentId : ' + paymentId);
     return visaCheckoutData;
   }
 };

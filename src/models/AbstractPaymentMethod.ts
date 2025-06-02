@@ -77,7 +77,7 @@ export abstract class AbstractPaymentMethod implements PaymentMethodStrategy {
         isError = true;
       }
     } catch (error) {
-      errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST,error,FunctionConstant.FUNC_PROCESS_AUTHORIZATION),__filename,'PaymentId : ' + updatePaymentObj.id);
+      errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, error, FunctionConstant.FUNC_PROCESS_AUTHORIZATION), __filename, 'PaymentId : ' + updatePaymentObj.id);
       isError = true;
     }
 

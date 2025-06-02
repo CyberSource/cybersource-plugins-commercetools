@@ -64,7 +64,7 @@ const getTransactionSearchResponse = async (query: string, limit: number, sort: 
       return searchResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new AuthenticationError(CustomMessages.EXCEPTION_MSG_TRANSACTION_SEARCH, exception,FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE),__filename, '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.EXCEPTION_MSG_TRANSACTION_SEARCH, exception, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE), __filename, '');
     return searchResponse;
   }
 };

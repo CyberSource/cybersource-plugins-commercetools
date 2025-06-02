@@ -74,7 +74,7 @@ const getCaptureResponse = async (payment: Payment, updateTransactions: Partial<
       return paymentResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_CAPTURE_RESPONSE),__filename,payment?.id);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_CAPTURE_RESPONSE), __filename, payment?.id);
     return paymentResponse;
   }
 };

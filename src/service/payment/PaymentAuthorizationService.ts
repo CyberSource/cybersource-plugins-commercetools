@@ -112,14 +112,14 @@ const getAuthorizationResponse = async (payment: Payment, cart: Cart, service: s
           });
         }
       }).catch((error) => {
-        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, error,FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE),__filename,payment?.id);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, error, FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE), __filename, payment?.id);
         return error;
       });
     } else {
       return paymentResponse;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception,FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE),__filename,payment?.id);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE), __filename, payment?.id);
     return paymentResponse;
   }
 };

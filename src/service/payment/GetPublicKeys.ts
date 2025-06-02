@@ -65,15 +65,15 @@ const getPublicKeys = async (captureContext: string, paymentObj: Payment): Promi
                 pemPublicKey = jwkToPem(data);
                 isSignatureValid = jwt.verify(captureContext, pemPublicKey);
               } catch (exception) {
-                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION, exception ,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,'PaymentId : ' + paymentId);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION, exception, FunctionConstant.FUNC_GET_PUBLIC_KEYS), __filename, 'PaymentId : ' + paymentId);
               }
               isSignatureValid?.flx?.data ? resolve(true) : reject(false);
             } else {
               if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text, error ,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,'PaymentId : ' + paymentId);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text, error, FunctionConstant.FUNC_GET_PUBLIC_KEYS), __filename, 'PaymentId : ' + paymentId);
               } else {
                 errorData = error?.response?.text ? error.response.text : JSON.stringify(error);
-                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text, error ,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,'PaymentId : ' + paymentId);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text, error, FunctionConstant.FUNC_GET_PUBLIC_KEYS), __filename, 'PaymentId : ' + paymentId);
               }
               reject(errorData);
             }
@@ -86,7 +86,7 @@ const getPublicKeys = async (captureContext: string, paymentObj: Payment): Promi
       return false;
     }
   } catch (exception) {
-    errorHandler.logError(new PaymentProcessingError('', exception,FunctionConstant.FUNC_GET_PUBLIC_KEYS),__filename,paymentObj.id);
+    errorHandler.logError(new PaymentProcessingError('', exception, FunctionConstant.FUNC_GET_PUBLIC_KEYS), __filename, paymentObj.id);
     return false;
   }
 };

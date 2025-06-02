@@ -137,6 +137,8 @@ export abstract class Constants {
   static readonly ADDITIONAL_CUSTOM_TYPE_FILE_PATH = 'src/resources/isv_additonal_custom_type.json';
   static readonly CERTIFICATE_PATH = '../certificates';
   static readonly STRING_TEST = 'test';
+  static readonly STRING_GOOGLE_PAY = 'googlePay';
+  static readonly STRING_VISA = 'visa';
 
   static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ENCODING_SHA_TWO_FIFTY_SIX = 'sha256';
