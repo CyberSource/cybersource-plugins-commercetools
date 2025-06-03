@@ -5,7 +5,7 @@ import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
 import { Constants } from '../constants/paymentConstants';
 import { CustomTokenType, PaymentCustomFieldsType } from '../types/Types';
-import paymentUtils from '../utils/PaymentUtils';
+import { errorHandler, PaymentProcessingError } from '../utils/ErrorHandler';
 import paymentValidator from '../utils/PaymentValidator';
 
 export class PaymentInformationModel {
@@ -47,7 +47,7 @@ export class PaymentInformationModel {
                     }
                     break;
                 default:
-                    paymentUtils.logData(__filename, FunctionConstant.FUNC_MAP_PAYMENT_INFORMATION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
+                    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_MAP_PAYMENT_INFORMATION), __filename, '');
             }
         } else if (FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === functionName && cardTokens && cardTokens.customerTokenId) {
             paymentInformation = {} as Ptsv2paymentsPaymentInformation;

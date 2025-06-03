@@ -1,9 +1,11 @@
 import { Cart } from '@commercetools/platform-sdk';
 import restApi, { GenerateUnifiedCheckoutCaptureContextRequest, Upv1capturecontextsOrderInformation } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 
@@ -31,7 +33,8 @@ const generateCaptureContext = async (cartObj: Cart | null, country: string, loc
       const requestObj: GenerateUnifiedCheckoutCaptureContextRequest = {
         clientVersion: clientVersion,
         allowedCardNetworks: allowedCardNetworks,
-        targetOrigins: targetOrigins
+        targetOrigins: targetOrigins,
+        transientTokenResponseOptions: { includeCardPrefix: false }
       }
       if ('Payments' === service && cartObj) {
         requestObj.orderInformation = prepareFields.getOrderInformation(FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT, null, null, cartObj, null, null, service, currencyCode);
@@ -81,7 +84,7 @@ const generateCaptureContext = async (cartObj: Cart | null, country: string, loc
       return isv_tokenCaptureContextSignature;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CAPTURE_CONTEXT, exception, FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT), __filename, '');
     return isv_tokenCaptureContextSignature;
   }
 };

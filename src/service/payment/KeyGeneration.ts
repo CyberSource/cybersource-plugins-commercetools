@@ -1,9 +1,11 @@
 import restApi from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { KeyResponse, MidCredentialsType } from '../../types/Types';
+import { AuthenticationError, errorHandler } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -66,7 +68,7 @@ const getKeyGenerationResponse = async (midCredentials: MidCredentialsType): Pro
       return error;
     });
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, '', exception, '', '', '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_SERVICE_PROCESS, exception, FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE), __filename, '');
     return keyResponse;
   }
 };

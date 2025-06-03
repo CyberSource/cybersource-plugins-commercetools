@@ -59,7 +59,7 @@ Your application is now available at `https://<Globally_Unique_Function_App_Name
 
 ## Loggers in Azure
 
-- In order to see the extension logs, add a console.log statement inside the `logData` function in PaymentUtils.ts file. The logs can be found in your Azure Function, under `Monitoring` --> `Log Stream`
+- In order to see the extension logs in Cloudwatch, console.log statement can be added inside the `logData` function in PaymentUtils.ts file for general logs, and inside the `logError` function in ErrorHandler.ts file for Error logs. The logs can be found in your Azure Function, under `Monitoring` --> `Log Stream`
 > **_NOTE:_** Logs displayed here will not be stored permanently
 
 ## Modifying Environment Variables

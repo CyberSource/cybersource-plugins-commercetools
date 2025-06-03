@@ -6,6 +6,7 @@ import { Constants } from "../../constants/paymentConstants";
 import paymentAuthSetUp from '../../service/payment/PayerAuthenticationSetupService';
 import paymentAuthorization from '../../service/payment/PaymentAuthorizationService';
 import { ActionResponseType, CustomTokenType, PaymentCustomFieldsType, TokenCreateFlagType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from "../ErrorHandler";
 import paymentActions from '../PaymentActions';
 import paymentUtils from "../PaymentUtils";
 import paymentValidator from '../PaymentValidator';
@@ -14,6 +15,7 @@ import commercetoolsApi from '../api/CommercetoolsApi';
 import cartHelper from "./CartHelper";
 import paymentHelper from "./PaymentHelper";
 import tokenHelper from "./TokenHelper";
+
 
 /**
  * Processes the payer authentication enroll tokens.
@@ -100,7 +102,7 @@ const getPayerAuthValidateResponse = async (updatePaymentObj: Payment): Promise<
             }
         }
     } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_NO_CARD_DETAILS);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_NO_CARD_DETAILS, '', FunctionConstant.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE), __filename, 'PaymentId : ' + paymentId);
     }
     return authResponse;
 };
@@ -143,7 +145,7 @@ const getPayerAuthSetUpResponse = async (updatePaymentObj: Payment): Promise<Act
             }
         }
     } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE), __filename, 'PaymentId : ' + paymentId);
     }
     return setUpActionResponse;
 };
@@ -183,7 +185,7 @@ const getPayerAuthEnrollResponse = async (updatePaymentObj: Payment): Promise<Ac
             }
         }
     } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE), __filename, 'PaymentId : ' + paymentId);
     }
     return enrollResponse;
 };

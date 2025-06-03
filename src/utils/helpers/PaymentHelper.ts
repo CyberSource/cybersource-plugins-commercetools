@@ -1,151 +1,17 @@
-import { Cart, Customer, Payment } from "@commercetools/platform-sdk";
+import { Payment } from "@commercetools/platform-sdk";
 import { PtsV2PaymentsPost201Response } from "cybersource-rest-client";
 
 import { CustomMessages } from "../../constants/customMessages";
 import { FunctionConstant } from "../../constants/functionConstant";
 import { Constants } from "../../constants/paymentConstants";
 import { PayerAuthData } from "../../models/PayerAuthDataModel";
-import paymentAuthorization from '../../service/payment/PaymentAuthorizationService';
-import { ActionResponseType, ActionType, CardAddressGroupType, CustomTokenType, PaymentTransactionType } from "../../types/Types";
+import { ActionResponseType, ActionType, PaymentTransactionType } from "../../types/Types";
+import { errorHandler, PaymentProcessingError } from "../ErrorHandler";
 import paymentActions from "../PaymentActions";
 import paymentHandler from "../PaymentHandler";
 import paymentUtils from "../PaymentUtils";
 import paymentValidator from "../PaymentValidator";
 import commercetoolsApi from "../api/CommercetoolsApi";
-
-import cartHelper from "./CartHelper";
-import tokenHelper from "./TokenHelper";
-
-/**
- * Retrieves the credit card authorization response.
- * 
- * @param {Payment} updatePaymentObj - Updated payment object.
- * @param {Customer | null} customerInfo - Customer information.
- * @param {Cart} cartObj - Cart object.
- * @param {Partial<PaymentTransactionType>} updateTransactions - Updated transaction details.
- * @param {CustomTokenType} cardTokens - Card tokens.
- * @param {string} orderNo - Order number.
- * @returns {Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }>} - Object containing error flag, payment response, and authorization response.
- */
-const getPaymentResponse = async (updatePaymentObj: Payment, customerInfo: Customer | null, cartObj: Cart, updateTransactions: Partial<PaymentTransactionType>, cardTokens: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
-    let isSaveToken = false;
-    let isError = false;
-    let paymentResponse;
-    let isv_applePaySessionData = '';
-    let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
-    const evaluateTokenCreationResponse = await tokenHelper.evaluateTokenCreation(customerInfo, updatePaymentObj, FunctionConstant.FUNC_GET_PAYMENT_RESPONSE);
-    if (!evaluateTokenCreationResponse.isError) {
-        isSaveToken = evaluateTokenCreationResponse.isSaveToken;
-        if (updatePaymentObj?.custom?.fields?.isv_transientToken && (Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING))) {
-            cartObj = await cartHelper.updateCartWithUCAddress(updatePaymentObj, cartObj);
-        }
-        paymentResponse = await paymentAuthorization.getAuthorizationResponse(updatePaymentObj, cartObj, Constants.STRING_CARD, cardTokens, isSaveToken, false, orderNo);
-        if (paymentResponse && updatePaymentObj && paymentResponse?.httpCode) {
-            authResponse = getAuthResponse(paymentResponse, updateTransactions);
-            if (authResponse && authResponse?.actions && authResponse['actions'].length) {
-                if (Constants.APPLE_PAY === updatePaymentObj.paymentMethodInfo.method) {
-                    const cardDetails = await cartHelper.getPaymentData(paymentResponse, updatePaymentObj);
-                    if (cardDetails) {
-                        const actions = paymentActions.cardDetailsActions(cardDetails);
-                        paymentValidator.validateActionsAndPush(actions, authResponse.actions);
-                    }
-                    if (updatePaymentObj?.custom?.fields?.isv_applePaySessionData) {
-                        authResponse.actions.push(...paymentUtils.setCustomFieldToNull({ isv_applePaySessionData }));
-                    }
-                }
-            } else {
-                isError = true;
-            }
-        } else {
-            isError = true;
-        }
-    }
-    return { isError, paymentResponse, authResponse };
-};
-
-/**
- * Retrieves the response for Click to Pay.
- * 
- * @param {Payment} updatePaymentObj - Updated payment object.
- * @param {Cart} cartObj - Cart object.
- * @param {PaymentTransactionType} updateTransactions - Updated transactions.
- * @param {CustomTokenType} customerTokenId - Customer token ID.
- * @param {string} orderNo - Order number.
- * @returns {Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }>} - Response containing error flag, payment response, and authentication response.
- */
-const getClickToPayResponse = async (updatePaymentObj: Payment, cartObj: Cart, updateTransactions: Partial<PaymentTransactionType>, customerTokenId: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
-    let isError = false;
-    let paymentId = updatePaymentObj?.id || '';
-    let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
-    let actions: Partial<ActionType>[] = [];
-    let paymentResponse;
-    if (updatePaymentObj?.custom?.fields?.isv_transientToken && (Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING))) {
-        cartObj = await cartHelper.updateCartWithUCAddress(updatePaymentObj, cartObj);
-    }
-    paymentResponse = await paymentAuthorization.getAuthorizationResponse(updatePaymentObj, cartObj, 'visa', customerTokenId, false, false, orderNo);
-    if (paymentResponse && paymentResponse.httpCode) {
-        authResponse = getAuthResponse(paymentResponse, updateTransactions);
-        if (authResponse) {
-            const visaCheckoutData = await cartHelper.getPaymentData(paymentResponse, updatePaymentObj);
-            if (visaCheckoutData) {
-                actions = paymentActions.cardDetailsActions(visaCheckoutData);
-                paymentValidator.validateActionsAndPush(actions, authResponse.actions);
-            } else {
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CLICK_TO_PAY_RESPONSE, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_UPDATE_CLICK_TO_PAY_DATA);
-            }
-        } else {
-            isError = true;
-        }
-    } else {
-        isError = true;
-    }
-    return { isError, paymentResponse, authResponse };
-};
-
-/**
- * Retrieves the response for Google Pay.
- * 
- * @param {Payment} updatePaymentObj - Updated payment object.
- * @param {Cart} cartObj - Cart object.
- * @param {PaymentTransactionType} updateTransactions - Updated transactions.
- * @param {CustomTokenType} customerTokens - Customer tokens.
- * @param {string} orderNo - Order number.
- * @returns {Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }>} - Response containing error flag, payment response, and authentication response.
- */
-const getGooglePayResponse = async (updatePaymentObj: Payment, cartObj: Cart, updateTransactions: Partial<PaymentTransactionType>, customerTokens: CustomTokenType, orderNo: string): Promise<{ isError: boolean, paymentResponse: any, authResponse: ActionResponseType }> => {
-    let isError = false;
-    let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
-    const cardDetails: Partial<CardAddressGroupType> = {
-        cardFieldGroup: {
-            prefix: '',
-            suffix: '',
-            expirationMonth: '',
-            expirationYear: '',
-            type: '',
-        },
-    };
-    let actions: Partial<ActionType>[] = [];
-    let paymentResponse;
-    if (updatePaymentObj?.custom?.fields?.isv_transientToken && (Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE || paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING))) {
-        cartObj = await cartHelper.updateCartWithUCAddress(updatePaymentObj, cartObj);
-    }
-    paymentResponse = await paymentAuthorization.getAuthorizationResponse(updatePaymentObj, cartObj, 'googlePay', customerTokens, false, false, orderNo);
-    if (paymentResponse && paymentResponse?.httpCode) {
-        authResponse = getAuthResponse(paymentResponse, updateTransactions);
-        if (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode) {
-            if (paymentResponse?.data?.paymentInformation?.tokenizedCard && paymentResponse.data.paymentInformation.tokenizedCard?.expirationMonth) {
-                cardDetails.cardFieldGroup = paymentResponse.data.paymentInformation.tokenizedCard;
-            } else if (paymentResponse?.data?.paymentInformation?.card && paymentResponse.data.paymentInformation.card?.expirationMonth) {
-                cardDetails.cardFieldGroup = paymentResponse.data.paymentInformation.card;
-            }
-            actions = paymentActions.cardDetailsActions(cardDetails);
-            paymentValidator.validateActionsAndPush(actions, authResponse.actions);
-        }
-    } else {
-        isError = true;
-    }
-    return { isError, paymentResponse, authResponse };
-};
 
 /**
  * Processes the authentication response from a payment service.
@@ -297,7 +163,7 @@ const setTransactionCustomType = (transactionId: string, pendingAmount: number):
     paymentValidator.setObjectValue(returnResponse, Constants.TRANSACTION_ID, transactionId, '', Constants.STR_STRING, false);
     paymentValidator.setObjectValue(returnResponse.fields, 'isv_availableCaptureAmount', pendingAmount, '', 'number', false);
     if (!returnResponse.fields.isv_availableCaptureAmount || !returnResponse.transactionId) {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_TRANSACTION_CUSTOM_TYPE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '', FunctionConstant.FUNC_SET_TRANSACTION_CUSTOM_TYPE), __filename, '');
     }
     return returnResponse;
 };
@@ -330,14 +196,11 @@ const updateCustomField = async (customFields: any, getCustomObj: any, typeId: s
             }
         }
     } catch (exception) {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_UPDATE_CUSTOM_FIELDS, CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception, '', '', '');
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_SYNC_DETAILS, exception, FunctionConstant.FUNC_UPDATE_CUSTOM_FIELDS), __filename, '');
     }
 };
 
 export default {
-    getPaymentResponse,
-    getClickToPayResponse,
-    getGooglePayResponse,
     getAuthResponse,
     processTransaction,
     setTransactionCustomType,

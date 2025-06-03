@@ -1,4 +1,4 @@
-import { Cart,Payment, Transaction } from '@commercetools/platform-sdk';
+import { Cart, Payment, Transaction } from '@commercetools/platform-sdk';
 import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
 
 import { CustomMessages } from '../../constants/customMessages';
@@ -7,6 +7,7 @@ import { Constants } from '../../constants/paymentConstants';
 import createSearchRequest from '../../service/payment/CreateTransactionSearchRequest';
 import getTransaction from '../../service/payment/GetTransactionData';
 import { ActionResponseType, ActionType, AmountPlannedType, ApplicationsType, PaymentTransactionType, ReportSyncType } from '../../types/Types';
+import { ApiError, errorHandler, PaymentProcessingError } from '../ErrorHandler';
 import paymentActions from '../PaymentActions';
 import paymentUtils from '../PaymentUtils';
 import paymentValidator from '../PaymentValidator';
@@ -509,7 +510,7 @@ const getTransactionSummaries = async (updatePaymentObj: Payment, retryCount: nu
                 };
                 resolve(transactionSummaryObject);
             } else {
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES, Constants.LOG_ERROR, 'PaymentId : ' + updatePaymentObj.id, CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH);
+                errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH, '', FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES), __filename, 'PaymentId : ' + updatePaymentObj.id);
                 reject(transactionSummaryObject);
             }
         }, 1500);
@@ -517,7 +518,7 @@ const getTransactionSummaries = async (updatePaymentObj: Payment, retryCount: nu
         if (error) {
             errorData = typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : error;
         }
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH + errorData);
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_RETRY_TRANSACTION_SEARCH + errorData, error, FunctionConstant.FUNC_GET_TRANSACTION_SUMMARIES), __filename, 'PaymentId : ' + paymentId);
         return transactionSummaryObject;
     });
 };
@@ -660,7 +661,7 @@ const getMissingPaymentDetails = async () => {
                                 break;
                             }
                         } catch (exception) {
-                            paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_MISSING_PAYMENT_DETAILS, '', exception, '', '', '');
+                            errorHandler.logError(new ApiError('', exception, FunctionConstant.FUNC_GET_MISSING_PAYMENT_DETAILS), __filename, '');
                         }
                     }
                 }
@@ -690,8 +691,8 @@ const syncPaymentDetails = async (dataActions: Partial<ActionType>[], currentPay
                 actions: dataActions,
                 id: currentPaymentObject.id,
                 version: currentPaymentObject.version,
-           };
-        commercetoolsApi.syncVisaCardDetails(updateObject);
+            };
+            commercetoolsApi.syncVisaCardDetails(updateObject);
         }
     }
 }

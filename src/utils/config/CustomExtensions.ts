@@ -4,7 +4,7 @@ import { Constants } from '../../constants/paymentConstants';
 import customerUpdateJson from '../../resources/customer_update_extension.json';
 import paymentCreateJson from '../../resources/payment_create_extension.json';
 import paymentUpdateJson from '../../resources/payment_update_extension.json';
-import paymentUtils from '../PaymentUtils';
+import { AuthenticationError, errorHandler, PaymentProcessingError } from '../ErrorHandler';
 import commercetoolsApi from '../api/CommercetoolsApi';
 import authenticationHelper from '../helpers/AuthenticationHelper';
 
@@ -55,15 +55,15 @@ const syncExtensions = async (extension: any) => {
         extension.destination.authentication.headerValue = 'Bearer' + ' ' + headerValue;
         const scriptResponse = await commercetoolsApi.addExtensions(extension);
         if (scriptResponse && Constants.HTTP_SUCCESS_STATUS_CODE !== parseInt(scriptResponse.statusCode)) {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_EXTENSIONS, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_FULL_COLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message);
+          errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.STRING_FULL_COLON + extension.key + Constants.STRING_HYPHEN + scriptResponse.message, '', FunctionConstant.FUNC_SYNC_EXTENSIONS), __filename, '');
         }
         isExtensionsSynced = true;
       } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_EXTENSIONS, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER);
+        errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER, '', FunctionConstant.FUNC_SYNC_EXTENSIONS), __filename, '');
       }
     }
   } catch (err) {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_EXTENSIONS, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.REGEX_HYPHEN + extension.key);
+    errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_CREATE_EXTENSION + Constants.REGEX_HYPHEN + extension.key, err, FunctionConstant.FUNC_SYNC_EXTENSIONS), __filename, '');
   }
   return isExtensionsSynced;
 };

@@ -1,10 +1,12 @@
 import { Payment } from '@commercetools/platform-sdk';
 import restApi, { Ptsv2paymentsidrefundsOrderInformation, Ptsv2paymentsidrefundsProcessingInformation, PtsV2PaymentsRefundPost201Response, RefundPaymentRequest } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { PaymentTransactionType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -78,7 +80,7 @@ const getRefundData = async (payment: Payment, captureId: string, updateTransact
       return paymentResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_REFUND_DATA, '', exception, payment.id, 'PaymentId : ', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_REFUND_DATA), __filename, payment?.id);
     return paymentResponse;
   }
 };

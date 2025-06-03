@@ -21,6 +21,7 @@ import { Constants } from '../constants/paymentConstants';
 import { Token } from '../models/TokenModel';
 import { ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, ErrorType, LoggerConfigType, PaymentCustomFieldsType, PaymentTransactionType } from '../types/Types';
 
+import { errorHandler, PaymentProcessingError, SystemError, ValidationError } from './ErrorHandler';
 import paymentValidator from './PaymentValidator';
 import commercetoolsApi from './api/CommercetoolsApi';
 
@@ -93,39 +94,6 @@ const getDate = (dateInput: Date | string | number | null = null, isReturnTypeSt
 };
 
 /**
- * Log exceptions.
- * 
- * @param {string} fileName - Log file name.
- * @param {string} functionName - Name of the function where the exception occurred.
- * @param {string} exceptionMsg - Exception message.
- * @param {any} exception - The exception object.
- * @param {string} id - Resource ID.
- * @param {string} resourceType - Type of the resource.
- * @param {string} key - Key related to the exception (optional).
- */
-const logExceptionData = (fileName: string, functionName: string, exceptionMsg: string, exception: any, id: string, resourceType: string, key: string) => {
-  let exceptionData: string;
-  if (typeof exception === Constants.STR_STRING) {
-    exceptionData = exceptionMsg + Constants.STRING_HYPHEN + exception.toUpperCase();
-  } else if (exception instanceof Error) {
-    if (exceptionMsg) {
-      exceptionData =
-        FunctionConstant.FUNC_ADD_CUSTOM_TYPES === functionName || FunctionConstant.FUNC_ADD_EXTENSIONS === functionName || FunctionConstant.FUNC_GET_CUSTOM_TYPES === functionName
-          ? exceptionMsg + Constants.STRING_FULL_COLON + key + Constants.STRING_HYPHEN + exception.message
-          : exceptionMsg + Constants.STRING_HYPHEN + exception.message;
-    } else {
-      exceptionData = FunctionConstant.FUNC_ADD_CUSTOM_TYPES === functionName || FunctionConstant.FUNC_ADD_EXTENSIONS === functionName || FunctionConstant.FUNC_GET_CUSTOM_TYPES === functionName ? exceptionMsg + Constants.STRING_FULL_COLON + key + Constants.STRING_HYPHEN + exception : exception.message;
-    }
-  } else {
-    exceptionData = exceptionMsg ? exceptionMsg + Constants.STRING_HYPHEN + exception : JSON.stringify(exception);
-  }
-  if (CustomMessages.EXCEPTION_MERCHANT_SECRET_KEY_REQUIRED === exceptionData || CustomMessages.EXCEPTION_MERCHANT_KEY_ID_REQUIRED === exceptionData) {
-    exceptionData = CustomMessages.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET;
-  }
-  id ? logData(fileName, functionName, Constants.LOG_ERROR, resourceType + id, exceptionData) : logData(fileName, functionName, Constants.LOG_ERROR, '', exceptionData);
-};
-
-/**
  * Set custom field mapper.
  * 
  * @param {PaymentCustomFieldsType} fields - Custom fields object.
@@ -185,7 +153,7 @@ const setTransactionId = (paymentResponse: PtsV2PaymentsPost201Response | PtsV2P
   paymentValidator.setObjectValue(transactionIdData, 'interactionId', paymentResponse, 'transactionId', Constants.STR_STRING, false);
   paymentValidator.setObjectValue(transactionIdData, 'transactionId', transactionDetail, 'id', Constants.STR_STRING, false);
   if (!transactionIdData.interactionId || !transactionIdData.transactionId) {
-    logData(__filename, FunctionConstant.FUNC_SET_TRANSACTION_ID, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_TRANSACTION_DETAILS, '', FunctionConstant.FUNC_SET_TRANSACTION_ID), __filename, '');
   }
   return transactionIdData;
 };
@@ -405,7 +373,7 @@ const getCertificatesData = async (url: string): Promise<{ status: number; data:
           }
         })
         .catch(function (exception: string) {
-          logData(__filename, FunctionConstant.FUNC_GET_CERTIFICATES_DATA, Constants.LOG_ERROR, '', exception);
+          errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_FETCH_CERTIFICATE, exception, FunctionConstant.FUNC_GET_CERTIFICATES_DATA), __filename, '');
           reject(certificateResponse);
         });
     }).catch((error) => {
@@ -588,7 +556,7 @@ const getRequestObj = (body: any): any => {
   let requestObj;
   if (body) {
     const requestBody = JSON.parse(body.toString());
-    (requestBody?.resource?.obj) ? requestObj = requestBody?.resource?.obj : logData(__filename, 'FuncGetRequestObj', Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_INVALID_REQUEST);
+    (requestBody?.resource?.obj) ? requestObj = requestBody?.resource?.obj : errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_INVALID_REQUEST, '', FunctionConstant.FUNC_GET_REQUEST_OBJ), __filename, '');
   }
   return requestObj;
 };
@@ -732,10 +700,10 @@ const logErrorMessage = (error: any, functionName: string, id: string) => {
       errorMessage = CustomMessages.ERROR_MSG_FLEX_TOKEN_KEYS + Constants.STRING_HYPHEN;
   }
   if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
-    logData(__filename, functionName, Constants.LOG_ERROR, idValue, errorMessage + error.response.text);
+    errorHandler.logError(new PaymentProcessingError(errorMessage, error.response.text, functionName), __filename, idValue);
   } else {
     typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : (errorData = error);
-    logData(__filename, functionName, Constants.LOG_ERROR, idValue, errorMessage + errorData);
+    errorHandler.logError(new PaymentProcessingError(errorMessage + errorData, '', functionName), __filename, idValue);
   }
 };
 
@@ -785,7 +753,7 @@ const logRateLimitException = (requestCount: number): void => {
 };
 
 const maskData = (obj: any) => {
-  let logData = JSON.parse(obj);
+  let logData = obj !== undefined && JSON.parse(obj);
   replaceChar(logData);
   return JSON.stringify(logData);
 };
@@ -795,10 +763,10 @@ const replaceChar = (logData: any) => {
   const replaceCharacterRegex = /./g;
   const payload = ['email', 'lastName', 'firstName', 'expirationYear', 'expirationMonth', 'phoneNumber', 'cvv', 'securityCode', 'address1', 'postalCode', 'locality', 'address2', 'ipAddress'];
   Object.keys(logData).forEach(key => {
-    if ('object' === typeof logData[key] && null !== logData[key]) {
+    if ('object' === typeof logData[key] && null !== logData[key] && logData[key] !== undefined) {
       replaceChar(logData[key]);
     } else {
-      if (payload.includes(key) && null !== logData[key] && "string" === typeof logData[key]) {
+      if (payload.includes(key) && null !== logData[key] && logData[key] !== undefined && "string" === typeof logData[key]) {
         logData[key] = logData[key].replace(replaceCharacterRegex, "x");
       }
     }
@@ -828,14 +796,14 @@ const setCertificatecache = async (url: string, keyPass: string, merchantId: str
         setCache(certificate, currentFileLastModifiedTime);
         cache.put(`cert-${merchantId}`, certificate);
       } else {
-        logData(__filename, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_FETCH_CERTIFICATE);
+        errorHandler.logError(new SystemError(CustomMessages.ERROR_MSG_FETCH_CERTIFICATE, '', FunctionConstant.FUNC_SET_CERTIFICATE_CACHE), __filename, '');
       }
     }
   } catch (exception: any) {
     if (typeof exception === Constants.STR_OBJECT && exception.message) {
-      logExceptionData(__filename, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE, exception.message, exception, '', '', '',);
+      errorHandler.logError(new PaymentProcessingError(exception.message, exception, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE), __filename, '');
     } else {
-      logExceptionData(__filename, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE, '', exception, '', '', '',);
+      errorHandler.logError(new PaymentProcessingError('', exception, FunctionConstant.FUNC_SET_CERTIFICATE_CACHE), __filename, '');
     }
   }
 };
@@ -860,7 +828,7 @@ const validatePathname = (pathname: any) => {
 const sanitizeAndValidateUrl = (req: any) => {
   const originalUrl = url.parse(req.url, true);
   if (!validatePathname(originalUrl.pathname || '')) {
-    logData(__filename, FunctionConstant.FUNC_SANITIZE_AND_VALIDATE_URL, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_INVALID_PATHNAME);
+    errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_INVALID_PATHNAME, '', FunctionConstant.FUNC_SANITIZE_AND_VALIDATE_URL), __filename, '');
     return null;
   }
   const sanitizedUrl: any = {
@@ -897,7 +865,6 @@ const validateId = (pathname: any) => {
 
 export default {
   logData,
-  logExceptionData,
   setCustomFieldMapper,
   setCustomFieldToNull,
   setTransactionId,

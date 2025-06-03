@@ -68,6 +68,6 @@ class CommonAddressMapper {
         targetAddress.postalCode = sourceAddress?.postalCode || '';
         targetAddress.country = sourceAddress?.country || '';
         targetAddress.email = sourceAddress?.email || '';
-        targetAddress.phoneNumber = sourceAddress?.phone || sourceAddress?.mobile || '';
+        (sourceAddress?.phone || sourceAddress?.mobile) && (targetAddress.phoneNumber = sourceAddress?.phone || sourceAddress?.mobile);
     }
 }
