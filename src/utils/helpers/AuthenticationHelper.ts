@@ -4,6 +4,7 @@ import { CustomObjectPagedQueryResponse } from '@commercetools/platform-sdk';
 
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
+import { errorHandler, PaymentProcessingError } from '../ErrorHandler';
 import paymentUtils from "../PaymentUtils";
 import commercetoolsApi from '../api/CommercetoolsApi';
 
@@ -28,8 +29,12 @@ const encryption = (data: string): string => {
             const encryptStringData = iv.toString(Constants.HEX) + Constants.STRING_FULL_COLON + encryptionInfo.toString() + Constants.STRING_FULL_COLON + authTag.toString(Constants.HEX);
             baseEncodedData = Buffer.from(encryptStringData).toString(Constants.ENCODING_BASE_SIXTY_FOUR);
         }
-    } catch (exception) {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ENCRYPTION, '', exception, '', '', '');
+    } catch (exception: any) {
+        if (typeof exception === Constants.STR_OBJECT && exception.message) {
+            errorHandler.logError(new PaymentProcessingError(exception.message, exception, FunctionConstant.FUNC_ENCRYPTION), __filename, '');
+        } else {
+            errorHandler.logError(new PaymentProcessingError('', exception, FunctionConstant.FUNC_ENCRYPTION), __filename, '');
+        }
     }
     return baseEncodedData;
 };
@@ -55,8 +60,12 @@ const decryption = (encodedCredentials: string): string => {
             decryptedData = decipher.update(encryptedData, Constants.ENCODING_BASE_SIXTY_FOUR, Constants.UNICODE_ENCODING_SYSTEM);
             decryptedData += decipher.final(Constants.UNICODE_ENCODING_SYSTEM);
         }
-    } catch (exception) {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_DECRYPTION, '', exception, '', '', '');
+    } catch (exception: any) {
+        if (typeof exception === Constants.STR_OBJECT && exception.message) {
+            errorHandler.logError(new PaymentProcessingError(exception.message, exception, FunctionConstant.FUNC_DECRYPTION), __filename, '');
+        } else {
+            errorHandler.logError(new PaymentProcessingError('', exception, FunctionConstant.FUNC_DECRYPTION), __filename, '');
+        }
     }
     return decryptedData;
 };
@@ -93,8 +102,12 @@ const authenticateNetToken = async (signature: any, notification: any): Promise<
                 }
             }
         }
-    } catch (exception) {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_AUTHENTICATE_NET_TOKEN, '', exception, '', '', '');
+    } catch (exception: any) {
+        if (typeof exception === Constants.STR_OBJECT && exception.message) {
+            errorHandler.logError(new PaymentProcessingError(exception.message, exception, FunctionConstant.FUNC_AUTHENTICATE_NET_TOKEN), __filename, '');
+        } else {
+            errorHandler.logError(new PaymentProcessingError('', exception, FunctionConstant.FUNC_AUTHENTICATE_NET_TOKEN), __filename, '');
+        }
     }
     return isValidNotification;
 };

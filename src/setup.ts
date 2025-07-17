@@ -5,6 +5,7 @@ import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
 import { Constants } from './constants/paymentConstants';
 import { MidCredentialsType, SubscriptionInformationType } from './types/Types';
+import { ApiError, errorHandler } from './utils/ErrorHandler';
 import paymentUtils from './utils/PaymentUtils';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
 import MultiMid from './utils/config/MultiMid';
@@ -27,7 +28,7 @@ const setupExtensionResources = async (): Promise<boolean> => {
       paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_SETUP_RESOURCES);
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE, '', CustomMessages.EXCEPTION_MSG_SETUP_RESOURCES, '', '', '');
+    errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_SETUP_RESOURCES, exception, FunctionConstant.FUNC_SET_UP_EXTENSION_RESOURCE), __filename, '');
   }
   return isExtensionSetupComplete;
 };
@@ -87,7 +88,7 @@ const createWebhookSubscription = async (): Promise<any> => {
       }
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncCreateWebhookSubscription', '', exception, '', '', '');
+    errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_API_EXECUTION, exception, FunctionConstant.FUNC_CREATE_WEBHOOK_SUBSCRIPTION), __filename, '');
     return;
   }
   return setCustomObjectResponse;

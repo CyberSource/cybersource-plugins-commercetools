@@ -6,6 +6,7 @@ import { Constants } from "../../constants/paymentConstants";
 import getTransaction from "../../service/payment/GetTransactionData";
 import getTransientTokenData from "../../service/payment/GetTransientTokenData";
 import { ActionType, VisaUpdateType } from "../../types/Types";
+import { errorHandler, PaymentProcessingError } from "../ErrorHandler";
 import paymentActions from "../PaymentActions";
 import paymentUtils from "../PaymentUtils";
 import commercetoolsApi from "../api/CommercetoolsApi";
@@ -24,7 +25,7 @@ const getCartDetailsByPaymentId = async (paymentId: string): Promise<any> => {
       cartDetails = cartResponse.results[0];
     }
   } else {
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CART_DETAILS_BY_PAYMENT_ID, Constants.LOG_ERROR, 'PaymentId : ' + paymentId, CustomMessages.ERROR_MSG_PAYMENT_DETAILS);
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PAYMENT_DETAILS, '', FunctionConstant.FUNC_GET_CART_DETAILS_BY_PAYMENT_ID), __filename, `${Constants.PAYMENT_ID} : ${paymentId}`);
   }
   return cartDetails;
 };

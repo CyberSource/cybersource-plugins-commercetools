@@ -120,6 +120,7 @@ export abstract class FunctionConstant {
   static readonly FUNC_HANDLE_TEST_CONNECTION = 'FuncHandleTestConnection';
   static readonly FUNC_GET_MISSING_PAYMENT_DETAILS = 'FuncGetMissingPaymentDetails';
   static readonly FUNC_SYNC_PAYMENT_AND_ADDRESS_DETAILS = 'FuncSyncPaymentAndAddressDetails';
+  static readonly FUNC_PROCESS_AUTHORIZATION = 'FuncProcessAuthorization';
 
   //requestBuilder Functions
   static readonly FUNC_GET_CONFIG_OBJECT = 'FuncGetConfigObject';
@@ -142,6 +143,8 @@ export abstract class FunctionConstant {
   static readonly FUNC_ADD_CUSTOM_TYPE = 'FuncAddCustomType';
   static readonly FUNC_SET_CERTIFICATE_CACHE = 'FuncSetCertificateCache';
   static readonly FUNC_SANITIZE_AND_VALIDATE_URL = 'FuncSanitizeAndValidateUrl';
+  static readonly FUNC_INITIALIZE_COMMERCETOOLS_CLIENT = 'FuncInitializeCommercetoolsClient';
+  static readonly FUNC_HANDLE_POST_AUTHORIZATION = 'FuncHandlePostAuthorization';
 
   //Controller Functions
   static readonly FUNC_PAYMENT_CREATE_API = 'FuncPaymentCreateApi';

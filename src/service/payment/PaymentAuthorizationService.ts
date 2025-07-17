@@ -1,10 +1,12 @@
 import { Cart, Payment } from '@commercetools/platform-sdk';
 import restApi, { CreatePaymentRequest, Ptsv2paymentsOrderInformation, PtsV2PaymentsPost201Response, Ptsv2paymentsProcessingInformation } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { CustomTokenType, PaymentTransactionType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -110,14 +112,14 @@ const getAuthorizationResponse = async (payment: Payment, cart: Cart, service: s
           });
         }
       }).catch((error) => {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE, '', error, '', '', '');
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, error, FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE), __filename, payment?.id);
         return error;
       });
     } else {
       return paymentResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE, '', exception, payment?.id, 'PaymentId : ', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE), __filename, payment?.id);
     return paymentResponse;
   }
 };

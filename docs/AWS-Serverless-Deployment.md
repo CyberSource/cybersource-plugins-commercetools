@@ -44,7 +44,7 @@ Replace value of
 
 ## Loggers in AWS Cloudwatch
 
-In order to see the extension logs in Cloudwatch, console.log statement can be added inside the function `logData` in PaymentUtils.ts file. 
+In order to see the extension logs in Cloudwatch, console.log statement can be added inside the `logData` function in PaymentUtils.ts file for general logs, and inside the `logError` function in ErrorHandler.ts file for Error logs. 
 
 ## Steps to Deploy Extension on AWS Lambda
 

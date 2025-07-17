@@ -1,9 +1,11 @@
 import restApi, { CreateSearchRequest, TssV2TransactionsPost201Response } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
+import { AuthenticationError, errorHandler } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -62,7 +64,7 @@ const getTransactionSearchResponse = async (query: string, limit: number, sort: 
       return searchResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, '', exception, '', '', '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.EXCEPTION_MSG_TRANSACTION_SEARCH, exception, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE), __filename, '');
     return searchResponse;
   }
 };

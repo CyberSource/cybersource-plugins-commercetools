@@ -50,6 +50,11 @@ export abstract class CustomMessages {
     static readonly EXCEPTION_MSG_CUSTOMER_OBJECT = 'An exception occurred while fetching customer object';
     static readonly EXCEPTION_MSG_CONNECTION_ERROR = 'An exception occured while testing credentials';
     static readonly EXCEPTION_MSG_ENV_VARIABLES_NOT_SET = 'Please configure the credentials in env file';
+    static readonly EXCEPTION_MSG_PAYMENT_DETAILS_API = 'An exception occured while retrieving payment';
+    static readonly EXCEPTION_MSG_CAPTURE_CONTEXT_API = 'An exception occured while generating capture context';
+    static readonly EXCEPTION_MSG_NOTIFICATION_API = 'An exception occurred while updating a token';
+    static readonly EXCEPTION_MSG_DELETE_TOKEN = 'An exception occurred while deleting a token';
+    static readonly EXCEPTION_MSG_PROCESSING_REQUEST = 'An exception occurred while processing your request';
 
     //Error messages
     static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
@@ -132,6 +137,8 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_JWT_ENV_VARIABLE_NOT_SET = 'Please configure the JWT credentials in env file to use Message Level Encryption';
     static readonly ERROR_MSG_CERTIFICATE_NOT_SET = 'Please provide p12 certificate for the MID to use Message Level Encryption';
     static readonly ERROR_MSG_INVALID_PATHNAME = 'Invalid Pathname';
+    static readonly ERROR_MSG_API_EXECUTION = 'An error occured while processing your request';
+    static readonly ERROR_MSG_PAYMENT_PROCESSING = 'Error processing payment authorization for method: ';
 
     //Network token logs
     static readonly ERROR_MSG_INVALID_INSTRUMENT_IDENTIFIER = 'Invalid Instrument identifier';

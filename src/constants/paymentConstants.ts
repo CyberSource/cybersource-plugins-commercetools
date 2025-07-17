@@ -35,7 +35,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
   static readonly PAYMENT_GATEWAY_NETWORK_TOKEN_EVENT_TYPE = 'tms.networktoken.updated';
   static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'Commercetools(REST)';
-  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.2.0';
+  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.2.1';
 
   //Payment status codes
   static readonly HTTP_CODE_ZERO = 0;
@@ -137,6 +137,8 @@ export abstract class Constants {
   static readonly ADDITIONAL_CUSTOM_TYPE_FILE_PATH = 'src/resources/isv_additonal_custom_type.json';
   static readonly CERTIFICATE_PATH = '../certificates';
   static readonly STRING_TEST = 'test';
+  static readonly STRING_GOOGLE_PAY = 'googlePay';
+  static readonly STRING_VISA = 'visa';
 
   static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ENCODING_SHA_TWO_FIFTY_SIX = 'sha256';

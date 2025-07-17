@@ -494,6 +494,12 @@ declare module "cybersource-rest-client" {
     targetOrigins?: Array<string>;
     allowedCardNetworks?: Array<string>;
     clientVersion?: string;
+    transientTokenResponseOptions?:transientTokenResponseOptions;
+  }
+
+   export interface transientTokenResponseOptions{
+    // include card prefix 
+    includeCardPrefix?: boolean;
   }
   export interface GeneratePublicKeyRequest {
     /**
@@ -15000,6 +15006,7 @@ declare module "cybersource-rest-client" {
     captureMandate?: Upv1capturecontextsCaptureMandate;
     orderInformation?: Upv1capturecontextsOrderInformation;
     checkoutApiInitialization?: Upv1capturecontextsCheckoutApiInitialization;
+    transientTokenResponseOptions?:transientTokenResponseOptions;
   }
   export interface Upv1capturecontextsCheckoutApiInitialization {
     profileId?: string;

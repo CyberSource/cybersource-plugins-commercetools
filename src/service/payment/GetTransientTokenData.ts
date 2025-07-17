@@ -1,9 +1,11 @@
 import restApi from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { PaymentCustomFieldsType, ResponseType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 import multiMid from '../../utils/config/MultiMid';
 
@@ -60,11 +62,11 @@ const getTransientTokenDataResponse = async (resourceObj: any, service: string):
               resolve(paymentResponse);
             } else if (error) {
               if (error?.response && error?.response?.text && 0 < error?.response?.text.length) {
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, Constants.LOG_ERROR, logInput, error.response.text);
                 errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
+                errorHandler.logError(new PaymentProcessingError(errorData, error, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE), __filename, logInput);
               } else {
                 typeof error === Constants.STR_OBJECT ? (errorData = JSON.stringify(error)) : (errorData = error);
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, Constants.LOG_ERROR, logInput, errorData);
+                errorHandler.logError(new PaymentProcessingError(error.response.text, error, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE), __filename, logInput);
               }
               paymentResponse.httpCode = error.status;
               reject(paymentResponse);
@@ -80,7 +82,7 @@ const getTransientTokenDataResponse = async (resourceObj: any, service: string):
       return paymentResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_TRANSIENT_TOKEN_DATA, exception, FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE), __filename, '');
     return paymentResponse;
   }
 };

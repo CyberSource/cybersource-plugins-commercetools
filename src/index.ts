@@ -16,6 +16,8 @@ import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
 import { Constants } from './constants/paymentConstants';
 import { testApiConnection } from './testConnection';
+import { NotificationBodyType } from './types/Types';
+import { ApiError, AuthenticationError, errorHandler, PaymentProcessingError, SystemError, ValidationError } from './utils/ErrorHandler';
 import paymentActions from './utils/PaymentActions';
 import paymentHandler from './utils/PaymentHandler';
 import paymentUtils from './utils/PaymentUtils';
@@ -62,7 +64,7 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
   const authHeader = req?.headers['authorization'];
   const whitelistUrls = process.env.PAYMENT_GATEWAY_WHITELIST_URLS;
   const requestUrl = req.url;
-  let notificationBody: any;
+  let notificationBody: NotificationBodyType;
   let parsedUrl;
   let whitelistUrlArray: string[] = [];
   if (requestUrl) {
@@ -87,13 +89,13 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
           }
         }
         if (!isValidNotification) {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_AUTHENTICATION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_SIGNATURE_DOES_NOT_MATCH);
+          errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_SIGNATURE_DOES_NOT_MATCH, '', FunctionConstant.FUNC_AUTHENTICATION), __filename, '');
           res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
           res.end();
         }
       });
     } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_AUTHENTICATION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_UNHANDLED_REQUEST_METHOD);
+      errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_UNHANDLED_REQUEST_METHOD, '', FunctionConstant.FUNC_AUTHENTICATION), __filename, '');
       res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
       res.end();
     }
@@ -179,12 +181,12 @@ const handleRequest = async (req: any, res: any): Promise<void> => {
     try {
       await handler(req, res);
     } catch (exception) {
-      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, '', exception, '', '', '');
+      errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_API_EXECUTION, exception, FunctionConstant.FUNC_REQUEST_HANDLER), __filename, '');
       res.end(CustomMessages.ERROR_MSG_INTERNAL_SERVER_ERROR);
     }
   } else {
     const handleRequestMessage = req.method === 'GET' ? CustomMessages.ERROR_MSG_GET_REQUEST : CustomMessages.ERROR_MSG_POST_REQUEST;
-    paymentUtils.logData(__filename, FunctionConstant.FUNC_REQUEST_HANDLER, Constants.LOG_ERROR, '', handleRequestMessage);
+    errorHandler.logError(new ValidationError(handleRequestMessage, '', FunctionConstant.FUNC_REQUEST_HANDLER), __filename, '');
     res.statusCode = 404;
     return res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
   }
@@ -239,7 +241,7 @@ const handlePaymentsData = async (req: any, res: any): Promise<void> => {
       errorMessage = CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, 'FuncHandlePaymentsData', '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PAYMENT_DETAILS_API, exception, FunctionConstant.FUNC_HANDLE_PAYMENTS_DATA), __filename, '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
     res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
     res.setHeader('Location', '/orders');
@@ -331,12 +333,12 @@ const handlePaymentCreate = async (req: any, res: any): Promise<void> => {
       const paymentObj = requestObj;
       response = await apiHandler.paymentCreateApi(paymentObj);
     } else {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA);
+      errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE), __filename, '');
       response = paymentUtils.getEmptyResponse();
     }
   } catch (exception) {
     const paymentId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE, '', exception, encodeURI(paymentId), Constants.PAYMENT_ID, '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_CREATE_PAYMENT_API, exception, FunctionConstant.FUNC_HANDLE_PAYMENT_CREATE), __filename, encodeURI(paymentId));
     response = paymentUtils.invalidOperationResponse();
   }
   const paymentCreateResponse = JSON.stringify(response);
@@ -360,7 +362,7 @@ const handlePaymentUpdate = async (req: any, res: any): Promise<void> => {
     }
   } catch (exception) {
     const paymentId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_PAYMENT_UPDATE, '', exception, encodeURI(paymentId), 'PaymentId : ', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_UPDATE_PAYMENT_API, exception, FunctionConstant.FUNC_HANDLE_PAYMENT_UPDATE), __filename, encodeURI(paymentId));
     updateResponse = paymentUtils.invalidOperationResponse();
   }
   const paymentUpdateResponse = JSON.stringify(updateResponse);
@@ -384,7 +386,7 @@ const handleCustomerUpdate = async (req: any, res: any): Promise<void> => {
       response = await apiHandler.customerUpdateApi(customerObj);
     } catch (exception) {
       const customerId = req?.body?.resource?.obj?.id ? req.body.resource.obj.id : '';
-      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CUSTOMER_UPDATE, '', exception, encodeURI(customerId), 'CustomerId : ', '');
+      errorHandler.logError(new SystemError(CustomMessages.EXCEPTION_UPDATE_CUSTOMER_API, exception, FunctionConstant.FUNC_HANDLE_CUSTOMER_UPDATE), __filename, encodeURI(customerId));
     }
   }
   //If an exception or an error occurs, return the received customer object back
@@ -429,7 +431,7 @@ const handleAuthReversal = async (req: any, res: any): Promise<void> => {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_AUTH_REVERSAL, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_REVERSAL_SERVICE, exception, FunctionConstant.FUNC_HANDLE_AUTH_REVERSAL), __filename, '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   route.sendResponse(res, Constants.HTTP_REDIRECT_STATUS_CODE, '', '', { header: 'Location', view: viewData });
@@ -467,7 +469,7 @@ const handleCapture = async (req: any, res: any): Promise<void> => {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CAPTURE, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CAPTURE_SERVICE, exception, FunctionConstant.FUNC_HANDLE_CAPTURE), __filename, '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   route.sendResponse(res, Constants.HTTP_REDIRECT_STATUS_CODE, '', '', { header: 'Location', view: viewData });
@@ -505,7 +507,7 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
       orderErrorMessage = CustomMessages.ERROR_MSG_CANNOT_PROCESS;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_REFUND, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_REFUND_SERVICE, exception, FunctionConstant.FUNC_HANDLE_REFUND), __filename, '');
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
@@ -520,7 +522,7 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
  * @param {any} res - The server response object.
  * @returns {Promise<void>} - A promise resolving to void.
  */
-const handlePostNetTokenNotification = async (req: any, res: any): Promise<void> => {
+const handlePostNetTokenNotification = async (req: NotificationBodyType, res: any): Promise<void> => {
   res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
   let response = {
     errorMessage: '',
@@ -535,11 +537,11 @@ const handlePostNetTokenNotification = async (req: any, res: any): Promise<void>
         res.statusCode = Constants.HTTP_OK_STATUS_CODE;
         paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION, Constants.LOG_INFO, '', response.successMessage);
       } else {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION, Constants.LOG_ERROR, '', response.errorMessage);
+        errorHandler.logError(new ApiError(response.errorMessage, '', FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION), __filename, '');
       }
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION, '', exception, '', '', '');
+    errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_API_EXECUTION, exception, FunctionConstant.FUNC_HANDLE_POST_NET_TOKEN_NOTIFICATION), __filename, '');
   }
   res.end();
 };
@@ -633,7 +635,7 @@ const handleCaptureContext = async (req: any, res: any): Promise<void> => {
     try {
       response = await apiHandler.captureContextApi(requestObj);
     } catch (exception) {
-      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_CAPTURE_CONTEXT, '', exception, '', '', '');
+      errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_CAPTURE_CONTEXT, exception, FunctionConstant.FUNC_HANDLE_CAPTURE_CONTEXT), __filename, '');
     }
   }
   const captureContextResponse = JSON.stringify(response);
@@ -650,7 +652,7 @@ const handleTestConnection = async (_req: any, res: any): Promise<void> => {
       testApiResponse = CustomMessages.ERROR_MSG_LIMIT_REACHED;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_HANDLE_TEST_CONNECTION, '', exception, '', '', '');
+    errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_API_EXECUTION, exception, FunctionConstant.FUNC_HANDLE_TEST_CONNECTION), __filename, '');
   }
   res.end(testApiResponse);
 };

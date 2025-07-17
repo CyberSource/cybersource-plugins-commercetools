@@ -1,10 +1,12 @@
 import { Cart, Payment } from '@commercetools/platform-sdk';
 import restApi, { AuthReversalRequest, Ptsv2paymentsidreversalsOrderInformation, PtsV2PaymentsReversalsPost201Response } from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { PaymentTransactionType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -68,7 +70,7 @@ const getAuthReversalResponse = async (payment: Payment, cart: Cart, authReversa
       return paymentResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, '', exception, '', '', '');
+    errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_PROCESSING_REQUEST, exception, FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE), __filename, '');
     return paymentResponse;
   }
 };

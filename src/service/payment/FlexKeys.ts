@@ -3,10 +3,12 @@ import restApi, { GenerateCaptureContextRequest } from 'cybersource-rest-client'
 import jwt from 'jsonwebtoken';
 import { jwtDecode } from 'jwt-decode';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { ResponseType } from '../../types/Types';
+import { errorHandler, PaymentProcessingError } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -39,7 +41,8 @@ const getFlexKeys = async (paymentObj: Payment): Promise<any> => {
     const requestObj: GenerateCaptureContextRequest = {
       targetOrigins: targetOrigins,
       clientVersion: clientVersion,
-      allowedCardNetworks: allowedCardNetworks
+      allowedCardNetworks: allowedCardNetworks,
+      transientTokenResponseOptions: { includeCardPrefix: false }
     }
     if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
       paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_FLEX_KEYS, Constants.LOG_DEBUG, 'PaymentId : ' + paymentId, 'Flex Keys Request = ' + JSON.stringify(requestObj));
@@ -70,11 +73,11 @@ const getFlexKeys = async (paymentObj: Payment): Promise<any> => {
           });
         }
       }).catch((error) => {
-        paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_FLEX_KEYS, '', error, '', '', '');
+        errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_CAPTURE_CONTEXT_API, error, FunctionConstant.FUNC_GET_FLEX_KEYS), __filename, '');
         return error;
       });
     } catch (exception) {
-      paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_GET_FLEX_KEYS, '', exception, '', '', '');
+      errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_MSG_CAPTURE_CONTEXT_API, exception, FunctionConstant.FUNC_GET_FLEX_KEYS), __filename, '');
       return flexKeysResponse;
     }
   } else {

@@ -1,6 +1,7 @@
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
+import { ApiError, errorHandler } from '../ErrorHandler';
 import paymentUtils from '../PaymentUtils';
 
 import customExtension from './CustomExtensions';
@@ -40,7 +41,7 @@ const addCustomType = async (): Promise<void> => {
       paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_CUSTOM_FIELD_SETUP);
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, '', '', '');
+    errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, FunctionConstant.FUNC_ADD_CUSTOM_TYPE), __filename, '');
   }
 }
 

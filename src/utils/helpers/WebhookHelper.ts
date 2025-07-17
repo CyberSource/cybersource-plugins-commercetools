@@ -148,7 +148,7 @@ const verifySubscription = async (searchSubscriptionResponse: any, merchantId: s
 const handleWebhookSubscription = async (midCredentials: MidCredentialsType) => {
     let createSubscriptionResponseObject = initializeSubscriptionResponseObject();
     if (midCredentials?.merchantId && midCredentials?.merchantKeyId && midCredentials?.merchantSecretKey && process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL) {
-        const [responseForKeyGeneration, responseForGetSubscription] = await Promise.all([
+        const [responseForKeyGeneration,responseForGetSubscription] = await Promise.all([
             keyGeneration.getKeyGenerationResponse(midCredentials),
             getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(midCredentials)
         ]);

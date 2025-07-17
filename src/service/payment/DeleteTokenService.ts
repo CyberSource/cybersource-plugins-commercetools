@@ -1,9 +1,11 @@
 import restApi from 'cybersource-rest-client';
 
+import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import prepareFields from '../../requestBuilder/PrepareFields';
 import { CustomerTokensType, ResponseType } from '../../types/Types';
+import { AuthenticationError, errorHandler } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
 
 /**
@@ -50,7 +52,7 @@ const deleteCustomerToken = async (customerTokenObj: Partial<CustomerTokensType>
       return customerTokenDeleteResponse;
     }
   } catch (exception) {
-    paymentUtils.logExceptionData(__filename, FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN, '', exception, '', '', '');
+    errorHandler.logError(new AuthenticationError(CustomMessages.EXCEPTION_MSG_DELETE_TOKEN, exception, FunctionConstant.FUNC_DELETE_CUSTOMER_TOKEN), __filename, '');
     return customerTokenDeleteResponse;
   }
 };

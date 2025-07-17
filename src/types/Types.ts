@@ -417,7 +417,35 @@ export type LoggerConfigType = {
 export type MetaDataType = {
   key: string,
   value: string,
-}
+};
+
+export type NotificationBodyType = {
+  notificationId: string;
+  retryNumber: number;
+  eventType: string;
+  eventDate: string;
+  webhookId: string;
+  payload: Array<{
+    data: {
+      _links: {
+        paymentInstruments: Array<{
+          href: string;
+        }>;
+        instrumentIdentifiers: Array<{
+          href: string;
+        }>;
+        customers: Array<{
+          href: string;
+        }>;
+      };
+      id: string;
+      type: string;
+      version: string;
+    };
+    organizationId: string;
+  }>;
+};
+
 export type ProcessingInformationType = Ptsv2creditsProcessingInformationBankTransferOptions | Ptsv2paymentsidrefundsProcessingInformation | Ptsv2paymentsidreversalsProcessingInformation | Ptsv2paymentsProcessingInformation | Ptsv2paymentsProcessingInformationAuthorizationOptions | Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator;
 
 export type OrderInformation = Ptsv2paymentsidcapturesOrderInformation | Ptsv2paymentsidrefundsOrderInformation | Ptsv2paymentsidreversalsOrderInformation | Ptsv2paymentsOrderInformation | Upv1capturecontextsOrderInformation;
