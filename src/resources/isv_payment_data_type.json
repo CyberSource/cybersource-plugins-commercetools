@@ -85,6 +85,28 @@
       "inputHint": "SingleLine"
     },
     {
+      "name": "isv_payPalUrl",
+      "label": {
+        "en": "PayPal Payment Redirection URL"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_payPalRequestId",
+      "label": {
+        "en": "PayPal Request id for follow-on transactions"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
       "name": "isv_cardType",
       "label": {
         "en": "Card type"

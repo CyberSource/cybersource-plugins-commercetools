@@ -36,6 +36,9 @@ const getCaptureResponse = async (payment: Payment, updateTransactions: Partial<
         processingInformation: processingInformation,
         orderInformation: orderInformation
       }
+      if (Constants.PAYPAL === payment.paymentMethodInfo.method) {
+        requestObj.paymentInformation = prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, payment, null, null);
+      }
       if (0 < merchantDefinedFields?.length) {
         requestObj.merchantDefinedInformation = merchantDefinedFields;
       }

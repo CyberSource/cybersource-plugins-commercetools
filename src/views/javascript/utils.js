@@ -1,6 +1,6 @@
 /**
  * Converts an amount to a specified number of decimal places.
- * 
+ *
  * @param {number} amount - The amount to be converted.
  * @param {number} fractionDigits - The number of decimal places.
  * @returns {number} - The converted amount.
@@ -13,7 +13,7 @@ export function amountConversion(amount, fractionDigits) {
 }
 /**
  * Rounds off an amount to a specified number of decimal places.
- * 
+ *
  * @param {number} amount - The amount to be rounded off.
  * @param {number} fractionDigits - The number of decimal places.
  * @returns {number} - The rounded off value.
@@ -27,7 +27,7 @@ export function roundOff(amount, fractionDigits) {
 }
 /**
  * Converts a date string to a readable date format.
- * 
+ *
  * @param {string} dateString - The date string to be converted.
  * @returns {string} - The converted readable date.
  */
@@ -41,20 +41,26 @@ export function dateConversion(dateString) {
 }
 /**
  * Extracts the payment ID from the URL query parameters.
- * 
+ *
  * @returns {string|null} - The payment ID if found, otherwise null.
  */
 export function getPaymentId() {
   let paymentId = '';
+  const gcpFunctionName = `/${window.PAYMENT_GATEWAY_GCP_FUNCTION_NAME}`;
   const urlInstance = new URL(window.location.href);
-  if (validateWhiteListEndPoints(urlInstance?.pathname)) {
+  let pathName = urlInstance?.pathname;
+  if (gcpFunctionName && pathName.startsWith(gcpFunctionName)) {
+    pathName = pathName.slice(gcpFunctionName.length);
+    if (!pathName.startsWith('/')) pathName = '/' + pathName;
+  }
+  if (validateWhiteListEndPoints(pathName)) {
     paymentId = urlInstance.searchParams.get('id');
   }
   return paymentId;
 }
 /**
  * Adds a new row to a table body with cells containing the specified data.
- * 
+ *
  * @param {HTMLTableSectionElement} tableBody - The table body element where the row will be added.
  * @param {Array<string>} cellsData - An array of data to be inserted into the row cells.
  */
@@ -82,7 +88,7 @@ export function createAndSetAttributes(type, attributes, textContent) {
 }
 /**
  * Formats an amount with a currency code.
- * 
+ *
  * @param {number} amount - The amount to be formatted.
  * @param {string} currencyCode - The currency code.
  * @returns {string} - The formatted currency string.
@@ -93,7 +99,7 @@ export function formatCurrency(amount, currencyCode) {
 
 // Regular expression validation for validating paymentId
 export function validatePaymentId(paymentId) {
-  let validatedId = ''
+  let validatedId = '';
   const paymentIdRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   if (paymentIdRegex.test(paymentId)) {
     validatedId = paymentId;
@@ -110,16 +116,32 @@ export function validateAmountValue(amount) {
 }
 
 export const validateWhiteListEndPoints = (url) => {
-  const whiteListEndpoints = ['/api/extension/payment/create', '/api/extension/payment/update',
-    '/api/extension/customer/update', '/netTokenNotification', '/captureContext', '/orders', '/orderData',
-    '/capture', '/refund', '/authReversal', '/paymentDetails', '/paymentData', '/payerAuthReturnUrl',
-    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico'];
+  const whiteListEndpoints = [
+    '/api/extension/payment/create',
+    '/api/extension/payment/update',
+    '/api/extension/customer/update',
+    '/netTokenNotification',
+    '/captureContext',
+    '/orders',
+    '/orderData',
+    '/capture',
+    '/refund',
+    '/authReversal',
+    '/paymentDetails',
+    '/paymentData',
+    '/payerAuthReturnUrl',
+    '/sync',
+    '/decisionSync',
+    '/configureExtension',
+    '/generateHeader',
+    '/favicon.ico',
+  ];
   let urlValidated = false;
   if (whiteListEndpoints.includes(url)) {
     urlValidated = true;
   }
   return urlValidated;
-}
+};
 
 function sanitizeForHTML(input) {
   return input.replace(/[&<>"']/g, (match) => {
@@ -136,12 +158,12 @@ function sanitizeForHTML(input) {
 
 export function sanitizeResponseData(data) {
   if (data && 'object' === typeof data) {
-    Object.keys(data).forEach(key => {
+    Object.keys(data).forEach((key) => {
       if ('string' === typeof data[key]) {
         data[key] = sanitizeForHTML(data[key]);
       }
       if (Array.isArray(data[key])) {
-        data[key] = data[key].map(item => typeof item === 'string' ? sanitizeForHTML(item) : item);
+        data[key] = data[key].map((item) => (typeof item === 'string' ? sanitizeForHTML(item) : item));
       }
       if (typeof data[key] === 'object') {
         data[key] = sanitizeResponseData(data[key]);
@@ -151,5 +173,11 @@ export function sanitizeResponseData(data) {
   return data;
 }
 
-export const validPathRegex = /^\/paymentDetails\?id=[a-fA-F0-9\-]{36}$/;
-;
+export function getApiPath(endpoint) {
+  const gcpFunctionName = `/${window.PAYMENT_GATEWAY_GCP_FUNCTION_NAME}`;
+  const pathName = window.location.pathname;
+  return pathName.startsWith(gcpFunctionName) ? `${gcpFunctionName}/${endpoint}` : `/${endpoint}`;
+}
+
+const funcName = window.PAYMENT_GATEWAY_GCP_FUNCTION_NAME || '';
+export const validPathRegex = new RegExp(`^\/?(?:${funcName}\/)?paymentDetails\\?id=[a-fA-F0-9\\-]{36}$`);

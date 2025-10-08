@@ -46,6 +46,13 @@ export class PaymentInformationModel {
                         paymentInformation.card = this.setPaymentInformationCardDetails();
                     }
                     break;
+                case Constants.PAYPAL:
+                    paymentInformation.paymentType = { name: Constants.EWALLET };
+                    paymentInformation.paymentType.method = { name: Constants.PAYPAL.toUpperCase() };
+                    if (FunctionConstant.FUNC_CREATE_ORDER_RESPONSE === functionName && customerTokenId) {
+                        paymentInformation.eWallet = { accountId: customerTokenId };
+                    }
+                    break;
                 default:
                     errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_EMPTY_PAYMENT_DATA, '', FunctionConstant.FUNC_MAP_PAYMENT_INFORMATION), __filename, '');
             }

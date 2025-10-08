@@ -1,4 +1,4 @@
-import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, validateAmountValue, sanitizeResponseData } from './utils.js';
+import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, validateAmountValue, sanitizeResponseData, getApiPath } from './utils.js';
 
 if (window.location.pathname.includes('paymentDetails')) {
   document.addEventListener('DOMContentLoaded', async function () {
@@ -32,7 +32,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         generateOrderItemsTable(cart, discountObject, locale, fractionDigits);
       } else {
         const removeElements = (ids) => {
-          ids.forEach(id => {
+          ids.forEach((id) => {
             const element = document.getElementById(id);
             if (element) {
               element.remove();
@@ -85,7 +85,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         captureMsgDiv.classList.add('div-padding');
         captureMsgDiv.textContent = `You can capture amount ${authorizedAmount} `;
         const partialCaptureForm = document.createElement('form');
-        partialCaptureForm.action = '/capture';
+        partialCaptureForm.action = getApiPath('capture');
         partialCaptureForm.classList.add('div-padding');
         partialCaptureForm.id = 'partialCaptureForm';
         renderPartialCaptureForm(partialCaptureForm, encodeURIComponent(id));
@@ -96,7 +96,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         const authButton = document.createElement('a');
         authButton.classList.add('button');
         authButton.id = 'auth';
-        authButton.href = `/authReversal?id=${encodeURIComponent(id)}`;
+        authButton.href = getApiPath(`authReversal?id=${encodeURIComponent(id)}`);
         authButton.role = 'button';
         authButton.textContent = 'Reverse';
 
@@ -108,7 +108,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         refundMsgDiv.textContent = `You can refund amount ${captureAmount}`;
 
         const refundForm = document.createElement('form');
-        refundForm.action = '/refund';
+        refundForm.action = getApiPath('refund');
         refundForm.classList.add('div-padding');
         refundForm.id = 'refundForm';
         renderRefundForm(refundForm, encodeURIComponent(id));
@@ -195,7 +195,7 @@ async function fetchPaymentsInfo() {
   if (paymentId) {
     try {
       loadingIndicator.style.display = 'flex';
-      const response = await fetch(`/paymentData?id=${encodeURIComponent(paymentId)}`, { method: 'GET' });
+      const response = await fetch(getApiPath(`paymentData?id=${encodeURIComponent(paymentId)}`), { method: 'GET' });
       const data = await response.text();
       const jsonData = JSON.parse(data);
       return sanitizeResponseData(jsonData);
@@ -334,6 +334,12 @@ function createCustomFieldsTable(payments, orderNo) {
     if (orderNo) {
       tableHTML += createRow('Reconciliation Id', orderNo).outerHTML;
     }
+    if (fields?.isv_payPalRequestId) {
+      tableHTML += createRow('PayPal Request Id', fields?.isv_payPalRequestId).outerHTML;
+    }
+    if (fields?.isv_payPalUrl) {
+      tableHTML += createRow('PayPal Redirection URL', fields.isv_payPalUrl).outerHTML;
+    }
     tableHTML += '</table>';
     return tableHTML;
   }
@@ -348,7 +354,7 @@ function renderCustomFields(payments, orderNo) {
   const customFieldsDiv = document.getElementById('paymentCustomFields');
   if (payments?.custom?.fields && customFieldsDiv) {
     while (customFieldsDiv.firstChild) {
-      customFieldsDiv.removeChild(customFieldsDiv.firstChild)
+      customFieldsDiv.removeChild(customFieldsDiv.firstChild);
     }
     const customFieldsHeader = document.createElement('h2');
     customFieldsHeader.textContent = 'Payment Custom Fields';
@@ -443,7 +449,7 @@ function renderPartialCaptureForm(partialCaptureForm, id) {
       type: 'hidden',
       name: 'captureId',
       id: 'captureId',
-      value: id
+      value: id,
     });
     partialCaptureForm.appendChild(captureIdInput);
     const captureAmountLabel = document.createTextNode('Capture amount: ');
@@ -455,14 +461,18 @@ function renderPartialCaptureForm(partialCaptureForm, id) {
       size: '6',
       value: '',
       autocomplete: 'off',
-      required: true
+      required: true,
     });
     partialCaptureForm.appendChild(captureAmountInput);
-    const captureButton = createAndSetAttributes('button', {
-      type: 'submit',
-      id: 'captureButton',
-      className: 'button'
-    }, 'Capture');
+    const captureButton = createAndSetAttributes(
+      'button',
+      {
+        type: 'submit',
+        id: 'captureButton',
+        className: 'button',
+      },
+      'Capture',
+    );
     partialCaptureForm.appendChild(captureButton);
   }
 }
@@ -474,7 +484,7 @@ function renderRefundForm(refundForm, id) {
       type: 'hidden',
       name: 'refundId',
       id: 'refundId',
-      value: id
+      value: id,
     });
     refundForm.appendChild(refundIdInput);
     const refundAmountText = document.createTextNode('Refund amount: ');
@@ -486,14 +496,18 @@ function renderRefundForm(refundForm, id) {
       size: '6',
       value: '',
       autocomplete: 'off',
-      required: true
+      required: true,
     });
     refundForm.appendChild(refundAmountInput);
-    const refundButton = createAndSetAttributes('button', {
-      type: 'submit',
-      id: 'refundButton',
-      className: 'button'
-    }, 'Refund');
+    const refundButton = createAndSetAttributes(
+      'button',
+      {
+        type: 'submit',
+        id: 'refundButton',
+        className: 'button',
+      },
+      'Refund',
+    );
     refundForm.appendChild(refundButton);
   }
 }

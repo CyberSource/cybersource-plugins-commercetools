@@ -1,4 +1,4 @@
-import { amountConversion, dateConversion, validPathRegex } from './utils.js';
+import { amountConversion, dateConversion, validPathRegex, getApiPath } from './utils.js';
 
 if (window.location.pathname.includes('orders')) {
   document.addEventListener('DOMContentLoaded', async function () {
@@ -57,13 +57,13 @@ if (window.location.pathname.includes('orders')) {
 
 /**
  * Renders a list of orders in a table format.
- * 
+ *
  * @param {Array} orderList - List of orders to render.
  */
 async function renderOrders(orderList) {
   const paymentDetailsBody = document.getElementById('paymentDetailsBody');
   paymentDetailsBody.textContent = '';
-
+  
   if (orderList && 0 < orderList.length) {
     await Promise.all(
       orderList.map(async (order, index) => {
@@ -74,7 +74,8 @@ async function renderOrders(orderList) {
             order.paymentMethodInfo.name ? order?.paymentMethodInfo?.name?.en : order?.paymentMethodInfo?.method,
             dateConversion(order.createdAt),
             dateConversion(order.lastModifiedAt),
-            `/paymentDetails?id=${encodeURIComponent(order.id)}`);
+            getApiPath(`paymentDetails?id=${encodeURIComponent(order.id)}`),
+          ); 
           newRow.addEventListener('click', () => {
             const url = newRow.getAttribute('data-href');
             if (validPathRegex.test(url)) {
@@ -83,7 +84,7 @@ async function renderOrders(orderList) {
           });
           paymentDetailsBody.appendChild(newRow);
         }
-      })
+      }),
     );
   } else {
     const newRow = createTableRowEmpty();
@@ -93,7 +94,7 @@ async function renderOrders(orderList) {
 
 /**
  * Creates a table row with order details.
- * 
+ *
  * @param {number} index - The index of the row.
  * @param {string} orderId - The order ID.
  * @param {string} currencyCode - The currency code.
@@ -136,7 +137,7 @@ function createTableRow(index, orderId, currencyCode, amount, paymentMethod, cre
 
 /**
  * Creates an empty table row indicating that there are no orders.
- * 
+ *
  * @returns {HTMLTableRowElement} - The created empty table row element.
  */
 function createTableRowEmpty() {
@@ -151,7 +152,7 @@ function createTableRowEmpty() {
 
 /**
  * Displays an error message on the page.
- * 
+ *
  * @param {string} message - The error message to be displayed.
  * @returns {Promise<void>} - A Promise that resolves once the message is displayed.
  */
@@ -165,7 +166,7 @@ async function displayErrorMessage(message) {
 
 /**
  * Displays a success message on the page.
- * 
+ *
  * @param {string} message - The success message to be displayed.
  * @returns {Promise<void>} - A Promise that resolves once the message is displayed.
  */
@@ -177,14 +178,14 @@ async function displaySuccessMessage(message) {
 
 /**
  * Fetches order information from the server.
- * 
+ *
  * @returns {Promise<any>} A Promise that resolves with the fetched order information.
  */
 async function fetchOrdersInfo() {
   const loadingIndicator = document.getElementById('loading');
   try {
     loadingIndicator.style.display = 'flex';
-    const response = await fetch('/orderData', {
+    const response = await fetch(getApiPath('orderData'), {
       method: 'GET',
     });
     const ordersData = await response.text();
@@ -201,7 +202,7 @@ async function fetchOrdersInfo() {
 
 /**
  * Adds a click event listener to the provided element.
- * 
+ *
  * @param {HTMLElement} element - The HTML element to attach the event listener to.
  */
 function addEventListener(element) {

@@ -261,6 +261,8 @@ export class OrderInformationMapper {
         break;
       case FunctionConstant.FUNC_GET_REFUND_DATA:
       case FunctionConstant.FUNC_GET_CAPTURE_RESPONSE:
+      case FunctionConstant.FUNC_GET_SESSION_RESPONSE:
+      case FunctionConstant.FUNC_CREATE_ORDER_RESPONSE:
         paymentValidator.setObjectValue(orderInformation, 'amountDetails', this.setAmountDetails(), '', Constants.STR_OBJECT, false);
         break;
     }
@@ -324,6 +326,8 @@ export class OrderInformationMapper {
         }
         break;
       case FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE:
+      case FunctionConstant.FUNC_GET_SESSION_RESPONSE:
+      case FunctionConstant.FUNC_CREATE_ORDER_RESPONSE:
         amountDetails = prepareFields.getOrderInformationAmountDetails(this.functionName, null, this.paymentObject, this.cartObj, this.currencyCode, this.service);
         break;
       case FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE: {

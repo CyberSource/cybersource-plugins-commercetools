@@ -20,7 +20,7 @@ import paymentUtils from '../../utils/PaymentUtils';
  * @param {string} orderNo - The order number.
  * @returns { Promise<PtsV2PaymentsPost201Response>} - The authorization response.
  */
-const getAuthorizationResponse = async (payment: Payment, cart: Cart, service: string, cardTokens: CustomTokenType, isSaveToken: boolean, payerAuthMandateFlag: boolean, orderNo: string): Promise<any> => {
+const getAuthorizationResponse = async (payment: Payment, cart: Cart, service: string, cardTokens: CustomTokenType, isSaveToken: boolean, payerAuthMandateFlag: boolean, orderNo: string, intentsId?:string): Promise<any> => {
   const paymentResponse = {
     httpCode: 0,
     transactionId: '',
@@ -39,7 +39,7 @@ const getAuthorizationResponse = async (payment: Payment, cart: Cart, service: s
       const requestObj: CreatePaymentRequest = {
         clientReferenceInformation: clientReferenceInformation
       };
-      const processingInformation = prepareFields.getProcessingInformation(FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE, payment, orderNo, service, cardTokens, isSaveToken) as Ptsv2paymentsProcessingInformation;
+      const processingInformation = prepareFields.getProcessingInformation(FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE, payment, orderNo, service, cardTokens, isSaveToken ,intentsId) as Ptsv2paymentsProcessingInformation;
       const tokenInformation = prepareFields.getTokenInformation(payment, FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE);
       if (Constants.CREDIT_CARD === payment.paymentMethodInfo.method || Constants.CC_PAYER_AUTHENTICATION === payment.paymentMethodInfo.method) {
         if (!customFields?.isv_savedToken) {
