@@ -23,7 +23,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE = 'CHECK';
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'GD1GCCBN';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'NTKW5X4G';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
   static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
@@ -35,7 +35,15 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
   static readonly PAYMENT_GATEWAY_NETWORK_TOKEN_EVENT_TYPE = 'tms.networktoken.updated';
   static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'Commercetools(REST)';
-  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.2.1';
+  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.3.0';
+  static readonly PAYMENT_GATEWAY_AP_SESSIONS = 'AP_SESSIONS';
+  static readonly PAYMENT_GATEWAY_AP_STATUS = 'AP_STATUS';
+  static readonly PAYMENT_GATEWAY_AP_ORDER = 'AP_ORDER';
+  static readonly PAYMENT_GATEWAY_AP_AUTH = 'AP_AUTH';
+  static readonly PAYMENT_GATEWAY_AP_SALE = 'AP_SALE';
+  static readonly PAYMENT_GATEWAY_AP_CAPTURE = 'AP_CAPTURE';
+  static readonly PAYMENT_GATEWAY_AP_REFUND = 'AP_REFUND';
+  static readonly PAYMENT_GATEWAY_AP_REVERSAL = 'AP_AUTH_REVERSAL';
 
   //Payment status codes
   static readonly HTTP_CODE_ZERO = 0;
@@ -49,8 +57,14 @@ export abstract class Constants {
   static readonly HTTP_GONE_STATUS_CODE = 410;
   static readonly HTTP_SERVER_ERROR_STATUS_CODE = 500;
 
+  //Content types
+  static readonly CONTENT_TYPE_JSON = 'application/json';
+  static readonly CONTENT_TYPE_TEXT_HTML = 'text/html';
+  static readonly CONTENT_TYPE_TEXT_PLAIN = 'text/plain';
+
   //Payment response
   static readonly API_STATUS_AUTHORIZED = 'AUTHORIZED';
+  static readonly API_STATUS_REVIEW = 'REVIEW';
   static readonly API_STATUS_AUTHORIZED_RISK_DECLINED = 'AUTHORIZED_RISK_DECLINED';
   static readonly API_STATUS_COMPLETED = 'COMPLETED';
   static readonly API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED = 'CUSTOMER_AUTHENTICATION_REQUIRED';
@@ -62,6 +76,8 @@ export abstract class Constants {
   static readonly API_STATUS_PENDING_REVIEW = 'PENDING_REVIEW';
   static readonly API_STATUS_REVERSED = 'REVERSED';
   static readonly API_STATUS_AUTH_REVERSED = 'AUTH_REVERSED';
+  static readonly API_STATUS_SETTLED = 'SETTLED';
+  static readonly API_STATUS_REFUNDED = 'REFUNDED';
   static readonly HTTP_STATUS_DECISION_ACCEPT = 'ACCEPT';
   static readonly HTTP_STATUS_DECISION_REJECT = 'REJECT';
   static readonly APPLICATION_RCODE = '1';
@@ -77,6 +93,7 @@ export abstract class Constants {
   static readonly REGEX_UNDERSCORE = '_';
   static readonly STRING_FULL_COLON = ':';
   static readonly STRING_HYPHEN = ' - ';
+  static readonly STATIC_FILE_REGEX = /\.(css|js|png|jpg|jpeg|gif|ico)$/;
 
   //Payment methods
   static readonly CREDIT_CARD = 'creditCard';
@@ -86,6 +103,7 @@ export abstract class Constants {
   static readonly ECHECK = 'eCheck';
   static readonly GOOGLE_PAY = 'googlePay';
   static readonly EWALLET = 'EWALLET';
+  static readonly PAYPAL = 'payPal';
 
   //Strings
   static readonly STRING_AWS = 'aws';
@@ -107,6 +125,7 @@ export abstract class Constants {
   static readonly STRING_CUSTOM = 'custom';
   static readonly STRING_DUPLICATE_FIELD = 'DuplicateField';
   static readonly STRING_ENROLL_CHECK = 'enrollCheck';
+  static readonly STRING_SESSIONS = 'session';
   static readonly STRING_STATUS = 'status';
   static readonly STRING_ORDER = 'order';
   static readonly STRING_CREATED = 'CREATED';
@@ -139,6 +158,7 @@ export abstract class Constants {
   static readonly STRING_TEST = 'test';
   static readonly STRING_GOOGLE_PAY = 'googlePay';
   static readonly STRING_VISA = 'visa';
+  static readonly STRING_GCP = 'gcp';
 
   static readonly ENCODING_BASE_SIXTY_FOUR = 'base64';
   static readonly ENCODING_SHA_TWO_FIFTY_SIX = 'sha256';
@@ -200,7 +220,7 @@ export abstract class Constants {
   static readonly WHITE_LIST_ENDPOINTS = ['/api/extension/payment/create', '/api/extension/payment/update',
     '/api/extension/customer/update', '/netTokenNotification', '/captureContext', '/orders', '/orderData',
     '/capture', '/refund', '/authReversal', '/paymentDetails', '/paymentData', '/payerAuthReturnUrl',
-    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico', '/testConnection'];
+    '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico', '/testConnection', '/payPalReturnUrl', '/payPalCancelUrl'];
 
   //HTMLContent
   static readonly HTML_PREFIX =
@@ -209,7 +229,7 @@ export abstract class Constants {
 
   //Function Arrays
   static readonly UPDATE_AMOUNT_RESPONSE_FUNCTIONS = ['FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetAuthReversalResponse'];
-  static readonly GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS = ['FuncGetTransactionData', 'FuncGetFlexKeys', 'FuncGetPayerAuthSetupData', 'FuncGetAuthReversalResponse', 'FuncGetAuthorizationResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData'];
+  static readonly GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS = ['FuncGetTransactionData', 'FuncGetFlexKeys', 'FuncGetPayerAuthSetupData', 'FuncGetAuthReversalResponse', 'FuncGetAuthorizationResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse'];
   static readonly GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS = ['FuncGetTransactionSearchResponse', 'FuncGetConversionDetails', 'FuncGetPublicKeys', 'FuncGetTransientTokenDataResponse', 'FuncWebhookSubscriptionResponse', 'FuncGetKeyGenerationResponse', 'FuncGetCreateWebhookSubscriptionResponse', 'FuncDeleteWebhookSubscriptionResponse', 'FuncGetTransactionData'];
   static readonly GET_PROCESSING_INFORMATION_FUNCTIONS = ['FuncGetAuthorizationResponse', 'FuncGetAddTokenResponse', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetAuthReversalResponse'];
   static readonly MAP_PAYMENT_INFORMATION_FUNCTIONS = ['FuncGetAuthorizationResponse', 'FuncGetRefundData', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse', 'FuncGetCaptureResponse', 'FuncGetAuthReversalResponse'];

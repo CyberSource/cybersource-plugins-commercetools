@@ -35,6 +35,9 @@ const getAuthReversalResponse = async (payment: Payment, cart: Cart, authReversa
         processingInformation: processingInformation,
         orderInformation: orderInformation
       }
+      if (Constants.PAYPAL === payment.paymentMethodInfo.method) {
+        requestObj.paymentInformation = prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, payment, null, null);
+      }
       if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
         paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + payment.id, 'Authorization Reversal Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
       }

@@ -133,9 +133,41 @@ const getPaymentData = async (paymentResponse: any, updatePaymentObj: Payment) =
   }
   return cartDetails;
 };
+
+/**
+ * Updates the cart with the PayPal address details from the transaction status.
+ *
+ * This function checks if the required payment, cart, and transaction information is present.
+ * If so, it updates the cart with the billing address from the PayPal transaction and logs the result.
+ * If any required information is missing, it logs an error message.
+ *
+ * @param updatePaymentObj - The payment object containing payment details.
+ * @param cartObj - The cart object to be updated.
+ * @param transactionStatus - The transaction status object containing PayPal order information.
+ * @returns A promise that resolves to the updated cart object if the update is successful, or undefined otherwise.
+ */
+const updateCartWithPayPalAddress = async (updatePaymentObj: Payment, cartObj: Cart, transactionStatus: any): Promise<any> => {
+  let message = '';
+  let paymentId = updatePaymentObj.id || '';
+  let cartId = cartObj?.id;
+  let cartVersion = cartObj?.version || '';
+  let updatedCart;
+  if (updatePaymentObj && cartObj && cartId && cartVersion && transactionStatus.orderInformation.billTo) {
+    let orderInformation = transactionStatus.orderInformation;
+    updatedCart = await commercetoolsApi.updateCartByPaymentId(cartId, paymentId, cartObj.version, orderInformation);
+    message = updatedCart ? CustomMessages.SUCCESS_MSG_PAYPAL_ADDRESS_DETAILS : CustomMessages.ERROR_MSG_PAYPAL_ADDRESS_DETAILS;
+  }
+  else {
+    message = CustomMessages.ERROR_MSG_ADDRESS_NOT_FOUND_IN_TRANSACTION;
+  }
+  paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_WITH_PAYPAL_ADDRESS, Constants.LOG_INFO, 'PaymentId : ' + paymentId, message);
+  return updatedCart;
+};
+
 export default {
   getCartDetailsByPaymentId,
   updateCartWithUCAddress,
   updateCardDetails,
   getPaymentData,
+  updateCartWithPayPalAddress
 }

@@ -1,10 +1,11 @@
-import { Payment } from "@commercetools/platform-sdk";
+import { CartPagedQueryResponse, Payment } from "@commercetools/platform-sdk";
 import { PtsV2PaymentsPost201Response } from "cybersource-rest-client";
 
 import { CustomMessages } from "../../constants/customMessages";
 import { FunctionConstant } from "../../constants/functionConstant";
 import { Constants } from "../../constants/paymentConstants";
 import { PayerAuthData } from "../../models/PayerAuthDataModel";
+import SessionService from "../../service/payment/SessionService";
 import { ActionResponseType, ActionType, PaymentTransactionType } from "../../types/Types";
 import { errorHandler, PaymentProcessingError } from "../ErrorHandler";
 import paymentActions from "../PaymentActions";
@@ -38,14 +39,18 @@ const getAuthResponse = (paymentResponse: PtsV2PaymentsPost201Response | any, tr
         const { httpCode, data, status } = paymentResponse || {};
         const { consumerAuthenticationInformation } = data || {};
         const validPendingAuthenticationResponse = paymentValidator.isValidPendingAuthenticationResponse(httpCode, status, data, consumerAuthenticationInformation)
-        if (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode && transactionDetail && (Constants.API_STATUS_AUTHORIZED === status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === status || Constants.API_STATUS_PENDING === status)) {
+        let isPayPalReview = false;
+        if (Constants.API_STATUS_AUTHORIZED === paymentResponse.status && (Constants.API_STATUS_REVIEW === paymentResponse?.data?.errorInformation?.reason || Constants.API_STATUS_REVIEW === paymentResponse?.text?.errorInformation?.reason)) {
+            isPayPalReview = true;
+        };
+        if (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode && transactionDetail && (Constants.API_STATUS_AUTHORIZED === status || Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === status || Constants.API_STATUS_PENDING === status || Constants.API_STATUS_SETTLED === status) && !isPayPalReview) {
             const setTransaction = paymentUtils.setTransactionId(paymentResponse, transactionDetail);
             setCustomField =
                 Constants.CT_TRANSACTION_TYPE_CHARGE === transactionDetail.type && Constants.API_STATUS_AUTHORIZED_RISK_DECLINED === status
                     ? paymentUtils.changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_FAILURE)
                     : paymentUtils.changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
             response = paymentActions.createResponse(setTransaction, setCustomField, null, null);
-        } else if (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse?.httpCode && (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW === paymentResponse?.status || Constants.API_STATUS_PENDING_REVIEW === paymentResponse?.status) && transactionDetail) {
+        } else if (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse?.httpCode && (Constants.API_STATUS_AUTHORIZED_PENDING_REVIEW === paymentResponse?.status || Constants.API_STATUS_PENDING_REVIEW === paymentResponse?.status || isPayPalReview) && transactionDetail) {
             const setTransaction = paymentUtils.setTransactionId(paymentResponse, transactionDetail);
             setCustomField = paymentUtils.changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_PENDING);
             response = paymentActions.createResponse(setTransaction, setCustomField, null, null);
@@ -59,7 +64,13 @@ const getAuthResponse = (paymentResponse: PtsV2PaymentsPost201Response | any, tr
             const payerAuthenticationData = new PayerAuthData(consumerAuthenticationInformation, paymentResponse);
             const actions = paymentActions.payerAuthActions(payerAuthenticationData);
             response.actions = actions;
-        } else {
+        } else if (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode && Constants.STRING_CREATED === status) {
+            const isv_payPalUrl = paymentResponse.isv_payPalUrl;
+            const isv_payPalRequestId = paymentResponse.isv_payPalRequestId;
+            const actions = paymentUtils.setCustomFieldMapper({ isv_payPalUrl, isv_payPalRequestId });
+            response.actions = actions;
+        }
+        else {
             if (!transactionDetail) {
                 response = paymentUtils.getEmptyResponse();
             } else {
@@ -200,9 +211,25 @@ const updateCustomField = async (customFields: any, getCustomObj: any, typeId: s
     }
 };
 
+const getPayPalSessionResponse = async (updatePaymentObj: Payment): Promise<ActionResponseType> => {
+    let sessionActionResponse: ActionResponseType = paymentUtils.getEmptyResponse();
+    let cartObjQueryResponse: CartPagedQueryResponse = await paymentUtils.getCartObject(updatePaymentObj);
+    const { results } = cartObjQueryResponse;
+    if (results.length && updatePaymentObj?.custom?.fields && !updatePaymentObj?.custom?.fields?.isv_payPalUrl) {
+        let sessionResponse = await SessionService.getSessionResponse(updatePaymentObj, results[0]);
+        if (sessionResponse && sessionResponse.httpCode && Constants.STRING_CREATED === sessionResponse.status) {
+            sessionActionResponse = getAuthResponse(sessionResponse, null);
+        }
+    } else {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PAYPAL_SESSION_RESPONSE, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_CREATE_SESSION);
+    }
+    return sessionActionResponse;
+}
+
 export default {
     getAuthResponse,
     processTransaction,
     setTransactionCustomType,
-    updateCustomField
+    updateCustomField,
+    getPayPalSessionResponse
 }

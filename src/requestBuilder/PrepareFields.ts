@@ -6,7 +6,7 @@ import {
   Ptsv2paymentsBuyerInformation, Ptsv2paymentsClientReferenceInformation, Ptsv2paymentsConsumerAuthenticationInformation,
   Ptsv2paymentsDeviceInformation, Ptsv2paymentsidcapturesOrderInformationAmountDetails, Ptsv2paymentsidClientReferenceInformationPartner,
   Ptsv2paymentsidreversalsClientReferenceInformation, Ptsv2paymentsidreversalsClientReferenceInformationPartner,
-  Ptsv2paymentsidreversalsOrderInformationAmountDetails, Ptsv2paymentsOrderInformationAmountDetails,
+  Ptsv2paymentsidreversalsOrderInformationAmountDetails, Ptsv2paymentsMerchantInformation, Ptsv2paymentsOrderInformationAmountDetails,
   Ptsv2paymentsOrderInformationBillTo, Ptsv2paymentsOrderInformationShipTo, Ptsv2paymentsPromotionInformation, Ptsv2paymentsRiskInformationBuyerHistory,
   Ptsv2paymentsRiskInformationBuyerHistoryCustomerAccount, Ptsv2paymentsTokenInformation, Riskv1authenticationsetupsTokenInformation,
   Riskv1authenticationsRiskInformation, Riskv1decisionsClientReferenceInformation, Riskv1decisionsClientReferenceInformationPartner,
@@ -87,7 +87,7 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
         configObject.keyPass = jwtConfiguration.keyPass;
         const keysDirectory = path.join(__dirname, Constants.CERTIFICATE_PATH);
         let filePath = path.resolve(path.join(keysDirectory, process.env.PAYMENT_GATEWAY_KEY_FILE_NAME + '.p12'));
-        if (!jwtConfiguration.keyFileName && !fs.existsSync(filePath) && (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) && jwtConfiguration.keyFileUrl) {
+        if (!jwtConfiguration.keyFileName && !fs.existsSync(filePath) && (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_GCP === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) && jwtConfiguration.keyFileUrl) {
           configObject.keyFileName = Constants.STRING_TEST;
           configObject.keysDirectory = path.resolve(__dirname, Constants.CERTIFICATE_PATH);
           await paymentUtils.setCertificatecache(jwtConfiguration.keyFileUrl, jwtConfiguration.keyPass, midCredentialsObject.merchantId);
@@ -119,8 +119,8 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
  * @param {boolean | null} isSaveToken - Specifies whether to save the token or not. 
  * @returns {restApi.Ptsv2paymentsProcessingInformation} - The processing information object.
  */
-const getProcessingInformation = (functionName: string, resourceObj: Payment | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) => {
-  const processingInformation = new ProcessingInformation(functionName, resourceObj, orderNo, service, cardTokens, isSaveToken);
+const getProcessingInformation = (functionName: string, resourceObj: Payment | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null, intentsId?:string) => {
+  const processingInformation = new ProcessingInformation(functionName, resourceObj, orderNo, service, cardTokens, isSaveToken, intentsId);
   return processingInformation.getProcessingInformation() as ProcessingInformationType;
 };
 
@@ -221,7 +221,7 @@ const getOrderInformationAmountDetails = (functionName: string, captureAmount: n
     }
     orderInformationAmountDetails.totalAmount = captureAmount;
     orderInformationAmountDetails.currency = paymentObj?.amountPlanned?.currencyCode;
-  } else if (cartObj?.totalPrice && (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName)) {
+  } else if (cartObj?.totalPrice && (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName || FunctionConstant.FUNC_CREATE_ORDER_RESPONSE === functionName || FunctionConstant.FUNC_GET_SESSION_RESPONSE === functionName)) {
     orderInformationAmountDetails = {} as Ptsv2paymentsOrderInformationAmountDetails;
     orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits);
     orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
@@ -560,6 +560,16 @@ const getMetaData = (payment: Payment): MetaDataType[] => {
   return metaData;
 };
 
+const getMerchantInformation = (functionName: string): Ptsv2paymentsMerchantInformation => {
+  let merchantInformation = {} as Ptsv2paymentsMerchantInformation;
+  if (FunctionConstant.FUNC_GET_SESSION_RESPONSE === functionName && process.env.PAYMENT_GATEWAY_PAYPAL_RETURN_URL && process.env.PAYMENT_GATEWAY_PAYPAL_CANCEL_URL) {
+    merchantInformation.successUrl = process.env.PAYMENT_GATEWAY_PAYPAL_RETURN_URL;
+    merchantInformation.cancelUrl = process.env.PAYMENT_GATEWAY_PAYPAL_CANCEL_URL;
+    merchantInformation.failureUrl = process.env.PAYMENT_GATEWAY_PAYPAL_FAILURE_URL;
+  }
+  return merchantInformation;
+};
+
 export default {
   getProcessingInformation,
   getPaymentInformation,
@@ -580,5 +590,6 @@ export default {
   getOrderInformationAmountDetails,
   getOrderInformationBillToDetails,
   getOrderInformationShipToDetails,
-  getMetaData
+  getMetaData,
+  getMerchantInformation
 };

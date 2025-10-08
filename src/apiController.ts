@@ -76,6 +76,8 @@ const paymentUpdateApi = async (paymentObj: Payment): Promise<ActionResponseType
         if (0 === transactionLength) {
           if (Constants.CC_PAYER_AUTHENTICATION === paymentMethod) {
             updateResponse = await payerAuthHelper.processPayerAuthentication(paymentObj);
+          } else if (Constants.PAYPAL === paymentMethod) {
+            updateResponse = await paymentHelper.getPayPalSessionResponse(paymentObj)
           }
         }
         if (0 < transactionLength) {

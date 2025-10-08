@@ -5,6 +5,8 @@ import { PtsV2PaymentsPost201Response } from "cybersource-rest-client";
 import { CustomMessages } from "../constants/customMessages";
 import { FunctionConstant } from "../constants/functionConstant";
 import { Constants } from "../constants/paymentConstants";
+import CheckTransactionStatus from "../service/payment/CheckTransactionStatus";
+import CreateOrderService from "../service/payment/CreateOrderService";
 import paymentAuthorization from '../service/payment/PaymentAuthorizationService';
 import { ActionResponseType, CustomTokenType, PaymentTransactionType } from "../types/Types";
 import { errorHandler, PaymentProcessingError } from "../utils/ErrorHandler";
@@ -53,18 +55,33 @@ export abstract class AbstractPaymentMethod implements PaymentMethodStrategy {
     let isError = false;
     let authResponse: ActionResponseType = paymentUtils.getEmptyResponse();
     let paymentResponse;
+    let createOrder;
+    let intentsId;
     try {
       if (updatePaymentObj?.custom?.fields?.isv_transientToken &&
         (Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE ||
           paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING))) {
         cartInfo = await cartHelper.updateCartWithUCAddress(updatePaymentObj, cartInfo);
       }
+      if (updatePaymentObj?.custom?.fields?.isv_payPalUrl && updatePaymentObj.custom.fields.isv_payPalRequestId) {
+        let transactionStatus = await CheckTransactionStatus.getTransactionStatusResponse(updatePaymentObj, updatePaymentObj.custom.fields.isv_payPalRequestId);
+        if (Constants.STRING_CREATED === transactionStatus.status && transactionStatus?.paymentInformation?.eWallet?.accountId) {
+          createOrder = await CreateOrderService.getCreateOrderResponse(updatePaymentObj, updatePaymentObj?.custom?.fields?.isv_payPalRequestId, transactionStatus?.paymentInformation?.eWallet?.accountId, cartInfo);
+          if (Constants.STRING_CREATED === createOrder.status && createOrder.id) {
+            cartInfo = await cartHelper.updateCartWithPayPalAddress(updatePaymentObj, cartInfo, transactionStatus);
+            intentsId = createOrder.id;
+          } else {
+            isError = true;
+          }
+        }
+      }
       paymentResponse = await this.getAuthorizationResponse(
         updatePaymentObj,
         cartInfo,
         cardTokens,
         orderNo,
-        customerInfo
+        customerInfo,
+        intentsId
       );
       if (paymentResponse && paymentResponse.httpCode) {
         authResponse = await this.getAuthResponse(paymentResponse, updateTransactions);
@@ -99,7 +116,8 @@ export abstract class AbstractPaymentMethod implements PaymentMethodStrategy {
     cartInfo: Cart,
     cardTokens: CustomTokenType,
     orderNo: string,
-    customerInfo: Customer | null
+    customerInfo: Customer | null,
+    intentsId?: string
   ): Promise<PtsV2PaymentsPost201Response | any> {
     // Default implementation uses the payment authorization service
     const isSaveToken = await this.shouldSaveToken(updatePaymentObj, customerInfo);
@@ -110,7 +128,8 @@ export abstract class AbstractPaymentMethod implements PaymentMethodStrategy {
       cardTokens,
       isSaveToken,
       false,
-      orderNo
+      orderNo,
+      intentsId
     );
   }
 

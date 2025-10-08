@@ -20,6 +20,9 @@ export abstract class FunctionConstant {
   static readonly FUNC_GET_CAPTURE_RESPONSE = 'FuncGetCaptureResponse';
   static readonly FUNC_GET_REFUND_DATA = 'FuncGetRefundData';
   static readonly FUNC_GET_UPDATE_TOKEN_RESPONSE = 'FuncGetUpdateTokenResponse';
+  static readonly FUNC_CREATE_ORDER_RESPONSE = 'FuncCreateOrderResponse';
+  static readonly FUNC_GET_TRANSACTION_STATUS = 'FuncGetTransactionStatus';
+  static readonly FUNC_GET_SESSION_RESPONSE = 'FuncGetSessionResponse';
 
   //Helper functions
   static readonly FUNC_HANDLE_CARD_ADDITION = 'FuncAddCardHandler';
@@ -121,10 +124,13 @@ export abstract class FunctionConstant {
   static readonly FUNC_GET_MISSING_PAYMENT_DETAILS = 'FuncGetMissingPaymentDetails';
   static readonly FUNC_SYNC_PAYMENT_AND_ADDRESS_DETAILS = 'FuncSyncPaymentAndAddressDetails';
   static readonly FUNC_PROCESS_AUTHORIZATION = 'FuncProcessAuthorization';
+  static readonly FUNC_UPDATE_CART_WITH_PAYPAL_ADDRESS = 'FuncUpdateCartWithPayPalAddress';
+  static readonly FUNC_GET_PAYPAL_SESSION_RESPONSE = 'FuncGetPayPalSessionResponse';
 
   //requestBuilder Functions
   static readonly FUNC_GET_CONFIG_OBJECT = 'FuncGetConfigObject';
   static readonly FUNC_GET_META_DATA = 'FuncGetMetaData';
+  static readonly FUNC_GET_MERCHANT_INFORMATION = 'FuncGetMerchantInformation';
 
   //utils Functions
   static readonly FUNC_SYNC_EXTENSIONS = 'FuncSyncExtensions';

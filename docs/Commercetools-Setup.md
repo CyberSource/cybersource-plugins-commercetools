@@ -161,6 +161,8 @@ Fields
 | isv_shippingMethod                   | String  | false    || 
 | isv_metadata                         | String  | false    ||
 | isv_accountPurchaseCount             | Number  | false    ||
+| isv_payPalUrl                        | String  | false    ||
+| isv_payPalRequestId                  | String  | false    ||
 
 ### Payer Authentication enrolment check
 
