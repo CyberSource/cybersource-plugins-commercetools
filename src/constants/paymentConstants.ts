@@ -224,7 +224,7 @@ export abstract class Constants {
 
   //HTMLContent
   static readonly HTML_PREFIX =
-    '<!DOCTYPE html> <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Commercetools Cybersource Extension</title><script>if (top != self) {top.location = encodeURI(self.location);}</script><link rel="stylesheet" href="css/styles.css" /></head><body>';
+    '<!DOCTYPE html> <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Commercetools Cybersource Extension</title><script type="text/javascript">if (self === top) {var antiClickjack = document.getElementById("antiClickjack");if (antiClickjack) {antiClickjack.parentNode.removeChild(antiClickjack);}} else {top.location = encodeURI(self.location);}</script><link rel="stylesheet" href="css/styles.css" /></head><body>';
   static readonly HTML_SUFFIX = '</body></html>';
 
   //Function Arrays

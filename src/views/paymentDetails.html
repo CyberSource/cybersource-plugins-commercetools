@@ -5,8 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Commercetools Cybersource Extension</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <script>
-    if (top != self) {
+  <style id="antiClickjack">
+    body {
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+    if (self === top) {
+      var antiClickjack = document.getElementById("antiClickjack");
+      if (antiClickjack) {
+        antiClickjack.parentNode.removeChild(antiClickjack);
+      }
+    } else {
       top.location = encodeURI(self.location);
     }
   </script>
@@ -39,7 +49,7 @@
   <div class="panel card4 padding16" id="paymentDetails">
     <h2>Payment Details</h2>
     <hr />
-      <table class="paymentTableAbove" id="paymentDetailsTable" aria-describedby="This table refers to payment specific details">
+    <table class="paymentTableAbove" id="paymentDetailsTable" aria-describedby="This table refers to payment specific details">
       <tr>
         <th id="paymentMethodNameHeading">Payment Method Name</th>
         <th id="paymentMethodHeading">Payment Method</th>
@@ -52,7 +62,7 @@
   <div class="panel card4 padding16" id="paymentTransactions">
     <h2>Payment Transactions</h2>
     <hr />
-      <table class="paymentTableAbove" id="paymentTransactionsTable" aria-describedby="This table refers to transaction details">
+    <table class="paymentTableAbove" id="paymentTransactionsTable" aria-describedby="This table refers to transaction details">
       <tr>
         <th id="transactionTypeHeading">Transaction Type</th>
         <th id="statusHeading">Status</th>

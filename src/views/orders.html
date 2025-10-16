@@ -5,8 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Commercetools Cybersource Extension</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <script>
-    if (top != self) {
+  <style id="antiClickjack">
+    body {
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+    if (self === top) {
+      var antiClickjack = document.getElementById("antiClickjack");
+      if (antiClickjack) {
+        antiClickjack.parentNode.removeChild(antiClickjack);
+      }
+    } else {
       top.location = encodeURI(self.location);
     }
   </script>
@@ -20,7 +30,7 @@
     <em></em>
   </div>
   <div class="leftDiv"><h1>Payments</h1></div>
-    <div class="buttonright"><a class="button" href="/configureExtension" role="button" id="runScript">Run Script</a></div>
+  <div class="buttonright"><a class="button" href="/configureExtension" role="button" id="runScript">Run Script</a></div>
   <div class="buttonright"><a class="button" href="/decisionSync" role="button" id="decisionSync">Run Decision Sync</a></div>
   <div class="buttonright"><a class="button" href="/sync" role="button" id="sync">Run Sync</a></div>
   <table class="order" id="paymentDetailsTable" aria-describedby="This table refers to payment table">
@@ -37,5 +47,5 @@
   </table>
   <div id="loading"><span>Loading...</span></div>
   <script type="module" src="javascript/orders.js"></script>
-  </body>
+</body>
 </html>
