@@ -13,7 +13,7 @@
     "tsc": "tsc",
     "start": "npm run build && run-func ./build/main/testConnection.js testApiConnection && node build/main/index.js",
     "deploy": "npm run build && serverless deploy",
-    "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.js src/**/*.png src/**/*.p12 build/main",
+    "build": "npm-run-all clean && run-p build:* && cpy 'src/**/*.{html,css,js,png,p12}' build/main --parents",
     "setup-resources": "npm run build && run-func ./build/main/setup.js setupExtensionResources",
     "create-subscription": "npm run build && run-func ./build/main/setup.js createWebhookSubscription",
     "test-connection": "npm run build && run-func ./build/main/testConnection.js testApiConnection",
@@ -73,7 +73,7 @@
     "@google-cloud/functions-framework": "^4.0.0",
     "axios": "^1.6.5",
     "chunk": "^0.0.3",
-    "copyfiles": "^2.4.1",
+    "cpy-cli": "^5.0.0",
     "cors": "^2.8.5",
     "cybersource-rest-client": "^0.0.70",
     "dir-archiver": "^2.1.0",
@@ -89,7 +89,7 @@
     "nyc": "^15.1.0",
     "rimraf": "^5.0.8",
     "run-func": "^3.0.0",
-    "serverless": "^3.38.0",
+    "serverless": "^4.21.1",
     "serverless-http": "^3.2.0",
     "serverless-ignore": "^0.2.1"
   },
@@ -113,5 +113,9 @@
     "open-cli": "^7.2.0",
     "prettier": "^3.3.0",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "glob": "^10.4.5",
+    "axios": "^1.6.5"
   }
 }
