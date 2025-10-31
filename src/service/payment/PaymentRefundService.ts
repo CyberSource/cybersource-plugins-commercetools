@@ -41,7 +41,7 @@ const getRefundData = async (payment: Payment, captureId: string, updateTransact
       if (0 < merchantDefinedFields?.length) {
         requestObj.merchantDefinedInformation = merchantDefinedFields;
       }
-      if (Constants.ECHECK === payment?.paymentMethodInfo?.method) {
+      if (Constants.ECHECK === payment?.paymentMethodInfo?.method || Constants.PAYPAL === payment.paymentMethodInfo.method) {
         const paymentInformation = prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_REFUND_DATA, payment, null, null);
         requestObj.paymentInformation = paymentInformation;
       }

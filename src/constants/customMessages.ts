@@ -9,6 +9,7 @@ export abstract class CustomMessages {
     static readonly SUCCESS_MSG_EXTENSION_CREATION = 'Successfully executed the script';
     static readonly SUCCESS_MSG_UPDATE_CLICK_TO_PAY_CARD_DETAILS = 'Updated click to pay card details successfully';
     static readonly SUCCESS_MSG_UC_ADDRESS_DETAILS = 'Successfully updated cart address as the UC address';
+    static readonly SUCCESS_MSG_PAYPAL_ADDRESS_DETAILS = 'Successfully updated cart address as the PayPal address';
     static readonly SUCCESS_MSG_UPDATED_ADDRESS_DETAILS = 'Successfully updated address details';
     static readonly SUCCESS_MSG_UPDATE_CARD_DETAILS = 'Successfully updated card details';
     static readonly SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN = 'Successfully updated customer token through webhooks API';
@@ -139,6 +140,8 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_INVALID_PATHNAME = 'Invalid Pathname';
     static readonly ERROR_MSG_API_EXECUTION = 'An error occured while processing your request';
     static readonly ERROR_MSG_PAYMENT_PROCESSING = 'Error processing payment authorization for method: ';
+    static readonly ERROR_MSG_CREATE_SESSION = 'There was an error while creating an session';
+    static readonly ERROR_MSG_PAYPAL_ADDRESS_DETAILS = 'Unable to update the address as the PayPal address';
 
     //Network token logs
     static readonly ERROR_MSG_INVALID_INSTRUMENT_IDENTIFIER = 'Invalid Instrument identifier';

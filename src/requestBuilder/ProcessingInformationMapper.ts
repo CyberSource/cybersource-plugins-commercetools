@@ -15,6 +15,7 @@ export class ProcessingInformation {
     private resourceObj: Payment | null;
     private cardTokens: CustomTokenType | null;
     private processingInformation: any;
+    private intentsId?: string;
 
     /**
     * Constructs a new instance of ProcessingInformation.
@@ -27,7 +28,7 @@ export class ProcessingInformation {
     * @param cardTokens - Card token information, if available.
     * @param isSaveToken - A flag indicating if a token should be saved.
     */
-    constructor(functionName: string, resourceObj: Payment | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null) {
+    constructor(functionName: string, resourceObj: Payment | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null, intentsId?: string) {
         this.functionName = functionName;
         this.resourceObj = resourceObj;
         this.orderNo = orderNo;
@@ -35,6 +36,7 @@ export class ProcessingInformation {
         this.cardTokens = cardTokens;
         this.isSaveToken = isSaveToken;
         this.processingInformation = this.initializeProcessingInformation();
+        this.intentsId = intentsId;
     }
 
     /**
@@ -90,8 +92,21 @@ export class ProcessingInformation {
         if (customFields?.isv_enabledMoto) {
             this.processingInformation.commerceIndicator = 'MOTO';
         }
-        if (customFields?.isv_saleEnabled) {
+        if (customFields?.isv_saleEnabled && Constants.PAYPAL !== this.service) {
             this.processingInformation.capture = true;
+        }
+        if (Constants.PAYPAL === this.service) {
+            this.processingInformation.intentsId = this.intentsId;
+        }
+        if (Constants.PAYPAL === this.resourceObj?.paymentMethodInfo.method) {
+            const payPalActionMap: Record<string, string[]> = {
+                [FunctionConstant.FUNC_GET_CAPTURE_RESPONSE]: [Constants.PAYMENT_GATEWAY_AP_CAPTURE],
+                [FunctionConstant.FUNC_GET_REFUND_DATA]: [Constants.PAYMENT_GATEWAY_AP_REFUND],
+                [FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE]: [Constants.PAYMENT_GATEWAY_AP_REVERSAL]
+            }
+            if (payPalActionMap[this.functionName]) {
+                actionList.push(...payPalActionMap[this.functionName]);
+            }
         }
         paymentValidator.setObjectValue(this.processingInformation, 'walletType', customFields, 'isv_walletType', Constants.STR_STRING, false);
         if (!paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER) && (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === this.functionName || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName)) {
@@ -99,11 +114,19 @@ export class ProcessingInformation {
         }
         const actionMap: Record<string, string[]> = {
             [Constants.STRING_ENROLL_CHECK]: [Constants.PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION],
-            [Constants.VALIDATION]: [Constants.PAYMENT_GATEWAY_VALIDATE_CONSUMER_AUTHENTICATION]
+            [Constants.VALIDATION]: [Constants.PAYMENT_GATEWAY_VALIDATE_CONSUMER_AUTHENTICATION],
+            [Constants.STRING_SESSIONS]: [Constants.PAYMENT_GATEWAY_AP_SESSIONS],
+            [Constants.STRING_STATUS]: [Constants.PAYMENT_GATEWAY_AP_STATUS],
+            [Constants.STRING_ORDER]: [Constants.PAYMENT_GATEWAY_AP_ORDER],
         };
 
         if (actionMap[this.service]) {
             actionList.push(...actionMap[this.service]);
+        }
+        if (this.service === Constants.PAYPAL) {
+            actionList.push(customFields?.isv_saleEnabled
+                ? Constants.PAYMENT_GATEWAY_AP_SALE
+                : Constants.PAYMENT_GATEWAY_AP_AUTH);
         }
         if ((!customFields?.isv_savedToken && customFields?.isv_tokenAlias && this.isSaveToken) || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName) {
             actionList.push(Constants.PAYMENT_GATEWAY_TOKEN_CREATE);

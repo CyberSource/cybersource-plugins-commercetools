@@ -26,7 +26,7 @@ const getOMServiceResponse = (paymentResponse: PtsV2PaymentsCapturesPost201Respo
     let setCustomType: Partial<ActionType> | null = null;
     let response = paymentUtils.getEmptyResponse();
     if (paymentResponse && transactionDetail) {
-        if (Constants.API_STATUS_PENDING === paymentResponse.status || Constants.API_STATUS_REVERSED === paymentResponse.status || Constants.API_STATUS_AUTH_REVERSED === paymentResponse.status) {
+        if (Constants.API_STATUS_PENDING === paymentResponse.status || Constants.API_STATUS_REVERSED === paymentResponse.status || Constants.API_STATUS_REFUNDED === paymentResponse.status || Constants.API_STATUS_SETTLED === paymentResponse.status || Constants.API_STATUS_AUTH_REVERSED === paymentResponse.status) {
             setCustomField = paymentUtils.changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
             if (captureId && 0 <= pendingAmount) {
                 setCustomType = paymentHelper.setTransactionCustomType(captureId, pendingAmount);
@@ -234,7 +234,7 @@ const getRefundResponse = async (updatePaymentObj: Payment, updateTransactions: 
                                     if (1 === iterateRefund && 0 === iterateRefundAmount) {
                                         refundActions = getOMServiceResponse(orderResponse, updateTransactions, refundResponseObject.transactionId, pendingTransactionAmount);
                                     } else {
-                                        if (Constants.API_STATUS_PENDING === orderResponse.status) {
+                                        if (Constants.API_STATUS_PENDING === orderResponse.status || Constants.API_STATUS_REFUNDED === orderResponse.status) {
                                             transactionState = Constants.CT_TRANSACTION_STATE_SUCCESS;
                                             setAction = paymentHelper.setTransactionCustomType(refundResponseObject.transactionId, pendingTransactionAmount);
                                         } else {

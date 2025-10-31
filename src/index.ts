@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
@@ -70,17 +71,19 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
   if (requestUrl) {
     parsedUrl = url.parse(requestUrl, true);
   }
+  if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
+    if ((req.url && Constants.STATIC_FILE_REGEX.test(req.url)) || parsedUrl?.pathname === '/') {
+      app.server.emit('request', req, res);
+      return;
+    }
+  }
   if ('/netTokenNotification' === parsedUrl?.pathname) {
     if ('GET' === req.method) {
       res.statusCode = Constants.HTTP_OK_STATUS_CODE;
       res.end();
     } else if ('POST' === req.method) {
-      let body = '';
-      req.on('data', (chunk: { toString: () => string }) => {
-        body += chunk.toString();
-      });
-      req.on('end', async () => {
-        notificationBody = JSON.parse(body);
+      if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
+        notificationBody = (req as any).body;
         const vcSignature = req?.headers['v-c-signature'];
         if (vcSignature && notificationBody) {
           isValidNotification = await authenticationHelper.authenticateNetToken(vcSignature, notificationBody);
@@ -93,7 +96,28 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
           res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
           res.end();
         }
-      });
+      }
+      else {
+        let body = '';
+        req.on('data', (chunk: { toString: () => string }) => {
+          body += chunk.toString();
+        });
+        req.on('end', async () => {
+          notificationBody = JSON.parse(body);
+          const vcSignature = req?.headers['v-c-signature'];
+          if (vcSignature && notificationBody) {
+            isValidNotification = await authenticationHelper.authenticateNetToken(vcSignature, notificationBody);
+            if (isValidNotification) {
+              await handlePostNetTokenNotification(notificationBody, res);
+            }
+          }
+          if (!isValidNotification) {
+            errorHandler.logError(new AuthenticationError(CustomMessages.ERROR_MSG_SIGNATURE_DOES_NOT_MATCH, '', FunctionConstant.FUNC_AUTHENTICATION), __filename, '');
+            res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
+            res.end();
+          }
+        });
+      }
     } else {
       errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_UNHANDLED_REQUEST_METHOD, '', FunctionConstant.FUNC_AUTHENTICATION), __filename, '');
       res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
@@ -117,9 +141,9 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
       const pathName = parsedUrl?.pathname;
       if (pathName && Constants.EXTENSION_SERVICE_END_POINTS.includes(pathName)) {
         res.setHeader('WWW-Authenticate', Constants.AUTHENTICATION_SCHEME);
-        route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
+        route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       } else {
-        route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
+        route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       }
     } else {
       const pathName = parsedUrl?.pathname;
@@ -127,13 +151,13 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
         const base64Credentials = authHeader.split(' ')[1];
         base64Credentials === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE
           ? handleRequest(req, res)
-          : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS }));
+          : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS }));
       } else if (Constants.PAYMENT_CREATE_DESTINATION_URL === requestUrl || Constants.PAYMENT_UPDATE_DESTINATION_URL === requestUrl || Constants.CUSTOMER_UPDATE_DESTINATION_URL === requestUrl || '/captureContext' === requestUrl) {
         const encodedCredentials = authHeader.split(' ')[1];
         const decrypt = authenticationHelper.decryption(encodedCredentials);
-        decrypt && decrypt === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE ? handleRequest(req, res) : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
+        decrypt && decrypt === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE ? handleRequest(req, res) : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       } else {
-        route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, 'application/json', JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
+        route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       }
     }
   }
@@ -162,7 +186,7 @@ const handleRequest = async (req: any, res: any): Promise<void> => {
       '/decisionSync': handleDecisionSync,
       '/configureExtension': handleConfigureExtensions,
       '/generateHeader': handleGenerateHeader,
-      '/testConnection': handleTestConnection,
+      '/testConnection': handleTestConnection
     },
     'POST': {
       '/api/extension/payment/update': handlePaymentUpdate,
@@ -173,8 +197,7 @@ const handleRequest = async (req: any, res: any): Promise<void> => {
     }
   };
   if (!pathName) {
-    res.statusCode = Constants.HTTP_NOT_FOUND_STATUS_CODE;
-    return res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
+    return route.sendResponse(res, Constants.HTTP_NOT_FOUND_STATUS_CODE, Constants.CONTENT_TYPE_TEXT_PLAIN, CustomMessages.ERROR_MSG_NOT_FOUND);
   }
   const handler = methodHandlers[req.method]?.[pathName];
   if (handler) {
@@ -182,13 +205,12 @@ const handleRequest = async (req: any, res: any): Promise<void> => {
       await handler(req, res);
     } catch (exception) {
       errorHandler.logError(new ApiError(CustomMessages.ERROR_MSG_API_EXECUTION, exception, FunctionConstant.FUNC_REQUEST_HANDLER), __filename, '');
-      res.end(CustomMessages.ERROR_MSG_INTERNAL_SERVER_ERROR);
+      return route.sendResponse(res, 500, Constants.CONTENT_TYPE_TEXT_PLAIN, CustomMessages.ERROR_MSG_INTERNAL_SERVER_ERROR);
     }
   } else {
     const handleRequestMessage = req.method === 'GET' ? CustomMessages.ERROR_MSG_GET_REQUEST : CustomMessages.ERROR_MSG_POST_REQUEST;
     errorHandler.logError(new ValidationError(handleRequestMessage, '', FunctionConstant.FUNC_REQUEST_HANDLER), __filename, '');
-    res.statusCode = 404;
-    return res.end(CustomMessages.ERROR_MSG_NOT_FOUND);
+    return route.sendResponse(res, Constants.HTTP_NOT_FOUND_STATUS_CODE, Constants.CONTENT_TYPE_TEXT_PLAIN, CustomMessages.ERROR_MSG_NOT_FOUND);
   }
 };
 
@@ -201,12 +223,21 @@ const handleRequest = async (req: any, res: any): Promise<void> => {
  */
 const handlePaymentDetails = async (_req: any, res: any): Promise<void> => {
   const htmlData = fs.readFileSync(path.join(__dirname, '/views/paymentDetails.html'), 'utf8');
+  let sanitizedHtmlData = '';
   const doc = new JSDOM(htmlData);
   const bodyContent = doc.window.document.body.innerHTML;
   const sanitizedBody = paymentUtils.sanitizeHtml(bodyContent);
-  const sanitizedHtmlData = Constants.HTML_PREFIX + sanitizedBody + Constants.HTML_SUFFIX;
-  res.setHeader('Content-Security-Policy', "script-src 'self'");
-  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'text/html', sanitizedHtmlData);
+
+  const nonce = crypto.randomBytes(16).toString('base64');
+  if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
+    const gcpFuncName = process.env.PAYMENT_GATEWAY_GCP_FUNCTION_NAME || '';
+    const setLinkScript = paymentUtils.getSetLinkScript('paymentDetails', nonce);
+    sanitizedHtmlData = paymentUtils.injectScripts(sanitizedBody, gcpFuncName, nonce, setLinkScript);
+  } else {
+    sanitizedHtmlData = Constants.HTML_PREFIX + sanitizedBody + Constants.HTML_SUFFIX;
+  }
+  res.setHeader('Content-Security-Policy', `script-src 'self' 'nonce-${nonce}'`);
+  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, Constants.CONTENT_TYPE_TEXT_HTML, sanitizedHtmlData);
 };
 
 /**
@@ -260,7 +291,7 @@ const handlePaymentsData = async (req: any, res: any): Promise<void> => {
     orderNo: paymentDetailsApiResponse.orderNo
   };
   const response = JSON.stringify(paymentDetailsPage);
-  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'application/json', response);
+  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, Constants.CONTENT_TYPE_JSON, response);
 };
 
 /**
@@ -271,13 +302,21 @@ const handlePaymentsData = async (req: any, res: any): Promise<void> => {
  * @returns {Promise<void>} - A promise resolving to void.
  */
 const handleOrders = async (_req: any, res: any): Promise<void> => {
-  const htmlData = fs.readFileSync(path.join(__dirname, '/views/orders.html'), 'utf8');
+  let htmlData = fs.readFileSync(path.join(__dirname, '/views/orders.html'), 'utf8');
   const doc = new JSDOM(htmlData);
   const bodyContent = doc.window.document.body.innerHTML;
   const sanitizedBody = paymentUtils.sanitizeHtml(bodyContent);
-  const sanitizedHtmlData = Constants.HTML_PREFIX + sanitizedBody + Constants.HTML_SUFFIX;
-  res.setHeader('Content-Security-Policy', "script-src 'self'");
-  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'text/html', sanitizedHtmlData);
+  let sanitizedHtmlData = '';
+  const nonce = crypto.randomBytes(16).toString('base64');
+  if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
+    const gcpFuncName = process.env.PAYMENT_GATEWAY_GCP_FUNCTION_NAME || '';
+    const setLinkScript = paymentUtils.getSetLinkScript('orders', nonce);
+    sanitizedHtmlData = paymentUtils.injectScripts(sanitizedBody, gcpFuncName, nonce, setLinkScript);
+  } else {
+    sanitizedHtmlData = Constants.HTML_PREFIX + sanitizedBody + Constants.HTML_SUFFIX;
+  }
+  res.setHeader('Content-Security-Policy', `script-src 'self' 'nonce-${nonce}'`);
+  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, Constants.CONTENT_TYPE_TEXT_HTML, sanitizedHtmlData);
 };
 
 /**
@@ -314,7 +353,7 @@ const handleOrdersData = async (_req: any, res: any): Promise<void> => {
   orderPage.orderErrorMessage = orderErrorMessage;
   orderPage.orderSuccessMessage = orderSuccessMessage;
   const response = JSON.stringify(orderPage);
-  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, 'application/json', response);
+  route.sendResponse(res, Constants.HTTP_OK_STATUS_CODE, Constants.CONTENT_TYPE_JSON, response);
 };
 
 /**
@@ -327,8 +366,7 @@ const handleOrdersData = async (_req: any, res: any): Promise<void> => {
 const handlePaymentCreate = async (req: any, res: any): Promise<void> => {
   let response;
   try {
-    const body = await paymentUtils.collectRequestData(req);
-    const requestObj = await paymentUtils.getRequestObj(body);
+    const requestObj = await paymentUtils.getRequestPayload(req);
     if (null !== requestObj && typeof requestObj === Constants.STR_OBJECT) {
       const paymentObj = requestObj;
       response = await apiHandler.paymentCreateApi(paymentObj);
@@ -354,8 +392,7 @@ const handlePaymentCreate = async (req: any, res: any): Promise<void> => {
 const handlePaymentUpdate = async (req: any, res: any): Promise<void> => {
   let updateResponse: any = paymentUtils.getEmptyResponse();
   try {
-    const body = await paymentUtils.collectRequestData(req);
-    const requestObj = await paymentUtils.getRequestObj(body);
+    const requestObj = await paymentUtils.getRequestPayload(req);
     if (null !== requestObj && typeof requestObj === Constants.STR_OBJECT) {
       const updatePaymentObj = requestObj;
       updateResponse = await apiHandler.paymentUpdateApi(updatePaymentObj);
@@ -378,8 +415,7 @@ const handlePaymentUpdate = async (req: any, res: any): Promise<void> => {
  */
 const handleCustomerUpdate = async (req: any, res: any): Promise<void> => {
   let response: any = paymentUtils.invalidInputResponse();
-  const body = await paymentUtils.collectRequestData(req);
-  const requestObj = await paymentUtils.getRequestObj(body);
+  const requestObj = await paymentUtils.getRequestPayload(req);
   if (null !== requestObj && typeof requestObj === Constants.STR_OBJECT) {
     const customerObj = requestObj;
     try {
@@ -410,7 +446,7 @@ const handleCustomerUpdate = async (req: any, res: any): Promise<void> => {
  */
 const handleAuthReversal = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
-  let viewData = '/orders';
+  let viewData = paymentUtils.getApiPath('orders');
   let authReverseApiResponse = {
     errorMessage: '',
     successMessage: '',
@@ -424,7 +460,7 @@ const handleAuthReversal = async (req: any, res: any): Promise<void> => {
         errorMessage = authReverseApiResponse.errorMessage;
         successMessage = authReverseApiResponse.successMessage;
         if (paymentUtils.validateId(paymentId)) {
-          viewData = `/paymentDetails?id=${encodeURIComponent(paymentId)}`;
+          viewData = paymentUtils.getApiPath(`paymentDetails?id=${encodeURIComponent(paymentId)}`);
         }
       }
     } else {
@@ -446,7 +482,7 @@ const handleAuthReversal = async (req: any, res: any): Promise<void> => {
  */
 const handleCapture = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
-  let viewData = '/orders';
+  let viewData = paymentUtils.getApiPath('orders');
   let captureApiResponse = {
     errorMessage: '',
     successMessage: '',
@@ -462,7 +498,7 @@ const handleCapture = async (req: any, res: any): Promise<void> => {
         errorMessage = captureApiResponse.errorMessage;
         successMessage = captureApiResponse.successMessage;
         if (paymentUtils.validateId(paymentId)) {
-          viewData = `/paymentDetails?id=${encodeURIComponent(paymentId)}`;
+          viewData = paymentUtils.getApiPath(`paymentDetails?id=${encodeURIComponent(paymentId)}`);
         }
       }
     } else {
@@ -484,7 +520,7 @@ const handleCapture = async (req: any, res: any): Promise<void> => {
  */
 const handleRefund = async (req: any, res: any): Promise<void> => {
   let paymentId: string;
-  let viewData = '/orders';
+  let viewData = paymentUtils.getApiPath('orders');
   let refundApiResponse = {
     errorMessage: '',
     successMessage: '',
@@ -500,7 +536,7 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
         errorMessage = refundApiResponse.errorMessage;
         successMessage = refundApiResponse.successMessage;
         if (paymentUtils.validateId(paymentId)) {
-          viewData = `/paymentDetails?id=${encodeURIComponent(paymentId)}`;
+          viewData = paymentUtils.getApiPath(`paymentDetails?id=${encodeURIComponent(paymentId)}`);
         }
       }
     } else {
@@ -558,7 +594,8 @@ const handleDecisionSync = async (_req: any, res: any): Promise<void> => {
   orderSuccessMessage = decisionSyncResponse.message;
   orderErrorMessage = decisionSyncResponse.error;
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
-  res.setHeader('Location', '/orders');
+  const redirectPath = paymentUtils.getApiPath('orders');
+  res.setHeader('Location', redirectPath)
   res.end();
 };
 
@@ -576,8 +613,9 @@ const handleSync = async (_req: any, res: any): Promise<void> => {
   }
   orderSuccessMessage = syncResponse.message;
   orderErrorMessage = syncResponse.error;
+  const redirectPath = paymentUtils.getApiPath('orders');
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
-  res.setHeader('Location', '/orders');
+  res.setHeader('Location', redirectPath);
   await res.end();
 };
 
@@ -592,8 +630,9 @@ const handleConfigureExtensions = async (_req: any, res: any): Promise<void> => 
   await createExtension();
   await createCustomTypes();
   orderSuccessMessage = CustomMessages.SUCCESS_MSG_EXTENSION_CREATION;
+  const redirectPath = paymentUtils.getApiPath('orders');
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
-  res.setHeader('Location', '/orders');
+  res.setHeader('Location', redirectPath);
   await res.end();
 };
 
@@ -628,9 +667,14 @@ const handleGenerateHeader = async (_req: any, res: any): Promise<void> => {
  */
 const handleCaptureContext = async (req: any, res: any): Promise<void> => {
   let response = '';
-  const body = await paymentUtils.collectRequestData(req);
-  const requestObj = JSON.parse(body);
-
+  let requestObj;
+  if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
+    requestObj = req?.body;
+  }
+  else {
+    const body = await paymentUtils.collectRequestData(req);
+    requestObj = JSON.parse(body);
+  }
   if (null !== requestObj && typeof requestObj === Constants.STR_OBJECT) {
     try {
       response = await apiHandler.captureContextApi(requestObj);
@@ -656,6 +700,19 @@ const handleTestConnection = async (_req: any, res: any): Promise<void> => {
   }
   res.end(testApiResponse);
 };
+
+if (Constants.STRING_GCP === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
+  exports.handler = (req: any, res: any) => {
+    const corsOrigin = '*';
+    res.set('Access-Control-Allow-Origin', corsOrigin);
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+      res.status(204).end();
+      return;
+    }
+    authentication(req, res);
+  };
+}
 
 if (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
   exports.handler = serverless(app.server);

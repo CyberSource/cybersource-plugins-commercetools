@@ -851,7 +851,7 @@ const sanitizeAndValidateUrl = (req: any) => {
  * @returns {string} - The validated redirect path (either an allowed path or "/orders").
  */
 const validateRedirectPaths = (paths: string) => {
-  const allowedPaths = ['/orders', '/paymentDetails'];
+  const allowedPaths = ['/orders', '/paymentDetails', `/${process.env.PAYMENT_GATEWAY_GCP_FUNCTION_NAME}`];
   if (!allowedPaths.some(path => paths.startsWith(path))) {
     paths = '/orders';
   }
@@ -862,6 +862,105 @@ const validateId = (pathname: any) => {
   const validPathnamePattern = /^[a-zA-Z0-9_-]+$/;
   return validPathnamePattern.test(pathname);
 };
+
+const getApiPath = (endpoint: string) => {
+  let funcName = '';
+  if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
+    funcName = (process.env.PAYMENT_GATEWAY_GCP_FUNCTION_NAME || '').replace(/^\/+/, '');
+  }
+  return funcName ? `/${funcName}/${endpoint}` : `/${endpoint}`;
+}
+
+const injectScripts = (html: string, gcpFuncName: string, nonce: string, setLinkScript: string) => {
+  const scriptTag = `<script nonce="${nonce}">window.PAYMENT_GATEWAY_GCP_FUNCTION_NAME = "${gcpFuncName}";</script>`;
+  // Inject both scripts right after <body>
+  return Constants.HTML_PREFIX.replace('<body>', '<body>' + scriptTag + setLinkScript) + html + Constants.HTML_SUFFIX;
+}
+
+const getSetLinkScript = (type: 'orders' | 'paymentDetails', nonce: string): string => {
+  if (type === 'orders') {
+    return `<script nonce="${nonce}">
+      document.addEventListener('DOMContentLoaded', function () {
+        const gcpFuncName = window.PAYMENT_GATEWAY_GCP_FUNCTION_NAME;
+        function getHref(endpoint) {
+          return gcpFuncName ? \`/\${gcpFuncName}/\${endpoint}\` : \`/\${endpoint}\`;
+        }
+        const runScript = document.getElementById('runScript');
+        if (runScript) runScript.href = getHref('configureExtension');
+        const decisionSync = document.getElementById('decisionSync');
+        if (decisionSync) decisionSync.href = getHref('decisionSync');
+        const sync = document.getElementById('sync');
+        if (sync) sync.href = getHref('sync');
+      });
+    </script>`;
+  }
+  if (type === 'paymentDetails') {
+    return `<script nonce="${nonce}">
+      document.addEventListener('DOMContentLoaded', function () {
+        const gcpFuncName = window.PAYMENT_GATEWAY_GCP_FUNCTION_NAME;
+        function getHref(endpoint) {
+          return gcpFuncName ? \`/\${gcpFuncName}/\${endpoint}\` : \`/\${endpoint}\`;
+        }
+        const backButton = document.getElementById('backButton');
+        if (backButton) backButton.href = getHref('orders');
+      });
+    </script>`;
+  }
+  return '';
+}
+
+ /*
+ * Sanitizes log data to prevent log forging attacks.
+ *
+ * @param { any } data - The data to sanitize for logging.
+ * @returns { any } - The sanitized data.
+ */
+const sanitizeLogData = (data: any): any => {
+  if (!data) {
+    return data;
+  }
+
+  if (typeof data === 'string') {
+    // Remove newlines, carriage returns, and other control characters that could be used for log forging
+    return data.replace(/[\n\r\t\v\f\0]/g, '').replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+  }
+
+  if (typeof data === 'object' && data !== null) {
+    if (Array.isArray(data)) {
+      return data.map(item => sanitizeLogData(item));
+    }
+
+    const sanitizedData: any = {};
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        sanitizedData[key] = sanitizeLogData(data[key]);
+      }
+    }
+    return sanitizedData;
+  }
+
+  return data;
+};
+
+/**
+ * Gets the request payload from the request object.
+ * Sanitizes the payload to prevent log forging attacks.
+ *
+ * @param {any} req - The request object.
+ * @returns {Promise<any>} - The sanitized request payload.
+ */
+const getRequestPayload = async (req: any) => {
+  if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
+    let rawRequest = req.body;
+    // Sanitize the request payload to prevent log forging
+    return sanitizeLogData(rawRequest.resource.obj);
+  } else {
+    const body = await collectRequestData(req);
+    // getRequestObj already parses the body, but we need to sanitize it as well
+    return sanitizeLogData(await getRequestObj(body));
+  }
+}
+
 
 export default {
   logData,
@@ -902,5 +1001,9 @@ export default {
   setCertificatecache,
   sanitizeAndValidateUrl,
   validateRedirectPaths,
-  validateId
+  validateId,
+  getApiPath,
+  injectScripts,
+  getSetLinkScript,
+  getRequestPayload
 };

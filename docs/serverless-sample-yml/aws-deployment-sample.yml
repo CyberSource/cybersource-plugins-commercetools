@@ -1,6 +1,6 @@
 service: <service-name>
  
-frameworkVersion: '3'
+frameworkVersion: '4'
  
 provider:
   name: aws
@@ -21,7 +21,10 @@ functions:
           method: ANY
 
 package:
+  individually: false
+  excludeDevDependencies: false
   patterns:
+    -  node_modules/**
     - '!docs/**'
     - '!README.md'
     - '!src/unit-tests/**'

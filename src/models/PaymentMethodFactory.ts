@@ -6,6 +6,7 @@ import { ClickToPayPaymentMethod } from "./payment-methods/ClickToPayPaymentMeth
 import { CreditCardPaymentMethod } from "./payment-methods/CreditCardPaymentMethod";
 import { ECheckPaymentMethod } from "./payment-methods/ECheckPaymentMethod";
 import { GooglePayPaymentMethod } from "./payment-methods/GooglePayPaymentMethod";
+import { PayPalPaymentMethod } from "./payment-methods/PayPalPaymentMethod";
 
 /**
  * Factory class for creating payment method strategy instances
@@ -46,6 +47,9 @@ export class PaymentMethodFactory {
         break;
       case Constants.ECHECK:
         paymentMethodInstance = new ECheckPaymentMethod();
+        break;
+      case Constants.PAYPAL:
+        paymentMethodInstance = new PayPalPaymentMethod();
         break;
       default:
         throw new Error(`Unsupported payment method: ${paymentMethod}`);

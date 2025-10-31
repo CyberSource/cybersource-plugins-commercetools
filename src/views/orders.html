@@ -1,41 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Commercetools Cybersource Extension</title>
-    <link rel="stylesheet" href="css/styles.css" />
-    <script>
-      if (top != self) {
-        top.location = encodeURI(self.location);
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commercetools Cybersource Extension</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style id="antiClickjack">
+    body {
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+    if (self === top) {
+      var antiClickjack = document.getElementById("antiClickjack");
+      if (antiClickjack) {
+        antiClickjack.parentNode.removeChild(antiClickjack);
       }
-    </script>
-  </head>
-  <body>
-    <h1 class="order">Commercetools Cybersource Extension</h1>
-    <div id="orderErrorMessage">
-      <em></em>
-    </div>
-    <div id="orderSuccessMessage">
-      <em></em>
-    </div>
-    <div class="leftDiv"><h1>Payments</h1></div>
-    <div class="buttonright"><a class="button" href="/configureExtension" role="button" id="runScript">Run Script</a></div>
-    <div class="buttonright"><a class="button" href="/decisionSync" role="button" id="decisionSync">Run Decision Sync</a></div>
-    <div class="buttonright"><a class="button" href="/sync" role="button" id="sync">Run Sync</a></div>
-    <table class="order" id="paymentDetailsTable" aria-describedby="This table refers to payment table">
-      <thead>
-        <tr>
-          <th id="paymentIdHeading">Payment Id</th>
-          <th id="orderTotalHeading">Order Total</th>
-          <th id="paymentMethodHeading">Payment Method</th>
-          <th id="dateCreatedHeading">Date Created</th>
-          <th id="dateModifiedHeading">Date Modified</th>
-        </tr>
-      </thead>
-      <tbody id="paymentDetailsBody"></tbody>
-    </table>
-    <div id="loading"><span>Loading...</span></div>
-    <script type="module" src="javascript/orders.js"></script>
-  </body>
+    } else {
+      top.location = encodeURI(self.location);
+    }
+  </script>
+</head>
+<body>
+  <h1 class="order">Commercetools Cybersource Extension</h1>
+  <div id="orderErrorMessage">
+    <em></em>
+  </div>
+  <div id="orderSuccessMessage">
+    <em></em>
+  </div>
+  <div class="leftDiv"><h1>Payments</h1></div>
+  <div class="buttonright"><a class="button" href="/configureExtension" role="button" id="runScript">Run Script</a></div>
+  <div class="buttonright"><a class="button" href="/decisionSync" role="button" id="decisionSync">Run Decision Sync</a></div>
+  <div class="buttonright"><a class="button" href="/sync" role="button" id="sync">Run Sync</a></div>
+  <table class="order" id="paymentDetailsTable" aria-describedby="This table refers to payment table">
+    <thead>
+      <tr>
+        <th id="paymentIdHeading">Payment Id</th>
+        <th id="orderTotalHeading">Order Total</th>
+        <th id="paymentMethodHeading">Payment Method</th>
+        <th id="dateCreatedHeading">Date Created</th>
+        <th id="dateModifiedHeading">Date Modified</th>
+      </tr>
+    </thead>
+    <tbody id="paymentDetailsBody"></tbody>
+  </table>
+  <div id="loading"><span>Loading...</span></div>
+  <script type="module" src="javascript/orders.js"></script>
+</body>
 </html>
