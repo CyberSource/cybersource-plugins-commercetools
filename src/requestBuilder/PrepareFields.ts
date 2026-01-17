@@ -194,6 +194,10 @@ const getOrderInformation = (functionName: string, paymentObj: Payment | null, u
   return orderInformationMapper.getOrderInformation();
 };
 
+const getCartTotalPrice = (cartObj: Cart): number => {
+  return cartObj.taxedPrice?.totalGross?.centAmount ?? cartObj.totalPrice?.centAmount ?? 0;
+}
+
 /**
  * Generates order information amount details based on the provided parameters.
  * 
@@ -223,12 +227,12 @@ const getOrderInformationAmountDetails = (functionName: string, captureAmount: n
     orderInformationAmountDetails.currency = paymentObj?.amountPlanned?.currencyCode;
   } else if (cartObj?.totalPrice && (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName)) {
     orderInformationAmountDetails = {} as Ptsv2paymentsOrderInformationAmountDetails;
-    orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits);
+    orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(getCartTotalPrice(cartObj), cartObj.totalPrice.fractionDigits);
     orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
   } else if (FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT === functionName) {
     orderInformationAmountDetails = {} as Upv1capturecontextsOrderInformationAmountDetails;
     if ('Payments' === service && cartObj?.totalPrice) {
-      orderInformationAmountDetails.totalAmount = `${paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits)}`;
+      orderInformationAmountDetails.totalAmount = `${paymentUtils.convertCentToAmount(getCartTotalPrice(cartObj), cartObj.totalPrice.fractionDigits)}`;
       orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
     } else if ('MyAccounts' === service) {
       orderInformationAmountDetails.currency = currencyCode;

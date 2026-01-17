@@ -54,6 +54,9 @@ class LineItemMapper {
         orderInformationLineItem.unitPrice = unitPrice;
         orderInformationLineItem.quantity = quantity;
         orderInformationLineItem.discountAmount = discountAmount;
+        if (functionName === FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE) {
+            (orderInformationLineItem as Ptsv2paymentsOrderInformationLineItems).taxAmount = taxRate ? String(taxRate * lineItemTotalAmount) : undefined;
+        }
         paymentValidator.setObjectValue(orderInformationLineItem, 'taxRate', taxRate, '', Constants.STR_NUMBER, false);
         return orderInformationLineItem;
     }
@@ -113,6 +116,13 @@ export class LineItem {
         return LineItemMapper.mapLineItemValues(this.functionName, this.lineItemTotalAmount, 'coupon', 'coupon', 'coupon', this.unitPrice, 1);
     }
 
+    private getTaxRate(isShipping: boolean): number | undefined {
+        if (isShipping) {
+            return this.cartObj.shippingInfo?.taxRate?.amount;
+        }
+        return this.lineItem?.taxRate?.amount;
+    }
+
     /**
      * Sets values for a line item based on whether it is a shipping item.
      * @param {boolean} isShipping - Indicates if the line item is for shipping.
@@ -122,7 +132,7 @@ export class LineItem {
         let discountPrice = 0;
         let unitPrice: number;
         let quantity: number;
-        let taxRate = null;
+        let taxRate = undefined;
         let item: any;
         let discountArray: any;
         if (isShipping) {
@@ -130,15 +140,13 @@ export class LineItem {
             discountArray = item?.discountedPrice?.includedDiscounts;
             unitPrice = this.unitPrice;
             quantity = 1;
-            if (this.cartObj?.shipping && this.cartObj.shipping[0]?.shippingInfo?.taxRate?.includedInPrice) {
-                taxRate = this.cartObj.shipping[0].shippingInfo.taxRate.amount
-            }
+            taxRate = this.getTaxRate(isShipping);
         } else {
             item = this.item || this.lineItem;
             discountArray = item?.discountedPrice?.includedDiscounts;
             unitPrice = this.unitPrice;
             quantity = this.item ? this.item.quantity : this.lineItem.quantity;
-            taxRate = this.lineItem?.taxRate?.includedInPrice ? this.lineItem.taxRate.amount : undefined;
+            taxRate = this.getTaxRate(isShipping);
         }
         if (discountArray) {
             discountArray.forEach((discount: any) => {
