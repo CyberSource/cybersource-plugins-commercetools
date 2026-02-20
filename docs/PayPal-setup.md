@@ -18,20 +18,6 @@ merchant account with your Cybersource merchant account:
 - Save the account facilitator email address, the client ID, and the secret key for future
   reference.
 
-  For example:
-
-      ◦ Account facilitator email address:
-
-        merchantuser-facilitator@merchant.com
-
-      ◦ Client ID:
-
-        AahnQzKLL2vvG_UI6YQy9xcyt5joMLVoPHW-1Bv8gCvPkTiNwQSRCvKIKXy8UZZguijbwJTTs_Cjhdz
-
-      ◦ Secret key:
-
-        EOE3eqqeIBy4q8LhsON0-wp2zPb_0SOqPH3sopx_uwuIMkCug7zw3aKDunstrXmcrGecmpeUJgsqTGO
-
 - Contact Cybersourcemerchant support and provide your PayPal credentials:
 
       ◦ Account facilitator email address
