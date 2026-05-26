@@ -19,7 +19,7 @@ import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
 import { Constants } from '../constants/paymentConstants';
 import { Token } from '../models/TokenModel';
-import { ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, ErrorType, LoggerConfigType, PaymentCustomFieldsType, PaymentTransactionType } from '../types/Types';
+import { ActionResponseType, ActionType, AddressType, AmountPlannedType, CertificateResponseType, CustomerCustomType, CustomerTokensType, ErrorType, LoggerConfigType, PaymentCustomFieldsType, PaymentTransactionType } from '../types/Types';
 
 import { errorHandler, PaymentProcessingError, SystemError, ValidationError } from './ErrorHandler';
 import paymentValidator from './PaymentValidator';
@@ -43,6 +43,7 @@ const logData = (filePath: string, method: string, type: string, id: string, log
   let logger: winston.Logger;
   let fileName = path.parse(path.basename(filePath)).name;
   let newDate = getDate(Date.now(), true);
+  const sanitizedLogMessage = logMessage.replace(/[\r\n]/g, ' ');
   loggingFormat = printf(({ label, methodName, level, message }) => {
     return `[${newDate}] [${label}] [${methodName}] [${level.toUpperCase()}]` + (id ? ` [${id}]` : '') + (consolidatedTime ? ` [Execution Time: ${consolidatedTime}] Ms` : '') + ` : ${message}`;
   });
@@ -64,7 +65,7 @@ const logData = (filePath: string, method: string, type: string, id: string, log
       label: fileName,
       methodName: method,
       level: type,
-      message: logMessage,
+      message: sanitizedLogMessage,
     } as Partial<LoggerConfigType>;
     if (id) {
       loggerConfig.id = encodeURI(id);
@@ -72,7 +73,7 @@ const logData = (filePath: string, method: string, type: string, id: string, log
     if (consolidatedTime) {
       loggerConfig.consolidatedTime = `${consolidatedTime} Ms`
     }
-    logger.log(loggerConfig as LoggerConfigType);
+    logger.log(sanitizeLogData(loggerConfig) as LoggerConfigType);
   }
 };
 
@@ -809,8 +810,8 @@ const setCertificatecache = async (url: string, keyPass: string, merchantId: str
 };
 
 const setCache = (certificate: any, timeStamp: Date) => {
-  cache.put("certificateLastModifideTimeStamp", timeStamp);
-  cache.put("certificateFromP12File", certificate);
+  cache.put(Constants.CACHE_CERTIFICATE_LAST_MODIFIED_TIMESTAMP, timeStamp);
+  cache.put(Constants.CACHE_CERTIFICATE_FROM_P12_FILE, certificate);
 }
 
 const sanitize = (input: any) => {
@@ -961,6 +962,32 @@ const getRequestPayload = async (req: any) => {
   }
 }
 
+/**
+ * Validates and sanitizes an action response before sending to commercetools
+ * Ensures the response structure is valid and contains only expected fields
+ * 
+ * @param response - The response object to validate
+ * @returns Validated response object
+ */
+const validateActionResponse = (response: ActionResponseType): ActionResponseType => {
+  // Ensure response is an object
+  if (!response || typeof response !== 'object') {
+    return { actions: [], errors: [] };
+  }
+
+  // Validate actions array
+  const validatedActions = Array.isArray(response.actions) ? response.actions : [];
+  
+  // Validate errors array
+  const validatedErrors = Array.isArray(response.errors) ? response.errors : [];
+
+  // Return validated response with only expected fields
+  return {
+    actions: validatedActions,
+    errors: validatedErrors,
+  };
+}
+
 
 export default {
   logData,
@@ -1005,5 +1032,6 @@ export default {
   getApiPath,
   injectScripts,
   getSetLinkScript,
-  getRequestPayload
+  getRequestPayload,
+  validateActionResponse
 };

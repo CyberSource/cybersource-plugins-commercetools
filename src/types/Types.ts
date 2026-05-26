@@ -79,7 +79,6 @@ export type PaymentCustomFieldsType = {
   isv_applePayDisplayName: string;
   isv_applePaySessionData: string;
   isv_saleEnabled: boolean;
-  isv_enabledMoto: string;
   isv_walletType: string;
   isv_accountNumber: string;
   isv_accountType: string;

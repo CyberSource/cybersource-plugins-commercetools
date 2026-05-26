@@ -72,7 +72,9 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
     parsedUrl = url.parse(requestUrl, true);
   }
   if (process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT === Constants.STRING_GCP) {
-    if ((req.url && Constants.STATIC_FILE_REGEX.test(req.url)) || parsedUrl?.pathname === '/') {
+    /* START GENAI */
+    if (Constants.STATIC_FILE_REGEX.test(parsedUrl?.pathname || '') || parsedUrl?.pathname === '/') {
+    /* END GENAI */
       app.server.emit('request', req, res);
       return;
     }
@@ -103,7 +105,16 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
           body += chunk.toString();
         });
         req.on('end', async () => {
-          notificationBody = JSON.parse(body);
+          /* START GENAI */
+          try {
+            notificationBody = JSON.parse(body);
+          } catch {
+            errorHandler.logError(new ValidationError(CustomMessages.ERROR_MSG_INVALID_NOTIFICATION_DATA, '', FunctionConstant.FUNC_AUTHENTICATION), __filename, '');
+            res.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
+            res.end();
+            return;
+          }
+          /* END GENAI */
           const vcSignature = req?.headers['v-c-signature'];
           if (vcSignature && notificationBody) {
             isValidNotification = await authenticationHelper.authenticateNetToken(vcSignature, notificationBody);
@@ -149,13 +160,21 @@ async function authentication(req: http.IncomingMessage, res: http.ServerRespons
       const pathName = parsedUrl?.pathname;
       if (authHeader && pathName && Constants.EXTENSION_SERVICE_END_POINTS.includes(pathName)) {
         const base64Credentials = authHeader.split(' ')[1];
-        base64Credentials === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE
+        /* START GENAI */
+        const expectedValue = process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE || '';
+        const credentialMatch = base64Credentials && expectedValue && base64Credentials.length === expectedValue.length && crypto.timingSafeEqual(Buffer.from(base64Credentials), Buffer.from(expectedValue));
+        credentialMatch
+        /* END GENAI */
           ? handleRequest(req, res)
           : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_INVALID_AUTHENTICATION_CREDENTIALS }));
       } else if (Constants.PAYMENT_CREATE_DESTINATION_URL === requestUrl || Constants.PAYMENT_UPDATE_DESTINATION_URL === requestUrl || Constants.CUSTOMER_UPDATE_DESTINATION_URL === requestUrl || '/captureContext' === requestUrl) {
         const encodedCredentials = authHeader.split(' ')[1];
         const decrypt = authenticationHelper.decryption(encodedCredentials);
-        decrypt && decrypt === process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE ? handleRequest(req, res) : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
+        /* START GENAI */
+        const expectedVal = process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE || '';
+        const decryptMatch = decrypt && expectedVal && decrypt.length === expectedVal.length && crypto.timingSafeEqual(Buffer.from(decrypt), Buffer.from(expectedVal));
+        decryptMatch ? handleRequest(req, res) : route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
+        /* END GENAI */
       } else {
         route.sendResponse(res, Constants.HTTP_UNAUTHORIZED_STATUS_CODE, Constants.CONTENT_TYPE_JSON, JSON.stringify({ message: CustomMessages.ERROR_MSG_MISSING_AUTHORIZATION_HEADER }));
       }
@@ -402,7 +421,8 @@ const handlePaymentUpdate = async (req: any, res: any): Promise<void> => {
     errorHandler.logError(new PaymentProcessingError(CustomMessages.EXCEPTION_UPDATE_PAYMENT_API, exception, FunctionConstant.FUNC_HANDLE_PAYMENT_UPDATE), __filename, encodeURI(paymentId));
     updateResponse = paymentUtils.invalidOperationResponse();
   }
-  const paymentUpdateResponse = JSON.stringify(updateResponse);
+  const validatedResponse = paymentUtils.validateActionResponse(updateResponse);
+  const paymentUpdateResponse = JSON.stringify(validatedResponse);
   res.end(paymentUpdateResponse);
 };
 
@@ -547,7 +567,15 @@ const handleRefund = async (req: any, res: any): Promise<void> => {
     orderErrorMessage = CustomMessages.EXCEPTION_MSG_FETCH_PAYMENT_DETAILS;
   }
   res.statusCode = Constants.HTTP_REDIRECT_STATUS_CODE;
-  res.setHeader('Location', paymentUtils.validateRedirectPaths(viewData));
+  const redirectPath = paymentUtils.validateRedirectPaths(viewData);
+  
+  if (typeof redirectPath === 'string' && redirectPath.startsWith('/')) {
+     res.setHeader('Location', redirectPath);
+  } else {
+     res.setHeader('Location', '/orders'); //fallback
+  }
+ 
+ 
   res.end();
 };
 

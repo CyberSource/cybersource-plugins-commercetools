@@ -351,9 +351,11 @@ const retrieveSyncAmountDetails = async (paymentDetails: Payment, element: any, 
  * @returns {Promise<any>} - The updated response.
  */
 const runSyncUpdateCaptureAmount = async (updatePaymentObj: Payment | null, amount: number): Promise<any> => {
-    if (!updatePaymentObj || 0 <= amount) {
+    /* START GENAI */
+    if (!updatePaymentObj || 0 >= amount) {
         return null;
     }
+    /* END GENAI */
     const { id: paymentId, version: initialPaymentVersion, transactions: updateTransactions } = updatePaymentObj || {};
     let paymentVersion = initialPaymentVersion;
     let updateResponse: any;

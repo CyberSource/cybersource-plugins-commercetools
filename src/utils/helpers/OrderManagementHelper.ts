@@ -56,11 +56,13 @@ const getCapturedAmount = (refundPaymentObj: Payment): number => {
     if (refundPaymentObj) {
         const fractionDigits = refundPaymentObj.amountPlanned.fractionDigits;
         refundTransaction = refundPaymentObj.transactions;
-        const indexValue = refundTransaction.findIndex((transaction, index) => {
+        const indexValue = refundTransaction.findIndex((transaction, _index) => {
             if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type) {
                 return true;
             }
-            return index;
+            /* START GENAI */
+            return false;
+            /* END GENAI */
         });
         if (0 <= indexValue) {
             for (let transaction of refundTransaction) {
@@ -90,11 +92,13 @@ const getAuthorizedAmount = (capturePaymentObj: Payment): number => {
     if (capturePaymentObj) {
         const captureTransaction = capturePaymentObj.transactions;
         const fractionDigits = capturePaymentObj.amountPlanned.fractionDigits;
-        const indexValue = captureTransaction.findIndex((transaction: Transaction, index: number) => {
+        const indexValue = captureTransaction.findIndex((transaction: Transaction, _index: number) => {
             if (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION === transaction.type) {
                 return true;
             }
-            return index;
+            /* START GENAI */
+            return false;
+            /* END GENAI */
         });
         if (0 <= indexValue) {
             const authorizedAmount = Number(captureTransaction[indexValue]?.amount?.centAmount);

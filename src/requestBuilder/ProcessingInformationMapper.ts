@@ -76,7 +76,7 @@ export class ProcessingInformation {
         }
         this.configureReconciliationId(orderNo);
         this.configurePaymentSolution(resourceObj, customFields);
-        this.configureBankTransferOptions(resourceObj, customFields);
+        this.configureBankTransferOptions(resourceObj);
 
         return this.processingInformation;
     }
@@ -89,7 +89,9 @@ export class ProcessingInformation {
    * @param customFields - Custom fields related to the payment.
    */
     private configureAuthorizationProcessing(actionList: string[], customFields: any) {
-        if (customFields?.isv_enabledMoto) {
+        /* START GENAI */
+        if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_MOTO)) {
+        /* END GENAI */
             this.processingInformation.commerceIndicator = 'MOTO';
         }
         if (customFields?.isv_saleEnabled && Constants.PAYPAL !== this.service) {
@@ -194,12 +196,14 @@ export class ProcessingInformation {
      * @param resourceObj - The payment resource object containing payment method info.
      * @param customFields - Custom fields that may influence the bank transfer configuration.
      */
-    private configureBankTransferOptions(resourceObj: Payment | null, customFields?: Partial<PaymentCustomFieldsType>) {
+    private configureBankTransferOptions(resourceObj: Payment | null) {
         if (Constants.ECHECK === resourceObj?.paymentMethodInfo?.method) {
+            /* START GENAI */
             const banktransferOptions: Ptsv2creditsProcessingInformationBankTransferOptions = {
-                secCode: customFields?.isv_enabledMoto ? 'TEL' : 'WEB',
+                secCode: paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_MOTO) ? 'TEL' : 'WEB',
                 fraudScreeningLevel: 1
             };
+            /* END GENAI */
             this.processingInformation.bankTransferOptions = banktransferOptions;
         }
     }

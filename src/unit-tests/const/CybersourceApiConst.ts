@@ -1,9 +1,11 @@
+/* START GENAI */
  const configObject = {
   authenticationType: 'http_signature',
-  runEnvironment: 'apitest.cybersource.com',
-  merchantID: 'visa_isv_commercetools_pmt',
-  merchantKeyId: 'c886fd00-4d1b-4163-9a02-024948d0fe07',
-  merchantsecretKey: 'uWewxMNOAbkMcR6mivYXQDa7uyLUHN3d3TEAxIqI/2g=',
+  runEnvironment: process.env.PAYMENT_GATEWAY_TEST_ENVIRONMENT || 'apitest.cybersource.com',
+  merchantID: process.env.PAYMENT_GATEWAY_MERCHANT_ID || '',
+  merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID || '',
+  merchantsecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY || '',
+/* END GENAI */
   logConfiguration: {
     enableLog: false,
   },
