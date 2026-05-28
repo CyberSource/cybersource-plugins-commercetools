@@ -26,7 +26,7 @@ import paymentHelper from './utils/helpers/PaymentHelper';
 const ALLOWED_TOKEN_FIELDS: (keyof CustomerTokensType)[] = [
   'alias', 'value', 'paymentToken', 'instrumentIdentifier',
   'cardType', 'cardName', 'cardNumber', 'cardExpiryMonth',
-  'cardExpiryYear', 'addressId', 'timeStamp', 'address',
+  'cardExpiryYear', 'addressId', 'timestamp', 'address',
 ];
 
 /**
@@ -63,17 +63,23 @@ const isValidTokenSchema = (tokenObj: any): tokenObj is Partial<CustomerTokensTy
 
 /**
  * Verifies that the token identified by paymentToken belongs to the customer
- * by checking that it exists in the customer's isv_tokens array.
+ * by fetching the customer's authoritative isv_tokens from the server-side
+ * commercetools API and validating the paymentToken against that source.
  *
  * @param {string} paymentToken - The paymentToken to verify ownership of.
- * @param {string[]} customerTokens - The customer's full isv_tokens array.
- * @returns {boolean} - True if the paymentToken is found in the customer's tokens.
+ * @param {string} customerId - The customer ID to fetch authoritative data for.
+ * @returns {Promise<boolean>} - True if the paymentToken is found in the customer's server-side tokens.
  */
-const isTokenOwnedByCustomer = (paymentToken: string, customerTokens: string[]): boolean => {
-  if (!customerTokens || !Array.isArray(customerTokens) || customerTokens.length === 0) {
+const isTokenOwnedByCustomer = async (paymentToken: string, customerId: string): Promise<boolean> => {
+  if (!paymentToken || !customerId) {
     return false;
   }
-  for (const tokenStr of customerTokens) {
+  const customerInfo = await commercetoolsApi.getCustomer(customerId);
+  const serverTokens = customerInfo?.custom?.fields?.isv_tokens;
+  if (!serverTokens || !Array.isArray(serverTokens) || serverTokens.length === 0) {
+    return false;
+  }
+  for (const tokenStr of serverTokens) {
     try {
       const token = JSON.parse(tokenStr);
       if (token && token.paymentToken === paymentToken) {
@@ -185,16 +191,18 @@ const customerUpdateApi = async (customerObj: any): Promise<ActionResponseType> 
       } else if (isv_tokens && 0 < isv_tokens?.length) {
         const tokensToUpdate = JSON.parse(customerObj.custom.fields.isv_tokens[0]);
         /* START GENAI */
-        if (!isValidTokenSchema(tokensToUpdate) || !isTokenOwnedByCustomer(tokensToUpdate.paymentToken as string, isv_tokens)) {
-          paymentUtils.logData(__filename, FunctionConstant.FUNC_CUSTOMER_UPDATE_API, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_INVALID_TOKEN_DATA);
-          return response;
+        if (Constants.ISV_TOKEN_ACTION_DELETE === isv_tokenAction || Constants.ISV_TOKEN_ACTION_UPDATE === isv_tokenAction) {
+          if (!isValidTokenSchema(tokensToUpdate) || !(await isTokenOwnedByCustomer(tokensToUpdate.paymentToken as string, customerObj.id))) {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_CUSTOMER_UPDATE_API, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_INVALID_TOKEN_DATA);
+            return response;
+          }
         }
         /* END GENAI */
         switch (isv_tokenAction) {
-          case 'delete':
+          case Constants.ISV_TOKEN_ACTION_DELETE:
             response = await paymentHandler.handleCardDeletion(tokensToUpdate, customerObj.id);
             break;
-          case 'update':
+          case Constants.ISV_TOKEN_ACTION_UPDATE:
             response = await paymentHandler.handleUpdateCard(tokensToUpdate, customerObj.id, customerObj);
             break;
           default:
@@ -462,4 +470,6 @@ export default {
   captureContextApi,
   notificationApi,
   orderManagementApi,
+  isValidTokenSchema,
+  isTokenOwnedByCustomer,
 };

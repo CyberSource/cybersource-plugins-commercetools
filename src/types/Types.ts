@@ -175,7 +175,7 @@ export type CustomerTokensType = {
   cardExpiryMonth: string;
   cardExpiryYear: string;
   addressId: string;
-  timeStamp: string;
+  timestamp: string;
   address: Partial<AddressType>;
 };
 //Mid credentials object

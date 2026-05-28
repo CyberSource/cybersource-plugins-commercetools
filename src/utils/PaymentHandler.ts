@@ -243,7 +243,7 @@ const handleApplePaySession = async (fields: Partial<PaymentCustomFieldsType>): 
   if (PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH && PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH && PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME && PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID) {
     const certificateString = PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH;
     const keyString = PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH;
-    if (Constants.STRING_AWS === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
+    if (Constants.STRING_AWS === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_GCP === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
       const certData = await paymentUtils.getCertificatesData(certificateString);
       const keyData = await paymentUtils.getCertificatesData(keyString);
       if (Constants.HTTP_OK_STATUS_CODE === certData?.status && certData.data && Constants.HTTP_OK_STATUS_CODE === keyData.status && keyData.data) {

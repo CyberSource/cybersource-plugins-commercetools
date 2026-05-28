@@ -200,6 +200,8 @@ export abstract class Constants {
   static readonly ISV_ADDRESS_ID = 'isv_addressId';
   static readonly ISV_TRANSACTION_DATA = 'isv_transaction_data';
   static readonly ISV_TOKEN_ACTION = 'isv_tokenAction';
+  static readonly ISV_TOKEN_ACTION_DELETE = 'delete';
+  static readonly ISV_TOKEN_ACTION_UPDATE = 'update';
   static readonly ISV_CARD_NEW_EXPIRY_MONTH = 'isv_cardNewExpiryMonth';
   static readonly ISV_CARD_NEW_EXPIRY_YEAR = 'isv_cardNewExpiryYear';
   static readonly ISV_FAILED_TOKENS = 'isv_failedTokens';
