@@ -15,6 +15,7 @@ const getSubscriptionDetails = async (apiClient: any, configObject: any, request
     apiHeaders.contentTypes,
     apiHeaders.accepts,
     apiHeaders.returnType,
+    false,
     callback
   );
 };
@@ -34,6 +35,7 @@ const createNewSubscription = async (apiClient: any, configObject: any, requestO
     apiHeaders.contentTypes,
     apiHeaders.accepts,
     apiHeaders.returnType,
+    false,
     callback
   );
 };
@@ -53,6 +55,7 @@ const deleteWebhookSubscription = async (apiClient: any, configObject: any, webh
     apiHeaders.contentTypes,
     apiHeaders.accepts,
     apiHeaders.returnType,
+    false,
     callback
   );
 };

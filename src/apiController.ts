@@ -114,7 +114,6 @@ const paymentCreateApi = async (paymentObj: Payment): Promise<ActionResponseType
       } else {
         const microFormKeys = await flexKeys.getFlexKeys(paymentObj);
         if (microFormKeys?.isv_tokenCaptureContextSignature) {
-          response = paymentUtils.invalidOperationResponse();
           const verifiedCaptureContext = await keyVerification.getPublicKeys(microFormKeys.isv_tokenCaptureContextSignature, paymentObj);
           if (verifiedCaptureContext) {
             const actions = paymentUtils.setCustomFieldMapper(microFormKeys);

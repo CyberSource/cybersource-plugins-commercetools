@@ -93,7 +93,7 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
         if (!jwtConfiguration.keyFileName && !fs.existsSync(filePath) && (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_GCP === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) && jwtConfiguration.keyFileUrl) {
           configObject.keyFileName = Constants.STRING_TEST;
           configObject.keysDirectory = path.resolve(__dirname, Constants.CERTIFICATE_PATH);
-          await paymentUtils.setCertificatecache(jwtConfiguration.keyFileUrl, jwtConfiguration.keyPass, midCredentialsObject.merchantId);
+          await paymentUtils.setCertificatecache(jwtConfiguration.keyFileUrl, jwtConfiguration.keyPass, midCredentialsObject.merchantId, jwtConfiguration.keyAlias || '');
         } else if (jwtConfiguration.keyFileName && fs.existsSync(filePath)) {
           configObject.keyFileName = jwtConfiguration.keyFileName;
           configObject.keysDirectory = path.resolve(__dirname, Constants.CERTIFICATE_PATH);
@@ -387,7 +387,7 @@ const getTargetOrigins = (): string[] => {
  */
 const getAllowedPaymentMethods = (): string[] => {
   let { PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS } = process.env;
-  let allowedPaymentTypesArray = ['PANENTRY', 'SRC', 'GOOGLEPAY'];
+  let allowedPaymentTypesArray = ['PANENTRY', 'CLICKTOPAY', 'GOOGLEPAY'];
   if (PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS) {
     const allowedPaymentTypes = PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS;
     allowedPaymentTypesArray = allowedPaymentTypes.split(Constants.REGEX_COMMA);

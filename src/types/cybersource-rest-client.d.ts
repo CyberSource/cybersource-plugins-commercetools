@@ -96,6 +96,7 @@ declare module "cybersource-rest-client" {
       contentTypes: Array<string>,
       accepts: Array<string>,
       returnType: string | Array<string> | Record<string, unknown>,
+      isResponseMLEForApi: boolean,
       callback: any,
     ): Record<string, unknown>;
 
@@ -14952,7 +14953,7 @@ declare module "cybersource-rest-client" {
      */
     getTransaction(id: string, callback?: any): TssV2TransactionsGet200Response;
   }
-  export class TransientTokenDataApi {
+  export class TransientTokenDataV2Api {
     config: MerchantConfig;
     apiClient: ApiClient;
 

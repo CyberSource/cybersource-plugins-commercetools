@@ -3,7 +3,6 @@ import crypto from 'crypto';
 import { Payment } from '@commercetools/platform-sdk';
 import restApi from 'cybersource-rest-client';
 import jwt from 'jsonwebtoken';
-import jwkToPem from 'jwk-to-pem';
 
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
@@ -55,14 +54,14 @@ const getPublicKeys = async (captureContext: string, paymentObj: Payment): Promi
         publicKeyHeaderParams['Digest'] = `SHA-256=${digest}`;
         const startTime = new Date().getTime();
         return await new Promise((resolve, reject) => {
-          apiClient.callApi(publicKeyURL, 'GET', publicKeyPathParams, {}, publicKeyHeaderParams, null, null, [], ['application/json'], ['application/json'], Constants.STR_OBJECT, (error: any, data: any, response: any) => {
+          apiClient.callApi(publicKeyURL, 'GET', publicKeyPathParams, {}, publicKeyHeaderParams, null, null, [], ['application/json'], ['application/json'], Constants.STR_OBJECT,false, (error: any, data: any, response: any) => {
             const endTime = new Date().getTime();
             paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_DEBUG, 'PaymentId : ' + paymentId, 'Public Key Response =' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
             paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_INFO, '', `${endTime - startTime}`);
             if (data) {
               let isSignatureValid;
               try {
-                pemPublicKey = jwkToPem(data);
+                pemPublicKey = crypto.createPublicKey({ key: data, format: 'jwk' }).export({ type: 'spki', format: 'pem' }) as string;
                 isSignatureValid = jwt.verify(captureContext, pemPublicKey);
               } catch (exception) {
                 errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION, exception, FunctionConstant.FUNC_GET_PUBLIC_KEYS), __filename, 'PaymentId : ' + paymentId);
