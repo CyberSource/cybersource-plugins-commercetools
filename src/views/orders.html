@@ -10,15 +10,51 @@
       display: none;
     }
   </style>
-  <script type="text/javascript">
-    if (self === top) {
-      var antiClickjack = document.getElementById("antiClickjack");
-      if (antiClickjack) {
-        antiClickjack.parentNode.removeChild(antiClickjack);
+  <script>
+    // Framebusting with whitelist validation for legacy browsers - Checkmarx compliance
+    (function() {
+      // Hardcoded whitelist of allowed paths
+      var whiteListEndpoints = [
+        '/orders',
+        '/orderData',
+        '/capture',
+        '/refund',
+        '/authReversal',
+        '/paymentDetails',
+        '/paymentData',
+        '/sync',
+        '/decisionSync',
+        '/configureExtension',
+        '/generateHeader',
+        '/favicon.ico'
+      ];
+      
+      if (self === top) {
+        // Not in a frame - show content
+        var antiClickjack = document.getElementById("antiClickjack");
+        if (antiClickjack && antiClickjack.parentNode) {
+          antiClickjack.parentNode.removeChild(antiClickjack);
+        }
+      } else {
+        // In a frame - validate before redirecting
+        var currentPath = window.location.pathname;
+        var matchedPath = null;
+        
+        for (var i = 0; i < whiteListEndpoints.length; i++) {
+          if (currentPath === whiteListEndpoints[i] || currentPath.indexOf(whiteListEndpoints[i]) === 0) {
+            matchedPath = whiteListEndpoints[i];  // Store the hardcoded value that matched
+            break;
+          }
+        }
+        
+        if (matchedPath) {
+          // Safe redirect using hardcoded whitelist value only (no DOM data)
+          top.location = matchedPath;
+        } else {
+          console.error('Invalid redirect URL blocked for security');
+        }
       }
-    } else {
-      top.location = encodeURI(self.location);
-    }
+    })();
   </script>
 </head>
 <body>

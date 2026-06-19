@@ -1,4 +1,4 @@
-import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, validateAmountValue, sanitizeResponseData, getApiPath } from './utils.js';
+import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, sanitizeResponseData, getApiPath, validateAmountValue } from './utils.js';
 
 if (window.location.pathname.includes('paymentDetails')) {
   document.addEventListener('DOMContentLoaded', async function () {
@@ -78,12 +78,18 @@ if (window.location.pathname.includes('paymentDetails')) {
       buttonsDiv.classList.add('div-padding');
       buttonsDiv.id = 'buttonsDiv';
 
-      const authorizedAmount = validateAmountValue(paymentsData?.authorizedAmount);
+     const authorizedAmountValue = validateAmountValue(paymentsData?.authorizedAmount);
+
+       const authorizedAmount = authorizedAmountValue > 0 ? String(authorizedAmountValue) : '';
+
       const captureAmount = validateAmountValue(paymentsData?.captureAmount);
+
       if (authPresent && !authReversalPresent && (!refundPresent || (refundPresent && authorizedAmount)) && ((capturePresent && authorizedAmount) || (!capturePresent && authorizedAmount))) {
         const captureMsgDiv = document.createElement('div');
         captureMsgDiv.classList.add('div-padding');
-        captureMsgDiv.textContent = `You can capture amount ${authorizedAmount} `;
+        /* START GENAI */
+        captureMsgDiv.textContent = 'Capture is available. Enter the amount to capture:';
+        /* END GENAI */
         const partialCaptureForm = document.createElement('form');
         partialCaptureForm.action = getApiPath('capture');
         partialCaptureForm.classList.add('div-padding');
@@ -105,7 +111,9 @@ if (window.location.pathname.includes('paymentDetails')) {
       if ((capturePresent && !authReversalPresent && refundPresent && captureAmount) || (!refundPresent && capturePresent)) {
         const refundMsgDiv = document.createElement('div');
         refundMsgDiv.classList.add('div-padding');
-        refundMsgDiv.textContent = `You can refund amount ${captureAmount}`;
+        /* START GENAI */
+        refundMsgDiv.textContent = 'Refund is available. Enter the amount to refund:';
+        /* END GENAI */
 
         const refundForm = document.createElement('form');
         refundForm.action = getApiPath('refund');

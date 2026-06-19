@@ -26,6 +26,19 @@ const clientSecret = process.env.CT_CLIENT_SECRET || '';
 const authHost = process.env.CT_AUTH_HOST || '';
 const apiHost = process.env.CT_API_HOST || '';
 
+/* START GENAI */
+/**
+ * Sanitizes a value for safe use in Commercetools query predicates.
+ * Escapes backslash and double-quote characters to prevent predicate injection.
+ *
+ * @param {string} value - The value to sanitize.
+ * @returns {string} - The sanitized value safe for embedding in predicate strings.
+ */
+const sanitizePredicateValue = (value: string): string => {
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+};
+/* END GENAI */
+
 const getClient = async () => {
   let client: ByProjectKeyRequestBuilder | null = null;
   const httpMiddlewareOptions: HttpMiddlewareOptions = {
@@ -96,7 +109,7 @@ const queryCartById = async (id: string, idType: string): Promise<any> => {
           .carts()
           .get({
             queryArgs: {
-              where: `${Constants.ANONYMOUS_ID}="${id}" AND ${Constants.ACTIVE_CART_STATE}`,
+              where: `${Constants.ANONYMOUS_ID}="${sanitizePredicateValue(id)}" AND ${Constants.ACTIVE_CART_STATE}`,
               sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
             },
           });
@@ -107,7 +120,7 @@ const queryCartById = async (id: string, idType: string): Promise<any> => {
           .carts()
           .get({
             queryArgs: {
-              where: `${Constants.CUSTOMER_ID}="${id}" AND ${Constants.ACTIVE_CART_STATE}`,
+              where: `${Constants.CUSTOMER_ID}="${sanitizePredicateValue(id)}" AND ${Constants.ACTIVE_CART_STATE}`,
               sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
             },
           });
@@ -118,7 +131,7 @@ const queryCartById = async (id: string, idType: string): Promise<any> => {
           .carts()
           .get({
             queryArgs: {
-              where: `paymentInfo(payments(id="${id}"))`,
+              where: `paymentInfo(payments(id="${sanitizePredicateValue(id)}"))`,
             },
           });
         logIdType = 'Payment Id: ';
@@ -154,11 +167,11 @@ const queryOrderById = async (id: string, idType: string) => {
   if (id && idType && client) {
     switch (idType) {
       case Constants.CART_ID:
-        query = client.orders().get({ queryArgs: { where: [`cart(id="${id}")`] } });
+        query = client.orders().get({ queryArgs: { where: [`cart(id="${sanitizePredicateValue(id)}")`] } });
         logIdType = 'CartId : ';
         break;
       case Constants.PAYMENT_ID:
-        query = client.orders().get({ queryArgs: { where: [`paymentInfo(payments(id="${id}"))`] } });
+        query = client.orders().get({ queryArgs: { where: [`paymentInfo(payments(id="${sanitizePredicateValue(id)}"))`] } });
         logIdType = 'PaymentId : ';
         break;
       default:
@@ -738,7 +751,7 @@ const retrieveCustomObjectByContainer = async (container: string) => {
   let getCustomObjectsResponse: any;
   const client = await getClient();
   if (container && client) {
-    const query = client.customObjects().get({ queryArgs: { where: [`container="${container}"`] } });
+    const query = client.customObjects().get({ queryArgs: { where: [`container="${sanitizePredicateValue(container)}"`] } });
     const startTime = new Date().getTime();
     getCustomObjectsResponse = await query.execute();
     const endTime = new Date().getTime();
@@ -794,7 +807,7 @@ const retrieveCustomerByCustomField = async (customFieldName: string, customFiel
   let retrieveCustomerByCustomObjectResponse;
   const client = await getClient();
   if (customFieldName && customFieldValue && client) {
-    const query = client.customers().get({ queryArgs: { where: `custom(fields(${customFieldName} = "${customFieldValue}"))` } });
+    const query = client.customers().get({ queryArgs: { where: `custom(fields(${customFieldName} = "${sanitizePredicateValue(customFieldValue)}"))` } });
     retrieveCustomerByCustomObjectResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${retrieveCustomerByCustomObjectResponse.consolidatedTime} `);
   }

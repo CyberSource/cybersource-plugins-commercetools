@@ -35,7 +35,7 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
   static readonly PAYMENT_GATEWAY_NETWORK_TOKEN_EVENT_TYPE = 'tms.networktoken.updated';
   static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'Commercetools(REST)';
-  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.3.0';
+  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.3.1';
   static readonly PAYMENT_GATEWAY_AP_SESSIONS = 'AP_SESSIONS';
   static readonly PAYMENT_GATEWAY_AP_STATUS = 'AP_STATUS';
   static readonly PAYMENT_GATEWAY_AP_ORDER = 'AP_ORDER';
@@ -155,6 +155,8 @@ export abstract class Constants {
   static readonly NETWORK_TOKEN_EVENT = 'tms.networktoken.updated';
   static readonly ADDITIONAL_CUSTOM_TYPE_FILE_PATH = 'src/resources/isv_additonal_custom_type.json';
   static readonly CERTIFICATE_PATH = '../certificates';
+  static readonly CACHE_CERTIFICATE_FROM_P12_FILE = 'certificateFromP12File';
+  static readonly CACHE_CERTIFICATE_LAST_MODIFIED_TIMESTAMP = 'certificateLastModifideTimeStamp';
   static readonly STRING_TEST = 'test';
   static readonly STRING_GOOGLE_PAY = 'googlePay';
   static readonly STRING_VISA = 'visa';
@@ -198,6 +200,8 @@ export abstract class Constants {
   static readonly ISV_ADDRESS_ID = 'isv_addressId';
   static readonly ISV_TRANSACTION_DATA = 'isv_transaction_data';
   static readonly ISV_TOKEN_ACTION = 'isv_tokenAction';
+  static readonly ISV_TOKEN_ACTION_DELETE = 'delete';
+  static readonly ISV_TOKEN_ACTION_UPDATE = 'update';
   static readonly ISV_CARD_NEW_EXPIRY_MONTH = 'isv_cardNewExpiryMonth';
   static readonly ISV_CARD_NEW_EXPIRY_YEAR = 'isv_cardNewExpiryYear';
   static readonly ISV_FAILED_TOKENS = 'isv_failedTokens';

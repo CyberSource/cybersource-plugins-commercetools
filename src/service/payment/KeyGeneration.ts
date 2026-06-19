@@ -14,8 +14,6 @@ import paymentUtils from '../../utils/PaymentUtils';
  * @returns {Promise<unknown>}} - The key generation response.
 */
 const getKeyGenerationResponse = async (midCredentials: MidCredentialsType): Promise<KeyResponse> => {
-  let merchantId = '';
-  const vCPermissions = '100';
   const keyResponse: KeyResponse = {
     httpCode: 0,
     organizationId: null,
@@ -27,7 +25,6 @@ const getKeyGenerationResponse = async (midCredentials: MidCredentialsType): Pro
   const apiClient = new restApi.ApiClient();
   const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, midCredentials, null, null);
   if (configObject) {
-    merchantId = configObject.merchantID;
     opts = {
       vCCorrelationId: null,
       saveSymEgressKey: {
@@ -46,7 +43,7 @@ const getKeyGenerationResponse = async (midCredentials: MidCredentialsType): Pro
     const startTime = new Date().getTime();
     return await new Promise<KeyResponse>((resolve, reject) => {
       if (createNewWebhooksApiInstance) {
-        createNewWebhooksApiInstance.saveSymEgressKey(merchantId, vCPermissions, opts, function (error: any, data: any, response: any) {
+        createNewWebhooksApiInstance.saveSymEgressKey(opts, function (error: any, data: any, response: any) {
           const endTime = new Date().getTime();
           paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_KEY_GENERATION_RESPONSE, Constants.LOG_DEBUG, '', paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
           if (data) {

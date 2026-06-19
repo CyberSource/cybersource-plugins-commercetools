@@ -201,8 +201,10 @@ const createEnrollResponseActions = (response: any, updatePaymentObj: Payment): 
         let { transactionId: isv_payerEnrollTransactionId, httpCode: isv_payerEnrollHttpCode, status: isv_payerEnrollStatus, data } = response || {};
         action.actions = paymentUtils.setCustomFieldMapper({ isv_payerEnrollTransactionId, isv_payerEnrollHttpCode, isv_payerEnrollStatus });
         if (Constants.HTTP_SUCCESS_STATUS_CODE === isv_payerEnrollHttpCode && Constants.API_STATUS_AUTHORIZED === isv_payerEnrollStatus && data) {
+            if(!customFields?.isv_payerAuthenticationTransactionId){
             isv_payerAuthenticationTransactionId = response.data.consumerAuthenticationInformation?.authenticationTransactionId || isv_payerEnrollTransactionId;
             action.actions.push(...paymentUtils.setCustomFieldMapper({ isv_payerAuthenticationTransactionId }));
+            }
         }
         if (response.data?.id && 'PAYERAUTH_INVOKE' === response.action || 'PAYERAUTH_EXTERNAL' === response.action || ('04' === response?.requestData?.consumerAuthenticationInformation?.challengeCode && paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_DECISION_MANAGER))) {
             isv_dmpaFlag = true;

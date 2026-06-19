@@ -27,6 +27,7 @@ import { AddressMapper } from './AddressMapper';
 import { OrderInformationMapper } from './OrderInformationMapper';
 import { PaymentInformationModel } from './PaymentInformation';
 import { ProcessingInformation } from './ProcessingInformationMapper';
+import cache from 'memory-cache';
 
 /**
  * Generates the configuration object based on the provided parameters.
@@ -79,6 +80,8 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
     configObject.merchantKeyId = midCredentialsObject.merchantKeyId;
     configObject.merchantsecretKey = midCredentialsObject.merchantSecretKey;
     if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_USE_MLE) && !Constants.MLE_UNSUPPORTED_FUNCTIONS.includes(functionName)) {
+      cache.del(Constants.CACHE_CERTIFICATE_FROM_P12_FILE);
+      cache.del(Constants.CACHE_CERTIFICATE_LAST_MODIFIED_TIMESTAMP);
       const jwtConfiguration = multiMid.getKeyCredentials(midCredentialsObject.merchantId);
       if (jwtConfiguration.keyPass && (jwtConfiguration.keyFileName || jwtConfiguration.keyFileUrl)) {
         configObject.useMLEGlobally = true;
@@ -90,7 +93,7 @@ const getConfigObject = async (functionName: string, midCredentials: MidCredenti
         if (!jwtConfiguration.keyFileName && !fs.existsSync(filePath) && (Constants.STRING_AWS === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_GCP === process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) && jwtConfiguration.keyFileUrl) {
           configObject.keyFileName = Constants.STRING_TEST;
           configObject.keysDirectory = path.resolve(__dirname, Constants.CERTIFICATE_PATH);
-          await paymentUtils.setCertificatecache(jwtConfiguration.keyFileUrl, jwtConfiguration.keyPass, midCredentialsObject.merchantId);
+          await paymentUtils.setCertificatecache(jwtConfiguration.keyFileUrl, jwtConfiguration.keyPass, midCredentialsObject.merchantId, jwtConfiguration.keyAlias || '');
         } else if (jwtConfiguration.keyFileName && fs.existsSync(filePath)) {
           configObject.keyFileName = jwtConfiguration.keyFileName;
           configObject.keysDirectory = path.resolve(__dirname, Constants.CERTIFICATE_PATH);
@@ -194,6 +197,10 @@ const getOrderInformation = (functionName: string, paymentObj: Payment | null, u
   return orderInformationMapper.getOrderInformation();
 };
 
+const getCartTotalPrice = (cartObj: Cart): number => {
+  return cartObj.taxedPrice?.totalGross?.centAmount ?? cartObj.totalPrice?.centAmount ?? 0;
+}
+
 /**
  * Generates order information amount details based on the provided parameters.
  * 
@@ -223,12 +230,12 @@ const getOrderInformationAmountDetails = (functionName: string, captureAmount: n
     orderInformationAmountDetails.currency = paymentObj?.amountPlanned?.currencyCode;
   } else if (cartObj?.totalPrice && (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === functionName || FunctionConstant.FUNC_CREATE_ORDER_RESPONSE === functionName || FunctionConstant.FUNC_GET_SESSION_RESPONSE === functionName)) {
     orderInformationAmountDetails = {} as Ptsv2paymentsOrderInformationAmountDetails;
-    orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits);
+    orderInformationAmountDetails.totalAmount = paymentUtils.convertCentToAmount(getCartTotalPrice(cartObj), cartObj.totalPrice.fractionDigits);
     orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
   } else if (FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT === functionName) {
     orderInformationAmountDetails = {} as Upv1capturecontextsOrderInformationAmountDetails;
     if ('Payments' === service && cartObj?.totalPrice) {
-      orderInformationAmountDetails.totalAmount = `${paymentUtils.convertCentToAmount(cartObj.totalPrice.centAmount, cartObj.totalPrice.fractionDigits)}`;
+      orderInformationAmountDetails.totalAmount = `${paymentUtils.convertCentToAmount(getCartTotalPrice(cartObj), cartObj.totalPrice.fractionDigits)}`;
       orderInformationAmountDetails.currency = cartObj?.totalPrice?.currencyCode;
     } else if ('MyAccounts' === service) {
       orderInformationAmountDetails.currency = currencyCode;
@@ -380,7 +387,7 @@ const getTargetOrigins = (): string[] => {
  */
 const getAllowedPaymentMethods = (): string[] => {
   let { PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS } = process.env;
-  let allowedPaymentTypesArray = ['PANENTRY', 'SRC', 'GOOGLEPAY'];
+  let allowedPaymentTypesArray = ['PANENTRY', 'CLICKTOPAY', 'GOOGLEPAY'];
   if (PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS) {
     const allowedPaymentTypes = PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS;
     allowedPaymentTypesArray = allowedPaymentTypes.split(Constants.REGEX_COMMA);

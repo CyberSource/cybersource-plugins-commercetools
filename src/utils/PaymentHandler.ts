@@ -61,7 +61,7 @@ const handleAuthorization = async (updatePaymentObj: Payment, updateTransactions
       const serviceResponse = await handlePaymentAuth(paymentMethod, updatePaymentObj, customerInfo, results[0], updateTransactions, cardTokens, orderNo);
       const authresponse = serviceResponse?.authResponse;
       if (authresponse) {
-        authResponse = serviceResponse.authResponse;
+        authResponse = paymentUtils.validateActionResponse(serviceResponse.authResponse);
         isError = serviceResponse.isError;
       }
       const paymentResponse = serviceResponse.paymentResponse;
@@ -163,6 +163,63 @@ const handlePayerAuthReversal = async (updatePaymentObj: Payment, paymentRespons
   return updateActions;
 };
 
+/* START GENAI */
+/**
+ * Allowlist of Apple Pay validation domains and IP addresses.
+ * Only these endpoints are permitted for Apple Pay session validation requests.
+ */
+const applePayAllowedDomains = {
+  domains: [
+    'apple-pay-gateway.apple.com',
+    'cn-apple-pay-gateway.apple.com',
+    'apple-pay-gateway-cert.apple.com',
+    'cn-apple-pay-gateway-cert.apple.com',
+  ],
+  ipAddresses: [
+    '17.171.78.7', '17.171.78.71', '17.171.78.135', '17.171.78.199', '17.171.79.12',
+    '17.141.128.7', '17.141.128.71', '17.141.128.135', '17.141.128.199', '17.141.129.12',
+    '17.32.214.7', '17.157.96.181', '17.33.194.239', '17.33.192.38', '17.33.193.110',
+    '17.33.202.35', '17.33.201.101', '17.33.200.169',
+    '101.230.204.232', '101.230.204.242', '101.230.204.240',
+    '60.29.205.104', '60.29.205.106', '60.29.205.108',
+    '17.171.85.7', '17.179.124.181', '17.32.214.56',
+    '17.33.194.218', '17.33.192.145', '17.33.193.45',
+    '17.33.200.47', '17.33.202.99', '17.33.201.105',
+    '101.230.204.235',
+  ],
+};
+
+/**
+ * Validates that the Apple Pay validation URL is an allowed Apple endpoint.
+ * Checks URL scheme (must be https), and that the hostname matches
+ * an allowed domain or IP address from the allowlist.
+ *
+ * @param {string | undefined} validationUrl - The URL to validate.
+ * @returns {boolean} - True if the URL is allowed, false otherwise.
+ */
+const isValidApplePayValidationUrl = (validationUrl: string | undefined): boolean => {
+  if (!validationUrl) {
+    return false;
+  }
+  try {
+    const parsedUrl = new URL(validationUrl);
+    if (parsedUrl.protocol !== 'https:') {
+      return false;
+    }
+    const hostname = parsedUrl.hostname.toLowerCase();
+    if (applePayAllowedDomains.domains.includes(hostname)) {
+      return true;
+    }
+    if (applePayAllowedDomains.ipAddresses.includes(hostname)) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
+/* END GENAI */
+
 /**
  * Handles Apple Pay session.
  * 
@@ -177,10 +234,16 @@ const handleApplePaySession = async (fields: Partial<PaymentCustomFieldsType>): 
     key: '',
   });
   const { PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH, PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH, PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME, PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID, PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT } = process.env || {};
+  /* START GENAI */
+  if (!isValidApplePayValidationUrl(fields.isv_applePayValidationUrl)) {
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_APPLE_PAY_SESSION, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_APPLE_PAY_INVALID_VALIDATION_URL);
+    return serviceResponse;
+  }
+  /* END GENAI */
   if (PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH && PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH && PAYMENT_GATEWAY_APPLE_PAY_DOMAIN_NAME && PAYMENT_GATEWAY_APPLE_PAY_MERCHANT_ID) {
     const certificateString = PAYMENT_GATEWAY_APPLE_PAY_CERTIFICATE_PATH;
     const keyString = PAYMENT_GATEWAY_APPLE_PAY_KEY_PATH;
-    if (Constants.STRING_AWS === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
+    if (Constants.STRING_AWS === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_AZURE === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT || Constants.STRING_GCP === PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT) {
       const certData = await paymentUtils.getCertificatesData(certificateString);
       const keyData = await paymentUtils.getCertificatesData(keyString);
       if (Constants.HTTP_OK_STATUS_CODE === certData?.status && certData.data && Constants.HTTP_OK_STATUS_CODE === keyData.status && keyData.data) {
@@ -320,7 +383,7 @@ const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId:
   const isError = false;
   let finalTokenIndex = -1;
   let parsedTokens: Partial<CustomerTokensType>;
-  let addressData: _BaseAddress | null = null;
+  let addressData: any = null;
   let updateServiceResponse: any;
   if (customerId) {
     const customerInfo = await commercetoolsApi.getCustomer(customerId);
@@ -351,7 +414,9 @@ const handleUpdateCard = async (tokens: Partial<CustomerTokensType>, customerId:
             parsedTokens = JSON.parse(existingTokens[finalTokenIndex]);
             parsedTokens.cardExpiryMonth = updateServiceResponse?.card.expirationMonth;
             parsedTokens.cardExpiryYear = updateServiceResponse?.card.expirationYear;
-            parsedTokens.addressId = tokens.addressId;
+            if (addressData?.id) {
+              parsedTokens.addressId = addressData.id;
+            }
             existingTokens[finalTokenIndex] = JSON.stringify(parsedTokens);
             returnResponse = paymentActions.getUpdateTokenActions(existingTokens, isv_failedTokens, isError, customerObj, null);
           } else {

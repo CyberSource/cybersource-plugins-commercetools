@@ -371,17 +371,6 @@
       "inputHint": "SingleLine"
     },
     {
-      "name": "isv_enabledMoto",
-      "label": {
-        "en": "Flag indicating MOTO transaction"
-      },
-      "required": false,
-      "type": {
-        "name": "Boolean"
-      },
-      "inputHint": "SingleLine"
-    },
-    {
       "name": "isv_walletType",
       "label": {
         "en": "Value indicating wallet type"

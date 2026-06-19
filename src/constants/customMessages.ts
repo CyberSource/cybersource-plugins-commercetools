@@ -61,6 +61,10 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
     static readonly ERROR_MSG_APPLICATION_DETAILS = 'Unable to fetch transaction application details';
     static readonly ERROR_MSG_APPLE_PAY_CERTIFICATES = 'Please provide certificates paths for Apple Pay in configuration file';
+    /* START GENAI */
+    static readonly ERROR_MSG_APPLE_PAY_INVALID_VALIDATION_URL = 'The Apple Pay validation URL is not allowed. Only Apple Pay gateway endpoints are permitted.';
+    static readonly ERROR_MSG_INVALID_TOKEN_DATA = 'Invalid token data: the token object does not conform to the expected schema or does not belong to this customer.';
+    /* END GENAI */
     static readonly ERROR_MSG_ACCESSING_CERTIFICATES = 'An error occurred while accessing ApplePay Certificates';
     static readonly ERROR_MSG_ENV_VARIABLES_NOT_FOUND = 'Missing configurations for merchant id ';
     static readonly ERROR_MSG_EMPTY_PAYMENT_DATA = 'There was an error while fetching payment details';

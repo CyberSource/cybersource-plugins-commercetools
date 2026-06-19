@@ -8,7 +8,7 @@ import captureContext from './service/payment/CaptureContextService';
 import flexKeys from './service/payment/FlexKeys';
 import getCardByInstrument from './service/payment/GetCardByInstrumentId';
 import keyVerification from './service/payment/GetPublicKeys';
-import { ActionResponseType, AmountPlannedType } from './types/Types';
+import { ActionResponseType, AmountPlannedType, CustomerTokensType } from './types/Types';
 import { ApiError, errorHandler, PaymentProcessingError } from './utils/ErrorHandler';
 import paymentActions from './utils/PaymentActions';
 import paymentHandler from './utils/PaymentHandler';
@@ -17,6 +17,81 @@ import commercetoolsApi from './utils/api/CommercetoolsApi';
 import orderManagementHelper from './utils/helpers/OrderManagementHelper';
 import payerAuthHelper from './utils/helpers/PayerAuthHelper';
 import paymentHelper from './utils/helpers/PaymentHelper';
+
+/* START GENAI */
+/**
+ * Allowed fields for the CustomerTokensType schema.
+ * Only these string fields are expected in a valid token object.
+ */
+const ALLOWED_TOKEN_FIELDS: (keyof CustomerTokensType)[] = [
+  'alias', 'value', 'paymentToken', 'instrumentIdentifier',
+  'cardType', 'cardName', 'cardNumber', 'cardExpiryMonth',
+  'cardExpiryYear', 'addressId', 'timestamp', 'address',
+];
+
+/**
+ * Validates the parsed token object against the expected CustomerTokensType schema.
+ * Ensures the object is a plain object, contains only allowed fields,
+ * and that required fields (paymentToken, value) are non-empty strings.
+ *
+ * @param {any} tokenObj - The parsed token object to validate.
+ * @returns {boolean} - True if the object conforms to the expected schema.
+ */
+const isValidTokenSchema = (tokenObj: any): tokenObj is Partial<CustomerTokensType> => {
+  if (!tokenObj || typeof tokenObj !== 'object' || Array.isArray(tokenObj)) {
+    return false;
+  }
+  const tokenKeys = Object.keys(tokenObj);
+  for (const key of tokenKeys) {
+    if (!ALLOWED_TOKEN_FIELDS.includes(key as keyof CustomerTokensType)) {
+      return false;
+    }
+  }
+  if (!tokenObj.paymentToken || typeof tokenObj.paymentToken !== 'string' || tokenObj.paymentToken.trim().length === 0) {
+    return false;
+  }
+  if (!tokenObj.value || typeof tokenObj.value !== 'string' || tokenObj.value.trim().length === 0) {
+    return false;
+  }
+  for (const key of tokenKeys) {
+    if (key !== 'address' && tokenObj[key] !== undefined && typeof tokenObj[key] !== 'string') {
+      return false;
+    }
+  }
+  return true;
+};
+
+/**
+ * Verifies that the token identified by paymentToken belongs to the customer
+ * by fetching the customer's authoritative isv_tokens from the server-side
+ * commercetools API and validating the paymentToken against that source.
+ *
+ * @param {string} paymentToken - The paymentToken to verify ownership of.
+ * @param {string} customerId - The customer ID to fetch authoritative data for.
+ * @returns {Promise<boolean>} - True if the paymentToken is found in the customer's server-side tokens.
+ */
+const isTokenOwnedByCustomer = async (paymentToken: string, customerId: string): Promise<boolean> => {
+  if (!paymentToken || !customerId) {
+    return false;
+  }
+  const customerInfo = await commercetoolsApi.getCustomer(customerId);
+  const serverTokens = customerInfo?.custom?.fields?.isv_tokens;
+  if (!serverTokens || !Array.isArray(serverTokens) || serverTokens.length === 0) {
+    return false;
+  }
+  for (const tokenStr of serverTokens) {
+    try {
+      const token = JSON.parse(tokenStr);
+      if (token && token.paymentToken === paymentToken) {
+        return true;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return false;
+};
+/* END GENAI */
 
 
 
@@ -39,7 +114,6 @@ const paymentCreateApi = async (paymentObj: Payment): Promise<ActionResponseType
       } else {
         const microFormKeys = await flexKeys.getFlexKeys(paymentObj);
         if (microFormKeys?.isv_tokenCaptureContextSignature) {
-          response = paymentUtils.invalidOperationResponse();
           const verifiedCaptureContext = await keyVerification.getPublicKeys(microFormKeys.isv_tokenCaptureContextSignature, paymentObj);
           if (verifiedCaptureContext) {
             const actions = paymentUtils.setCustomFieldMapper(microFormKeys);
@@ -115,11 +189,19 @@ const customerUpdateApi = async (customerObj: any): Promise<ActionResponseType> 
         response = await paymentHandler.handleCardAddition(customerObj.id, customerAddress, customerObj);
       } else if (isv_tokens && 0 < isv_tokens?.length) {
         const tokensToUpdate = JSON.parse(customerObj.custom.fields.isv_tokens[0]);
+        /* START GENAI */
+        if (Constants.ISV_TOKEN_ACTION_DELETE === isv_tokenAction || Constants.ISV_TOKEN_ACTION_UPDATE === isv_tokenAction) {
+          if (!isValidTokenSchema(tokensToUpdate) || !(await isTokenOwnedByCustomer(tokensToUpdate.paymentToken as string, customerObj.id))) {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_CUSTOMER_UPDATE_API, Constants.LOG_ERROR, '', CustomMessages.ERROR_MSG_INVALID_TOKEN_DATA);
+            return response;
+          }
+        }
+        /* END GENAI */
         switch (isv_tokenAction) {
-          case 'delete':
+          case Constants.ISV_TOKEN_ACTION_DELETE:
             response = await paymentHandler.handleCardDeletion(tokensToUpdate, customerObj.id);
             break;
-          case 'update':
+          case Constants.ISV_TOKEN_ACTION_UPDATE:
             response = await paymentHandler.handleUpdateCard(tokensToUpdate, customerObj.id, customerObj);
             break;
           default:
@@ -238,16 +320,35 @@ const orderManagementApi = async (paymentId: string, transactionAmount: number |
             pendingAmount = orderManagementHelper.getCapturedAmount(paymentObject);
             break;
         }
-        if (0 === transactionAmount) {
+        /* START GENAI */
+        if (Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION === transactionType) {
+          amountPlanned = { ...paymentObject.amountPlanned };
+          const transactionObject = paymentUtils.createTransactionObject(paymentObject.version, amountPlanned, transactionType, Constants.CT_TRANSACTION_STATE_INITIAL, undefined, undefined);
+        /* END GENAI */
+          const addTransaction = await commercetoolsApi.addTransaction(transactionObject, paymentId);
+          if (addTransaction && addTransaction.transactions?.length) {
+            const transactionLength = addTransaction.transactions.length;
+            const latestTransaction = addTransaction.transactions[transactionLength - 1];
+            if (latestTransaction && Constants.CT_TRANSACTION_STATE_SUCCESS === latestTransaction.state) {
+              if (latestTransaction?.type) {
+                apiResponse.successMessage = paymentUtils.handleOmSuccessMessage(latestTransaction.type);
+              }
+            } else {
+              apiResponse.errorMessage = paymentUtils.handleOMErrorMessage(2, transactionType);
+            }
+          } else {
+            apiResponse.errorMessage = CustomMessages.ERROR_MSG_ADD_TRANSACTION_DETAILS;
+          }
+        /* START GENAI */
+        } else if (!transactionAmount || transactionAmount <= 0) {
           apiResponse.errorMessage = paymentUtils.handleOMErrorMessage(0, transactionType);
-        } else if (pendingAmount && transactionAmount && transactionAmount > pendingAmount) {
+        } else if (pendingAmount && transactionAmount > pendingAmount) {
           apiResponse.errorMessage = paymentUtils.handleOMErrorMessage(1, transactionType);
         } else {
-          if (transactionAmount) {
-            amountPlanned = paymentObject.amountPlanned;
-            amountPlanned.centAmount = paymentUtils.convertAmountToCent(transactionAmount, fractionDigits)
-          }
-          const transactionObject = paymentUtils.createTransactionObject(paymentObject.version, paymentObject.amountPlanned, transactionType, Constants.CT_TRANSACTION_STATE_INITIAL, undefined, undefined);
+          amountPlanned = { ...paymentObject.amountPlanned };
+          amountPlanned.centAmount = paymentUtils.convertAmountToCent(transactionAmount, fractionDigits);
+          const transactionObject = paymentUtils.createTransactionObject(paymentObject.version, amountPlanned, transactionType, Constants.CT_TRANSACTION_STATE_INITIAL, undefined, undefined);
+        /* END GENAI */
           const addTransaction = await commercetoolsApi.addTransaction(transactionObject, paymentId);
           if (addTransaction && addTransaction.transactions?.length) {
             const transactionLength = addTransaction.transactions.length;
@@ -368,4 +469,6 @@ export default {
   captureContextApi,
   notificationApi,
   orderManagementApi,
+  isValidTokenSchema,
+  isTokenOwnedByCustomer,
 };

@@ -148,6 +148,7 @@ export abstract class FunctionConstant {
   static readonly FUNC_SET_OBJECT_VALUE = 'FuncSetObjectValue';
   static readonly FUNC_ADD_CUSTOM_TYPE = 'FuncAddCustomType';
   static readonly FUNC_SET_CERTIFICATE_CACHE = 'FuncSetCertificateCache';
+  static readonly FUNC_SET_MLE_CACHE = 'FuncSetMLECache';
   static readonly FUNC_SANITIZE_AND_VALIDATE_URL = 'FuncSanitizeAndValidateUrl';
   static readonly FUNC_INITIALIZE_COMMERCETOOLS_CLIENT = 'FuncInitializeCommercetoolsClient';
   static readonly FUNC_HANDLE_POST_AUTHORIZATION = 'FuncHandlePostAuthorization';

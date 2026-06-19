@@ -82,19 +82,17 @@ For the Commercetools Extension to support MOTO transaction, follow the steps me
     - [Process a Payment With eCheck](./Process-a-Payment-eCheck.md)
 
 
-    and add the following properties
 
-    | Property                      | Value                            | Required | Notes                                                                                                   |
-    | ----------------------------- | -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-    | custom.fields.isv_enabledMoto | Flag Indicating MOTO transaction | Yes      | Boolean value. Used by the extention to identify whether it is a normal transaction or MOTO transaction |
+    and ensure the environment variable `PAYMENT_GATEWAY_ENABLE_MOTO` is set to `true` in your server configuration to enable MOTO transaction processing.
+
 
 5.  Add the payment to the cart
 
-6.  Update the Commercetools payment (<https://docs.commercetools.com/api/projects/payments>) with the fields mentioned in the step 5 of [Process a Card Payment Without Payer Authentication](./Process-a-Card-Payment-Without-Payer-Authentication.md) along with the below data
 
-    | Property                      | Value                            | Required | Notes                                                                                                   |
-    | ----------------------------- | -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-    | custom.fields.isv_enabledMoto | Flag Indicating MOTO transaction | Yes      | Boolean value. Used by the extention to identify whether it is a normal transaction or MOTO transaction |
+6.  Update the Commercetools payment (<https://docs.commercetools.com/api/projects/payments>) with the fields mentioned in the step 5 of [Process a Card Payment Without Payer Authentication](./Process-a-Card-Payment-Without-Payer-Authentication.md)
+
+    > **_NOTE:_** MOTO transactions are controlled server-side via the `PAYMENT_GATEWAY_ENABLE_MOTO` environment variable. Set this to `true` in your deployment configuration to enable MOTO processing.
+
 
 7.  Add a transaction to the payment
 

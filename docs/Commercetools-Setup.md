@@ -142,7 +142,6 @@ Fields
 | isv_payerEnrollStatus                | String  | false    ||
 | isv_payerEnrollHttpCode              | Number  | false    ||
 | isv_saleEnabled                      | Boolean | false    ||
-| isv_enabledMoto                      | Boolean | false    ||
 | isv_walletType                       | String  | false    ||
 | isv_accountNumber                    | String  | false    ||
 | isv_accountType                      | String  | false    ||

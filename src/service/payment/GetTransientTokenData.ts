@@ -47,7 +47,7 @@ const getTransientTokenDataResponse = async (resourceObj: any, service: string):
         midCredentials = multiMid.getMidCredentials(tokenObject.isv_merchantId);
       }
       const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE, midCredentials, null, null);
-      const getTransientTokenDataApiInstance = configObject && new restApi.TransientTokenDataApi(configObject, apiClient);
+      const getTransientTokenDataApiInstance = configObject && new restApi.TransientTokenDataV2Api(configObject, apiClient);
       const startTime = new Date().getTime();
       return await new Promise<Partial<ResponseType>>(function (resolve, reject) {
         if (getTransientTokenDataApiInstance) {
