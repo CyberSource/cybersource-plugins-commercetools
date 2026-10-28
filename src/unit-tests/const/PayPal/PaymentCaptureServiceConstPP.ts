@@ -45,7 +45,6 @@ const payment = {
             "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
         },
         "fields": {
-            "isv_deviceFingerprintId": "c4ebb8bd-9b22-47d4-adc3-5c79dd06f276",
             "isv_merchantId": "wiproltd",
             "isv_saleEnabled": false,
             "isv_shippingMethod": "SINGLE",

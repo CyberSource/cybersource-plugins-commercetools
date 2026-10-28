@@ -1,10 +1,9 @@
 import { CustomObjectDraft } from '@commercetools/platform-sdk';
 import dotenv from 'dotenv';
-
 import { CustomMessages } from './constants/customMessages';
 import { FunctionConstant } from './constants/functionConstant';
 import { Constants } from './constants/paymentConstants';
-import { MidCredentialsType, SubscriptionInformationType } from './types/Types';
+import { MidCredentialsType, SubscriptionInformationType, MerchantWebhookCollectionType } from './types/Types';
 import { ApiError, errorHandler } from './utils/ErrorHandler';
 import paymentUtils from './utils/PaymentUtils';
 import commercetoolsApi from './utils/api/CommercetoolsApi';
@@ -34,56 +33,114 @@ const setupExtensionResources = async (): Promise<boolean> => {
 };
 
 /**
- * Creates webhook subscription for the payment gateway.
- * @returns {Promise<any>} A promise that resolves to the response of setting the custom object containing subscription information.
+ * Helper function to create a subscription information object
+ */
+const createSubscriptionInfo = (response: any, webhookType: string): SubscriptionInformationType | null => {
+  const isAccepted = Constants.HTTP_SUCCESS_STATUS_CODE === response?.httpCode || Constants.HTTP_OK_STATUS_CODE === response?.httpCode;
+  if (isAccepted && response?.key && response?.keyId && response?.keyExpiration && response?.webhookId && response?.merchantId) {
+    return {
+      merchantId: response.merchantId,
+      key: response.key,
+      keyId: response.keyId,
+      keyExpiration: response.keyExpiration,
+      webhookId: response.webhookId,
+      webhookType: webhookType,
+    };
+  }
+  return null;
+};
+
+/**
+ * Creates webhook subscriptions for all webhook types and stores them in the custom object.
+ * @returns {Promise<any>} A promise that resolves to the response of setting the custom object containing all subscription information.
  */
 const createWebhookSubscription = async (): Promise<any> => {
   let setCustomObjectResponse;
-  let subscriptionResponse;
+  let subscriptionResponse: any;
   let midCredentials: MidCredentialsType;
-  let subscriptionInformation: SubscriptionInformationType;
-  let networkTokenMultiMidArray: string[] = [];
-  let subscriptionInformationArray: SubscriptionInformationType[] = [];
-  if (process.env.PAYMENT_GATEWAY_NETWORK_TOKEN_MULTI_MID) {
-    networkTokenMultiMidArray = process.env.PAYMENT_GATEWAY_NETWORK_TOKEN_MULTI_MID.split(',');
+  let allMids: string[] = [];
+  let merchantWebhookCollections: MerchantWebhookCollectionType[] = [];
+  if (process.env.PAYMENT_GATEWAY_MERCHANT_ID) {
+    allMids.push(process.env.PAYMENT_GATEWAY_MERCHANT_ID);
   }
+  if (process.env.PAYMENT_GATEWAY_UNIFIED_CHECKOUT_MULTI_MID) {
+    const networkTokenMultiMidArray = process.env.PAYMENT_GATEWAY_UNIFIED_CHECKOUT_MULTI_MID.split(',');
+    for (let mid of networkTokenMultiMidArray) {
+      mid = mid.trim();
+      if (mid && !allMids.includes(mid)) {
+        allMids.push(mid);
+      }
+    }
+  }
+
   try {
-    if (0 < networkTokenMultiMidArray.length) {
-      for (let mid of networkTokenMultiMidArray) {
-        if (process.env.PAYMENT_GATEWAY_MERCHANT_ID === mid) {
-          mid = '';
-        }
+    const existingCustomObject = await commercetoolsApi.retrieveCustomObjectByContainer(Constants.CUSTOM_OBJECT_CONTAINER);
+    const storedCollections = existingCustomObject?.results?.[0]?.value;
+    if (Array.isArray(storedCollections)) {
+      merchantWebhookCollections = storedCollections.filter((collection: MerchantWebhookCollectionType) => collection?.merchantId);
+    }
+    if (0 < allMids.length) {
+      for (let mid of allMids) {
+        if (!mid) continue;
+
         midCredentials = MultiMid.getMidCredentials(mid);
         subscriptionResponse = await webhookHelper.handleWebhookSubscription(midCredentials);
-        if (subscriptionResponse?.subscriptionPresent) {
-          paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_INFO, '', `Subcription already present for mid ${mid}`);
-          if (!networkTokenMultiMidArray.includes(subscriptionResponse?.merchantId)) {
-            return;
+        const merchantId = subscriptionResponse?.merchantId;
+        if (!merchantId) continue;
+
+        let merchantCollection = merchantWebhookCollections.find((collection) => collection.merchantId?.toLowerCase() === String(merchantId).toLowerCase());
+
+        if (!merchantCollection) {
+          merchantCollection = { merchantId };
+          merchantWebhookCollections.push(merchantCollection);
+        }
+        const webhookKeyInfo =
+          subscriptionResponse?.key && subscriptionResponse?.keyId && subscriptionResponse?.keyExpiration
+            ? { key: subscriptionResponse.key, keyId: subscriptionResponse.keyId, keyExpiration: subscriptionResponse.keyExpiration }
+            : null;
+        if (!webhookKeyInfo) {
+          paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_WARN, mid, 'Webhook security key not available. Webhook details cannot be stored.');
+        }
+        if (subscriptionResponse?.decisionManagerWebhook && webhookKeyInfo) {
+          subscriptionResponse.decisionManagerWebhook.key = webhookKeyInfo.key;
+          subscriptionResponse.decisionManagerWebhook.keyId = webhookKeyInfo.keyId;
+          subscriptionResponse.decisionManagerWebhook.keyExpiration = webhookKeyInfo.keyExpiration;
+          subscriptionResponse.decisionManagerWebhook.merchantId = merchantId;
+        }
+        if (subscriptionResponse?.unifiedCheckoutWebhook && webhookKeyInfo) {
+          subscriptionResponse.unifiedCheckoutWebhook.key = webhookKeyInfo.key;
+          subscriptionResponse.unifiedCheckoutWebhook.keyId = webhookKeyInfo.keyId;
+          subscriptionResponse.unifiedCheckoutWebhook.keyExpiration = webhookKeyInfo.keyExpiration;
+          subscriptionResponse.unifiedCheckoutWebhook.merchantId = merchantId;
+        }
+        if (subscriptionResponse?.decisionManagerWebhook) {
+          const decisionManagerInfo = createSubscriptionInfo(subscriptionResponse.decisionManagerWebhook, 'decisionManager');
+          if (decisionManagerInfo) {
+            merchantCollection.decisionManager = decisionManagerInfo;
+          } else {
+            paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_WARN, mid, 'Failed to create decisionManagerInfo from response');
           }
         }
-        if (Constants.HTTP_SUCCESS_STATUS_CODE === subscriptionResponse?.httpCode && subscriptionResponse?.key && subscriptionResponse.keyId && subscriptionResponse?.keyExpiration && subscriptionResponse?.webhookId && subscriptionResponse.merchantId) {
-          subscriptionInformation = {
-            merchantId: subscriptionResponse.merchantId,
-            key: subscriptionResponse.key,
-            keyId: subscriptionResponse.keyId,
-            keyExpiration: subscriptionResponse.keyExpiration,
-            webhookId: subscriptionResponse.webhookId,
-          };
-          subscriptionInformationArray.push(subscriptionInformation);
+        if (subscriptionResponse?.unifiedCheckoutWebhook) {
+          const ucInfo = createSubscriptionInfo(subscriptionResponse.unifiedCheckoutWebhook, 'unifiedCheckout');
+          if (ucInfo) {
+            merchantCollection.unifiedCheckout = ucInfo;
+          } else {
+            paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_WARN, mid, 'Failed to create ucInfo from response');
+          }
         }
       }
     }
-    if (0 < subscriptionInformationArray.length) {
+
+    if (0 < merchantWebhookCollections.length) {
       const setCustomObjectRequest: CustomObjectDraft = {
         container: Constants.CUSTOM_OBJECT_CONTAINER,
         key: Constants.CUSTOM_OBJECT_KEY,
-        value: subscriptionInformationArray,
+        value: merchantWebhookCollections,
       };
       setCustomObjectResponse = await commercetoolsApi.createCTCustomObject(setCustomObjectRequest);
-      if (Constants.HTTP_OK_STATUS_CODE === setCustomObjectResponse?.statusCode) {
-        paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_INFO, '', JSON.stringify(setCustomObjectResponse));
-      } else {
-        paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_INFO, '', JSON.stringify(setCustomObjectResponse));
+      if (!setCustomObjectResponse?.id || !setCustomObjectResponse?.container || !setCustomObjectResponse?.key || !setCustomObjectResponse?.value) {
+        paymentUtils.logData(__filename, 'FuncCreateWebhookSubscription', Constants.LOG_WARN, '', `Failed to store webhooks: ${JSON.stringify(setCustomObjectResponse)}`);
         return;
       }
     }

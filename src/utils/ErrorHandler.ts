@@ -39,7 +39,6 @@ export class PaymentError extends Error {
   }
 }
 
-// ---------- Custom Error Types ----------
 export class ValidationError extends PaymentError {
   constructor(message: string, details?: any, source = '') {
     super(message, 'ValidationError', details, source);
@@ -82,13 +81,12 @@ export class SystemError extends PaymentError {
   }
 }
 
-// ---------- Error Handler Singleton ----------
 export class ErrorHandler {
   private static instance: ErrorHandler;
   private logger: winston.Logger | null = null;
 
   private constructor() {
-    // Skip logger init in serverless
+
     if (
       Constants.STRING_AZURE !== process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT &&
       Constants.STRING_AWS !== process.env.PAYMENT_GATEWAY_SERVERLESS_DEPLOYMENT
@@ -162,5 +160,4 @@ export class ErrorHandler {
     }
   }
 }
-// Export singleton
 export const errorHandler = ErrorHandler.getInstance();

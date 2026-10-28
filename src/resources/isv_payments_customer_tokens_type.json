@@ -163,17 +163,6 @@
       "inputHint": "SingleLine"
     },
     {
-      "name": "isv_deviceFingerprintId",
-      "label": {
-        "en": "Session id used for device fingerprinting"
-      },
-      "required": false,
-      "type": {
-        "name": "String"
-      },
-      "inputHint": "SingleLine"
-    },
-    {
       "name": "isv_cardNewExpiryMonth",
       "label": {
         "en": "Card new expiry month to be updated"

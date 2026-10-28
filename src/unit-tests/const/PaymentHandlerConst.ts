@@ -575,7 +575,6 @@ const orderManagementHandlerRefundUpdateTransactions = {
 };
 
 const applePaySessionHandlerFields = {
-  isv_deviceFingerprintId: '2cd0221d-e31e-42d3-9d6b-aaeedd0eb62c',
   isv_applePayValidationUrl: 'https://apple-pay-gateway-cert.apple.com/paymentservices/startSession',
   isv_acceptHeader: '*/*',
   isv_applePayDisplayName: 'Sunrise',
@@ -583,7 +582,6 @@ const applePaySessionHandlerFields = {
 };
 
 const applePaySessionHandlerEmptyFields = {
-  isv_deviceFingerprintId: '',
   isv_applePayValidationUrl: '',
   isv_acceptHeader: '',
   isv_applePayDisplayName: '',
@@ -591,7 +589,6 @@ const applePaySessionHandlerEmptyFields = {
 };
 
 const applePaySessionHandlerInvalidFields = {
-  isv_deviceFingerprintId: '$R!^&@UI(',
   isv_applePayValidationUrl: '*@U*&@@&&*@U*@',
   isv_acceptHeader: '*@&^@%',
   isv_applePayDisplayName: '*&@&^@(@I(@',
@@ -643,7 +640,6 @@ const authorizationHandlerGPUpdatePaymentObject = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: 'c115e1e8-5864-4217-bea2-e0a09ca06abd',
       isv_token: googlePay.isv_token,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '106.202.150.94',
@@ -699,7 +695,6 @@ const authorizationHandlerVSUpdatePaymentObject = {
   custom: {
     type: { typeId: 'type', id: '87b9d9db-74a3-45d7-8e60-dde669866808' },
     fields: {
-      isv_deviceFingerprintId: '016bd52d-4592-4c90-8e5f-18a7592b4a4f',
       isv_token: cpay.isv_token,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '106.202.150.94',
@@ -744,7 +739,6 @@ const authorizationHandlerCCUpdatePaymentObject = {
     fields: {
       isv_tokenCaptureContextSignature:
         'eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiI1U05zMVduOWxXZnczZ2Z2b3QvTERSQUFFTzBrWUxFeTdmSHZSa09RZzMvMUs3S0lnNTl2ajJRWWJMKzNhU1dRUE1Vc0RhUGVKc0lNNHFvMTFERm5qNkcvV3NPZ1lrRndwVlZVQzJMQWxucWM1aHRqLzFjY2h6Q3g3NkMxTWUrMGZSZHIiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJxTXdHNWl0WDVjdV8zbjZteFFlNWR3eWRHWjRpS1FjRmlmd0FsM3c2UDdENUMtUF83SXhFMkwyNTRFa05UYVNqNk9VOWZCaldxZWU0VDdfeUZHbUxnTldZODc0dTVaTmNkeWZjcUlVa2hnV2JSOXdleVRkQVpuREY5YnE4emN1LUhQT1puU3pJS25MdUN1QmlfN0lRVkRfMkFNaXlqTU0yM1lwNlh3clVfLXRiUzZDeGprNFRRT0NfWVpzdXd6UEZuZEJ1aExWcVpQOXlfczBMSHhEOGRhZ0toMUVlcDN2cDRFTXl2OHl3WDNLdExxSEdWNTNubXc0bXBfRUdNRjY3STUwMzgtOGU2OXB1RGZUUnNrVC1OMUFIOUxUVmFjLVV0NGpMSmRRU2dLb2txWlJaSGNUTUNiMlg4NmtNTTNuQ19WQnpjVlloNWFKWFhBSGF3WW85ZnciLCJraWQiOiIwOHVnNEtYMmt4SnRicWFCMjlOU2pnYVdUbFUyMUFUaCJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2NDE4MDMwMjgsImlhdCI6MTY0MTgwMjEyOCwianRpIjoibTVEbnVSbnR1UU5pWm9RUSJ9.ATYmhFloIbOQtrp8UxwummoMvTVftvyVQFEBua-6g_YoDfr38d3TZrhr5DPaLvuYTxCUSxulFC97jzYSNyWqsgpIvdLXda_dal7uf3PZblNg5yBg9nOP_2RGSzbqHgRR8rWW55zKR-8xOvdIaJ4Kr9Hsf5zoC0rxIjcCCPmP494PaLdVXgfWOZwlp3jOeEqn_v78pP_7JwMLGEj4iEo2wpCSe_ra0_57aeJloq-pXS_C0SMKZq9CXytHpdJlL2uNpwisyBH9N6fdebaEvRARttHXHEkr0wAeFj0jEs46oW5DdjDQmTla2Qf4TSFkhZeUrYTce63nG8bAGd62MhwIng',
-      isv_deviceFingerprintId: '016bd52d-4592-4c90-8e5f-18a7592b4a4f',
       isv_cardExpiryYear: '2024',
       isv_token: creditCard.isv_token,
       isv_customerIpAddress: '106.202.150.94',
@@ -793,7 +787,6 @@ const authorizationHandler3DSUpdatePaymentObject = {
   custom: {
     type: { typeId: 'type', id: '87b9d9db-74a3-45d7-8e60-dde669866808' },
     fields: {
-      isv_deviceFingerprintId: '26a7d17b-426d-4b66-935d-db6593fe960d',
       isv_cardExpiryYear: '2024',
       isv_token: creditCard.isv_token,
       isv_customerIpAddress: '106.202.150.94',
@@ -848,7 +841,6 @@ const authorizationHandlerAPUpdatePaymentObject = {
   custom: {
     type: { typeId: 'type', id: '87b9d9db-74a3-45d7-8e60-dde669866808' },
     fields: {
-      isv_deviceFingerprintId: '5f39f56e-fb1f-4c29-80af-5168603ab5ce',
       isv_applePayValidationUrl: 'https://apple-pay-gateway-cert.apple.com/paymentservices/startSession',
       isv_acceptHeader: '*/*',
       isv_applePayDisplayName: 'Sunrise',
@@ -915,7 +907,6 @@ const authorizationHandlerECUpdatePaymentObject = {
       id: '230048d9-6594-41a9-854b-77e25ca5610d',
     },
     fields: {
-      isv_deviceFingerprintId: 'e11dac2a-7f5c-4c3a-ac68-828e888d5b49',
       isv_accountNumber: '4100',
       isv_acceptHeader: '*/*',
       isv_accountType: 'C',
@@ -975,7 +966,6 @@ const getPayerAuthEnrollResponseUpdatePaymentObj = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: 'f360dac6-1271-42f2-8733-3b1b3e497bc1',
       isv_cardExpiryYear: '2025',
       isv_token: creditCard.isv_token,
       isv_customerIpAddress: '223.226.228.123',
@@ -1046,7 +1036,6 @@ const getPayerAuthValidateResponseUpdatePaymentObj = {
     fields: {
       isv_requestJwt:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNGVjMTgxZC1jMTNkLTQ4M2ItYTk5Ny1iM2M5NTM4N2M0OTEiLCJpYXQiOjE2NTEyMjg2NDksImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY1MTIzMjI0OSwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiIwOWUzMDkyZS04MjllLTQxNjYtYTMxYi1kODZmYmQ0MjYzN2EifQ.I89pAlGI8B8SAoh4ENJDxAC-eb5lEs8m0KLDq8bij9k',
-      isv_deviceFingerprintId: 'e7744f08-b910-4b18-b08d-083502b21898',
       isv_payerEnrollTransactionId: '6512286557606123804951',
       isv_cardExpiryYear: '2025',
       isv_token: creditCard.isv_token,
@@ -1132,7 +1121,6 @@ const getPayerAuthValidateResponseUpdatePaymentObjGuest = {
     fields: {
       isv_requestJwt:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNGE3NTQyNS1lMmUzLTQyM2MtOGQxZS0yNWIyZWRjMGQ5Y2MiLCJpYXQiOjE2NTU4ODI1MjAsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTY1NTg4NjEyMCwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiJmNTZmODU1Ni1iMWRiLTQ2ZjktODlhMy1lN2Q1NmUyYmQ0YjYifQ.TEkyVIFKKmevRbuODVQOIbyQUozEjKPiUSstgCruVjI',
-      isv_deviceFingerprintId: 'a125d543-6b9f-4c07-a8de-90a5e6a8728b',
       isv_payerEnrollTransactionId: '6558825283576087403955',
       isv_cardExpiryYear: '2025',
       isv_token: creditCard.isv_token,
@@ -1242,7 +1230,6 @@ const payerAuthPaymentObject = {
     fields: {
       isv_requestJwt:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4NzY5Y2NlZC1hNmUxLTQ2NzMtODY1NC1mMWE0ZjA3ZTg5YzUiLCJpYXQiOjE3MDgwOTA3MzEsImlzcyI6IjVkZDgzYmYwMGU0MjNkMTQ5OGRjYmFjYSIsImV4cCI6MTcwODA5NDMzMSwiT3JnVW5pdElkIjoiNWEzZDAxZmU2ZmUzZDExMjdjZGJjOTFlIiwiUmVmZXJlbmNlSWQiOiI3YWI0MGI3ZS0yY2YyLTRmOTEtYmRiNS03ZGM5ZTNmNDY5Y2MifQ.35jVloDg0uncARS-BmBnZwOD2QiXfVqleJLEtx7BB-c',
-      isv_deviceFingerprintId: 'e3ac036f-ebd0-4c83-a726-c298019f2b45',
       isv_payerEnrollTransactionId: '7080907374326523603954',
       isv_token:
         'eyJraWQiOiIwOHhnelBoYU9Xc1NOYjFaOWRlR3BXZWM5NVk0V0x3SCIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzA3IiwiZXhwIjoxNzA4MDkxNjMwLCJ0eXBlIjoibWYtMi4wLjAiLCJpYXQiOjE3MDgwOTA3MzEsImp0aSI6IjFFNVROTTBWMFNUTFdSTVg5UTRTRzczTklHUzdJM01STEFVSU85UzhWMEQ1TFQxQUVFQVI2NUNGNjhFRTYwQjciLCJjb250ZW50Ijp7InBheW1lbnRJbmZvcm1hdGlvbiI6eyJjYXJkIjp7ImV4cGlyYXRpb25ZZWFyIjp7InZhbHVlIjoiMjAyOSJ9LCJudW1iZXIiOnsiZGV0ZWN0ZWRDYXJkVHlwZXMiOlsiMDAxIl0sIm1hc2tlZFZhbHVlIjoiWFhYWFhYWFhYWFhYMTExMSIsImJpbiI6IjQxMTExMSJ9LCJzZWN1cml0eUNvZGUiOnt9LCJleHBpcmF0aW9uTW9udGgiOnsidmFsdWUiOiIwMSJ9fX19fQ.WwqEwXvJxxq8_8Y5g-QKMbfnNjj7Q4__LldoAOjYG4GNwSWmTzNFFwoc5e47nh6jCAyquyLta0CzYmFXKhnmln-I1WqHPJhxUUpBrAO8Th3d6GBgGctId9YchnN0clyhNFH4SPBxDOM591BU7XrD0PzcG06QE5UB5LfVaR1ePGUZ8AtYVC2m-HcFgyIWtSf0dBWii1yBTLHLE9LVN7DHJP7QvWiwgwsPnfwpU7kOKOiuUwH4gC3xYCpq0dcbLWckI6aGLZiWivnvtGefXdOwjUIHyXzZ-8r_fsgsZ5Oan8E-Tt7kIOLC1qVIvtr11f3u3fEqqXJAFGCcZ7SedRb9PA',

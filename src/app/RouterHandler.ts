@@ -91,7 +91,7 @@ export class RouterHandler {
    * @param {number} port - The port number to listen on.
    * @param {Function} cb - The callback function to be called after listening.
    */
-  listen(port: number, callback = (err: any) => { console.log("error : ", err) }) {
+  listen(port: number, callback = (_err: any) => {}) {
     try {
       this.port = port || Constants.DEFAULT_PORT;
       this.server.listen(this.port, () => {
@@ -102,3 +102,4 @@ export class RouterHandler {
     }
   }
 }
+

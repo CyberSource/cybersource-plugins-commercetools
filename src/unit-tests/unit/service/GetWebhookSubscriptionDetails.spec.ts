@@ -14,7 +14,7 @@ let midCredentials = {
 
 test.serial('Test get webhook subscription response', async (t) => {
   try {
-    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(midCredentials)) as any;
+    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(midCredentials, 'decisionManager')) as any;
     if (Constants.HTTP_OK_STATUS_CODE === response.httpCode) {
       t.is(response.httpCode, Constants.HTTP_OK_STATUS_CODE);
     } else {
@@ -32,7 +32,7 @@ test.serial('Test get webhook subscription response', async (t) => {
 
 test.serial('Test get webhook subscription response without mid credentials', async (t) => {
   try {
-    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.emptyMidCredentials)) as any;
+    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.emptyMidCredentials, 'decisionManager')) as any;
     if (Constants.HTTP_OK_STATUS_CODE !== response.httpCode) {
       t.not(response.httpCode, Constants.HTTP_OK_STATUS_CODE);
     } else {
@@ -50,7 +50,7 @@ test.serial('Test get webhook subscription response without mid credentials', as
 
 test.serial('Test get webhook subscription response with invalid mid credentials', async (t) => {
   try {
-    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.invalidMidCredentials)) as any;
+    let response = (await getWebhookSubscriptionDetails.getWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.invalidMidCredentials, 'decisionManager')) as any;
     if (Constants.HTTP_OK_STATUS_CODE !== response.httpCode) {
       t.not(response.httpCode, Constants.HTTP_OK_STATUS_CODE);
     } else {

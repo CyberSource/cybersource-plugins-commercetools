@@ -106,6 +106,28 @@
       },
       "inputHint": "SingleLine"
     },
+        {
+      "name": "isv_ucAllowedPaymentTypes",
+      "label": {
+        "en": "Unified Checkout allowed payment types"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_ucBillingType",
+      "label": {
+        "en": "Unified Checkout billing type"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
     {
       "name": "isv_cardType",
       "label": {
@@ -297,17 +319,6 @@
       "name": "isv_userAgentHeader",
       "label": {
         "en": "Value of user agent header from browser"
-      },
-      "required": false,
-      "type": {
-        "name": "String"
-      },
-      "inputHint": "SingleLine"
-    },
-    {
-      "name": "isv_deviceFingerprintId",
-      "label": {
-        "en": "Session id used for device fingerprinting"
       },
       "required": false,
       "type": {
@@ -536,6 +547,39 @@
       "inputHint": "SingleLine"
     },
     {
+      "name": "isv_approvalCode",
+      "label": {
+        "en": "Approval Code from Unified Checkout"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_clientReferenceCode",
+      "label": {
+        "en": "Client Reference Code from Unified Checkout"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_processorTransactionId",
+      "label": {
+        "en": "Processor Transaction ID from Unified Checkout"
+      },
+      "required": false,
+      "type": {
+        "name": "String"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
       "name": "isv_dmpaFlag",
       "label": {
         "en": "Flag indicating dmpa scenario"
@@ -546,6 +590,19 @@
       },
       "inputHint": "SingleLine"
     },
+    {
+  "name": "isv_authCode",
+  "label": {
+    "en": "Authorization Code"
+  },
+  "required": false,
+  "type": {
+    "name": "String"
+  },
+  "inputHint": "SingleLine"
+},
+
+
     {
       "name": "isv_shippingMethod",
       "label": {
@@ -576,6 +633,28 @@
       "required": false,
       "type": {
         "name": "Number"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_scaCompleted",
+      "label": {
+        "en": "Flag indicating Strong Customer Authentication (3D Secure) is completed"
+      },
+      "required": false,
+      "type": {
+        "name": "Boolean"
+      },
+      "inputHint": "SingleLine"
+    },
+    {
+      "name": "isv_enabledMoto",
+      "label": {
+        "en": "MOTO enabled"
+      },
+      "required": false,
+      "type": {
+        "name": "Boolean"
       },
       "inputHint": "SingleLine"
     }

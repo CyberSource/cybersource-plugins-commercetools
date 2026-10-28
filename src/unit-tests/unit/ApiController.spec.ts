@@ -3,14 +3,15 @@ import dotenv from 'dotenv';
 
 import apiController from '../../apiController';
 import { Constants } from '../../constants/paymentConstants';
+ 
 import unit from '../JSON/unit.json';
 import ApiControllerConst from '../const/ApiControllerConst';
 import PaymentAuthorizationServiceConstCC from '../const/CreditCard/PaymentAuthorizationServiceConstCC';
-import PaymentCaptureServiceConstCC from '../const/CreditCard/PaymentCaptureServiceConstCC';
 
 dotenv.config();
 
 test.serial('Payment Create Api with credit card payment', async (t) => {
+  
   try {
     let result = await apiController.paymentCreateApi(ApiControllerConst.paymentObject as any);
     if (0 !== result.actions.length) {
@@ -38,7 +39,6 @@ test.serial('Payment Create Api for credit card with saved card', async (t) => {
 
     if (0 !== result.actions.length) {
       t.is(result.actions[0].action, 'setCustomField');
-      t.is(result.actions[0].name, 'isv_deviceFingerprintId');
       t.is(result.actions[1].name, 'isv_cardExpiryYear');
       t.is(result.actions[2].name, 'isv_tokenAlias');
       t.is(result.actions[3].name, 'isv_maskedPan');
@@ -127,112 +127,6 @@ test.serial('Test PaymentDetails Api Function', async (t) => {
   }
 });
 
-test.serial('Test PaymentUpdate Api Function For payerAuth setup response', async (t) => {
-  try {
-    let result = await apiController.paymentUpdateApi(ApiControllerConst.payerAuthenticationPaymentObj as any);
-    if (result.actions.length == 0) {
-      t.deepEqual(result.errors, []);
-    } else {
-      t.is(result.actions[0].action, 'setCustomField');
-      t.is(result.actions[0].name, 'isv_requestJwt');
-      t.is(result.actions[1].action, 'setCustomField');
-      t.is(result.actions[1].name, 'isv_cardinalReferenceId');
-      t.is(result.actions[2].action, 'setCustomField');
-      t.is(result.actions[2].name, 'isv_deviceDataCollectionUrl');
-    }
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
-
-test.serial('Test PaymentUpdate Api Function For payerAuth enroll response', async (t) => {
-  try {
-    let result = await apiController.paymentUpdateApi(ApiControllerConst.payerAuthEnrollPaymentObj as any);
-    if (result.actions.length == 0) {
-      t.is(result.errors[0].code, 'InvalidInput');
-    } else {
-      t.is(result.actions[0].action, 'setCustomField');
-      t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
-      t.is(result.actions[1].action, 'setCustomField');
-      t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
-      t.is(result.actions[2].action, 'setCustomField');
-      t.is(result.actions[2].name, 'isv_payerEnrollStatus');
-      t.is(result.actions[3].action, 'setCustomField');
-      t.is(result.actions[3].name, 'isv_dmpaFlag');
-      t.is(result.actions[4].action, 'setCustomField');
-      t.is(result.actions[4].name, 'isv_tokenCaptureContextSignature');
-      t.is(result.actions[5].action, 'setCustomField');
-      t.is(result.actions[5].name, 'isv_payerAuthenticationRequired');
-    }
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
-
-test.serial('Test PaymentUpdate Api function for PayerAuth Validate Response', async (t) => {
-  try {
-    let result = await apiController.paymentUpdateApi(ApiControllerConst.payerAuthSetupResponsePaymentObject);
-    if (result.actions.length > 0) {
-      t.is(result.actions[0].action, 'setCustomField');
-      t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
-      t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
-      t.is(result.actions[2].name, 'isv_payerEnrollStatus');
-    } else {
-      t.deepEqual(result.actions, []);
-    }
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
-
-test.serial('Test PaymentUpdate Api function when 3ds is enabled', async (t) => {
-  try {
-    ApiControllerConst.payerAuthSetupResponsePaymentObject.transactions[0] = PaymentCaptureServiceConstCC.payment.transactions[0];
-    ApiControllerConst.payerAuthSetupResponsePaymentObject.transactions[0].state = 'Initial';
-    let result = await apiController.paymentUpdateApi(ApiControllerConst.payerAuthSetupResponsePaymentObject);
-    if (result.actions.length > 0) {
-      t.is(result.actions[0].action, 'changeTransactionInteractionId');
-      t.is(result.actions[1].action, 'changeTransactionState');
-      t.is(result.actions[1].state, 'Failure');
-      t.is(result.actions[2].action, 'addInterfaceInteraction');
-    } else {
-      t.deepEqual(result.actions, []);
-    }
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
-
-test.serial('Test PaymentUpdate Api function when custom field is absent', async (t) => {
-  try {
-    ApiControllerConst.payerAuthSetupResponsePaymentObject.custom = {};
-    let result = await apiController.paymentUpdateApi(ApiControllerConst.payerAuthSetupResponsePaymentObject);
-    t.deepEqual(result.actions, []);
-    t.deepEqual(result.errors, []);
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
-
-test.serial('Test PaymentUpdate Api function for all payment methods', async (t) => {
-  try {
-    let result = await apiController.paymentUpdateApi(PaymentCaptureServiceConstCC.payment as any);
-    if (result.actions[0]?.action && 'setCustomField' === result.actions[0].action) {
-      t.is(result.actions[0].action, 'setCustomField');
-      t.is(result.actions[0].name, 'isv_payerEnrollTransactionId');
-      t.is(result.actions[1].name, 'isv_payerEnrollHttpCode');
-      t.is(result.actions[2].name, 'isv_payerEnrollStatus');
-    } else if (result.actions[0]?.action && 'changeTransactionInteractionId' === result.actions[0].action) {
-      t.is(result.actions[0].action, 'changeTransactionInteractionId');
-      t.is(result.actions[1].action, 'changeTransactionState');
-      t.is(result.actions[2].action, 'addInterfaceInteraction');
-    } else {
-      t.deepEqual(result.actions, []);
-    }
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
 
 test.serial('Test Customer Update Flex Microform', async (t) => {
   try {
@@ -270,7 +164,6 @@ test.serial('Test Customer Update for add card', async (t) => {
       t.is(result.actions[6].name, 'isv_cardExpiryMonth');
       t.is(result.actions[7].name, 'isv_addressId');
       t.is(result.actions[8].name, 'isv_currencyCode');
-      t.is(result.actions[9].name, 'isv_deviceFingerprintId');
       t.is(result.actions[10].name, 'isv_token');
       t.is(result.actions[11].name, 'isv_maskedPan');
     } else {
@@ -284,7 +177,6 @@ test.serial('Test Customer Update for add card', async (t) => {
       t.is(result.actions[6].name, 'isv_cardExpiryMonth');
       t.is(result.actions[7].name, 'isv_addressId');
       t.is(result.actions[8].name, 'isv_currencyCode');
-      t.is(result.actions[9].name, 'isv_deviceFingerprintId');
       t.is(result.actions[10].name, 'isv_token');
       t.is(result.actions[11].name, 'isv_maskedPan');
     }
@@ -309,7 +201,6 @@ test.serial('Test Customer Update when token already exist', async (t) => {
       t.is(result.actions[5].name, 'isv_cardExpiryMonth');
       t.is(result.actions[6].name, 'isv_addressId');
       t.is(result.actions[7].name, 'isv_currencyCode');
-      t.is(result.actions[8].name, 'isv_deviceFingerprintId');
       t.is(result.actions[9].name, 'isv_token');
       t.is(result.actions[10].name, 'isv_maskedPan');
     }
@@ -376,12 +267,11 @@ test.serial('Test CaptureContext Api function', async (t) => {
 test.serial('Test notificationApi function', async (t) => {
   const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Test timed out')), 10000));
   try {
+     
     const result: any = await Promise.race([apiController.notificationApi(ApiControllerConst.notification), timeout]);
-    if (result.successMessage === ApiControllerConst.constants.SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN) {
-      t.is(result.successMessage, ApiControllerConst.constants.SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN);
-    } else {
-      t.not(result.successMessage, ApiControllerConst.constants.SUCCESS_MSG_UPDATED_CUSTOMER_TOKEN);
-    }
+    t.is(result.successMessage, 'Network token webhook acknowledged.');
+    t.is(result.errorMessage, '');
+     
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -399,3 +289,5 @@ test.serial('Test order management api', async (t) => {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
+
+

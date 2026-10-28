@@ -1,5 +1,13 @@
 import { Payment } from '@commercetools/platform-sdk';
-import { Ptsv2paymentsidrefundsPaymentInformation, Ptsv2paymentsPaymentInformation, Ptsv2paymentsPaymentInformationBank, Ptsv2paymentsPaymentInformationBankAccount, Ptsv2paymentsPaymentInformationCard, Ptsv2paymentsPaymentInformationCustomer, Ptsv2paymentsPaymentInformationFluidData, Riskv1authenticationsetupsPaymentInformation } from 'cybersource-rest-client';
+import {
+    Ptsv2paymentsidrefundsPaymentInformation,
+    Ptsv2paymentsPaymentInformation,
+    Ptsv2paymentsPaymentInformationBank,
+    Ptsv2paymentsPaymentInformationBankAccount,
+    Ptsv2paymentsPaymentInformationCard,
+    Ptsv2paymentsPaymentInformationCustomer,
+    Ptsv2paymentsPaymentInformationFluidData,
+} from 'cybersource-rest-client';
 
 import { CustomMessages } from '../constants/customMessages';
 import { FunctionConstant } from '../constants/functionConstant';
@@ -20,9 +28,9 @@ export class PaymentInformationModel {
     public mapPaymentInformation(functionName: string, resourceObj: Payment | null, cardTokens: CustomTokenType | null, customerTokenId: string | null) {
         let paymentInformation: any;
         if (Constants.MAP_PAYMENT_INFORMATION_FUNCTIONS.includes(functionName) && resourceObj?.paymentMethodInfo?.method) {
-            paymentInformation = functionName === FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE ? {} as Ptsv2paymentsPaymentInformation
-                : {} as Ptsv2paymentsidrefundsPaymentInformation;
+            paymentInformation = functionName === FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE ? ({} as Ptsv2paymentsPaymentInformation) : ({} as Ptsv2paymentsidrefundsPaymentInformation);
             const customFields = resourceObj?.custom?.fields;
+
             switch (resourceObj.paymentMethodInfo.method) {
                 case Constants.ECHECK:
                     paymentInformation.bank = this.setPaymentInformationBankDetails(customFields);
@@ -36,15 +44,22 @@ export class PaymentInformationModel {
                     break;
                 case Constants.CREDIT_CARD:
                 case Constants.CC_PAYER_AUTHENTICATION:
+
+
                     if (customFields?.isv_savedToken) {
-                        paymentInformation.customer = this.setPaymentInformationCustomerDetails(cardTokens?.customerTokenId);
-                        paymentInformation.paymentInstrument = { id: cardTokens?.paymentInstrumentId };
+                        if (cardTokens?.paymentInstrumentId) {
+                            paymentInformation.paymentInstrument = { id: cardTokens.paymentInstrumentId };
+                        }
+                        if (cardTokens?.instrumentIdentifier) {
+                            paymentInformation.instrumentIdentifier = { id: cardTokens.instrumentIdentifier };
+                        }
                     } else {
                         if (cardTokens?.customerTokenId) {
                             paymentInformation.customer = this.setPaymentInformationCustomerDetails(cardTokens.customerTokenId);
                         }
                         paymentInformation.card = this.setPaymentInformationCardDetails();
                     }
+
                     break;
                 case Constants.PAYPAL:
                     paymentInformation.paymentType = { name: Constants.EWALLET };
@@ -60,9 +75,6 @@ export class PaymentInformationModel {
             paymentInformation = {} as Ptsv2paymentsPaymentInformation;
             paymentInformation.customer = this.setPaymentInformationCustomerDetails(cardTokens.customerTokenId);
             paymentInformation.card = this.setPaymentInformationCardDetails();
-        } else if (FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_DATA === functionName) {
-            paymentInformation = {} as Riskv1authenticationsetupsPaymentInformation;
-            paymentInformation.customer = this.setPaymentInformationCustomerDetails(customerTokenId);
         }
         return paymentInformation;
     }
@@ -84,8 +96,7 @@ export class PaymentInformationModel {
      * @returns The mapped card object.
      */
     private setPaymentInformationCardDetails() {
-        const card = {} as Ptsv2paymentsPaymentInformationCard
-        card.typeSelectionIndicator = 1;
+        const card = {} as Ptsv2paymentsPaymentInformationCard;
         return card;
     }
 
@@ -97,12 +108,12 @@ export class PaymentInformationModel {
     private setPaymentInformationBankDetails(fields: Partial<PaymentCustomFieldsType> | undefined) {
         const bankAccount: Ptsv2paymentsPaymentInformationBankAccount = {
             type: fields?.isv_accountType,
-            number: fields?.isv_accountNumber
-        }
+            number: fields?.isv_accountNumber,
+        };
         const bank: Ptsv2paymentsPaymentInformationBank = {
             account: bankAccount,
-            routingNumber: fields?.isv_routingNumber
-        }
+            routingNumber: fields?.isv_routingNumber,
+        };
         return bank;
     }
 

@@ -10,14 +10,13 @@ import paymentValidator from '../utils/PaymentValidator';
 import { LineItem } from './LineItemMapper';
 import prepareFields from './PrepareFields';
 
-
 class OrderInformationFactory {
   /**
-  * Creates an order information object based on the provided function name.
-  * 
-  * @param {string} functionName - The name of the function requesting the order information.
-  * @returns {object} - An object representing the order information specific to the function.
-  */
+   * Creates an order information object based on the provided function name.
+   *
+   * @param {string} functionName - The name of the function requesting the order information.
+   * @returns {object} - An object representing the order information specific to the function.
+   */
   static createOrderInformation(functionName: string) {
     let orderInformation = {};
     switch (functionName) {
@@ -45,7 +44,7 @@ class OrderInformationFactory {
 class ProcessLineItemInformation {
   /**
    * Processes line items for the provided payment object and cart.
-   * 
+   *
    * @param {string} functionName - The name of the function processing line items.
    * @param {string} locale - Locale for processing the items.
    * @param {Payment} paymentObject - The payment object containing payment details.
@@ -58,15 +57,15 @@ class ProcessLineItemInformation {
   }
 
   /**
-  * Processes custom line items for the provided cart.
-  * 
-  * @param {string} functionName - The name of the function processing custom line items.
-  * @param {string} locale - Locale for processing the items.
-  * @param {Payment} paymentObject - The payment object containing payment details.
-  * @param {Cart} cartObj - The cart object containing custom items.
-  * @param {number} fractionDigits - The number of fraction digits for currency conversion.
-  * @returns {Array} - An array of processed custom line items.
-  */
+   * Processes custom line items for the provided cart.
+   *
+   * @param {string} functionName - The name of the function processing custom line items.
+   * @param {string} locale - Locale for processing the items.
+   * @param {Payment} paymentObject - The payment object containing payment details.
+   * @param {Cart} cartObj - The cart object containing custom items.
+   * @param {number} fractionDigits - The number of fraction digits for currency conversion.
+   * @returns {Array} - An array of processed custom line items.
+   */
   static processCustomLineItems(functionName: string, locale: string, paymentObject: Payment, cartObj: Cart, fractionDigits: number): any[] {
     let customLineItemDetails = [];
     if (cartObj.customLineItems) {
@@ -76,28 +75,28 @@ class ProcessLineItemInformation {
   }
 
   /**
-  * Creates an instance of LineItem with the provided details.
-  * 
-  * @param {string} functionName - The name of the function.
-  * @param {string} locale - Locale for processing.
-  * @param {Payment} paymentObject - The payment object containing payment details.
-  * @param {Cart} cartObj - The cart object containing the item.
-  * @param {any} lineitem - The line item to be processed.
-  * @param {number} unitPrice - Unit price for the item.
-  * @param {any} item - The item being processed.
-  * @param {boolean} isShipping - Indicates if the item is for shipping.
-  * @param {boolean} isCustom - Indicates if the item is custom.
-  * @param {boolean} isTotalPriceDiscount - Indicates if the total price is discounted.
-  * @param {number} lineItemTotalAmount - The total amount for the line item.
-  * @returns {any} - A new instance of the line item.
-  */
+   * Creates an instance of LineItem with the provided details.
+   *
+   * @param {string} functionName - The name of the function.
+   * @param {string} locale - Locale for processing.
+   * @param {Payment} paymentObject - The payment object containing payment details.
+   * @param {Cart} cartObj - The cart object containing the item.
+   * @param {any} lineitem - The line item to be processed.
+   * @param {number} unitPrice - Unit price for the item.
+   * @param {any} item - The item being processed.
+   * @param {boolean} isShipping - Indicates if the item is for shipping.
+   * @param {boolean} isCustom - Indicates if the item is custom.
+   * @param {boolean} isTotalPriceDiscount - Indicates if the total price is discounted.
+   * @param {number} lineItemTotalAmount - The total amount for the line item.
+   * @returns {any} - A new instance of the line item.
+   */
   static createLineItemDetailsInstance(functionName: string, locale: string, paymentObject: Payment, cartObj: Cart, lineitem: any, unitPrice: number, item: any, isShipping: boolean, isCustom: boolean, isTotalPriceDiscount: boolean, lineItemTotalAmount: number): any {
     return new LineItem(lineitem, unitPrice, functionName, locale, item, paymentObject, isShipping, cartObj, isCustom, isTotalPriceDiscount, lineItemTotalAmount);
   }
 
   /**
    * Processes shipping information for the cart.
-   * 
+   *
    * @param {string} functionName - The name of the function processing shipping information.
    * @param {string} locale - Locale for processing.
    * @param {Payment} paymentObject - The payment object containing payment details.
@@ -110,9 +109,7 @@ class ProcessLineItemInformation {
     if (Constants.SHIPPING_MODE_MULTIPLE === cartObj.shippingMode && cartObj.shipping) {
       shippingLineItems = this.processLineItemDetails(functionName, locale, paymentObject, cartObj, cartObj.shipping, false, true, fractionDigits);
     } else if (cartObj.shippingInfo) {
-      const shippingCost = cartObj.shippingInfo.discountedPrice
-        ? paymentUtils.convertCentToAmount(cartObj.shippingInfo.discountedPrice.value.centAmount, fractionDigits)
-        : paymentUtils.convertCentToAmount(cartObj.shippingInfo.price.centAmount, fractionDigits);
+      const shippingCost = cartObj.shippingInfo.discountedPrice ? paymentUtils.convertCentToAmount(cartObj.shippingInfo.discountedPrice.value.centAmount, fractionDigits) : paymentUtils.convertCentToAmount(cartObj.shippingInfo.price.centAmount, fractionDigits);
       const lineItemsDetailsInstance = this.createLineItemDetailsInstance(functionName, locale, paymentObject, cartObj, cartObj, shippingCost, null, true, false, false, shippingCost);
       const lineItemDetails = lineItemsDetailsInstance.getLineItemDetails();
       if (lineItemDetails) {
@@ -124,7 +121,7 @@ class ProcessLineItemInformation {
 
   /**
    * Processes discount information for the cart.
-   * 
+   *
    * @param {string} functionName - The name of the function processing discount information.
    * @param {string} locale - Locale for processing.
    * @param {Payment} paymentObject - The payment object containing payment details.
@@ -146,7 +143,7 @@ class ProcessLineItemInformation {
 
   /**
    * Processes the details of line items, handling various pricing and discount scenarios.
-   * 
+   *
    * @param {string} functionName - The name of the function processing line item details.
    * @param {string} locale - Locale for processing the items.
    * @param {Payment} paymentObject - The payment object containing payment details.
@@ -209,17 +206,17 @@ export class OrderInformationMapper {
   private cartObj: Cart | null;
 
   /**
-  * Constructs the OrderInformationMapper with the necessary parameters.
-  * 
-  * @param {string} functionName - The name of the function for which order information is being created.
-  * @param {Payment | null} paymentObj - The payment object containing payment details.
-  * @param {Partial<PaymentTransactionType> | null} updateTransactions - The updated transaction details, if available.
-  * @param {Cart} cartObj - The cart object containing cart details and line items.
-  * @param {Customer | null} customerObj - The customer object containing customer details.
-  * @param {AddressType | null} address - The address object containing billing or shipping details.
-  * @param {string | null} service - The service name associated with the function.
-  * @param {string} currencyCode - The currency code for the transaction.
-  */
+   * Constructs the OrderInformationMapper with the necessary parameters.
+   *
+   * @param {string} functionName - The name of the function for which order information is being created.
+   * @param {Payment | null} paymentObj - The payment object containing payment details.
+   * @param {Partial<PaymentTransactionType> | null} updateTransactions - The updated transaction details, if available.
+   * @param {Cart} cartObj - The cart object containing cart details and line items.
+   * @param {Customer | null} customerObj - The customer object containing customer details.
+   * @param {AddressType | null} address - The address object containing billing or shipping details.
+   * @param {string | null} service - The service name associated with the function.
+   * @param {string} currencyCode - The currency code for the transaction.
+   */
   constructor(functionName: string, paymentObj: Payment | null, updateTransactions: Partial<PaymentTransactionType> | null, cartObj: Cart | null, customerObj: Customer | null, address: Partial<AddressType> | null, service: string, currencyCode: string) {
     this.functionName = functionName;
     this.paymentObject = paymentObj;
@@ -229,16 +226,18 @@ export class OrderInformationMapper {
     this.address = address;
     this.service = service;
     this.currencyCode = currencyCode;
-    this.fractionDigits = paymentObj?.amountPlanned?.fractionDigits || 0;
+
+    this.fractionDigits = paymentObj?.amountPlanned?.fractionDigits ?? cartObj?.totalPrice?.fractionDigits ?? cartObj?.taxedPrice?.totalGross?.fractionDigits ?? 2;
+
     this.locale = cartObj?.locale || '';
   }
 
   /**
-  * Creates and returns the order information object based on the provided function name.
-  * Uses different setters to populate fields like billing, shipping, line items, and amount details.
-  * 
-  * @returns {any} The constructed order information object.
-  */
+   * Creates and returns the order information object based on the provided function name.
+   * Uses different setters to populate fields like billing, shipping, line items, and amount details.
+   *
+   * @returns {any} The constructed order information object.
+   */
   getOrderInformation() {
     let orderInformation = OrderInformationFactory.createOrderInformation(this.functionName);
     switch (this.functionName) {
@@ -257,6 +256,11 @@ export class OrderInformationMapper {
         paymentValidator.setObjectValue(orderInformation, 'amountDetails', this.setAmountDetails(), '', Constants.STR_OBJECT, false);
         break;
       case FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT:
+        // For My Accounts (card-save-only), don't include lineItems
+        // For Payments (checkout), include lineItems from cart
+        if ('MyAccounts' !== this.service) {
+          paymentValidator.setObjectValue(orderInformation, 'lineItems', this.setLineItems(), '', Constants.STR_ARRAY, false);
+        }
         paymentValidator.setObjectValue(orderInformation, 'amountDetails', this.setAmountDetails(), '', Constants.STR_OBJECT, false);
         break;
       case FunctionConstant.FUNC_GET_REFUND_DATA:
@@ -272,16 +276,16 @@ export class OrderInformationMapper {
   /**
    * Sets and returns the billing information based on the function name.
    * It either uses the cart object or customer object to set the bill-to details.
-   * 
+   *
    * @returns {any} The bill-to details.
    */
   private setBillTo() {
-    return (FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === this.functionName) ? this.getBillToFromCartObject() : this.getBillToFromCustomerObject();
+    return FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE === this.functionName ? this.getBillToFromCartObject() : this.getBillToFromCustomerObject();
   }
 
   /**
    * Sets and returns the shipping information using the cart object.
-   * 
+   *
    * @returns {any} The ship-to details.
    */
   private setShipTo() {
@@ -291,7 +295,7 @@ export class OrderInformationMapper {
   /**
    * Constructs and returns the line items information from the cart object.
    * It processes the line items, custom line items, shipping, and discount information.
-   * 
+   *
    * @returns {any[]} The list of line items.
    */
   private setLineItems() {
@@ -308,7 +312,7 @@ export class OrderInformationMapper {
   /**
    * Constructs and returns the amount details for the order information.
    * The logic depends on the specific function (e.g., authorization, refund, capture).
-   * 
+   *
    * @returns {any} The amount details object.
    */
   private setAmountDetails() {
@@ -344,7 +348,7 @@ export class OrderInformationMapper {
 
   /**
    * Returns the bill-to details from the cart object for authorization responses.
-   * 
+   *
    * @returns {any} The bill-to information from the cart.
    */
   private getBillToFromCartObject() {
@@ -352,19 +356,19 @@ export class OrderInformationMapper {
   }
 
   /**
-  * Returns the bill-to details from the customer object for token-related responses.
-  * 
-  * @returns {any} The bill-to information from the customer.
-  */
+   * Returns the bill-to details from the customer object for token-related responses.
+   *
+   * @returns {any} The bill-to information from the customer.
+   */
   private getBillToFromCustomerObject() {
     return prepareFields.getOrderInformationBillToDetails(FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE, null, this.address, this.customerObject);
   }
 
   /**
-  * Returns the ship-to details from the cart object.
-  * 
-  * @returns {any} The ship-to information from the cart.
-  */
+   * Returns the ship-to details from the cart object.
+   *
+   * @returns {any} The ship-to information from the cart.
+   */
   private getShipToFromCartObject() {
     return prepareFields.getOrderInformationShipToDetails(this.cartObj, this.paymentObject?.custom?.fields.isv_shippingMethod);
   }

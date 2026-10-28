@@ -31,7 +31,7 @@ const getTransactionSearchResponse = async (query: string, limit: number, sort: 
         offset: 0,
         sort: sort
       }
-      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG) && !disableDebug) {
+      if (!disableDebug) {
         paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_SEARCH_RESPONSE, Constants.LOG_DEBUG, '', 'Create Transaction Search Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
       }
       const searchTransactionsApiInstance = configObject && new restApi.SearchTransactionsApi(configObject, apiClient);

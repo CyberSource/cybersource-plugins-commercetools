@@ -1,10 +1,18 @@
 import { ByProjectKeyRequestBuilder, createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 import {
-  _BaseAddress, ApiRequest, CartUpdateAction,
-  Customer, CustomerUpdateAction, CustomObjectDraft,
-  ExtensionDraft, OrderPagedQueryResponse, Payment,
-  PaymentAddTransactionAction, PaymentPagedQueryResponse,
-  PaymentUpdateAction, TypeDraft
+  _BaseAddress,
+  ApiRequest,
+  CartUpdateAction,
+  Customer,
+  CustomerUpdateAction,
+  CustomObjectDraft,
+  ExtensionDraft,
+  OrderPagedQueryResponse,
+  Payment,
+  PaymentAddTransactionAction,
+  PaymentPagedQueryResponse,
+  PaymentUpdateAction,
+  TypeDraft,
 } from '@commercetools/platform-sdk';
 import { type AuthMiddlewareOptions, ClientBuilder, type HttpMiddlewareOptions } from '@commercetools/ts-client';
 import dotenv from 'dotenv';
@@ -26,7 +34,6 @@ const clientSecret = process.env.CT_CLIENT_SECRET || '';
 const authHost = process.env.CT_AUTH_HOST || '';
 const apiHost = process.env.CT_API_HOST || '';
 
-/* START GENAI */
 /**
  * Sanitizes a value for safe use in Commercetools query predicates.
  * Escapes backslash and double-quote characters to prevent predicate injection.
@@ -37,7 +44,6 @@ const apiHost = process.env.CT_API_HOST || '';
 const sanitizePredicateValue = (value: string): string => {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 };
-/* END GENAI */
 
 const getClient = async () => {
   let client: ByProjectKeyRequestBuilder | null = null;
@@ -55,17 +61,13 @@ const getClient = async () => {
     httpClient: fetch,
   };
   try {
-    const ctpClient = new ClientBuilder()
-      .withProjectKey(projectKey)
-      .withClientCredentialsFlow(authMiddlewareOptions)
-      .withHttpMiddleware(httpMiddlewareOptions)
-      .build();
+    const ctpClient = new ClientBuilder().withProjectKey(projectKey).withClientCredentialsFlow(authMiddlewareOptions).withHttpMiddleware(httpMiddlewareOptions).build();
     return createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
   } catch (error) {
     errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_COMMERCETOOLS_CONNECT, error, FunctionConstant.FUNC_INITIALIZE_COMMERCETOOLS_CLIENT), __filename, '');
   }
   return client;
-}
+};
 
 /**
  * Executes a request against the Commercetools API and returns the response.
@@ -80,18 +82,18 @@ const getClient = async () => {
 const makeCommercetoolsRequest = async (query: any) => {
   let clientResponse: any = {};
   const startTime = new Date().getTime();
-  const clientResponseObject = await query.execute();;
+  const clientResponseObject = await query.execute();
   const endTime = new Date().getTime();
   if (clientResponseObject?.body) {
     clientResponse = clientResponseObject.body;
   }
   clientResponse.consolidatedTime = endTime - startTime;
   return clientResponse;
-}
+};
 
 /**
  * Queries a cart by its ID.
- * 
+ *
  * @param {string} id - The ID of the cart.
  * @param {string} idType - The type of ID.
  * @returns {Promise<any>} - The cart details.
@@ -105,56 +107,43 @@ const queryCartById = async (id: string, idType: string): Promise<any> => {
   if (id && idType && client) {
     switch (idType) {
       case Constants.ANONYMOUS_ID:
-        query = client
-          .carts()
-          .get({
-            queryArgs: {
-              where: `${Constants.ANONYMOUS_ID}="${sanitizePredicateValue(id)}" AND ${Constants.ACTIVE_CART_STATE}`,
-              sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
-            },
-          });
+        query = client.carts().get({
+          queryArgs: {
+            where: `${Constants.ANONYMOUS_ID}="${sanitizePredicateValue(id)}" AND ${Constants.ACTIVE_CART_STATE}`,
+            sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
+          },
+        });
         logIdType = 'Anonymous Id: ';
         break;
       case Constants.CUSTOMER_ID:
-        query = client
-          .carts()
-          .get({
-            queryArgs: {
-              where: `${Constants.CUSTOMER_ID}="${sanitizePredicateValue(id)}" AND ${Constants.ACTIVE_CART_STATE}`,
-              sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
-            },
-          });
+        query = client.carts().get({
+          queryArgs: {
+            where: `${Constants.CUSTOMER_ID}="${sanitizePredicateValue(id)}" AND ${Constants.ACTIVE_CART_STATE}`,
+            sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}`,
+          },
+        });
         logIdType = 'Customer Id: ';
         break;
       case Constants.PAYMENT_ID:
-        query = client
-          .carts()
-          .get({
-            queryArgs: {
-              where: `paymentInfo(payments(id="${sanitizePredicateValue(id)}"))`,
-            },
-          });
+        query = client.carts().get({
+          queryArgs: {
+            where: `paymentInfo(payments(id="${sanitizePredicateValue(id)}"))`,
+          },
+        });
         logIdType = 'Payment Id: ';
         break;
       default:
         return null;
     }
     queryCartByIdResponse = await makeCommercetoolsRequest(query);
-    paymentUtils.logData(
-      __filename,
-      FunctionConstant.FUNC_QUERY_CART_BY_ID,
-      Constants.LOG_INFO,
-      logIdType + id,
-      '',
-      `${queryCartByIdResponse.consolidatedTime}`
-    );
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_QUERY_CART_BY_ID, Constants.LOG_INFO, logIdType + id, '', `${queryCartByIdResponse.consolidatedTime}`);
   }
   return queryCartByIdResponse;
 };
 
 /**
  * Queries an order by its ID.
- * 
+ *
  * @param {string} id - The ID of the order.
  * @param {string} idType - The type of ID.
  * @returns {Promise<any>} - The order details.
@@ -185,7 +174,7 @@ const queryOrderById = async (id: string, idType: string) => {
 
 /**
  * Retrieves payment details by ID.
- * 
+ *
  * @param {string} paymentId - The ID of the payment.
  * @returns {Promise<any>} - The payment details.
  */
@@ -198,7 +187,7 @@ const retrievePayment = async (paymentId: string): Promise<any> => {
       retrievePaymentResponse = await makeCommercetoolsRequest(query);
       paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, '', '', `${retrievePaymentResponse.consolidatedTime}`);
     } catch (exception: any) {
-      if (typeof exception === Constants.STR_OBJECT && exception.message) {
+      if (Constants.STR_OBJECT === typeof exception && exception.message) {
         errorHandler.logError(new PaymentProcessingError(exception.message, exception, FunctionConstant.FUNC_RETRIEVE_PAYMENT), __filename, '');
       } else {
         errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT, exception, FunctionConstant.FUNC_RETRIEVE_PAYMENT), __filename, '');
@@ -208,9 +197,89 @@ const retrievePayment = async (paymentId: string): Promise<any> => {
   return retrievePaymentResponse;
 };
 
+const retrievePaymentByInteractionId = async (interactionId: string): Promise<any> => {
+  let paymentResponse = null;
+  const client = await getClient();
+  if (interactionId && client) {
+    try {
+      const query = client.payments().get({
+        queryArgs: {
+          where: `transactions(interactionId="${interactionId}")`,
+          limit: 1,
+        },
+      });
+      const response = await makeCommercetoolsRequest(query);
+      if (response?.results && response.results.length > 0) {
+        paymentResponse = response.results[0];
+      }
+    } catch (exception: any) {
+      paymentUtils.logData(__filename, 'retrievePaymentByInteractionId', Constants.LOG_DEBUG, '', 'Error: ' + (exception?.message || exception));
+    }
+  }
+  return paymentResponse;
+};
+
+const retrievePaymentByClientReferenceCode = async (clientReferenceCode: string): Promise<any> => {
+  let retrievePaymentResponse = null;
+  const client = await getClient();
+  if (clientReferenceCode && client) {
+    try {
+      const query = client.payments().get({
+        queryArgs: {
+          where: `custom(fields(isv_clientReferenceCode="${clientReferenceCode}"))`,
+          limit: 1,
+          expand: ['transactions']
+        },
+      });
+      const response = await makeCommercetoolsRequest(query);
+
+      if (response?.results && response.results.length > 0) {
+        retrievePaymentResponse = response.results[0];
+      }
+    } catch (exception: any) {
+      errorHandler.logError(new PaymentProcessingError(Constants.STR_OBJECT === typeof exception && exception.message ? exception.message : CustomMessages.ERROR_MSG_COMMERCETOOLS_CONNECT, exception, FunctionConstant.FUNC_RETRIEVE_PAYMENT), __filename, '');
+    }
+  }
+  return retrievePaymentResponse;
+};
+
+const updatePaymentCustomFields = async (paymentId: string, version: number, fields: Record<string, any>): Promise<any> => {
+  let response = null;
+  const client = await getClient();
+
+  if (!paymentId || !version || !fields || !client) {
+    return response;
+  }
+
+  const fieldActions = Object.keys(fields).map((key) => ({
+    action: Constants.SET_CUSTOM_FIELD,
+    name: key,
+    value: fields[key],
+  }));
+
+  if (0 === fieldActions.length) {
+    return response;
+  }
+
+  const query = client
+    .payments()
+    .withId({ ID: paymentId })
+    .post({
+      body: {
+        version,
+        actions: fieldActions as any,
+      },
+    });
+
+  response = await makeCommercetoolsRequest(query);
+  paymentUtils.logData(__filename, 'updatePaymentCustomFields', Constants.LOG_INFO, paymentId, '', `${response?.consolidatedTime || ''}`);
+
+  return response;
+};
+
 /**
  * Adds a transaction to a payment.
- * 
+ *
  * @param {PaymentTransactionType} transactionObject - The transaction object to add.
  * @param {string} paymentId - The ID of the payment.
  * @returns {Promise<Payment | null>} - The updated payment with the added transaction.
@@ -219,22 +288,25 @@ const addTransaction = async (transactionObject: Partial<PaymentTransactionType>
   let addTransactionResponse = null;
   const client = await getClient();
   if (transactionObject && paymentId && client) {
-    const query = client.payments().withId({ ID: paymentId }).post({
-      body: {
-        version: transactionObject.version as number,
-        actions: [
-          {
-            action: 'addTransaction',
-            transaction: {
-              type: transactionObject.type as string,
-              timestamp: paymentUtils.getDate(Date.now(), true),
-              amount: transactionObject.amount as AmountPlannedType,
-              state: transactionObject.state,
+    const query = client
+      .payments()
+      .withId({ ID: paymentId })
+      .post({
+        body: {
+          version: transactionObject.version as number,
+          actions: [
+            {
+              action: 'addTransaction',
+              transaction: {
+                type: transactionObject.type as string,
+                timestamp: paymentUtils.getDate(Date.now(), true),
+                amount: transactionObject.amount as AmountPlannedType,
+                state: transactionObject.state,
+              },
             },
-          },
-        ],
-      }
-    });
+          ],
+        },
+      });
     addTransactionResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_PAYMENT, Constants.LOG_INFO, '', '', `${addTransactionResponse.consolidatedTime}`);
   }
@@ -243,7 +315,7 @@ const addTransaction = async (transactionObject: Partial<PaymentTransactionType>
 
 /**
  * Retrieves orders.
- * 
+ *
  * @returns {Promise<any>} - The response body containing orders.
  */
 const getOrders = async (): Promise<any> => {
@@ -261,17 +333,16 @@ const getOrders = async (): Promise<any> => {
   return getOrderResponse;
 };
 
-
 /**
  * Updates cart by payment ID.
- * 
+ *
  * @param {string} cartId - The ID of the cart.
  * @param {string} paymentId - The ID of the payment.
  * @param {number} cartVersion - The version of the cart.
  * @param {CardAddressGroupType} addressData - The address data.
  * @returns {Promise<any>} - The response body containing updated cart data.
  */
-const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVersion: number, addressData: Partial<CardAddressGroupType>): Promise<any> => {
+const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVersion: number, addressData: Partial<CardAddressGroupType>, billingType?: string): Promise<any> => {
   let updateCartByPaymentIdResponse = null;
   let actions: CartUpdateAction[] = [];
   const client = await getClient();
@@ -279,7 +350,7 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
     if (addressData?.billToFieldGroup && Object.keys(addressData.billToFieldGroup).length) {
       actions.push({
         action: 'setBillingAddress',
-        address: new Address(addressData.billToFieldGroup) as _BaseAddress
+        address: new Address(addressData.billToFieldGroup) as _BaseAddress,
       });
     }
     if (addressData?.shipToFieldGroup && 0 !== Object.keys(addressData.shipToFieldGroup).length) {
@@ -292,7 +363,8 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
         address: new Address(addressData.shipToFieldGroup) as _BaseAddress,
       });
     }
-    if (addressData?.billTo && Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE) {
+    const effectiveBillingType = billingType ? billingType.trim().toUpperCase() : '';
+    if (addressData?.billTo && Constants.STRING_FULL === effectiveBillingType) {
       actions.push({
         action: 'setBillingAddress',
         address: new Address(addressData.billTo) as _BaseAddress,
@@ -305,17 +377,20 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
           actions.push({
             action: 'setShippingAddress',
             address: new Address(addressData.shipTo) as _BaseAddress,
-          })
+          });
         }
       }
     }
     if (actions && actions.length) {
-      const query = client.carts().withId({ ID: cartId }).post({
-        body: {
-          version: cartVersion,
-          actions: actions,
-        },
-      });
+      const query = client
+        .carts()
+        .withId({ ID: cartId })
+        .post({
+          body: {
+            version: cartVersion,
+            actions: actions,
+          },
+        });
       updateCartByPaymentIdResponse = await makeCommercetoolsRequest(query);
       paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CART_BY_PAYMENT_ID, Constants.LOG_INFO, 'CartId: ' + cartId || '', '', `${updateCartByPaymentIdResponse.consolidatedTime} `);
     }
@@ -325,7 +400,7 @@ const updateCartByPaymentId = async (cartId: string, paymentId: string, cartVers
 
 /**
  * Sets customer tokens.
- * 
+ *
  * @param {string} tokenCustomerId - The ID of the token customer.
  * @param {string} paymentInstrumentId - The ID of the payment instrument.
  * @param {string} instrumentIdentifier - The identifier of the instrument.
@@ -343,7 +418,7 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
     const customFields = updatePaymentObj?.custom?.fields;
     const customerInfo = await getCustomer(customerId);
     if (customerInfo) {
-      isCustomTypePresent = (customerInfo?.custom?.type?.id) ? true : false;
+      isCustomTypePresent = customerInfo?.custom?.type?.id ? true : false;
       const stringTokenData = JSON.stringify(new Token(customFields, tokenCustomerId, paymentInstrumentId, instrumentIdentifier, addressId, ''));
       if (isCustomTypePresent) {
         if (customerInfo?.custom?.fields?.isv_tokens && 0 < customerInfo?.custom?.fields?.isv_tokens?.length) {
@@ -373,7 +448,7 @@ const setCustomerTokens = async (tokenCustomerId: string, paymentInstrumentId: s
 
 /**
  * Retrieves customer information by ID.
- * 
+ *
  * @param {string} customerId - The ID of the customer.
  * @returns {Promise<Customer| null>} - The response containing customer information.
  */
@@ -388,36 +463,72 @@ const getCustomer = async (customerId: string): Promise<Customer | null> => {
   return getCustomerResponse;
 };
 
-/**
- * Updates a payment transaction's state synchronously.
- * 
- * @param {Partial<PaymentTransactionType>} decisionUpdateObject - The object containing payment transaction details.
- * @param {string} transactionId - The ID of the transaction to update.
- * @returns {Promise<void>}
- */
-const updateDecisionSync = async (decisionUpdateObject: Partial<PaymentTransactionType>, transactionId: string): Promise<void> => {
+const getCustomerByEmail = async (email: string): Promise<Customer | null> => {
+  let customerResponse = null;
   const client = await getClient();
-  if (decisionUpdateObject && decisionUpdateObject?.id && client) {
-    const query = client.payments().withId({ ID: decisionUpdateObject.id }).post({
-      body: {
-        version: decisionUpdateObject.version as number,
-        actions: [
-          {
-            action: Constants.CHANGE_TRANSACTION_STATE,
-            transactionId: transactionId,
-            state: decisionUpdateObject.state as string,
-          },
-        ],
+  if (email && client) {
+    const query = client.customers().get({
+      queryArgs: {
+        where: `email="${email}"`,
+        limit: 1,
       },
     });
+    const response = await makeCommercetoolsRequest(query);
+    paymentUtils.logData(__filename, 'FuncGetCustomerByEmail', Constants.LOG_INFO, 'Email : ' + email, '', `${response?.consolidatedTime} `);
+    if (response?.results?.length) {
+      customerResponse = response.results[0];
+    }
+  }
+  return customerResponse;
+};
+
+/**
+ * Updates a payment transaction's state and interaction id synchronously.
+ *
+ * @param {Partial<PaymentTransactionType>} decisionUpdateObject - The object containing payment transaction details.
+ * @param {string} transactionId - The ID of the transaction to update.
+ * @returns {Promise<Payment | null>} - The updated payment object.
+ */
+const updateDecisionSync = async (decisionUpdateObject: Partial<PaymentTransactionType>, transactionId: string): Promise<Payment | null> => {
+  const client = await getClient();
+  if (decisionUpdateObject && decisionUpdateObject?.id && client) {
+    const decisionSyncActions: PaymentUpdateAction[] = [];
+    if (decisionUpdateObject.interactionId) {
+      decisionSyncActions.push({
+        action: Constants.CHANGE_TRANSACTION_INTERACTION_ID,
+        transactionId: transactionId,
+        interactionId: decisionUpdateObject.interactionId,
+      });
+    }
+    if (decisionUpdateObject.state) {
+      decisionSyncActions.push({
+        action: Constants.CHANGE_TRANSACTION_STATE,
+        transactionId: transactionId,
+        state: decisionUpdateObject.state as string,
+      });
+    }
+    if (!decisionSyncActions.length) {
+      return null;
+    }
+    const query = client
+      .payments()
+      .withId({ ID: decisionUpdateObject.id })
+      .post({
+        body: {
+          version: decisionUpdateObject.version as number,
+          actions: decisionSyncActions,
+        },
+      });
     const decisionSyncResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, 'PaymentId : ' + decisionUpdateObject?.id, '', `${decisionSyncResponse.consolidatedTime} `);
+    return decisionSyncResponse;
   }
+  return null;
 };
 
 /**
  * Syncs Visa card details for a payment.
- * 
+ *
  * @param {VisaUpdateType} visaUpdateObject - Object containing Visa card update details.
  * @returns {Promise<Payment | null>} - Updated payment object.
  */
@@ -425,12 +536,15 @@ const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<Pa
   const client = await getClient();
   let syncVisaCardDetailsResponse = null;
   if (visaUpdateObject && visaUpdateObject?.id && client) {
-    const query = client.payments().withId({ ID: visaUpdateObject.id }).post({
-      body: {
-        version: visaUpdateObject.version,
-        actions: visaUpdateObject.actions as PaymentUpdateAction[],
-      }
-    });
+    const query = client
+      .payments()
+      .withId({ ID: visaUpdateObject.id })
+      .post({
+        body: {
+          version: visaUpdateObject.version,
+          actions: visaUpdateObject.actions as PaymentUpdateAction[],
+        },
+      });
     syncVisaCardDetailsResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_VISA_CARD_DETAILS, Constants.LOG_INFO, 'PaymentId : ' + visaUpdateObject?.id, '', `${syncVisaCardDetailsResponse.consolidatedTime} `);
   }
@@ -439,7 +553,7 @@ const syncVisaCardDetails = async (visaUpdateObject: VisaUpdateType): Promise<Pa
 
 /**
  * Syncs additional transaction details for a payment.
- * 
+ *
  * @param {ReportSyncType} syncUpdateObject - Object containing transaction details to sync.
  * @returns {Promise<Payment | null>} - Updated payment object.
  */
@@ -458,12 +572,15 @@ const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<Pay
         interactionId: syncUpdateObject.interactionId,
       },
     });
-    const query = client.payments().withId({ ID: syncUpdateObject.id }).post({
-      body: {
-        version: syncUpdateObject.version as number,
-        actions: addTransactionAction
-      }
-    });
+    const query = client
+      .payments()
+      .withId({ ID: syncUpdateObject.id })
+      .post({
+        body: {
+          version: syncUpdateObject.version as number,
+          actions: addTransactionAction,
+        },
+      });
     syncAddTransactionResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_SYNC_ADD_TRANSACTION, Constants.LOG_INFO, 'PaymentId : ' + syncUpdateObject?.id, '', `${syncAddTransactionResponse.consolidatedTime} `);
   }
@@ -472,7 +589,7 @@ const syncAddTransaction = async (syncUpdateObject: ReportSyncType): Promise<Pay
 
 /**
  * Adds custom types to the CommerceTools project.
- * 
+ *
  * @param {TypeDraft} customType - Custom type object to add.
  * @returns {Promise<any>} - Response of the add custom type operation.
  */
@@ -483,7 +600,7 @@ const addCustomTypes = async (customType: TypeDraft): Promise<any> => {
     const client = await getClient();
     if (client) {
       const query = client.types().post({
-        body: customType
+        body: customType,
       });
       const startTime = new Date().getTime();
       addCustomTypeResponse = await query.execute();
@@ -502,7 +619,7 @@ const addCustomTypes = async (customType: TypeDraft): Promise<any> => {
 
 /**
  * Adds extensions to the CommerceTools project.
- * 
+ *
  * @param {ExtensionDraft} extension - Extension object to add.
  * @returns {Promise<any>} - Response of the add extension operation.
  */
@@ -511,7 +628,7 @@ const addExtensions = async (extension: ExtensionDraft): Promise<any> => {
   const client = await getClient();
   if (client) {
     const query = client.extensions().post({
-      body: extension
+      body: extension,
     });
     const startTime = new Date().getTime();
     addExtensionsResponse = await query.execute();
@@ -521,9 +638,23 @@ const addExtensions = async (extension: ExtensionDraft): Promise<any> => {
   return addExtensionsResponse;
 };
 
+const deleteExtension = async (key: string): Promise<any> => {
+  const client = await getClient();
+  if (client) {
+    const existing = await client.extensions().withKey({ key }).get().execute();
+    if (existing?.body) {
+      await client
+        .extensions()
+        .withKey({ key })
+        .delete({ queryArgs: { version: existing.body.version } })
+        .execute();
+    }
+  }
+};
+
 /**
  * Retrieves a custom type by its key.
- * 
+ *
  * @param {string} key - Key of the custom type to retrieve.
  * @returns {Promise<any>} - Response of the get custom type operation.
  */
@@ -542,7 +673,7 @@ const getCustomType = async (key: string): Promise<any> => {
 
 /**
  * Updates the custom type associated with a customer.
- * 
+ *
  * @param {string} customerId - ID of the customer.
  * @param {string[]} fieldsData - Data to update the custom type fields.
  * @param {string[]} failedTokenData - Array of failed token data.
@@ -555,25 +686,28 @@ const setCustomType = async (customerId: string | undefined, fieldsData: string[
   const client = await getClient();
   if (customerId && client) {
     const customerInfo = await getCustomer(customerId);
-    const query = client.customers().withId({ ID: customerId }).post({
-      body: {
-        version: customerInfo?.version as number,
-        actions: [
-          {
-            action: Constants.SET_CUSTOM_TYPE,
-            type: {
-              key: 'isv_payments_customer_tokens',
-              typeId: Constants.TYPE_ID_TYPE,
+    const query = client
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version: customerInfo?.version as number,
+          actions: [
+            {
+              action: Constants.SET_CUSTOM_TYPE,
+              type: {
+                key: 'isv_payments_customer_tokens',
+                typeId: Constants.TYPE_ID_TYPE,
+              },
+              fields: {
+                isv_tokens: fieldsData,
+                isv_failedTokens: failedTokens,
+                isv_customerId: customerTokenId,
+              },
             },
-            fields: {
-              isv_tokens: fieldsData,
-              isv_failedTokens: failedTokens,
-              isv_customerId: customerTokenId,
-            },
-          },
-        ],
-      }
-    });
+          ],
+        },
+      });
     setCustomTypeResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOM_TYPE, Constants.LOG_INFO, '', '', `${setCustomTypeResponse.consolidatedTime} `);
   }
@@ -582,7 +716,7 @@ const setCustomType = async (customerId: string | undefined, fieldsData: string[
 
 /**
  * Changes the interaction ID of a transaction.
- * 
+ *
  * @param {any} transactionObj - Object containing transaction details.
  * @returns {Promise<Payment | null>} - Response of the change transaction interaction ID operation.
  */
@@ -591,18 +725,21 @@ const changeTransactionInteractionId = async (transactionObj: any) => {
   const client = await getClient();
   if (transactionObj?.paymentId && client) {
     let paymentId = transactionObj.paymentId;
-    const query = client.payments().withId({ ID: paymentId }).post({
-      body: {
-        version: transactionObj.version,
-        actions: [
-          {
-            action: Constants.CHANGE_TRANSACTION_INTERACTION_ID,
-            transactionId: transactionObj.transactionId,
-            interactionId: transactionObj.interactionId,
-          },
-        ],
-      }
-    });
+    const query = client
+      .payments()
+      .withId({ ID: paymentId })
+      .post({
+        body: {
+          version: transactionObj.version,
+          actions: [
+            {
+              action: Constants.CHANGE_TRANSACTION_INTERACTION_ID,
+              transactionId: transactionObj.transactionId,
+              interactionId: transactionObj.interactionId,
+            },
+          ],
+        },
+      });
     changeTransactionInteractionIdResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_CHANGE_TRANSACTION_INTERACTION_ID, Constants.LOG_INFO, '', '', `${changeTransactionInteractionIdResponse.consolidatedTime} `);
   }
@@ -611,7 +748,7 @@ const changeTransactionInteractionId = async (transactionObj: any) => {
 
 /**
  * Adds a custom field to a given type.
- * 
+ *
  * @param {string} typeId - The ID of the type to which the field will be added.
  * @param {number} version - The version of the type.
  * @param {any} fieldDefinition - The definition of the custom field to be added.
@@ -621,17 +758,20 @@ const addCustomField = async (typeId: string, version: number, fieldDefinition: 
   let addCustomFieldResponse;
   const client = await getClient();
   if (typeId && version && fieldDefinition && client) {
-    const query = client.types().withId({ ID: typeId }).post({
-      body: {
-        version: version,
-        actions: [
-          {
-            action: Constants.ADD_FIELD_DEFINITION,
-            fieldDefinition: fieldDefinition,
-          },
-        ],
-      }
-    });
+    const query = client
+      .types()
+      .withId({ ID: typeId })
+      .post({
+        body: {
+          version: version,
+          actions: [
+            {
+              action: Constants.ADD_FIELD_DEFINITION,
+              fieldDefinition: fieldDefinition,
+            },
+          ],
+        },
+      });
     addCustomFieldResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${addCustomFieldResponse.consolidatedTime} `);
   }
@@ -640,7 +780,7 @@ const addCustomField = async (typeId: string, version: number, fieldDefinition: 
 
 /**
  * Updates the available capture amount for a transaction.
- * 
+ *
  * @param {string} paymentId - The ID of the payment associated with the transaction.
  * @param {number} version - The version of the payment.
  * @param {string} transactionId - The ID of the transaction.
@@ -651,24 +791,27 @@ const updateAvailableAmount = async (paymentId: string, version: number, transac
   let updateAvailableAmountResponse;
   const client = await getClient();
   if (paymentId && version && transactionId && 0 > pendingAmount && client) {
-    const query = client.payments().withId({ ID: paymentId }).post({
-      body: {
-        version: version,
-        actions: [
-          {
-            action: Constants.SET_TRANSACTION_CUSTOM_TYPE,
-            type: {
-              key: Constants.ISV_TRANSACTION_DATA,
-              typeId: Constants.TYPE_ID_TYPE,
+    const query = client
+      .payments()
+      .withId({ ID: paymentId })
+      .post({
+        body: {
+          version: version,
+          actions: [
+            {
+              action: Constants.SET_TRANSACTION_CUSTOM_TYPE,
+              type: {
+                key: Constants.ISV_TRANSACTION_DATA,
+                typeId: Constants.TYPE_ID_TYPE,
+              },
+              fields: {
+                isv_availableCaptureAmount: pendingAmount,
+              },
+              transactionId: transactionId,
             },
-            fields: {
-              isv_availableCaptureAmount: pendingAmount,
-            },
-            transactionId: transactionId,
-          },
-        ],
-      }
-    });
+          ],
+        },
+      });
     updateAvailableAmountResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_AVAILABLE_AMOUNT, Constants.LOG_INFO, '', '', `${updateAvailableAmountResponse.consolidatedTime} `);
   }
@@ -677,7 +820,7 @@ const updateAvailableAmount = async (paymentId: string, version: number, transac
 
 /**
  * Retrieves a cart by its ID.
- * 
+ *
  * @param {string} cartId - The ID of the cart to retrieve.
  * @returns {Promise<any>} - Response containing the cart details.
  */
@@ -694,7 +837,7 @@ const getCartById = async (cartId: string) => {
 
 /**
  * Adds a new address to a customer.
- * 
+ *
  * @param {string} customerId - The ID of the customer.
  * @param {AddressType} addressObj - The address object to add.
  * @returns {Promise<any>} - Response containing the updated customer details.
@@ -708,15 +851,18 @@ const addCustomerAddress = async (customerId: string, addressObj: Partial<_BaseA
     customerData = await getCustomer(customerId);
     actions.push({
       action: 'addAddress',
-      address: new Address(addressObj) as _BaseAddress
+      address: new Address(addressObj) as _BaseAddress,
     });
     if (actions && actions.length && customerData) {
-      const query = client.customers().withId({ ID: customerId }).post({
-        body: {
-          version: customerData.version as number,
-          actions: actions,
-        }
-      });
+      const query = client
+        .customers()
+        .withId({ ID: customerId })
+        .post({
+          body: {
+            version: customerData.version as number,
+            actions: actions,
+          },
+        });
       addCustomerAddressResponse = await makeCommercetoolsRequest(query);
       paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOMER_ADDRESS, Constants.LOG_INFO, '', '', `${addCustomerAddressResponse.consolidatedTime} `);
     }
@@ -726,7 +872,7 @@ const addCustomerAddress = async (customerId: string, addressObj: Partial<_BaseA
 
 /**
  * Creates a custom object in the commercetools platform.
- * 
+ *
  * @param {CustomObjectDraft} customObjectData - Data for the custom object.
  * @returns {Promise<any>} - Response containing the created custom object.
  */
@@ -743,7 +889,7 @@ const createCTCustomObject = async (customObjectData: CustomObjectDraft) => {
 
 /**
  * Retrieves custom objects from the commercetools platform by container.
- * 
+ *
  * @param {string} container - The container name.
  * @returns {Promise<any>} - Response containing the retrieved custom objects.
  */
@@ -751,7 +897,7 @@ const retrieveCustomObjectByContainer = async (container: string) => {
   let getCustomObjectsResponse: any;
   const client = await getClient();
   if (container && client) {
-    const query = client.customObjects().get({ queryArgs: { where: [`container="${sanitizePredicateValue(container)}"`] } });
+    const query = client.customObjects().get({ queryArgs: { where: [`container="${container}"`] } });
     const startTime = new Date().getTime();
     getCustomObjectsResponse = await query.execute();
     const endTime = new Date().getTime();
@@ -765,7 +911,7 @@ const retrieveCustomObjectByContainer = async (container: string) => {
 
 /**
  * Updates customer tokens.
- * 
+ *
  * @param {any} updateObject - Object containing the token to update.
  * @param {CustomerType} customerObject - Customer object to update.
  * @param {any} failedTokens - Failed tokens data.
@@ -782,23 +928,106 @@ const updateCustomerToken = async (updateObject: any, customerObject: Partial<Cu
       customerTokenId && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_CUSTOMER_ID, value: customerTokenId },
       customerObject?.custom?.fields?.isv_tokenAction && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_TOKEN_ACTION, value: null },
       customerObject?.custom?.fields?.isv_cardNewExpiryMonth && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_CARD_NEW_EXPIRY_MONTH, value: null },
-      customerObject?.custom?.fields?.isv_cardNewExpiryYear && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_CARD_NEW_EXPIRY_YEAR, value: null }
+      customerObject?.custom?.fields?.isv_cardNewExpiryYear && { action: Constants.SET_CUSTOM_FIELD, name: Constants.ISV_CARD_NEW_EXPIRY_YEAR, value: null },
     ].filter(Boolean);
-    const query = client.customers().withId({ ID: customerId }).post({
-      body: {
-        version: customerObject.version as number,
-        actions: actions,
-      }
-    })
+    const query = client
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version: customerObject.version as number,
+          actions: actions,
+        },
+      });
     setCustomFieldResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_CUSTOMER_TOKEN, Constants.LOG_INFO, customerId, '', `${setCustomFieldResponse.consolidatedTime} `);
   }
   return setCustomFieldResponse;
 };
+const updateCustomerTokensField = async (customerId: string, tokens: string[], customerTokenId?: string | null): Promise<Partial<Customer> | null> => {
+  const client = await getClient();
+  if (!customerId || !client) {
+    return null;
+  }
+
+  const latestCustomer = await getCustomer(customerId);
+  if (!latestCustomer) {
+    throw new Error(`Unable to fetch latest customer for token update: ${customerId}`);
+  }
+
+  if (!latestCustomer?.custom?.type?.id) {
+    return setCustomType(customerId, tokens, latestCustomer?.custom?.fields?.isv_failedTokens || [], customerTokenId || undefined);
+  }
+
+  const hasTokenInArray = (tokenArray: any[], tokenToFind: string): boolean => {
+    return Array.isArray(tokenArray) && tokenArray.includes(tokenToFind);
+  };
+
+  const actions: CustomerUpdateAction[] = [
+    {
+      action: Constants.SET_CUSTOM_FIELD,
+      name: Constants.ISV_TOKENS,
+      value: tokens,
+    },
+    ...(['isv_token', 'isv_addressId'] as const)
+      .filter((fieldName) => Object.prototype.hasOwnProperty.call(latestCustomer?.custom?.fields || {}, fieldName))
+      .map((fieldName) => ({
+        action: Constants.SET_CUSTOM_FIELD,
+        name: fieldName,
+        value: null,
+      } as CustomerUpdateAction)),
+  ];
+
+  try {
+    const query = client
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version: latestCustomer.version as number,
+          actions,
+        },
+      });
+
+    const response = await makeCommercetoolsRequest(query);
+    const responseTokens = response?.custom?.fields?.isv_tokens || [];
+    const missingTokensAfterResponse = (tokens || []).filter((token) => !hasTokenInArray(responseTokens, token));
+    if (missingTokensAfterResponse.length > 0) {
+      paymentUtils.logData(__filename, 'FuncUpdateCustomerTokensField', Constants.LOG_WARN, customerId, 'Response payload missing expected tokens. Retrying single rewrite with latest version. missing=' + paymentUtils.maskData(JSON.stringify(missingTokensAfterResponse)));
+      const retryCustomer = await getCustomer(customerId);
+      if (!retryCustomer) {
+        throw new Error(`Retry customer fetch failed for ${customerId}`);
+      }
+
+      const retryQuery = client
+        .customers()
+        .withId({ ID: customerId })
+        .post({
+          body: {
+            version: retryCustomer.version as number,
+            actions,
+          },
+        });
+      const retryResponse = await makeCommercetoolsRequest(retryQuery);
+      const retryTokens = retryResponse?.custom?.fields?.isv_tokens || [];
+      const missingAfterRetry = (tokens || []).filter((token) => !hasTokenInArray(retryTokens, token));
+      if (missingAfterRetry.length > 0) {
+        throw new Error('updateCustomerTokensField verification failed after retry. missing=' + JSON.stringify(missingAfterRetry));
+      }
+
+      return retryResponse;
+    }
+
+    return response;
+  } catch (err: any) {
+    paymentUtils.logData(__filename, 'FuncUpdateCustomerTokensField', Constants.LOG_ERROR, customerId, 'Failed to update isv_tokens: ' + (err?.message || err) + ', body=' + JSON.stringify(err?.body || {}) + ', stack=' + (err?.stack || ''));
+    throw err;
+  }
+};
 
 /**
  * Retrieves customer by custom field name and value.
- * 
+ *
  * @param {string} customFieldName - Name of the custom field.
  * @param {string} customFieldValue - Value of the custom field.
  * @returns {Promise<any>} - Response containing the customer object.
@@ -807,7 +1036,7 @@ const retrieveCustomerByCustomField = async (customFieldName: string, customFiel
   let retrieveCustomerByCustomObjectResponse;
   const client = await getClient();
   if (customFieldName && customFieldValue && client) {
-    const query = client.customers().get({ queryArgs: { where: `custom(fields(${customFieldName} = "${sanitizePredicateValue(customFieldValue)}"))` } });
+    const query = client.customers().get({ queryArgs: { where: `custom(fields(${customFieldName} = "${customFieldValue}"))` } });
     retrieveCustomerByCustomObjectResponse = await makeCommercetoolsRequest(query);
     paymentUtils.logData(__filename, FunctionConstant.FUNC_RETRIEVE_CUSTOMER_BY_CUSTOM_FIELD, Constants.LOG_INFO, '', '', `${retrieveCustomerByCustomObjectResponse.consolidatedTime} `);
   }
@@ -815,8 +1044,63 @@ const retrieveCustomerByCustomField = async (customFieldName: string, customFiel
 };
 
 /**
+ * Retrieves a customer whose isv_tokens array contains a token matching the given paymentToken.
+ *
+ * @param {string} savedToken - The payment instrument token (isv_savedToken) to search for.
+ * @returns {Promise<Customer | null>} - The matching customer or null.
+ */
+const getCustomerBySavedToken = async (savedToken: string): Promise<Customer | null> => {
+  let customerResult: Customer | null = null;
+  const client = await getClient();
+  if (savedToken && client) {
+    const batchSize = 50;
+    const maxOffset = 500;
+    let offset = 0;
+    let hasMore = true;
+    while (hasMore && !customerResult && offset < maxOffset) {
+      const query = client.customers().get({
+        queryArgs: {
+          where: `custom(fields(isv_customerId is defined))`,
+          limit: batchSize,
+          offset,
+          withTotal: false,
+          sort: 'lastModifiedAt desc',
+        },
+      });
+      const response = await makeCommercetoolsRequest(query);
+      const batchCount = response?.results?.length || 0;
+      if (batchCount) {
+        for (const cust of response.results) {
+          const tokens = cust?.custom?.fields?.isv_tokens || [];
+          for (const tokenStr of tokens) {
+            try {
+              const parsed = JSON.parse(tokenStr);
+              if (parsed.paymentToken === savedToken) {
+                customerResult = cust;
+                break;
+              }
+            } catch (_e) {
+              /* skip invalid JSON entries */
+            }
+          }
+          if (customerResult) break;
+        }
+        offset += batchSize;
+        hasMore = batchCount === batchSize;
+      } else {
+        hasMore = false;
+      }
+    }
+    if (!customerResult) {
+      paymentUtils.logData(__filename, 'FuncGetCustomerBySavedToken', Constants.LOG_WARN, 'SavedToken : ' + savedToken, 'Customer not found after scanning offset=' + offset);
+    }
+  }
+  return customerResult;
+};
+
+/**
  * Retrieves discount by its ID.
- * 
+ *
  * @param {string} discountId - The ID of the discount.
  * @returns {Promise<any>} - The response containing the discount information.
  */
@@ -833,50 +1117,56 @@ const getDiscountCodes = async (discountId: string) => {
 
 /**
  * Fetches all payment records from the commercetools platform, sorted by last modified date in descending order.
- * 
+ *
  * @async
  * @function getAllPayments
  * @returns {Promise<Object|null>} Returns the response object containing all payment records, or null if the request fails.
- * 
+ *
  * Logs an error if unable to connect to the commercetools client.
  * */
 const getAllPayments = async (): Promise<PaymentPagedQueryResponse> => {
   let getAllPaymentsResponse = {} as PaymentPagedQueryResponse;
   const client = await getClient();
   if (client) {
-    const query = client.payments().get({ queryArgs: { sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}` } })
+    const query = client.payments().get({ queryArgs: { sort: `${Constants.LAST_MODIFIED_AT} ${Constants.DESC_ORDER}` } });
     const getAllPaymentsResponseObject = await query.execute();
     if (getAllPaymentsResponseObject?.body) {
       getAllPaymentsResponse = getAllPaymentsResponseObject.body;
     }
   }
   return getAllPaymentsResponse;
-}
+};
 
 const updateOrderAddress = async (orderId: string, orderVersion: number, actions: any[]) => {
   const client = await getClient();
   let orderUpdateResponse = null;
   if (client && orderId && orderVersion && actions && actions.length) {
-    const query = client.orders().withId({ ID: orderId }).post({
-      body: {
-        version: orderVersion,
-        actions: actions,
-      },
-    });
+    const query = client
+      .orders()
+      .withId({ ID: orderId })
+      .post({
+        body: {
+          version: orderVersion,
+          actions: actions,
+        },
+      });
     orderUpdateResponse = await query.execute();
   }
   return orderUpdateResponse;
-}
+};
 
 export default {
   queryCartById,
   queryOrderById,
   retrievePayment,
+  retrievePaymentByInteractionId,
+  retrievePaymentByClientReferenceCode,
   addTransaction,
   getOrders,
   updateCartByPaymentId,
   setCustomerTokens,
   getCustomer,
+  getCustomerByEmail,
   getCustomType,
   setCustomType,
   updateDecisionSync,
@@ -884,16 +1174,20 @@ export default {
   syncAddTransaction,
   addCustomTypes,
   addExtensions,
+  deleteExtension,
   addCustomField,
   updateAvailableAmount,
   getCartById,
   addCustomerAddress,
   changeTransactionInteractionId,
   createCTCustomObject,
+  updatePaymentCustomFields,
   retrieveCustomObjectByContainer,
   updateCustomerToken,
+  updateCustomerTokensField,
   retrieveCustomerByCustomField,
+  getCustomerBySavedToken,
   getDiscountCodes,
   getAllPayments,
-  updateOrderAddress
+  updateOrderAddress,
 };

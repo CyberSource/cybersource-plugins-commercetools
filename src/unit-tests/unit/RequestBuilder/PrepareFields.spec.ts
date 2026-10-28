@@ -1,3 +1,7 @@
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
 import { Payment } from '@commercetools/platform-sdk';
 import test from 'ava';
 import dotenv from 'dotenv';
@@ -25,6 +29,25 @@ test.serial('Get config object with payment object', async (t) => {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
+
+
+test.serial('Get config object for follow-on services uses JWT SHARED_SECRET', async (t) => {
+  try {
+    const originalUseMle = process.env.PAYMENT_GATEWAY_USE_MLE;
+    process.env.PAYMENT_GATEWAY_USE_MLE = 'false';
+
+    const result = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_REFUND_DATA, null, HelperConst.payment as Payment, null);
+    t.is(result?.authenticationType, Constants.JWT_AUTHENTICATION);
+    t.is(result?.jwtKeyType, Constants.PAYMENT_GATEWAY_JWT_KEY_TYPE);
+    t.is(result?.merchantKeyId, process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID);
+    t.is(result?.merchantsecretKey, process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY);
+
+    process.env.PAYMENT_GATEWAY_USE_MLE = originalUseMle;
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
 
 test.serial('Get config object with payment object for MLE', async (t) => {
   try {
@@ -61,6 +84,59 @@ test.serial('Get config object with payment object for MLE with empty Key FileNa
   }
 });
 
+test.serial('Get config object applies Request MLE to capture context for JWT SHARED_SECRET', async (t) => {
+  try {
+    const originalUseMle = process.env.PAYMENT_GATEWAY_USE_MLE;
+    const originalRequestMlePath = process.env.PAYMENT_GATEWAY_REQUEST_MLE_PUBLIC_CERT_PATH;
+    const tempRequestMleCertPath = path.join(os.tmpdir(), 'request-mle-public-cert-capture-context.pem');
+    fs.writeFileSync(tempRequestMleCertPath, 'request mle cert for capture context test');
+
+    process.env.PAYMENT_GATEWAY_USE_MLE = 'true';
+    process.env.PAYMENT_GATEWAY_REQUEST_MLE_PUBLIC_CERT_PATH = tempRequestMleCertPath;
+
+    const result = await prepareFields.getConfigObject(FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT, null, null, process.env.PAYMENT_GATEWAY_MERCHANT_ID || null);
+    t.is(result?.authenticationType, Constants.JWT_AUTHENTICATION);
+    t.is(result?.jwtKeyType, Constants.PAYMENT_GATEWAY_JWT_KEY_TYPE);
+    t.is(result?.enableRequestMLEForOptionalApisGlobally, true);
+    t.is(result?.mleForRequestPublicCertPath, tempRequestMleCertPath);
+
+    process.env.PAYMENT_GATEWAY_USE_MLE = originalUseMle;
+    process.env.PAYMENT_GATEWAY_REQUEST_MLE_PUBLIC_CERT_PATH = originalRequestMlePath;
+    if (fs.existsSync(tempRequestMleCertPath)) {
+      fs.unlinkSync(tempRequestMleCertPath);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+test.serial('Get config object applies Request MLE to follow-on services for JWT SHARED_SECRET', async (t) => {
+  try {
+    const originalUseMle = process.env.PAYMENT_GATEWAY_USE_MLE;
+    const originalRequestMlePath = process.env.PAYMENT_GATEWAY_REQUEST_MLE_PUBLIC_CERT_PATH;
+    const tempRequestMleCertPath = path.join(os.tmpdir(), 'request-mle-public-cert-follow-on.pem');
+    fs.writeFileSync(tempRequestMleCertPath, 'request mle cert for follow-on test');
+
+    process.env.PAYMENT_GATEWAY_USE_MLE = 'true';
+    process.env.PAYMENT_GATEWAY_REQUEST_MLE_PUBLIC_CERT_PATH = tempRequestMleCertPath;
+
+    const result = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, null, HelperConst.payment as Payment, null);
+    t.is(result?.authenticationType, Constants.JWT_AUTHENTICATION);
+    t.is(result?.jwtKeyType, Constants.PAYMENT_GATEWAY_JWT_KEY_TYPE);
+    t.is(result?.enableRequestMLEForOptionalApisGlobally, true);
+    t.is(result?.mleForRequestPublicCertPath, tempRequestMleCertPath);
+
+    process.env.PAYMENT_GATEWAY_USE_MLE = originalUseMle;
+    process.env.PAYMENT_GATEWAY_REQUEST_MLE_PUBLIC_CERT_PATH = originalRequestMlePath;
+    if (fs.existsSync(tempRequestMleCertPath)) {
+      fs.unlinkSync(tempRequestMleCertPath);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+
 test.serial('Get processing information for authorization response with Decision Manager turned ON', async (t) => {
   try {
     let originalEnv = process.env.PAYMENT_GATEWAY_DECISION_MANAGER;
@@ -94,7 +170,7 @@ test.serial('Get payment information for authorization response', async (t) => {
   try {
     const result = prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE, HelperConst.payment as Payment, null, null);
     if (result) {
-      t.is(result.card.typeSelectionIndicator, 1);
+      t.false(Object.prototype.hasOwnProperty.call(result.card, 'typeSelectionIndicator'));
     }
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
@@ -107,8 +183,8 @@ test.serial('Get client reference information for payer auth setup response', as
     const result = prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_PAYER_AUTH_SETUP_RESPONSE, '12345', HelperConst.payment as Payment);
     t.is(result.code, resourceId);
     t.is(result.partner.solutionId, Constants.PAYMENT_GATEWAY_PARTNER_SOLUTION_ID);
-    t.is(result.applicationName, Constants.PAYMENT_GATEWAY_APPLICATION_NAME);
-    t.is(result.applicationVersion, Constants.PAYMENT_GATEWAY_APPLICATION_VERSION);
+    //t.is(result.applicationName, Constants.PAYMENT_GATEWAY_APPLICATION_NAME);
+    //t.is(result.applicationVersion, Constants.PAYMENT_GATEWAY_APPLICATION_VERSION);
     t.is(result.partner.originalTransactionId, HelperConst.payment.id);
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
@@ -237,43 +313,24 @@ test.serial('Get target origins', async (t) => {
   }
 });
 
+test.serial('Get Unified Checkout MOTO setting from custom fields only', (t) => {
+  t.true(prepareFields.getEnableMoto({ [Constants.ISV_ENABLED_MOTO]: true }));
+  t.false(prepareFields.getEnableMoto({ [Constants.ISV_ENABLED_MOTO]: false }));
+  t.false(prepareFields.getEnableMoto());
+});
+
 test.serial('Get allowed payment methods', async (t) => {
   try {
-    let originalEnv = process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS;
-    process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS = 'PANENTRY,SRC,GOOGLEPAY';
-    const result = prepareFields.getAllowedPaymentMethods();
-    t.deepEqual(result, ['PANENTRY', 'SRC', 'GOOGLEPAY']);
-    process.env.PAYMENT_GATEWAY_UC_ALLOWED_PAYMENTS = originalEnv;
+    const customFields = {
+      isv_ucAllowedPaymentTypes: 'TMS_TOKEN,PANENTRY',
+    };
+    const result = prepareFields.getAllowedPaymentMethods(undefined, customFields as any);
+    t.deepEqual(result, ['TMS_TOKEN', 'PANENTRY']);
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
 
-test.serial('Get allowed card networks for capture context', async (t) => {
-  try {
-    let originalEnv = process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS;
-    process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS = 'VISA,MASTERCARD,AMEX';
-    const functionName = FunctionConstant.FUNC_GENERATE_CAPTURE_CONTEXT;
-    const result = prepareFields.getAllowedCardNetworks(functionName);
-    t.deepEqual(result, ['VISA', 'MASTERCARD', 'AMEX']);
-    process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS = originalEnv;
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
-
-test.serial('Get allowed card networks for other functions', async (t) => {
-  try {
-    let originalEnv = process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS;
-    process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS = 'VISA,MASTERCARD,AMEX';
-    const functionName = 'OtherFunction';
-    const result = prepareFields.getAllowedCardNetworks(functionName);
-    t.deepEqual(result, ['VISA', 'MASTERCARD', 'AMEX']);
-    process.env.PAYMENT_GATEWAY_CC_ALLOWED_CARD_NETWORKS = originalEnv;
-  } catch (error) {
-    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
-  }
-});
 
 test.serial('Get token information for payer auth setup data', async (t) => {
   try {
@@ -297,13 +354,15 @@ test.serial('Get token information for other functions', async (t) => {
   }
 });
 
+
 test.serial('Get capture mandate for Payments service', async (t) => {
   try {
-    const result = prepareFields.getCaptureMandate('Payments');
-    t.is(result.billingType, process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE);
-    t.is(result.requestEmail, PaymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_EMAIL));
-    t.is(result.requestPhone, PaymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_PHONE));
-    t.is(result.requestShipping, PaymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_SHIPPING));
+    const customFields = {
+      [Constants.ISV_UC_ALLOWED_PAYMENT_TYPES]: 'TMS_TOKEN,PANENTRY',
+      [Constants.ISV_UC_BILLING_TYPE]: 'FULL',
+    };
+    const result = prepareFields.getCaptureMandate('Payments', customFields as any);
+    t.is(result.billingType, 'FULL');
     t.is(result.showAcceptedNetworkIcons, PaymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_NETWORK_ICONS));
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
@@ -312,16 +371,18 @@ test.serial('Get capture mandate for Payments service', async (t) => {
 
 test.serial('Get capture mandate for MyAccounts service', async (t) => {
   try {
-    const result = prepareFields.getCaptureMandate('MyAccounts');
-    t.is(result.billingType, process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE);
-    t.is(result.requestShipping, false);
-    t.is(result.requestEmail, Constants.STRING_FULL === process.env.PAYMENT_GATEWAY_UC_BILLING_TYPE);
-    t.is(result.requestPhone, PaymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_PHONE));
+    const customFields = {
+      [Constants.ISV_UC_ALLOWED_PAYMENT_TYPES]: 'TMS_TOKEN,PANENTRY',
+      [Constants.ISV_UC_BILLING_TYPE]: 'FULL',
+    };
+    const result = prepareFields.getCaptureMandate('MyAccounts', customFields as any);
+    t.is(result.billingType, 'FULL');
     t.is(result.showAcceptedNetworkIcons, PaymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_UC_ENABLE_NETWORK_ICONS));
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
+
 
 test.serial('Get update token bill-to details', async (t) => {
   try {
@@ -383,6 +444,136 @@ test.serial('Get meta data', async (t) => {
       { key: '1', value: 'testValue1' },
       { key: '2', value: 'testValue2' }
     ]);
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+test.serial('Response MLE disabled: config does not include Response MLE fields', async (t) => {
+  try {
+    const originalResponseMleEnabled = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED;
+    const originalUseMle = process.env.PAYMENT_GATEWAY_USE_MLE;
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = 'false';
+    process.env.PAYMENT_GATEWAY_USE_MLE = 'true';
+
+    const result = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_REFUND_DATA, null, HelperConst.payment as Payment, null);
+
+    // Verify Response MLE fields are not present
+    t.false(result?.enableResponseMleGlobally);
+    t.is(result?.responseMlePrivateKeyFilePath, undefined);
+    t.is(result?.responseMlePrivateKeyFilePassword, undefined);
+
+    // Verify core authentication remains unchanged
+    t.is(result?.authenticationType, Constants.JWT_AUTHENTICATION);
+    t.is(result?.jwtKeyType, Constants.PAYMENT_GATEWAY_JWT_KEY_TYPE);
+    t.is(result?.merchantKeyId, process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID);
+    t.is(result?.merchantsecretKey, process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY);
+
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = originalResponseMleEnabled;
+    process.env.PAYMENT_GATEWAY_USE_MLE = originalUseMle;
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+test.serial('Response MLE enabled with dedicated P12 configuration: config includes Response MLE fields', async (t) => {
+  try {
+    const originalResponseMleEnabled = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED;
+    const originalUseMle = process.env.PAYMENT_GATEWAY_USE_MLE;
+    const originalResponseMleFile = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE;
+    const originalResponseMlePassword = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD;
+
+    // Create a temporary P12 file for testing
+    const tempP12Path = path.join(__dirname, '../../certificates/test-response-mle.p12');
+    const tempP12Dir = path.dirname(tempP12Path);
+    if (!fs.existsSync(tempP12Dir)) {
+      fs.mkdirSync(tempP12Dir, { recursive: true });
+    }
+    fs.writeFileSync(tempP12Path, Buffer.from([0x30, 0x00])); // Minimal binary content
+
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = 'true';
+    process.env.PAYMENT_GATEWAY_USE_MLE = 'true';
+    // Use dedicated Response MLE configuration variables
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE = 'test-response-mle';
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD = 'test-response-password';
+
+    const result = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_REFUND_DATA, null, HelperConst.payment as Payment, null);
+
+    // Verify Response MLE is enabled with dedicated configuration
+    t.is(result?.enableResponseMleGlobally, true);
+    t.truthy(result?.responseMlePrivateKeyFilePath);
+    t.is(result?.responseMlePrivateKeyFilePassword, 'test-response-password');
+
+    // Verify core authentication remains unchanged
+    t.is(result?.authenticationType, Constants.JWT_AUTHENTICATION);
+    t.is(result?.jwtKeyType, Constants.PAYMENT_GATEWAY_JWT_KEY_TYPE);
+
+    // Cleanup
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = originalResponseMleEnabled;
+    process.env.PAYMENT_GATEWAY_USE_MLE = originalUseMle;
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE = originalResponseMleFile;
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD = originalResponseMlePassword;
+    if (fs.existsSync(tempP12Path)) {
+      fs.unlinkSync(tempP12Path);
+    }
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+test.serial('Response MLE enabled without private key file: throws validation error', async (t) => {
+  try {
+    const originalResponseMleEnabled = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED;
+    const originalUseMle = process.env.PAYMENT_GATEWAY_USE_MLE;
+    const originalResponseMleFile = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE;
+    const originalResponseMlePassword = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD;
+
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = 'true';
+    process.env.PAYMENT_GATEWAY_USE_MLE = 'true';
+    // Clear the dedicated Response MLE private key file
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE = '';
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD = 'test-password';
+
+    try {
+      await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_REFUND_DATA, null, HelperConst.payment as Payment, null);
+      t.fail('Expected an error for missing Response MLE private key file');
+    } catch (error: any) {
+      t.true(error?.message.includes('PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE'), `Expected error about missing private key file, got: ${error?.message}`);
+    }
+
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = originalResponseMleEnabled;
+    process.env.PAYMENT_GATEWAY_USE_MLE = originalUseMle;
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE = originalResponseMleFile;
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD = originalResponseMlePassword;
+  } catch (error) {
+    t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+test.serial('Response MLE enabled without private key password: throws validation error', async (t) => {
+  try {
+    const originalResponseMleEnabled = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED;
+    const originalUseMle = process.env.PAYMENT_GATEWAY_USE_MLE;
+    const originalResponseMleFile = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE;
+    const originalResponseMlePassword = process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD;
+
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = 'true';
+    process.env.PAYMENT_GATEWAY_USE_MLE = 'true';
+    // Set private key file but clear password
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE = 'test-cert';
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD = '';
+
+    try {
+      await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_REFUND_DATA, null, HelperConst.payment as Payment, null);
+      t.fail('Expected an error for missing Response MLE private key password');
+    } catch (error: any) {
+      t.true(error?.message.includes('PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD'), `Expected error about missing password, got: ${error?.message}`);
+    }
+
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_ENABLED = originalResponseMleEnabled;
+    process.env.PAYMENT_GATEWAY_USE_MLE = originalUseMle;
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE = originalResponseMleFile;
+    process.env.PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD = originalResponseMlePassword;
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }

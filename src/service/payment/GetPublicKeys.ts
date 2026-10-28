@@ -52,9 +52,10 @@ const getPublicKeys = async (captureContext: string, paymentObj: Payment): Promi
         publicKeyPathParams.kid = parsedValue;
         const digest = crypto.createHash('sha256').update(JSON.stringify(null), 'utf8').digest(Constants.ENCODING_BASE_SIXTY_FOUR);
         publicKeyHeaderParams['Digest'] = `SHA-256=${digest}`;
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_DEBUG, 'PaymentId : ' + paymentId, 'Public Key Request = ' + JSON.stringify({ method: 'GET', url: publicKeyURL, pathParams: publicKeyPathParams, headers: publicKeyHeaderParams }));
         const startTime = new Date().getTime();
         return await new Promise((resolve, reject) => {
-          apiClient.callApi(publicKeyURL, 'GET', publicKeyPathParams, {}, publicKeyHeaderParams, null, null, [], ['application/json'], ['application/json'], Constants.STR_OBJECT,false, (error: any, data: any, response: any) => {
+          apiClient.callApi(publicKeyURL, 'GET', publicKeyPathParams, {}, publicKeyHeaderParams, null, null, [], ['application/json'], ['application/json'], Constants.STR_OBJECT, false, (error: any, data: any, response: any) => {
             const endTime = new Date().getTime();
             paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_DEBUG, 'PaymentId : ' + paymentId, 'Public Key Response =' + paymentUtils.maskData(JSON.stringify(response)), `${endTime - startTime}`);
             paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_PUBLIC_KEYS, Constants.LOG_INFO, '', `${endTime - startTime}`);
@@ -66,7 +67,7 @@ const getPublicKeys = async (captureContext: string, paymentObj: Payment): Promi
               } catch (exception) {
                 errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION, exception, FunctionConstant.FUNC_GET_PUBLIC_KEYS), __filename, 'PaymentId : ' + paymentId);
               }
-              isSignatureValid?.flx?.data ? resolve(true) : reject(false);
+              isSignatureValid?.flx?.data || isSignatureValid?.ctx?.[0]?.data ? resolve(true) : reject(false);
             } else {
               if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
                 errorHandler.logError(new PaymentProcessingError(CustomMessages.ERROR_MSG_PUBLIC_KEY_VERIFICATION + Constants.STRING_HYPHEN + error.response.text, error, FunctionConstant.FUNC_GET_PUBLIC_KEYS), __filename, 'PaymentId : ' + paymentId);

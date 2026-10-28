@@ -342,11 +342,37 @@ test.serial('Get InterationID', (t) => {
   t.is(result, '6805192636456088103954')
 })
 
-test.serial('count of token for an interval', (t) => {
-  let cardRate = Number(process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME);
-  let startTime = new Date();
-  startTime.setHours(startTime.getHours() - cardRate);
-  const result = paymentUtils.countTokenForGivenInterval(PaymentServiceConst.deleteTokenCustomerObj.custom?.fields?.isv_tokens as any, new Date(startTime).toISOString(), new Date(Date.now()).toISOString());
-  t.is(result, 0);
-})
+test('extractJweToken unwraps the encryptedResponse JSON wrapper', (t) => {
+  const wrapped = JSON.stringify({ encryptedResponse: 'eyJhbGciOiJSU0EtT0FFUCJ9...jwe-token' });
+  t.is(paymentUtils.extractJweToken(wrapped, 'merchant1'), 'eyJhbGciOiJSU0EtT0FFUCJ9...jwe-token');
+});
+
+test('extractJweToken treats non-JSON body as a raw JWE token', (t) => {
+  const rawJwe = 'eyJhbGciOiJSU0EtT0FFUCJ9...raw-jwe-token';
+  t.is(paymentUtils.extractJweToken(rawJwe, 'merchant1'), rawJwe);
+});
+
+test('extractJweToken treats JSON without encryptedResponse as a raw token', (t) => {
+  const jsonWithoutWrapper = JSON.stringify({ someOtherField: 'value' });
+  t.is(paymentUtils.extractJweToken(jsonWithoutWrapper, 'merchant1'), jsonWithoutWrapper);
+});
+
+test('normalizeUCWebhookStatus maps known raw statuses to the normalized vocabulary', (t) => {
+  t.is(paymentUtils.normalizeUCWebhookStatus('authorized'), 'SUCCESS');
+  t.is(paymentUtils.normalizeUCWebhookStatus('AUTHORIZED_PENDING_REVIEW'), 'PENDING_REVIEW');
+  t.is(paymentUtils.normalizeUCWebhookStatus('declined'), 'FAILURE');
+  t.is(paymentUtils.normalizeUCWebhookStatus('reversed'), 'CANCELLED');
+});
+
+test('normalizeUCWebhookStatus passes through unmapped statuses uppercased', (t) => {
+  t.is(paymentUtils.normalizeUCWebhookStatus('some_unmapped_status'), 'SOME_UNMAPPED_STATUS');
+  t.is(paymentUtils.normalizeUCWebhookStatus(''), '');
+});
+
+test('extractUCWebhookStatus picks the first populated status candidate in priority order', (t) => {
+  t.is(paymentUtils.extractUCWebhookStatus({ status: 'AUTHORIZED' }), 'AUTHORIZED');
+  t.is(paymentUtils.extractUCWebhookStatus({ responseStatus: { status: 'DECLINED' } }), 'DECLINED');
+  t.is(paymentUtils.extractUCWebhookStatus({ status: '', decisionStatus: 'ACCEPT' }), 'ACCEPT');
+  t.is(paymentUtils.extractUCWebhookStatus({}), '');
+});
 

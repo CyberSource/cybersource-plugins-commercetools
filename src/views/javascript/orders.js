@@ -1,3 +1,4 @@
+
 import { amountConversion, dateConversion, validPathRegex, getApiPath } from './utils.js';
 
 if (window.location.pathname.includes('orders')) {
@@ -27,7 +28,6 @@ if (window.location.pathname.includes('orders')) {
         addEventListener(auth);
         break;
       default:
-        console.log('No valid element found.');
         break;
     }
 
@@ -49,7 +49,6 @@ if (window.location.pathname.includes('orders')) {
     try {
       await renderOrders(orders.orderList);
     } catch (error) {
-      console.log('error', error);
       await displayErrorMessage('Error fetching orders');
     }
   });
@@ -192,7 +191,6 @@ async function fetchOrdersInfo() {
     const jsonData = JSON.parse(ordersData);
     return jsonData;
   } catch (error) {
-    console.log('error', error);
     await displayErrorMessage('Error in fetching orders');
     loadingIndicator.style.display = 'none';
   } finally {
@@ -215,3 +213,4 @@ function addEventListener(element) {
 function showDiv() {
   document.getElementById('loading').style.display = 'flex';
 }
+

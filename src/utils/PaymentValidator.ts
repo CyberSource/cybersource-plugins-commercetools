@@ -1,9 +1,7 @@
-import { Payment, Transaction } from "@commercetools/platform-sdk";
-
-import { Constants } from "../constants/paymentConstants";
-import { PaymentTransactionType, ResponseType } from "../types/Types";
-
-import paymentUtils from "./PaymentUtils";
+import { Payment, Transaction } from '@commercetools/platform-sdk';
+import { Constants } from '../constants/paymentConstants';
+import { PaymentTransactionType, ResponseType } from '../types/Types';
+import paymentUtils from './PaymentUtils';
 
 /**
  * Sets a value in the target object based on the source object and validates its type.
@@ -67,7 +65,7 @@ const validateActionsAndPush = (sourceArray: any[], targetArray: any[]) => {
     if (sourceArray && Array.isArray(sourceArray) && sourceArray.length && targetArray && Array.isArray(targetArray)) {
         sourceArray.forEach((action: any) => {
             targetArray.push(action);
-        })
+        });
     }
 };
 
@@ -79,9 +77,14 @@ const validateActionsAndPush = (sourceArray: any[], targetArray: any[]) => {
  */
 const isValidUpdateServiceResponse = (updateServiceResponse: any): boolean => {
     let validUpdateServiceResponseObject = false;
-    if (updateServiceResponse && Constants.HTTP_OK_STATUS_CODE === updateServiceResponse?.httpCode && updateServiceResponse?.card && 0 < Object.keys(updateServiceResponse.card).length &&
+    if (
+        updateServiceResponse &&
+        Constants.HTTP_OK_STATUS_CODE === updateServiceResponse?.httpCode &&
+        updateServiceResponse?.card &&
+        0 < Object.keys(updateServiceResponse.card).length &&
         updateServiceResponse?.card?.expirationMonth &&
-        updateServiceResponse?.card?.expirationYear) {
+        updateServiceResponse?.card?.expirationYear
+    ) {
         validUpdateServiceResponseObject = true;
     }
     return validUpdateServiceResponseObject;
@@ -95,29 +98,17 @@ const isValidUpdateServiceResponse = (updateServiceResponse: any): boolean => {
  */
 const isValidAddTokenResponse = (addTokenResponse: Partial<ResponseType>): boolean => {
     let validAddTokenResponseObject = false;
-    if (Constants.HTTP_SUCCESS_STATUS_CODE === addTokenResponse.httpCode &&
+    if (
+        Constants.HTTP_SUCCESS_STATUS_CODE === addTokenResponse.httpCode &&
         Constants.API_STATUS_AUTHORIZED === addTokenResponse.status &&
         addTokenResponse?.data?.tokenInformation &&
         addTokenResponse?.data?.tokenInformation?.paymentInstrument &&
         addTokenResponse?.data?.tokenInformation?.instrumentIdentifier &&
-        addTokenResponse?.data?.tokenInformation?.paymentInstrument?.id.length) {
+        addTokenResponse?.data?.tokenInformation?.paymentInstrument?.id.length
+    ) {
         validAddTokenResponseObject = true;
     }
     return validAddTokenResponseObject;
-};
-
-/**
- * Validates rate limiter input from environment variables.
- *
- * @returns {boolean} True if valid, otherwise false.
- */
-const isValidRateLimiterInput = (): boolean => {
-    if (Number.isInteger(Number(process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME)) &&
-        0 < Number(process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME) &&
-        Number.isInteger(Number(process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE)) &&
-        0 < Number(process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE))
-        return true;
-    return false;
 };
 
 /**
@@ -130,13 +121,15 @@ const isValidRateLimiterInput = (): boolean => {
  */
 const shouldProcessTokens = (isError: boolean, paymentResponse: any, updatePaymentObj: Payment): boolean => {
     const paymentMethod = updatePaymentObj?.paymentMethodInfo.method;
-    if (!isError &&
+    if (
+        !isError &&
         updatePaymentObj?.customer?.id &&
         Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse.httpCode &&
         Constants.API_STATUS_AUTHORIZED === paymentResponse.status &&
         (Constants.CREDIT_CARD === paymentMethod || Constants.CC_PAYER_AUTHENTICATION === paymentMethod) &&
         (undefined === updatePaymentObj?.custom?.fields?.isv_savedToken || null === updatePaymentObj.custom?.fields?.isv_savedToken || '' === updatePaymentObj?.custom?.fields?.isv_savedToken) &&
-        updatePaymentObj?.custom?.fields?.isv_tokenAlias) {
+        updatePaymentObj?.custom?.fields?.isv_savedToken !== undefined
+    ) {
         return true;
     }
     return false;
@@ -159,9 +152,10 @@ const shouldProcessFailedTokens = (paymentResponse: any, updatePaymentObj: Payme
         Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED !== paymentResponse.status &&
         (Constants.CREDIT_CARD === paymentMethod || Constants.CC_PAYER_AUTHENTICATION === paymentMethod) &&
         (undefined === customFields?.isv_savedToken || null === customFields?.isv_savedToken || '' === customFields?.isv_savedToken) &&
-        customFields?.isv_tokenAlias
-    ) return true;
-    return false
+        (customFields?.isv_cardType || customFields?.isv_maskedPan)
+    )
+        return true;
+    return false;
 };
 
 /**
@@ -172,13 +166,16 @@ const shouldProcessFailedTokens = (paymentResponse: any, updatePaymentObj: Payme
  * @returns {boolean} True if valid, otherwise false.
  */
 const isValidTransaction = (updatePaymentObj: Payment, updateTransactions: Partial<PaymentTransactionType>): boolean => {
-    if (updatePaymentObj
-        && updateTransactions
-        && updateTransactions?.amount
-        && 'number' === typeof updateTransactions.amount.centAmount
-        && 'number' === typeof updateTransactions.amount.fractionDigits
-        && undefined !== updateTransactions?.amount?.fractionDigits
-        && 0 <= updateTransactions.amount.fractionDigits && updateTransactions.amount?.type) {
+    if (
+        updatePaymentObj &&
+        updateTransactions &&
+        updateTransactions?.amount &&
+        'number' === typeof updateTransactions.amount.centAmount &&
+        'number' === typeof updateTransactions.amount.fractionDigits &&
+        undefined !== updateTransactions?.amount?.fractionDigits &&
+        0 <= updateTransactions.amount.fractionDigits &&
+        updateTransactions.amount?.type
+    ) {
         return true;
     }
     return false;
@@ -192,7 +189,7 @@ const isValidTransaction = (updatePaymentObj: Payment, updateTransactions: Parti
  */
 const isSuccessFulChargeTransaction = (transaction: Transaction): boolean => {
     if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type && Constants.CT_TRANSACTION_STATE_SUCCESS === transaction.state && transaction?.amount && transaction?.interactionId && transaction?.id) return true;
-    return false
+    return false;
 };
 
 /**
@@ -204,13 +201,14 @@ const isSuccessFulChargeTransaction = (transaction: Transaction): boolean => {
  * @returns {boolean} True if valid, otherwise false.
  */
 const isValidTransactionSummaries = (transactionDetail: any, updatePaymentObj: Payment, retryCount: number): boolean => {
-    if (transactionDetail &&
+    if (
+        transactionDetail &&
         Constants.HTTP_SUCCESS_STATUS_CODE === transactionDetail.httpCode &&
         transactionDetail?.data?._embedded?.transactionSummaries &&
-        ((Constants.CC_PAYER_AUTHENTICATION === updatePaymentObj.paymentMethodInfo.method && 2 <= transactionDetail?.data?.totalCount
-            && Constants.PAYMENT_GATEWAY_TRANSACTION_SUMMARIES_MAX_RETRY === retryCount) ||
+        ((Constants.CC_PAYER_AUTHENTICATION === updatePaymentObj.paymentMethodInfo.method && 2 <= transactionDetail?.data?.totalCount && Constants.PAYMENT_GATEWAY_TRANSACTION_SUMMARIES_MAX_RETRY === retryCount) ||
             (1 === transactionDetail?.data?.totalCount && updatePaymentObj?.custom?.fields?.isv_saleEnabled) ||
-            (1 < transactionDetail?.data?.totalCount && Constants.CC_PAYER_AUTHENTICATION !== updatePaymentObj.paymentMethodInfo.method))) {
+            (1 < transactionDetail?.data?.totalCount && Constants.CC_PAYER_AUTHENTICATION !== updatePaymentObj.paymentMethodInfo.method))
+    ) {
         return true;
     }
     return false;
@@ -223,11 +221,10 @@ const isValidTransactionSummaries = (transactionDetail: any, updatePaymentObj: P
  * @returns {boolean} True if authentication is required, otherwise false.
  */
 const isConsumerAuthenticationRequired = (paymentResponse: any) => {
-    return (Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse?.httpCode &&
-        paymentResponse?.data?.errorInformation &&
-        0 < paymentResponse?.data?.errorInformation.length &&
-        Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED === paymentResponse.data.errorInformation?.reason)
-}
+    return (
+        Constants.HTTP_SUCCESS_STATUS_CODE === paymentResponse?.httpCode && paymentResponse?.data?.errorInformation && 0 < paymentResponse?.data?.errorInformation.length && Constants.API_STATUS_CUSTOMER_AUTHENTICATION_REQUIRED === paymentResponse.data.errorInformation?.reason
+    );
+};
 
 /**
  * Validates the card response.
@@ -236,9 +233,7 @@ const isConsumerAuthenticationRequired = (paymentResponse: any) => {
  * @returns {boolean} True if valid, otherwise false.
  */
 const isValidCardResponse = (cardResponse: any): boolean => {
-    return (cardResponse.httpCode === Constants.HTTP_SUCCESS_STATUS_CODE &&
-        cardResponse.status === Constants.API_STATUS_AUTHORIZED &&
-        0 < cardResponse?.data?.tokenInformation?.paymentInstrument?.id.length);
+    return cardResponse.httpCode === Constants.HTTP_SUCCESS_STATUS_CODE && cardResponse.status === Constants.API_STATUS_AUTHORIZED && 0 < cardResponse?.data?.tokenInformation?.paymentInstrument?.id.length;
 };
 
 /**
@@ -251,12 +246,7 @@ const isValidCardResponse = (cardResponse: any): boolean => {
  * @returns {boolean} True if valid, otherwise false.
  */
 const isValidPendingAuthenticationResponse = (httpCode: number, status: string, data: any, consumerAuthenticationInformation: any) => {
-    return (Constants.HTTP_SUCCESS_STATUS_CODE === httpCode &&
-        Constants.API_STATUS_PENDING_AUTHENTICATION === status &&
-        data &&
-        0 < Object.keys(data).length &&
-        consumerAuthenticationInformation &&
-        0 < Object.keys(consumerAuthenticationInformation).length)
+    return Constants.HTTP_SUCCESS_STATUS_CODE === httpCode && Constants.API_STATUS_PENDING_AUTHENTICATION === status && data && 0 < Object.keys(data).length && consumerAuthenticationInformation && 0 < Object.keys(consumerAuthenticationInformation).length;
 };
 
 /**
@@ -278,7 +268,6 @@ export default {
     validateActionsAndPush,
     isValidUpdateServiceResponse,
     isValidAddTokenResponse,
-    isValidRateLimiterInput,
     shouldProcessTokens,
     shouldProcessFailedTokens,
     isValidTransaction,
@@ -287,5 +276,5 @@ export default {
     isConsumerAuthenticationRequired,
     isValidCardResponse,
     isValidPendingAuthenticationResponse,
-    validateWhiteListEndPoints
+    validateWhiteListEndPoints,
 };

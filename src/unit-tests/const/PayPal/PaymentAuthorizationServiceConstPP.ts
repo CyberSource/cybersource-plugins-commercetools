@@ -40,7 +40,6 @@ const payment = {
       "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
     },
     "fields": {
-      "isv_deviceFingerprintId": "c4ebb8bd-9b22-47d4-adc3-5c79dd06f276",
       "isv_merchantId": "",
       "isv_saleEnabled": false,
       "isv_shippingMethod": "SINGLE",
@@ -111,7 +110,6 @@ const payments = {
       "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
     },
     "fields": {
-      "isv_deviceFingerprintId": "c4ebb8bd-9b22-47d4-adc3-5c79dd06f276",
       "isv_merchantId": "",
       "isv_saleEnabled": false,
       "isv_shippingMethod": "SINGLE",
@@ -191,7 +189,6 @@ const guestPayment = {
       "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
     },
     "fields": {
-      "isv_deviceFingerprintId": "8a66f7a9-9585-4072-bb06-31b5c94c9e81",
       "isv_merchantId": "",
       "isv_saleEnabled": false,
       "isv_shippingMethod": "SINGLE",

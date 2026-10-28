@@ -1,5 +1,12 @@
 import { Payment } from '@commercetools/platform-sdk';
-import { Ptsv2creditsProcessingInformationBankTransferOptions, Ptsv2paymentsidrefundsProcessingInformation, Ptsv2paymentsidreversalsProcessingInformation, Ptsv2paymentsProcessingInformation, Ptsv2paymentsProcessingInformationAuthorizationOptions, Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator } from 'cybersource-rest-client';
+import {
+    Ptsv2creditsProcessingInformationBankTransferOptions,
+    Ptsv2paymentsidrefundsProcessingInformation,
+    Ptsv2paymentsidreversalsProcessingInformation,
+    Ptsv2paymentsProcessingInformation,
+    Ptsv2paymentsProcessingInformationAuthorizationOptions,
+    Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator,
+} from 'cybersource-rest-client';
 
 import { FunctionConstant } from '../constants/functionConstant';
 import { Constants } from '../constants/paymentConstants';
@@ -18,16 +25,16 @@ export class ProcessingInformation {
     private intentsId?: string;
 
     /**
-    * Constructs a new instance of ProcessingInformation.
-    * Initializes the processing information based on the provided function name.
-    * 
-    * @param functionName - Name of the function being processed (e.g., authorization, refund).
-    * @param resourceObj - The payment resource object, containing payment-related information.
-    * @param orderNo - The order number associated with the transaction.
-    * @param service - The service type associated with the processing (e.g., enrollment check, validation).
-    * @param cardTokens - Card token information, if available.
-    * @param isSaveToken - A flag indicating if a token should be saved.
-    */
+     * Constructs a new instance of ProcessingInformation.
+     * Initializes the processing information based on the provided function name.
+     *
+     * @param functionName - Name of the function being processed (e.g., authorization, refund).
+     * @param resourceObj - The payment resource object, containing payment-related information.
+     * @param orderNo - The order number associated with the transaction.
+     * @param service - The service type associated with the processing (e.g., enrollment check, validation).
+     * @param cardTokens - Card token information, if available.
+     * @param isSaveToken - A flag indicating if a token should be saved.
+     */
     constructor(functionName: string, resourceObj: Payment | null, orderNo: string, service: string, cardTokens: CustomTokenType | null, isSaveToken: boolean | null, intentsId?: string) {
         this.functionName = functionName;
         this.resourceObj = resourceObj;
@@ -40,10 +47,10 @@ export class ProcessingInformation {
     }
 
     /**
-    * Initializes the processing information based on the function name.
-    * 
-    * @returns An instance of processing information object (specific to the function).
-    */
+     * Initializes the processing information based on the function name.
+     *
+     * @returns An instance of processing information object (specific to the function).
+     */
     private initializeProcessingInformation() {
         let processingInformationInstance = {};
         switch (this.functionName) {
@@ -64,7 +71,7 @@ export class ProcessingInformation {
 
     /**
      * Configures and returns the processing information object.
-     * 
+     *
      * @returns The configured processing information object.
      */
     public getProcessingInformation() {
@@ -82,20 +89,15 @@ export class ProcessingInformation {
     }
 
     /**
-   * Configures authorization processing details, including MOTO indicators and capture actions.
-   * It also sets actionList and invokes additional authorization options if necessary.
-   * 
-   * @param actionList - List of actions to be configured for the transaction.
-   * @param customFields - Custom fields related to the payment.
-   */
+     * Configures authorization processing details, including MOTO indicators and capture actions.
+     * It also sets actionList and invokes additional authorization options if necessary.
+     *
+     * @param actionList - List of actions to be configured for the transaction.
+     * @param customFields - Custom fields related to the payment.
+     */
     private configureAuthorizationProcessing(actionList: string[], customFields: any) {
-        /* START GENAI */
-        if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_MOTO)) {
-        /* END GENAI */
+        if (paymentUtils.toBoolean(String(customFields?.[Constants.ISV_ENABLED_MOTO])) && FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE !== this.functionName) {
             this.processingInformation.commerceIndicator = 'MOTO';
-        }
-        if (customFields?.isv_saleEnabled && Constants.PAYPAL !== this.service) {
-            this.processingInformation.capture = true;
         }
         if (Constants.PAYPAL === this.service) {
             this.processingInformation.intentsId = this.intentsId;
@@ -104,8 +106,8 @@ export class ProcessingInformation {
             const payPalActionMap: Record<string, string[]> = {
                 [FunctionConstant.FUNC_GET_CAPTURE_RESPONSE]: [Constants.PAYMENT_GATEWAY_AP_CAPTURE],
                 [FunctionConstant.FUNC_GET_REFUND_DATA]: [Constants.PAYMENT_GATEWAY_AP_REFUND],
-                [FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE]: [Constants.PAYMENT_GATEWAY_AP_REVERSAL]
-            }
+                [FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE]: [Constants.PAYMENT_GATEWAY_AP_REVERSAL],
+            };
             if (payPalActionMap[this.functionName]) {
                 actionList.push(...payPalActionMap[this.functionName]);
             }
@@ -126,11 +128,9 @@ export class ProcessingInformation {
             actionList.push(...actionMap[this.service]);
         }
         if (this.service === Constants.PAYPAL) {
-            actionList.push(customFields?.isv_saleEnabled
-                ? Constants.PAYMENT_GATEWAY_AP_SALE
-                : Constants.PAYMENT_GATEWAY_AP_AUTH);
+            actionList.push(customFields?.isv_saleEnabled ? Constants.PAYMENT_GATEWAY_AP_SALE : Constants.PAYMENT_GATEWAY_AP_AUTH);
         }
-        if ((!customFields?.isv_savedToken && customFields?.isv_tokenAlias && this.isSaveToken) || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName) {
+        if ((!customFields?.isv_savedToken && this.isSaveToken) || FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE === this.functionName) {
             actionList.push(Constants.PAYMENT_GATEWAY_TOKEN_CREATE);
             this.processingInformation.actionList = actionList;
             this.addAuthorizationOptions();
@@ -144,22 +144,20 @@ export class ProcessingInformation {
      */
     private addAuthorizationOptions() {
         const initiator: Ptsv2paymentsProcessingInformationAuthorizationOptionsInitiator = {
-            credentialStoredOnFile: true
+            credentialStoredOnFile: true,
         };
         const authorizationOptions: Ptsv2paymentsProcessingInformationAuthorizationOptions = {
-            initiator: initiator
+            initiator: initiator,
         };
         this.processingInformation.authorizationOptions = authorizationOptions;
-        this.processingInformation.actionTokenTypes = this.cardTokens && this.cardTokens.customerTokenId ?
-            Constants.PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS :
-            Constants.PAYMENT_GATEWAY_TOKEN_ACTION_TYPES;
+        this.processingInformation.actionTokenTypes = this.cardTokens && this.cardTokens.customerTokenId ? Constants.PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS : Constants.PAYMENT_GATEWAY_TOKEN_ACTION_TYPES;
     }
 
     /**
-    * Configures the reconciliation ID if reconciliation is enabled in the environment variables.
-    * 
-    * @param orderNo - The order number used as the reconciliation ID.
-    */
+     * Configures the reconciliation ID if reconciliation is enabled in the environment variables.
+     *
+     * @param orderNo - The order number used as the reconciliation ID.
+     */
     private configureReconciliationId(orderNo: string) {
         if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ORDER_RECONCILIATION) && orderNo) {
             this.processingInformation.reconciliationId = orderNo;
@@ -168,16 +166,26 @@ export class ProcessingInformation {
 
     /**
      * Configures the payment solution (e.g., Google Pay, Apple Pay) based on the payment method in the resource object.
-     * 
+     *
      * @param resourceObj - The payment resource object containing payment method info.
      * @param customFields - Custom fields that may influence the payment solution configuration.
      */
     private configurePaymentSolution(resourceObj: Payment | null, customFields?: Partial<PaymentCustomFieldsType>) {
+        // Check if this is a follow-on function (capture, refund, reversal)
+        const isFollowOnFunction = [
+            FunctionConstant.FUNC_GET_CAPTURE_RESPONSE,
+            FunctionConstant.FUNC_GET_REFUND_DATA,
+            FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE
+        ].includes(this.functionName);
+
         switch (resourceObj?.paymentMethodInfo?.method) {
             case Constants.CLICK_TO_PAY: {
                 if (customFields && customFields?.isv_transientToken) {
                     this.processingInformation.paymentSolution = Constants.PAYMENT_GATEWAY_CLICK_TO_PAY_UC_PAYMENT_SOLUTION;
-                    this.processingInformation.visaCheckoutId = customFields.isv_transientToken;
+                    // Only set visaCheckoutId for initial authorization, NOT for follow-on transactions
+                    if (!isFollowOnFunction) {
+                        this.processingInformation.visaCheckoutId = customFields.isv_transientToken;
+                    }
                 }
                 break;
             }
@@ -192,18 +200,17 @@ export class ProcessingInformation {
 
     /**
      * Configures bank transfer options if the payment method is an eCheck.
-     * 
+     *
      * @param resourceObj - The payment resource object containing payment method info.
      * @param customFields - Custom fields that may influence the bank transfer configuration.
      */
     private configureBankTransferOptions(resourceObj: Payment | null) {
         if (Constants.ECHECK === resourceObj?.paymentMethodInfo?.method) {
-            /* START GENAI */
             const banktransferOptions: Ptsv2creditsProcessingInformationBankTransferOptions = {
-                secCode: paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_MOTO) ? 'TEL' : 'WEB',
-                fraudScreeningLevel: 1
+                secCode: paymentUtils.toBoolean(String(resourceObj.custom?.fields?.[Constants.ISV_ENABLED_MOTO])) ? 'TEL' : 'WEB',
+                fraudScreeningLevel: 1,
             };
-            /* END GENAI */
+
             this.processingInformation.bankTransferOptions = banktransferOptions;
         }
     }

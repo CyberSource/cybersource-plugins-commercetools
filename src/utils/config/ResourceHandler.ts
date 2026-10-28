@@ -36,14 +36,17 @@ const addCustomType = async (): Promise<void> => {
   try {
     if (process.env.CT_PROJECT_KEY && process.env.CT_CLIENT_ID && process.env.CT_CLIENT_SECRET && process.env.CT_AUTH_HOST && process.env.CT_API_HOST) {
       await customType.createAdditionalCustomType();
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, Constants.LOG_INFO, '', CustomMessages.SUCCESS_MSG_EXTENSION_CREATION);
+      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, Constants.LOG_INFO, '', CustomMessages.SUCCESS_MSG_EXTENSION_CREATION);
+      }
     } else {
       paymentUtils.logData(__filename, FunctionConstant.FUNC_ADD_CUSTOM_TYPE, Constants.LOG_WARN, '', CustomMessages.ERROR_MSG_CUSTOM_FIELD_SETUP);
+
     }
   } catch (exception) {
     errorHandler.logError(new ApiError(CustomMessages.EXCEPTION_MSG_CUSTOM_TYPE, exception, FunctionConstant.FUNC_ADD_CUSTOM_TYPE), __filename, '');
   }
-}
+};
 
 /**
  * creates the existence of required extensions for the payment gateway.

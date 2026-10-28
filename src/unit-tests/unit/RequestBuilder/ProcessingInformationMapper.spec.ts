@@ -7,6 +7,7 @@ import PaymentAuthorizationServiceConstAP from '../../const/ApplePay/PaymentAuth
 import PaymentAuthorizationServiceVsConst from '../../const/ClickToPay/PaymentAuthorizationServiceVsConst';
 import PaymentAuthorizationReversalConstCC from '../../const/CreditCard/PaymentAuthorizationReversalConstCC';
 import PaymentAuthorizationServiceConstCC from '../../const/CreditCard/PaymentAuthorizationServiceConstCC';
+import PaymentAuthorizationServiceConstECDebit from '../../const/ECheck/PaymentAuthorizationServiceConstECDebit';
 import PaymentAuthorizationServiceConstGP from '../../const/GooglePay/PaymentAuthorizationServiceConstGP';
 
 dotenv.config();
@@ -194,3 +195,58 @@ test.serial('Get processing information for refund', async (t) => {
     }
   }
 });
+
+test.serial('Get processing information for add token response', async (t) => {
+  try {
+    const payment = PaymentAuthorizationServiceConstCC.payment as any;
+    const paymentWithMotoEnabled = {
+      ...payment,
+      custom: {
+        ...payment.custom,
+        fields: { ...payment.custom.fields, isv_enabledMoto: true },
+      },
+    };
+    const motoEnabledAddToken = new ProcessingInformation(
+      FunctionConstant.FUNC_GET_ADD_TOKEN_RESPONSE,
+      paymentWithMotoEnabled,
+      PaymentAuthorizationServiceConstCC.orderNo,
+      PaymentAuthorizationServiceConstCC.service,
+      null,
+      false,
+    );
+    const result: any = motoEnabledAddToken.getProcessingInformation();
+    t.true(result.actionList.includes('TOKEN_CREATE'));
+    t.deepEqual(result.actionTokenTypes, ['customer', 'paymentInstrument', 'instrumentIdentifier']);
+    t.truthy(result.authorizationOptions?.initiator?.credentialStoredOnFile);
+    t.false(Object.prototype.hasOwnProperty.call(result, 'commerceIndicator'));
+  } catch (error) {
+    if (error instanceof Error) {
+      t.fail(`Caught an error during execution: ${error.message}`);
+    } else {
+      t.fail(`Caught an unknown error: ${String(error)}`);
+    }
+  }
+});
+
+test.serial('Uses the MOTO custom field for eCheck follow-on secCode', (t) => {
+  const payment = PaymentAuthorizationServiceConstECDebit.payment as any;
+  const paymentWithMotoEnabled = {
+    ...payment,
+    custom: {
+      ...payment.custom,
+      fields: { ...payment.custom.fields, isv_enabledMoto: true },
+    },
+  };
+  const paymentWithMotoDisabled = {
+    ...payment,
+    custom: {
+      ...payment.custom,
+      fields: { ...payment.custom.fields, isv_enabledMoto: false },
+    },
+  };
+  const motoEnabled = new ProcessingInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, paymentWithMotoEnabled, '', '', null, null).getProcessingInformation();
+  const motoDisabled = new ProcessingInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, paymentWithMotoDisabled, '', '', null, null).getProcessingInformation();
+  t.is(motoEnabled.bankTransferOptions.secCode, 'TEL');
+  t.is(motoDisabled.bankTransferOptions.secCode, 'WEB');
+});
+ 

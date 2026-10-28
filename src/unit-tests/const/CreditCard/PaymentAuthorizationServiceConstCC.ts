@@ -48,7 +48,6 @@ let payment = {
     fields: {
       isv_tokenCaptureContextSignature:
         'eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJxUC9kSU5ZcFozTmIzcjhnNlgzckpSQUFFTHY4VHRrTC9xdzE1RC9jcktJOWIzdERGbnpnZ01yMEk5OTJrUVdnSWFRU0VKTzRpQ0JiZERBN1RNMmd2VHZnUGgwdW80Q2dETG5xU25qQmYxTzh5cVltQXI2VGFTR2VxR1NickdHRXpaZ0IiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJnNmZyWlZSTHJ2bnNsdm9SX2ktM2FadThkWGM1UEhZZU5iN3J0aC1UQW11d2pLVWl4cnBfdkloSGs2VTRGREpWY0xIc2k2ZlNYT1VQeno5SzY1WnRqWGlnd3hDeTVQelBBRVFKNzRxZllKeG1qalhWUXVWdmthZUpiRDdVSU0xWXc5OGl2Y3Y0c09KRnpvS2Zvc00ySFdJVjJjbkVpaGJVbmVtekJwSDNsRXh1UFU1S0R5LXVyZzJzeWpLRjQ4aExXcGpxYnRHemVkV1VfWnp1QW9EU3pqcUtaTHoxb2RUdnoyNFVWcW1NMVZjLWhBcEIyWXdUam1vVE9MdnVPVkdrelY0cXRIUi1ULXFOLVRwRVRKLTJJbDJoU1Y0OHJkSjRiM1FWU0VHTzJzUm5nLWpHQmtlX2dMbmVNNjAxR1ZHVHZYc2lJZnN2V2xXZ1piUFowSnRZT3ciLCJraWQiOiIwODhlczJHVVpRN1I4WkU0WlBESDJoZnRCMFQwekM0UyJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2MzcyMzUwNzgsImlhdCI6MTYzNzIzNDE3OCwianRpIjoiOGRVbk1lNTNndUVlZXRPMSJ9.SHGohwgLRbk3AiRLSKQz0-NOLBwheay1Y9nSc7K-IctK6AHbTbTSG1d0yFa_PNUo_bLawyvwpvnJgFlccI1rgJR9VoBJhL8BZmwK2nBIrQyoKJyuAuIet0BZjzJ_0PWu9fr7mDdAJ5OAqtvw6AW4pFIri_1mV4AhAwBYSThlQOFFcGuRAsSFdK29TRMsqa31lkQ9tTUsXEteEHhHFGATXgTHqv3_wwWYoPx1IF--BpiCFE_tbkEldaQt6shemv69Y2mdGjskdm_KR1zKk0B7pwchZlzl4y5DhgVHxHcd1W1ej8flFuVvEI8EhVQ8zuOVE4zabUXGS6mdTv_8Pwp0gA',
-      isv_deviceFingerprintId: 'ecdce16c-7eee-45bc-8809-978623fb1272',
       isv_cardExpiryYear: '2030',
       isv_token: creditCard.isv_token,
       isv_customerIpAddress: '171.76.13.221',
@@ -102,7 +101,6 @@ const guestPayment = {
       id: 'e2288aa6-6a13-49eb-8f79-f9cc73fd4dd0',
     },
     fields: {
-      isv_deviceFingerprintId: 'e161b9f0-f093-4708-9805-e2639ef586e7',
       isv_cardExpiryYear: '2025',
       isv_token: creditCard.isv_token,
       isv_saleEnabled: false,
@@ -173,7 +171,6 @@ let payments = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: 'ecdce16c-7eee-45bc-8809-978623fb1272',
       isv_cardExpiryYear: '2030',
       isv_tokenAlias: creditCard.tokenAlias,
       isv_maskedPan: '411111XXXXXX1111',
@@ -546,6 +543,9 @@ let cart = {
 const cardTokens = {
   customerTokenId: creditCard.savedToken,
   paymentInstrumentId: creditCard.savedTokenId,
+   
+  instrumentIdentifier: '703000000002660108812',
+   
 };
 
 const guestCardTokens = {
@@ -612,7 +612,6 @@ let paymentInvalidToken = {
     fields: {
       isv_tokenCaptureContextSignature:
         'eyJraWQiOiJ6dSIsImFsZyI6IlJTMjU2In0.eyJmbHgiOnsicGF0aCI6Ii9mbGV4L3YyL3Rva2VucyIsImRhdGEiOiJ6d3ZMZ1lDSXpXcjRscFBQWXhRcGRSQUFFQnUvbUluYWlLRTczSkE1RHR3elJHR2JGTDIzdmJVT2hNaVIrMjhDYjRsY1hFbWxqR3krQSsyYjFhYVRaZklDTEtEV1d6djhxSmZLN3RWNlVQbHN1NzZ0WjFWbEwzbDdjVUFQTy9FcDRKdVoiLCJvcmlnaW4iOiJodHRwczovL3Rlc3RmbGV4LmN5YmVyc291cmNlLmNvbSIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsInVzZSI6ImVuYyIsIm4iOiJ1YXdYQjl6bGRfUmxqbUwyN0dTbWgzdGI5VnpkeFh0UGFVRE9UTlh0WDduaDZLX1ljOWdkOGdxcDVaV1ZQQzhVLWhtRjdlN3pkSXZnZlZwNzE5N25jcHdNdXZIV2tqRGhGRkJySGx0UmhNWjI5dTZ6VV9xT0NZMUprSk5aYS1XNDRYS2lpWkZXT2Z6RmJnNEZkVXdXYWhiRWtsT29VRW9VSlYyQ3dkUURuUnhpOG84Z0lhbjFBTl9hTjlLS0JYYUVpMlRQekxDcUh2SHBsZ2x2M0lGV09rOUpPenZjZ0VLMEFNUllEMm0wLWMtX3ZpcnhGLW0wQnpzVVUxR2pETFE5aW16al9jZkFGMF9VMFNRLUJxaWp2dlJrVWg1ZFlfMEdELTY1cGV3M2JyMld4Tmdvd2xPbzdhSEVNWWE4VjZBTkRDcjVyWmR1YkhEZU5OOEs2cEtrbVEiLCJraWQiOiIwOFF4cHlBbUJxR0Eyc3VwRFNST0E3d2FlQlhidmVpaSJ9fSwiY3R4IjpbeyJkYXRhIjp7InRhcmdldE9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sIm1mT3JpZ2luIjoiaHR0cHM6Ly90ZXN0ZmxleC5jeWJlcnNvdXJjZS5jb20ifSwidHlwZSI6Im1mLTAuMTEuMCJ9XSwiaXNzIjoiRmxleCBBUEkiLCJleHAiOjE2Mzg3OTU3MjgsImlhdCI6MTYzODc5NDgyOCwianRpIjoiamhBQ0VuSVN4ajZWb29CSyJ9.C3kcQ2u2Uwmv1zDEU_jyYCNlTzj1B9siEhkB_qrmsxxGK6kn9AtQTGcZ2lz5E6e4lEFcTmb9IFYijXTCrWxAaRezUGcbc-rtZMmVBCzuqS2UDIqe7xtpTrbLUW5gjlOPXjujTdcQhCWHjf8ISRgiyh2nRu_MTAyvhtVCo5Z7-GZgK28xao_AcK8VDSwv1CofEJYav0EoFxrzT-rJ_Z6OMt25-DTxV5HmO9eR8wD4HP89TbFjpwDl6HI-dR9SgJvFtDwudUrwfeWIRUrKIXHHZC0TuWDUBBMGihuo5ZDuIaOOhH5opjM7g6HDU36DtHCILfxeJX1aEKNgManT0S9Vjw',
-      isv_deviceFingerprintId: '5286820c-b9d2-4d08-8c1b-c871bfe16dcf',
       isv_cardExpiryYear: '2030',
       isv_tokenAlias: 'a12',
       isv_maskedPan: '411111XXXXXX1111',
@@ -968,7 +967,6 @@ const ucPayment = {
     },
     fields: {
       isv_transientToken: creditCard.isv_transientToken,
-      isv_deviceFingerprintId: '6e0a8cfe-f7de-48c7-ad22-ef9ef2b80774',
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '192.140.152.71',

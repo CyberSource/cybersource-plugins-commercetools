@@ -23,28 +23,29 @@ const getCaptureResponse = async (payment: Payment, updateTransactions: Partial<
     transactionId: '',
     status: '',
   };
+
   try {
     if (authId && payment) {
       const apiClient = new restApi.ApiClient();
       const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, null, payment, null);
-      let clientReferenceInformation = prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, payment.id);
+      const clientRefCode = payment?.custom?.fields?.isv_clientReferenceCode || payment.id;
+      let clientReferenceInformation = prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, clientRefCode);
       let processingInformation = prepareFields.getProcessingInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, payment, orderNo, '', null, null) as Ptsv2paymentsidreversalsProcessingInformation;
       let orderInformation = prepareFields.getOrderInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, payment, updateTransactions, null, null, null, '', '') as Ptsv2paymentsidcapturesOrderInformation;
       let merchantDefinedFields = prepareFields.getMetaData(payment);
       const requestObj: CapturePaymentRequest = {
         clientReferenceInformation: clientReferenceInformation,
         processingInformation: processingInformation,
-        orderInformation: orderInformation
-      }
-      if (Constants.PAYPAL === payment.paymentMethodInfo.method) {
+        orderInformation: orderInformation,
+      };
+      if (Constants.PAYPAL === payment.paymentMethodInfo.method || Constants.ECHECK === payment?.paymentMethodInfo?.method) {
         requestObj.paymentInformation = prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, payment, null, null);
       }
+
       if (0 < merchantDefinedFields?.length) {
         requestObj.merchantDefinedInformation = merchantDefinedFields;
       }
-      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + payment.id, 'Capture Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
-      }
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CAPTURE_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + payment.id, 'Capture Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
       const captureApiInstance = configObject && new restApi.CaptureApi(configObject, apiClient);
       const startTime = new Date().getTime();
       return await new Promise<PtsV2PaymentsCapturesPost201Response>(function (resolve, reject) {

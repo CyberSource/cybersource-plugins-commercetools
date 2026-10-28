@@ -95,11 +95,11 @@ const authenticateNetToken = async (signature: any, notification: any): Promise<
                         const decodedKey = Buffer.from(subscriptionData.key, Constants.ENCODING_BASE_SIXTY_FOUR);
                         const hmac = crypto.createHmac(Constants.ENCODING_SHA_TWO_FIFTY_SIX, decodedKey);
                         const generatedSignature = hmac.update(payload).digest(Constants.ENCODING_BASE_SIXTY_FOUR);
-                        /* START GENAI */
+
                         if (generatedSignature && sign && generatedSignature.length === sign.length && crypto.timingSafeEqual(Buffer.from(generatedSignature), Buffer.from(sign))) {
                             isValidNotification = true;
                         }
-                        /* END GENAI */
+
                     }
                 }
             }

@@ -45,9 +45,29 @@ export type AddressType = {
   mobile: string;
 };
 
+
+export type CaptureContextAddressFields = {
+  firstName?: string | null;
+  lastName?: string | null;
+  address1?: string | null;
+  address2?: string | null;
+  locality?: string | null;
+  postalCode?: string | null;
+  administrativeArea?: string | null;
+  country?: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
+};
+
+export type CaptureContextAddresses = {
+  billTo?: CaptureContextAddressFields | null;
+  shipTo?: CaptureContextAddressFields | null;
+};
+
+
 export type PaymentCustomFieldsType = {
   isv_token: string;
-  isv_tokenAlias: string;
+
   isv_savedToken: string;
   isv_tokenVerificationContext: string;
   isv_tokenCaptureContextSignature: string;
@@ -73,7 +93,6 @@ export type PaymentCustomFieldsType = {
   isv_payerEnrollHttpCode: number;
   isv_acceptHeader: string;
   isv_userAgentHeader: string;
-  isv_deviceFingerprintId: string;
   isv_customerIpAddress: string;
   isv_applePayValidationUrl: string;
   isv_applePayDisplayName: string;
@@ -95,7 +114,17 @@ export type PaymentCustomFieldsType = {
   isv_AVSResponse: string;
   isv_CVVResponse: string;
   isv_responseCode: string;
+
+  isv_approvalCode: string;
+  isv_clientReferenceCode: string;
+  isv_processorTransactionId: string;
+
   isv_dmpaFlag: boolean;
+  isv_ucAllowedPaymentTypes?: string;
+  isv_ucBillingType?: string;
+  isv_enabledMoto?: boolean;
+  isv_ucTargetOrigins?: string | string[];
+
   isv_shippingMethod?: string;
   isv_metadata?: string;
 };
@@ -138,6 +167,26 @@ export type ActionResponseType = {
   errors: ErrorType[];
 };
 
+export type SaveCardDecision = {
+  shouldSaveToken: boolean;
+  credentialStoredOnFile: string;
+  hasTokenInfo: boolean;
+  customerId: string;
+  paymentInstrumentId: string;
+  instrumentIdentifierId: string;
+  status: string;
+  responseCode: string;
+  reasonCode: string;
+  tokenInformation: any;
+};
+
+export type MergeCustomerTokensResult = {
+  parsedExistingTokens: any[];
+  updatedTokens: any[];
+  stringifiedTokens: string[];
+  alreadyExists: boolean;
+};
+
 export type ErrorType = {
   code: string;
   message: string;
@@ -146,7 +195,7 @@ export type ErrorType = {
 export type CustomerCustomType = {
   isv_tokens: string[];
   isv_token: string;
-  isv_tokenAlias: string;
+
   isv_savedToken: string;
   isv_tokenVerificationContext: string;
   isv_tokenCaptureContextSignature: string;
@@ -156,7 +205,6 @@ export type CustomerCustomType = {
   isv_cardExpiryYear: string;
   isv_addressId: string;
   isv_currencyCode: string;
-  isv_deviceFingerprintId: string;
   isv_cardNewExpiryMonth: string;
   isv_cardNewExpiryYear: string;
   isv_tokenUpdated: boolean;
@@ -177,6 +225,10 @@ export type CustomerTokensType = {
   addressId: string;
   timestamp: string;
   address: Partial<AddressType>;
+  paymentMethod?: string;
+  accountNumber?: string;
+  routingNumber?: string;
+  accountType?: string;
 };
 //Mid credentials object
 export type MidCredentialsType = {
@@ -190,11 +242,21 @@ export type KeyCredentialsType = {
   keyAlias: string | undefined;
   keyFileUrl: string | undefined;
   keyPass: string | undefined;
+  requestMlePublicCertUrl: string | undefined;
+  requestMlePublicCertFile: string | undefined;
+  requestMleP12Password: string | undefined;
+  responseMlePrivateKeyFile: string | undefined;
+  responseMlePrivateKeyUrl: string | undefined;
+  responseMlePrivateKeyPassword: string | undefined;
+  responseMleKID: string | undefined;
 }
 
 export type CustomTokenType = {
   customerTokenId: string;
   paymentInstrumentId: string;
+
+  instrumentIdentifier?: string;
+
 };
 
 export type CardAddressGroupType = {
@@ -360,7 +422,16 @@ export type InstrumentIdResponse = {
   cardSuffix: string;
   expirationMonth: string;
   expirationYear: string;
+  cardNumber?: string;
+  tokenizedCardNumber?: string;
+  paymentInstrumentId?: string;
+  text?: string;
+  bankAccount?: {
+    number?: string;
+    routingNumber?: string;
+  };
 };
+
 
 export type SubscriptionInformationType = {
   merchantId: string;
@@ -368,7 +439,16 @@ export type SubscriptionInformationType = {
   keyId: string;
   keyExpiration: string;
   webhookId: string;
+  webhookType?: string;
 };
+
+export type MerchantWebhookCollectionType = {
+  merchantId: string;
+  decisionManager?: SubscriptionInformationType;
+  apm?: SubscriptionInformationType;
+  unifiedCheckout?: SubscriptionInformationType;
+};
+
 
 export type TokenCreateFlagType = {
   isSaveToken: boolean;

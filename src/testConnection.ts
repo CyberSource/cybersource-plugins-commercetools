@@ -41,10 +41,14 @@ const testApiConnection = async (): Promise<string> => {
             if (isInvalidCreds) {
                 connectionMessage = `${CustomMessages.ERROR_MSG_INVALID_CREDENTIALS}`;
             }
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_TEST_API_CONNECTION, Constants.LOG_INFO, '', connectionMessage);
+            if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
+                paymentUtils.logData(__filename, FunctionConstant.FUNC_TEST_API_CONNECTION, Constants.LOG_INFO, '', connectionMessage);
+            }
         } else {
             connectionMessage = CustomMessages.EXCEPTION_MSG_ENV_VARIABLE_NOT_SET;
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_TEST_API_CONNECTION, Constants.LOG_WARN, '', connectionMessage);
+            if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
+                paymentUtils.logData(__filename, FunctionConstant.FUNC_TEST_API_CONNECTION, Constants.LOG_WARN, '', connectionMessage);
+            }
         }
     } catch (exception) {
         connectionMessage = CustomMessages.EXCEPTION_MSG_CONNECTION_ERROR;

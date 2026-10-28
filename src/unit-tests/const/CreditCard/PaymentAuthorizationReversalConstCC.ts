@@ -35,7 +35,6 @@ let payment ={
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "329b4580-0e41-498f-992d-abaa45efb968",
           "isv_token": "eyJraWQiOiIwOHN0bzdXSDU0UnQzNjlTNk8wWjdraWF4OUc1U1diRSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzA3IiwiZXhwIjoxNzQxNzcyMjQ4LCJ0eXBlIjoibWYtMi4xLjAiLCJpYXQiOjE3NDE3NzEzNDksImp0aSI6IjFFMUtKVUZRRThVRkdaVk5MRlVZUkxYVUg1RlFDTEIyNFo2MUJGQkYzOVk5TFJaWUEyRlo2N0QxNTVEODQ3OTkiLCJjb250ZW50Ijp7InBheW1lbnRJbmZvcm1hdGlvbiI6eyJjYXJkIjp7ImV4cGlyYXRpb25ZZWFyIjp7InZhbHVlIjoiMjAyOSJ9LCJudW1iZXIiOnsiZGV0ZWN0ZWRDYXJkVHlwZXMiOlsiMDAxIl0sIm1hc2tlZFZhbHVlIjoiWFhYWFhYWFhYWFhYMTExMSIsImJpbiI6IjQxMTExMSJ9LCJzZWN1cml0eUNvZGUiOnt9LCJleHBpcmF0aW9uTW9udGgiOnsidmFsdWUiOiIwMSJ9fX19fQ.W-CSGXonNN0SNXTLrlFEwCDM2dTt3rYX1w1wyY3ciffue4v_bdUvO_JRqp4Oqd-0wxCBKCd09czK2XDrAjrSWI9_oh8TrseJzGZEKBDUJ83R1pSf7f0c_XMcnruoRlN5C1T3pUTJbLIXaXc4i9UJLiYmJ-QBARY4S11vMRo5tkSaGg4nwxqI8s6QlNMXKuksDuIHLy83vvwdmuepjBw6Pcj_dgQNLU0ZAWueBzQNKeNube8x2UzN8uKG0404sunwJ6dOSsLMCWNzt8RLNW2yXsxY_HIPQbXfCaKSi_vGF85ni2grH_PcoRELxPANUYZqjcDaksYNq-5r6OrzmyqYxA",
           "isv_saleEnabled": false,
           "isv_shippingMethod": "",
@@ -99,7 +98,6 @@ let payments = {
   custom: {
     type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
     fields: {
-      isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
       isv_cardExpiryYear: '2030',
       isv_token:
         'eyJraWQiOiIwOG5aU1BESXFHRnZpaElMWEVxcEdkUG5lbUVUZXkySCIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAzMCIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTYzNTIzMTM5NCwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTYzNTIzMDQ5NCwianRpIjoiMUU2NTZWNThZVjVUS0hQUU1aTFdaMVlPWU1NNjhWWFNSOEpQTllGOFVFSTAzWFlYTTNCRDYxNzdBNkEyMEU5MiIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDMwIn0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.U-4A01seF4P9kXQLcNTivdWgYokoRUkjus9pujmNjVx4UOWSxRdp_FnCnt93H7_cEH7eZ46grEiYwyDwbCLYmar4zvzadhaMw0LG3L2_nchCO8GDUoroqpChMdgJ269iKg5EsFTQffMYGCc4FfNkHPn1E1_s_n47VDcqKvidAhryQvb16EsOVoheREE_d8fh8ltad32zwSnXcAyXKu_Zj2XFdhzIyq9Yf_ZTN1vlkMCyDEqpGZ-IX-sWdNFrsoU8L7RDeCNnknzl7JUy4usLo6lIf4vq-BgFrHc3b2W_q2CBqMvylixNlblDGChkB743TXXKR9iFrs3ajYXjHdZztA',
@@ -657,7 +655,6 @@ let multipleShippingPayment = {
   custom: {
     type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
     fields: {
-      isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
       isv_cardExpiryYear: '2030',
       isv_token:
         'eyJraWQiOiIwOG5aU1BESXFHRnZpaElMWEVxcEdkUG5lbUVUZXkySCIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjp7ImV4cGlyYXRpb25ZZWFyIjoiMjAzMCIsIm51bWJlciI6IjQxMTExMVhYWFhYWDExMTEiLCJleHBpcmF0aW9uTW9udGgiOiIwMSIsInR5cGUiOiIwMDEifSwiaXNzIjoiRmxleC8wOCIsImV4cCI6MTYzNTIzMTM5NCwidHlwZSI6Im1mLTAuMTEuMCIsImlhdCI6MTYzNTIzMDQ5NCwianRpIjoiMUU2NTZWNThZVjVUS0hQUU1aTFdaMVlPWU1NNjhWWFNSOEpQTllGOFVFSTAzWFlYTTNCRDYxNzdBNkEyMEU5MiIsImNvbnRlbnQiOnsicGF5bWVudEluZm9ybWF0aW9uIjp7ImNhcmQiOnsiZXhwaXJhdGlvblllYXIiOnsidmFsdWUiOiIyMDMwIn0sIm51bWJlciI6eyJtYXNrZWRWYWx1ZSI6IlhYWFhYWFhYWFhYWDExMTEiLCJiaW4iOiI0MTExMTEifSwic2VjdXJpdHlDb2RlIjp7fSwiZXhwaXJhdGlvbk1vbnRoIjp7InZhbHVlIjoiMDEifSwidHlwZSI6eyJ2YWx1ZSI6IjAwMSJ9fX19fQ.U-4A01seF4P9kXQLcNTivdWgYokoRUkjus9pujmNjVx4UOWSxRdp_FnCnt93H7_cEH7eZ46grEiYwyDwbCLYmar4zvzadhaMw0LG3L2_nchCO8GDUoroqpChMdgJ269iKg5EsFTQffMYGCc4FfNkHPn1E1_s_n47VDcqKvidAhryQvb16EsOVoheREE_d8fh8ltad32zwSnXcAyXKu_Zj2XFdhzIyq9Yf_ZTN1vlkMCyDEqpGZ-IX-sWdNFrsoU8L7RDeCNnknzl7JUy4usLo6lIf4vq-BgFrHc3b2W_q2CBqMvylixNlblDGChkB743TXXKR9iFrs3ajYXjHdZztA',

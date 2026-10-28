@@ -13,10 +13,11 @@ import paymentUtils from '../PaymentUtils';
 import paymentValidator from '../PaymentValidator';
 import commercetoolsApi from '../api/CommercetoolsApi';
 
+import networkTokenHelper from './NetworkTokenHelper';
 
 /**
  * Processes a valid card response, updating or creating token data based on the card response.
- * 
+ *
  * @param {FieldContainer} customFields - The custom fields related to the card and customer.
  * @param {any} cardTokens - The current card tokens available.
  * @param {any} cardResponse - The response object from the card processing service.
@@ -31,8 +32,7 @@ const processValidCardResponse = async (customFields: FieldContainer, cardTokens
     let existingFailedTokens: string[] = customFields?.isv_failedTokens || [];
     const tokenIndex = existingTokens.findIndex((token: any) => {
         const parsedToken = JSON.parse(token);
-        return parsedToken.value === customerTokenId &&
-            parsedToken.instrumentIdentifier === instrumentIdentifier;
+        return parsedToken.value === customerTokenId && parsedToken.instrumentIdentifier === instrumentIdentifier;
     });
     if (0 <= tokenIndex) {
         finalTokenIndex = tokenIndex;
@@ -47,7 +47,7 @@ const processValidCardResponse = async (customFields: FieldContainer, cardTokens
 
 /**
  * Extracts token IDs from the card response and card tokens.
- * 
+ *
  * @param {any} cardResponse - The response object from the card processing service.
  * @param {any} cardTokens - The current card tokens available.
  * @returns {Object} - An object containing customerTokenId, paymentInstrumentId, and instrumentIdentifier.
@@ -61,7 +61,7 @@ const getTokenIds = (cardResponse: any, cardTokens: any) => {
 
 /**
  * Processes an invalid card response, logging the error and updating token actions.
- * 
+ *
  * @param {FieldContainer} customFields - The custom fields related to the card and customer.
  * @param {Customer} customerObj - The customer object containing relevant customer information.
  * @param {string} customerId - The ID of the customer for logging purposes.
@@ -71,7 +71,7 @@ const processInvalidCardResponse = async (customFields: FieldContainer, customer
     const addressIdField = customFields?.isv_addressId === Constants.UC_ADDRESS ? '' : customFields.isv_addressId || '';
     let existingTokens = customerObj?.custom?.fields?.isv_tokens || [];
     let existingFailedTokens: string[] = [];
-    if (customFields?.isv_tokenAlias && customFields.isv_cardType && customFields.isv_maskedPan && customFields.isv_cardExpiryMonth && customFields.isv_cardExpiryYear) {
+    if (customFields.isv_cardType && customFields.isv_maskedPan && customFields.isv_cardExpiryMonth && customFields.isv_cardExpiryYear) {
         existingFailedTokens = await paymentUtils.createFailedTokenData(customFields, addressIdField);
     }
     const response = paymentActions.getUpdateTokenActions(existingTokens, existingFailedTokens, true, customerObj, null);
@@ -81,28 +81,49 @@ const processInvalidCardResponse = async (customFields: FieldContainer, customer
 
 /**
  * Retrieves billing address fields based on custom fields and customer information.
- * 
+ *
  * @param {FieldContainer} customFields - The custom fields related to the card and customer.
  * @param {readonly _BaseAddress[]} addressObj - An array of address objects associated with the customer.
  * @param {Customer} customerObj - The customer object containing relevant customer information.
  * @returns {Promise<_BaseAddress | null>} - A promise that resolves to the billing address fields or null if not found.
  */
-const getBillToFields = async (customFields: FieldContainer, addressObj: readonly _BaseAddress[], customerObj: Customer): Promise<Partial<AddressType> | null> => {
+
+const getBillToFields = async (customFields: FieldContainer, addressObj: readonly _BaseAddress[], customerObj: Customer, selectedAddressId?: string): Promise<Partial<AddressType> | null> => {
     let billToFields = null;
+    if (selectedAddressId && addressObj?.length) {
+        const selectedAddress = addressObj.find((addr) => addr.id === selectedAddressId);
+
+        if (selectedAddress) {
+            return selectedAddress;
+        } else {
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_CARD_ADDITION, Constants.LOG_WARN, '', `[Address Resolution] Selected address not found.`);
+        }
+    }
+
     if (Constants.UC_ADDRESS === customFields?.isv_addressId) {
         const ucAddressData = await getTransientTokenData.getTransientTokenDataResponse(customerObj, 'MyAccounts');
+
         if (Constants.HTTP_OK_STATUS_CODE === ucAddressData?.httpCode) {
             billToFields = ucAddressData.data.orderInformation.billTo;
         }
+
+        if (!billToFields && addressObj?.length) {
+            const defaultBillingAddressId = customerObj?.defaultBillingAddressId;
+            const defaultShippingAddressId = customerObj?.defaultShippingAddressId;
+
+            billToFields = addressObj.find((address) => address.id === defaultBillingAddressId) || addressObj.find((address) => address.id === defaultShippingAddressId) || addressObj[0] || null;
+
+            paymentUtils.logData(__filename, FunctionConstant.FUNC_HANDLE_CARD_ADDITION, Constants.LOG_WARN, '', '[Address Resolution] UC billTo lookup from transient token returned empty. Falling back to customer address.');
+        }
     } else {
-        billToFields = addressObj.find(address => customFields?.isv_addressId === address.id) || null;
+        billToFields = addressObj.find((address) => customFields?.isv_addressId === address.id) || null;
     }
+
     return billToFields;
 };
-
 /**
  * Counts the number of tokens added within a specific time interval.
- * 
+ *
  * @param {Customer | null} customerObj - Customer object.
  * @param {string} startTime - Start time of the interval.
  * @param {string} endTime - End time of the interval.
@@ -124,79 +145,8 @@ const getRateLimiterTokenCount = async (customerObj: Partial<Customer> | null, s
 };
 
 /**
- * Checks whether to create a token.
- * 
- * @param {Customer | null} customerInfo - Customer information.
- * @param {Payment | null} paymentObj - Payment object.
- * @param {string} functionName - Name of the calling function.
- * @returns {Promise<{ isSaveToken: boolean, isError: boolean }>} - Object containing flag indicating whether to save the token and error flag.
- */
-const evaluateTokenCreation = async (customerInfo: Partial<Customer> | null, paymentObj: Payment | null, functionName: string): Promise<{ isSaveToken: boolean, isError: boolean }> => {
-    let cardRate = 0;
-    let cardRateCount = 0;
-    const tokenCreateObj = {
-        isSaveToken: true,
-        isError: false,
-    }
-    if (FunctionConstant.FUNC_HANDLE_CARD_ADDITION === functionName || ((FunctionConstant.FUNC_GET_PAYMENT_RESPONSE === functionName || FunctionConstant.FUNC_GET_PAYER_AUTH_ENROLL_RESPONSE === functionName || FunctionConstant.FUNC_GET_PAYER_AUTH_VALIDATE_RESPONSE === functionName) && paymentObj?.custom?.fields?.isv_tokenAlias)) {
-        if (customerInfo && paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_RATE_LIMITER)) {
-            const validInputForRateLimiter = paymentValidator.isValidRateLimiterInput();
-            if (validInputForRateLimiter) {
-                cardRate = Number(process.env.PAYMENT_GATEWAY_SAVED_CARD_LIMIT_FRAME);
-                cardRateCount = Number(process.env.PAYMENT_GATEWAY_LIMIT_SAVED_CARD_RATE);
-                if (!tokenCreateObj.isError) {
-                    const startTime = paymentUtils.getDate(null, false) as Date;
-                    startTime.setHours(startTime.getHours() - cardRate);
-                    const limiterResponse = await getRateLimiterTokenCount(customerInfo, paymentUtils.getDate(startTime, true, null, null) as string, paymentUtils.getDate(Date.now(), true, null, null) as string);
-                    if (limiterResponse && cardRateCount <= limiterResponse) {
-                        tokenCreateObj.isSaveToken = false;
-                    }
-                }
-            } else {
-                tokenCreateObj.isError = true;
-                paymentUtils.logData(__filename, FunctionConstant.FUNC_EVALUATE_TOKEN_CREATION, Constants.LOG_WARN, 'CustomerId : ' + customerInfo.id, CustomMessages.ERROR_MSG_INVALID_RATE_LIMITER_CONFIGURATIONS);
-            }
-        }
-    }
-    return tokenCreateObj;
-};
-
-/**
- * Handles the creation of a payment token for a customer, retrieving relevant billing address fields if necessary.
- * 
- * @param {Partial<Customer>} customerObj - The customer object containing details for token creation.
- * @param {readonly _BaseAddress[]} addressObj - An array of address objects associated with the customer.
- * @param {string | undefined} isv_addressId - The identifier for the address to be used.
- * @returns {Promise<{ isSaveToken: boolean, cardTokens: any, billToFields: _BaseAddress | null }>} - A promise that resolves to an object containing:
- *  - isSaveToken: A boolean indicating if the token should be saved.
- *  - cardTokens: The retrieved card tokens for the customer.
- *  - billToFields: The billing address fields, or null if not found.
- */
-const handleTokenCreation = async (customerObj: Partial<Customer>, addressObj: readonly _BaseAddress[], isv_addressId: string | undefined): Promise<{ isSaveToken: boolean, cardTokens: any, billToFields: _BaseAddress | null }> => {
-    const tokenCreateResponse = await evaluateTokenCreation(customerObj, null, FunctionConstant.FUNC_HANDLE_CARD_ADDITION);
-    let billToFields: _BaseAddress | null = null;
-    const isSaveToken = tokenCreateResponse.isSaveToken;
-    const cardTokens = getCardTokens(customerObj, '');
-    if (!tokenCreateResponse.isError) {
-        if (Constants.UC_ADDRESS === isv_addressId) {
-            const ucAddressData = await getTransientTokenData.getTransientTokenDataResponse(customerObj, 'MyAccounts');
-            if (Constants.HTTP_OK_STATUS_CODE === ucAddressData?.httpCode) {
-                billToFields = ucAddressData.data.orderInformation.billTo;
-            }
-        } else {
-            addressObj.forEach((address) => {
-                if (isv_addressId === address.id) {
-                    billToFields = address;
-                }
-            });
-        }
-    }
-    return { isSaveToken, cardTokens, billToFields };
-};
-
-/**
  * Checks if the provided token matches an existing token in the customer's tokens and process tokens accordingly.
- * 
+ *
  * @param {string} customerTokenId - Customer token ID.
  * @param {string} instrumentIdentifier - Instrument identifier.
  * @param {Payment} updatePaymentObj - Updated payment object.
@@ -223,7 +173,7 @@ const processTokens = async (customerTokenId: string, paymentInstrumentId: strin
                         finalTokenIndex = tokenIndex;
                     }
                 });
-                if (-1 < finalTokenIndex && customFields?.isv_tokenAlias && customFields?.isv_cardExpiryMonth && customFields?.isv_cardExpiryYear) {
+                if (-1 < finalTokenIndex && customFields?.isv_cardExpiryMonth && customFields?.isv_cardExpiryYear) {
                     isExistingCardFlag = true;
                     parsedTokens = paymentUtils.updateParsedToken(existingTokens[finalTokenIndex], customFields, paymentInstrumentId, customerTokenId, addressId);
                     if (0 < Object.keys(parsedTokens).length) {
@@ -246,7 +196,7 @@ const processTokens = async (customerTokenId: string, paymentInstrumentId: strin
 
 /**
  * Retrieves card tokens from customer information.
- * 
+ *
  * @param {Customer | null} customerInfo - Customer information.
  * @param {string} isvSavedToken - Saved token.
  * @returns {Promise<CustomTokenType>} - Card tokens.
@@ -257,6 +207,27 @@ const getCardTokens = async (customerInfo: Partial<Customer> | null, paymentToke
         customerTokenId: '',
         paymentInstrumentId: '',
     };
+
+    if (customerInfo?.custom?.fields?.isv_tokens?.length) {
+        const customerId = customerInfo?.id || '';
+        try {
+            const originalTokensSnapshot = JSON.stringify(customerInfo.custom.fields.isv_tokens);
+            const refreshedTokens = await networkTokenHelper.refreshNetworkTokenCards(customerInfo.custom.fields.isv_tokens, customerInfo);
+            customerInfo.custom.fields.isv_tokens = refreshedTokens;
+
+            const refreshedTokensSnapshot = JSON.stringify(refreshedTokens);
+            if (originalTokensSnapshot !== refreshedTokensSnapshot && customerInfo?.id && customerInfo?.version) {
+                try {
+                    await commercetoolsApi.updateCustomerToken(refreshedTokens, customerInfo, customerInfo?.custom?.fields?.isv_failedTokens || [], customerInfo?.custom?.fields?.isv_customerId || null);
+                } catch (persistError) {
+                    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CARD_TOKENS, Constants.LOG_WARN, 'CustomerId: ' + customerId, 'Failed to persist refreshed Network Token details. Error: ' + (persistError instanceof Error ? persistError.message : String(persistError)));
+                }
+            }
+        } catch (error) {
+            const customerId = customerInfo?.id || ''; paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CARD_TOKENS, Constants.LOG_WARN, 'CustomerId: ' + customerId, 'Network token refresh failed before token selection. Error: ' + (error instanceof Error ? error.message : String(error)) + '. Proceeding with original tokens.',);
+        }
+    }
+
     if (customerInfo && customerInfo?.custom?.fields?.isv_tokens && 0 < customerInfo.custom.fields.isv_tokens?.length) {
         const existingTokens = customerInfo.custom.fields.isv_tokens;
         const tokenLength = customerInfo.custom.fields.isv_tokens.length;
@@ -267,6 +238,7 @@ const getCardTokens = async (customerInfo: Partial<Customer> | null, paymentToke
             if (paymentToken === newToken.paymentToken && cardTokens) {
                 cardTokens.customerTokenId = newToken.value;
                 cardTokens.paymentInstrumentId = newToken.paymentToken;
+                cardTokens.instrumentIdentifier = newToken.instrumentIdentifier;
             }
             if (tokenLength === currentIndex && '' === cardTokens.customerTokenId) {
                 cardTokens.customerTokenId = newToken.value;
@@ -278,7 +250,7 @@ const getCardTokens = async (customerInfo: Partial<Customer> | null, paymentToke
 
 /**
  * Retrieves the customer's address ID.
- * 
+ *
  * @param {Cart} cartObj - Cart object.
  * @returns {Promise<ActionResponseType>} - Address ID.
  */
@@ -286,7 +258,6 @@ const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse
     let customerTokenId = '';
     let addressId = '';
     let customerId = updatePaymentObj?.customer?.id || '';
-    let customerTokenResponse: Partial<Customer> | null = null;
     let customerInfo: Partial<Customer> | null = null;
 
     if (cartObj && cartObj?.billingAddress?.id) {
@@ -302,7 +273,7 @@ const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse
             customerInfo = await commercetoolsApi.addCustomerAddress(customerId, cartObj.billingAddress);
         }
         if (customerInfo?.addresses?.length) {
-            let customerAddress = customerInfo.addresses[customerInfo.addresses.length - 1]
+            let customerAddress = customerInfo.addresses[customerInfo.addresses.length - 1];
             if (customerAddress.firstName === cartObj?.billingAddress?.firstName && customerAddress.lastName === cartObj?.billingAddress?.lastName) {
                 addressId = customerInfo.addresses[customerInfo.addresses.length - 1].id as string;
             } else if (cartObj?.billingAddress) {
@@ -325,16 +296,12 @@ const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse
         }
         const paymentInstrumentId = tokenInfo.paymentInstrument.id;
         const instrumentIdentifier = tokenInfo.instrumentIdentifier.id;
-        customerTokenResponse = await processTokens(customerTokenId, paymentInstrumentId, instrumentIdentifier, updatePaymentObj, addressId);
-        let logMessage = customerTokenResponse ? CustomMessages.SUCCESS_MSG_CARD_TOKENS_UPDATE : CustomMessages.ERROR_MSG_TOKEN_UPDATE
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_INFO, 'CustomerId : ' + customerId || '', logMessage);
+        await processTokens(customerTokenId, paymentInstrumentId, instrumentIdentifier, updatePaymentObj, addressId);
     } else {
         const customFields = updatePaymentObj?.custom?.fields as Partial<PaymentCustomFieldsType>;
-        const processFailedTokenData = paymentValidator.shouldProcessFailedTokens(paymentResponse, updatePaymentObj)
+        const processFailedTokenData = paymentValidator.shouldProcessFailedTokens(paymentResponse, updatePaymentObj);
         if (processFailedTokenData) {
-            customerTokenResponse = await setCustomerFailedTokenData(updatePaymentObj, customFields, addressId);
-            const responseMessage = customerTokenResponse ? CustomMessages.SUCCESS_MSG_CARD_TOKENS_UPDATE : CustomMessages.ERROR_MSG_TOKEN_UPDATE;
-            paymentUtils.logData(__filename, FunctionConstant.FUNC_SET_CUSTOMER_TOKEN_DATA, Constants.LOG_DEBUG, 'CustomerId : ' + customerId || '', responseMessage);
+            await setCustomerFailedTokenData(updatePaymentObj, customFields, addressId);
         }
     }
     return authResponse;
@@ -342,7 +309,7 @@ const setCustomerTokenData = async (cardTokens: CustomTokenType, paymentResponse
 
 /**
  * Sets customer failed token data.
- * 
+ *
  * @param {Payment} updatePaymentObj - The payment object containing updated payment details.
  * @param {FieldContainer} customFields - The custom fields associated with the payment.
  * @param {string} addressId - The address ID.
@@ -380,8 +347,7 @@ const setCustomerFailedTokenData = async (updatePaymentObj: Payment, customField
         if (0 < fields?.isv_failedTokens?.length) {
             customerTokenResponse = await commercetoolsApi.updateCustomerToken(null, customerInfo, existingFailedTokensMap, null);
         } else {
-            customerTokenResponse = isCustomTypePresent ? await commercetoolsApi.updateCustomerToken(existingTokens, customerInfo, existingFailedTokensMap, null) :
-                await commercetoolsApi.setCustomType(customerId, existingTokens, existingFailedTokensMap);
+            customerTokenResponse = isCustomTypePresent ? await commercetoolsApi.updateCustomerToken(existingTokens, customerInfo, existingFailedTokensMap, null) : await commercetoolsApi.setCustomType(customerId, existingTokens, existingFailedTokensMap);
         }
     }
     return customerTokenResponse;
@@ -389,7 +355,7 @@ const setCustomerFailedTokenData = async (updatePaymentObj: Payment, customField
 
 /**
  * Adds billing address for UC token.
- * 
+ *
  * @param {Payment} updatePaymentObj - The payment object containing updated payment details.
  * @param {Cart} cartObj - The cart object.
  * @returns {Promise<Customer | null>} - The updated customer address.
@@ -425,11 +391,9 @@ export default {
     processInvalidCardResponse,
     getBillToFields,
     getRateLimiterTokenCount,
-    evaluateTokenCreation,
-    handleTokenCreation,
     processTokens,
     getCardTokens,
     setCustomerTokenData,
     setCustomerFailedTokenData,
-    addTokenAddressForUC
-}
+    addTokenAddressForUC,
+};

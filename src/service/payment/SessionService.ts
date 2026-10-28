@@ -50,6 +50,7 @@ const getSessionResponse = async (paymentObj: Payment, cartObj: Cart): Promise<a
         } else if (error) {
           if (error?.response && error?.response?.text && 0 < error?.response?.text?.length) {
             paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_SESSION_RESPONSE, Constants.LOG_ERROR, '', error.response.text);
+
             errorData = JSON.parse(error.response.text.replace(Constants.REGEX_DOUBLE_SLASH, ''));
             if (errorData?.id && errorData?.status) {
               paymentResponse.transactionId = errorData.id;

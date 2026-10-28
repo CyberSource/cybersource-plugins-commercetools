@@ -44,9 +44,7 @@ const getUpdateTokenResponse = async (tokens: Partial<CustomerTokensType>, newEx
         billTo: billTo,
         instrumentIdentifier: instrumentIdentifier
       }
-      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, Constants.LOG_DEBUG, '', 'Update Token Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
-      }
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_UPDATE_TOKEN_RESPONSE, Constants.LOG_DEBUG, '', 'Update Token Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
       const startTime = new Date().getTime();
       const customerPaymentInstrumentApiInstance = configObject && new restApi.CustomerPaymentInstrumentApi(configObject, apiClient);
       return await new Promise(function (resolve, reject) {

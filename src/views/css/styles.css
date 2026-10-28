@@ -90,6 +90,21 @@ tr.row {
 form {
   display: inline;
 }
+
+#captureAmount,
+#refundAmount {
+  margin-right: 16px;
+}
+
+#captureButton,
+#refundButton {
+  box-sizing: border-box;
+  min-width: 85px;
+  height: 36px;
+  line-height: 20px;
+  margin-right: 8px;
+}
+
 .alert {
   position: relative;
   padding: 0.75rem 1.25rem;

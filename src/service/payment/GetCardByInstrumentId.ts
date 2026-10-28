@@ -23,6 +23,12 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
     cardSuffix: '',
     expirationMonth: '',
     expirationYear: '',
+
+    cardNumber: '',
+    tokenizedCardNumber: '',
+    paymentInstrumentId: '',
+    text: '',
+    bankAccount: undefined as any,
   };
   const opts: any = [];
   try {
@@ -40,10 +46,16 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
               getCardResponse.httpCode = response[Constants.STRING_RESPONSE_STATUS];
               getCardResponse.instrumentIdentifier = data?.id;
               getCardResponse.state = data?.tokenizedCard?.state;
-              getCardResponse.cardPrefix = data?.tokenizedCard?.number;
-              getCardResponse.cardSuffix = data?.tokenizedCard?.card?.suffix;
-              getCardResponse.expirationMonth = data.tokenizedCard?.card?.expirationMonth;
-              getCardResponse.expirationYear = data.tokenizedCard?.card?.expirationYear;
+
+              getCardResponse.text = response?.text || '';
+              getCardResponse.bankAccount = data?.bankAccount || undefined;
+              getCardResponse.cardNumber = data?.card?.number || '';
+              getCardResponse.tokenizedCardNumber = data?.tokenizedCard?.number || '';
+              getCardResponse.cardPrefix = getCardResponse.cardNumber || getCardResponse.tokenizedCardNumber;
+              getCardResponse.cardSuffix = data?.card?.suffix || data?.tokenizedCard?.card?.suffix || '';
+              getCardResponse.expirationMonth = data?.card?.expirationMonth || data?.tokenizedCard?.card?.expirationMonth || '';
+              getCardResponse.expirationYear = data?.card?.expirationYear || data?.tokenizedCard?.card?.expirationYear || '';
+
               resolve(getCardResponse);
             } else if (error) {
               getCardResponse.httpCode = error.status;
@@ -65,4 +77,38 @@ const getCardByInstrumentResponse = async (instrumentIdentifier: string | undefi
   }
 };
 
-export default { getCardByInstrumentResponse };
+const getPaymentInstrumentIdByInstrumentIdentifier = async (instrumentIdentifier: string | undefined, merchantId: string): Promise<string> => {
+  if (!instrumentIdentifier) {
+    return '';
+  }
+
+  try {
+    const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE, null, null, merchantId);
+    const apiClient = new restApi.ApiClient();
+    const apiInstance = configObject && new restApi.InstrumentIdentifierApi(configObject, apiClient);
+
+    return await new Promise<string>((resolve) => {
+      if (!apiInstance) {
+        resolve('');
+        return;
+      }
+
+      apiInstance.getInstrumentIdentifierPaymentInstrumentsList(instrumentIdentifier, undefined, 0, 1, (error: any, data: any, response: any) => {
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_CARD_BY_INSTRUMENT_RESPONSE, Constants.LOG_DEBUG, 'InstrumentId : ' + instrumentIdentifier, 'InstrumentIdentifier paymentInstruments response = ' + paymentUtils.maskData(JSON.stringify(response)));
+
+        if (error || !data) {
+          resolve('');
+          return;
+        }
+
+        const paymentInstrumentId = data?._embedded?.paymentInstruments?.[0]?.id || data?.paymentInstruments?.[0]?.id || '';
+
+        resolve(paymentInstrumentId || '');
+      });
+    });
+  } catch {
+    return '';
+  }
+};
+
+export default { getCardByInstrumentResponse, getPaymentInstrumentIdByInstrumentIdentifier };
