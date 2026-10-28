@@ -1,5 +1,4 @@
 export abstract class CustomMessages {
-
     static readonly SUCCESS_MSG_CAPTURE_SERVICE = 'Capture is completed successfully';
     static readonly SUCCESS_MSG_CARD_TOKENS_UPDATE = 'Successfully updated card tokens';
     static readonly SUCCESS_MSG_DECISION_SYNC_SERVICE = 'Successfully completed Decision sync';
@@ -61,10 +60,18 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_ADD_TRANSACTION_DETAILS = 'There was an error while adding transaction details, please try again';
     static readonly ERROR_MSG_APPLICATION_DETAILS = 'Unable to fetch transaction application details';
     static readonly ERROR_MSG_APPLE_PAY_CERTIFICATES = 'Please provide certificates paths for Apple Pay in configuration file';
-    /* START GENAI */
+
     static readonly ERROR_MSG_APPLE_PAY_INVALID_VALIDATION_URL = 'The Apple Pay validation URL is not allowed. Only Apple Pay gateway endpoints are permitted.';
     static readonly ERROR_MSG_INVALID_TOKEN_DATA = 'Invalid token data: the token object does not conform to the expected schema or does not belong to this customer.';
-    /* END GENAI */
+
+    static readonly ERROR_MSG_REQUEST_MLE_CERT_PATH_NOT_SET = 'Please provide request MLE public certificate path when JWT SHARED_SECRET with Request MLE is enabled';
+    static readonly ERROR_MSG_REQUEST_MLE_CERT_PATH_INVALID = 'The request MLE public certificate path is invalid or the certificate file does not exist';
+
+    static readonly SUCCESS_MSG_REFRESH_STATUS = 'Payment status refreshed successfully';
+    static readonly ERROR_MSG_REFRESH_STATUS = 'Unable to refresh payment status, please try again';
+    static readonly ERROR_MSG_REFRESH_NOT_ALLOWED = 'Refresh status is not available for this payment';
+    static readonly ERROR_MSG_REFRESH_STATUS_MISSING_TRANSACTION = 'Unable to refresh payment status because transaction id is missing';
+
     static readonly ERROR_MSG_ACCESSING_CERTIFICATES = 'An error occurred while accessing ApplePay Certificates';
     static readonly ERROR_MSG_ENV_VARIABLES_NOT_FOUND = 'Missing configurations for merchant id ';
     static readonly ERROR_MSG_EMPTY_PAYMENT_DATA = 'There was an error while fetching payment details';
@@ -78,7 +85,7 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_COMMERCETOOLS_CONNECT = 'There was an error connecting to Commercetools';
     static readonly ERROR_MSG_CREATE_CUSTOM_TYPE = 'There was an error creating custom type';
     static readonly ERROR_MSG_CUSTOMER_DETAILS = 'Unable to fetch customer details';
-    static readonly ERROR_MSG_DISCOUNT_DETAILS = 'Unable to fetch discount details'
+    static readonly ERROR_MSG_DISCOUNT_DETAILS = 'Unable to fetch discount details';
     static readonly ERROR_MSG_CUSTOMER_UPDATE = 'Unable to update the customer with customer address';
     static readonly ERROR_MSG_EMPTY_CART = 'There is no cart available for the payment';
     static readonly ERROR_MSG_EMPTY_CUSTOM_FIELDS = 'There was an error processing your request';
@@ -122,8 +129,10 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_CAPTURE_AMOUNT_GREATER_THAN_ZERO = 'Capture amount should be greater than zero';
     static readonly ERROR_MSG_CAPTURE_EXCEEDS_AUTHORIZED_AMOUNT = 'Cannot perform capture as the entered amount exceeds authorized amount';
     static readonly ERROR_MSG_RETRY_TRANSACTION_SEARCH = 'Missing transaction details';
+    static readonly ERROR_MSG_CHECKOUT_SESSION = 'Failed to create checkout session';
     static readonly ERROR_MSG_UC_ADDRESS_DETAILS = 'Unable to update the address as the UC address';
     static readonly ERROR_MSG_CAPTURE_CONTEXT = 'Failed to generate capture context';
+    static readonly ERROR_MSG_SCA_REQUIRED_USER_MESSAGE = 'Your card issuer requires an extra security check to approve this payment. Please try again and follow the verification steps.';
     static readonly ERROR_MSG_TRANSIENT_TOKEN_DATA = 'Unable to fetch transient token data';
     static readonly ERROR_MSG_INVALID_INSTRUMENT_ID_RESPONSE = 'Invalid instrument identifier response';
     static readonly ERROR_MSG_SIGNATURE_DOES_NOT_MATCH = 'Generated signature does not match with header signature';
@@ -156,4 +165,22 @@ export abstract class CustomMessages {
     static readonly ERROR_MSG_PROCESSING_SUBSCRIPTION = 'Error in processing subscription';
     static readonly ERROR_MSG_SUBSCRIPTION_ALREADY_EXIST = 'Subscription Already Exists';
     static readonly ERROR_MSG_UNABLE_TO_UPDATE_CUSTOMER_TOKEN = 'An error occurred while updating the card from notification';
+
+    static readonly EXCEPTION_MSG_CHECKOUT_SESSION_API = 'An exception occurred while creating checkout session';
+
+    //Error messages
+
+    static readonly ERROR_MSG_INVALID_UC_CLIENT_VERSION = 'Please enter a valid Unified Checkout client version in the 1.x format, or leave it blank to let Unified Checkout handle it';
+
+    static readonly ERROR_MSG_MISSING_REQUIRED_SESSION_FIELDS = 'country, locale, and targetOrigins are required for Unified Checkout v1 sessions';
+    static readonly ERROR_MSG_INVALID_LOCALE_FORMAT = 'Locale must be in ISO-639_ISO-3166 format (e.g. en_US, en_GB)';
+
+    // MLE Configuration Error Messages
+    static readonly ERROR_MSG_REQUEST_MLE_CERTIFICATE_NOT_FOUND = 'Request MLE certificate not found';
+    static readonly ERROR_MSG_RESPONSE_MLE_PRIVATE_KEY_FILE_NOT_CONFIGURED = 'Response MLE is enabled but PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_FILE is not configured. Please set the Response MLE private key file path in environment or configuration.';
+    static readonly ERROR_MSG_RESPONSE_MLE_PRIVATE_KEY_PASSWORD_NOT_CONFIGURED = 'Response MLE is enabled but PAYMENT_GATEWAY_RESPONSE_MLE_PRIVATE_KEY_PASSWORD is not configured. Please set the Response MLE private key password in environment or configuration.';
+    static readonly ERROR_MSG_RESPONSE_MLE_DOWNLOAD_FAILED = 'Response MLE: Failed to download P12 from cloud';
+    static readonly ERROR_MSG_RESPONSE_MLE_FILE_VALIDATION_FAILED = 'Response MLE: Downloaded file validation failed';
+    static readonly ERROR_MSG_RESPONSE_MLE_DOWNLOAD_ERROR = 'Response MLE: Error downloading P12 from cloud';
+    static readonly ERROR_MSG_RESPONSE_MLE_PRIVATE_KEY_FILE_NOT_FOUND = 'Response MLE private key file not found';
 }

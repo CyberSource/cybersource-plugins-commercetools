@@ -1,6 +1,5 @@
 import { Cart, Payment, Transaction } from '@commercetools/platform-sdk';
 import { PtsV2PaymentsPost201Response } from 'cybersource-rest-client';
-
 import { CustomMessages } from '../../constants/customMessages';
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
@@ -13,7 +12,6 @@ import paymentUtils from '../PaymentUtils';
 import paymentValidator from '../PaymentValidator';
 import commercetoolsApi from '../api/CommercetoolsApi';
 import multiMid from '../config/MultiMid';
-
 import cartHelper from './CartHelper';
 import orderManagementHelper from './OrderManagementHelper';
 
@@ -308,6 +306,63 @@ const isAuthReversalTriggered = async (paymentDetails: Payment, query: string): 
     return isAuthReverseTriggered;
 };
 
+
+/**
+ * Looks up whether the gateway already holds a successful authorization reversal for this payment.
+ *
+ * Unlike isAuthReversalTriggered this does not require a matching commercetools transaction, so it also
+ * detects reversals raised manually from EBC, which the connector never recorded.
+ *
+ * @param {Payment} paymentDetails - Payment details.
+ * @returns {Promise<'PRESENT' | 'ABSENT' | 'UNKNOWN'>} - Reversal state at the gateway, UNKNOWN when the search fails.
+ */
+const getGatewayAuthReversalState = async (paymentDetails: Payment): Promise<'PRESENT' | 'ABSENT' | 'UNKNOWN'> => {
+    // Follow-on requests are sent with isv_clientReferenceCode when present, so search on the same value.
+    const clientReferenceCode = paymentDetails?.custom?.fields?.isv_clientReferenceCode || paymentDetails.id;
+    if (!clientReferenceCode) {
+        return 'UNKNOWN';
+    }
+    const query = Constants.PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE + clientReferenceCode + Constants.STRING_AND + Constants.STRING_AUTH_REVERSAL_LOOKUP_QUERY;
+    const mid = paymentDetails?.custom?.fields?.isv_merchantId ? paymentDetails.custom.fields.isv_merchantId : '';
+    const authMid = multiMid.getMidCredentials(mid);
+    const transactionDetail = await createSearchRequest.getTransactionSearchResponse(query, 50, Constants.STRING_SYNC_SORT, authMid);
+    if (!transactionDetail || Constants.HTTP_SUCCESS_STATUS_CODE !== transactionDetail.httpCode) {
+        return 'UNKNOWN';
+    }
+    const transactionSummaries = transactionDetail?.data?._embedded?.transactionSummaries || [];
+    const reversalPresent = transactionSummaries.some((summary: any) =>
+        summary?.applicationInformation?.applications?.some((application: Partial<ApplicationsType>) =>
+            Constants.STRING_SYNC_AUTH_REVERSAL_NAME === application.name
+            && Constants.APPLICATION_RCODE === application.rCode
+            && Constants.APPLICATION_RFLAG === application.rFlag
+        )
+    );
+    return reversalPresent ? 'PRESENT' : 'ABSENT';
+};
+
+/**
+ * Polls the gateway for an authorization reversal, allowing time for a reversal raised alongside the
+ * reject to reach the Transaction Search index.
+ *
+ * @param {Payment} paymentDetails - Payment details.
+ * @returns {Promise<'PRESENT' | 'ABSENT' | 'UNKNOWN'>} - Reversal state at the gateway.
+ */
+const awaitGatewayAuthReversalState = async (paymentDetails: Payment): Promise<'PRESENT' | 'ABSENT' | 'UNKNOWN'> => {
+    let gatewayReversalState: 'PRESENT' | 'ABSENT' | 'UNKNOWN' = 'UNKNOWN';
+    for (let attempt = 1; attempt <= Constants.PAYMENT_GATEWAY_AUTH_REVERSAL_LOOKUP_MAX_RETRY; attempt++) {
+        if (1 < attempt) {
+            await new Promise((resolve) => setTimeout(resolve, Constants.PAYMENT_GATEWAY_AUTH_REVERSAL_LOOKUP_DELAY));
+        }
+        gatewayReversalState = await getGatewayAuthReversalState(paymentDetails);
+        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, 'PaymentId : ' + paymentDetails.id, `Authorization reversal lookup attempt ${attempt} returned ${gatewayReversalState}.`);
+        if ('PRESENT' === gatewayReversalState) {
+            break;
+        }
+    }
+    return gatewayReversalState;
+};
+
+
 /**
 * Retrieves sync amount details based on the payment details and application response.
 * 
@@ -351,11 +406,11 @@ const retrieveSyncAmountDetails = async (paymentDetails: Payment, element: any, 
  * @returns {Promise<any>} - The updated response.
  */
 const runSyncUpdateCaptureAmount = async (updatePaymentObj: Payment | null, amount: number): Promise<any> => {
-    /* START GENAI */
+
     if (!updatePaymentObj || 0 >= amount) {
         return null;
     }
-    /* END GENAI */
+
     const { id: paymentId, version: initialPaymentVersion, transactions: updateTransactions } = updatePaymentObj || {};
     let paymentVersion = initialPaymentVersion;
     let updateResponse: any;
@@ -378,47 +433,197 @@ const runSyncUpdateCaptureAmount = async (updatePaymentObj: Payment | null, amou
     return updateResponse;
 };
 
+
 /**
  * Handles decision synchronization for payment transactions based on conversion details.
  * 
  * @param {any} conversionDetails - Conversion details containing merchant reference numbers and new decisions.
  * @returns {Promise<boolean>} - Indicates whether conversion is present.
  */
+/**
+ * Matches the webhook's requestId/captureRequestId against a payment's transactions and selects
+ * the pending transaction the decision sync should update, with a fallback summary for logging.
+ */
+const selectMatchingSyncTransaction = (
+    transactions: Partial<PaymentTransactionType>[],
+    requestId: string,
+    captureRequestId: string,
+    settlementSucceeded: boolean,
+    requestedDecision: string,
+    captureStatus: string,
+): {
+    selectedTransaction: Partial<PaymentTransactionType> | null;
+    additionalTransaction: Partial<PaymentTransactionType> | null;
+    selectionLogData: Record<string, unknown>;
+} => {
+    const matchingTransactions = (requestId || captureRequestId)
+        ? transactions.filter((transaction: Partial<PaymentTransactionType>) =>
+            transaction.interactionId === requestId ||
+            transaction.interactionId === captureRequestId ||
+            transaction.id === requestId ||
+            transaction.id === captureRequestId
+        )
+        : [];
+
+    let pendingCharge = matchingTransactions.find((tx: Partial<PaymentTransactionType>) =>
+        tx.type === Constants.CT_TRANSACTION_TYPE_CHARGE && tx.state === Constants.CT_TRANSACTION_STATE_PENDING
+    );
+    if (!pendingCharge && settlementSucceeded && captureRequestId) {
+        pendingCharge = transactions.find((tx: Partial<PaymentTransactionType>) =>
+            tx.type === Constants.CT_TRANSACTION_TYPE_CHARGE && tx.state === Constants.CT_TRANSACTION_STATE_PENDING
+        );
+    }
+
+    const pendingAuthorization = matchingTransactions.find((tx: Partial<PaymentTransactionType>) =>
+        tx.type === Constants.CT_TRANSACTION_TYPE_AUTHORIZATION && tx.state === Constants.CT_TRANSACTION_STATE_PENDING
+    );
+    const initialAuthorization = matchingTransactions.find((tx: Partial<PaymentTransactionType>) =>
+        tx.type === Constants.CT_TRANSACTION_TYPE_AUTHORIZATION && tx.state === Constants.CT_TRANSACTION_STATE_INITIAL
+    );
+    let selectedTransaction: Partial<PaymentTransactionType> | null = null;
+    let additionalTransaction: Partial<PaymentTransactionType> | null = null;
+
+    if (pendingCharge) {
+        selectedTransaction = pendingCharge;
+    } else if (pendingAuthorization) {
+        selectedTransaction = pendingAuthorization;
+    } else if (!matchingTransactions.length) {
+        selectedTransaction = transactions[transactions.length - 1];
+    }
+    let chargeFoundViaFallback = false;
+    if (requestedDecision === Constants.HTTP_STATUS_DECISION_ACCEPT && settlementSucceeded && selectedTransaction?.type === Constants.CT_TRANSACTION_TYPE_AUTHORIZATION && pendingCharge) {
+        additionalTransaction = pendingCharge;
+        chargeFoundViaFallback = !matchingTransactions.find((tx: Partial<PaymentTransactionType>) => tx.id === pendingCharge.id);
+    }
+    const transactionSummary = matchingTransactions.map((tx: Partial<PaymentTransactionType>) => ({
+        id: tx.id,
+        type: tx.type,
+        state: tx.state,
+        interactionId: tx.interactionId,
+        amount: tx.amount?.centAmount,
+    }));
+
+    const selectionLogData = {
+        requestId: requestId || 'N/A',
+        captureRequestId: captureRequestId || 'N/A',
+        settlementSucceeded,
+        matchedTransactionCount: matchingTransactions.length,
+        matchedTransactions: transactionSummary,
+        pendingChargeFound: !!pendingCharge,
+        chargeFoundViaFallback,
+        pendingAuthorizationFound: !!pendingAuthorization,
+        initialAuthorizationFound: !!initialAuthorization,
+        selectedTransactionId: selectedTransaction?.id || 'NONE',
+        selectedTransactionType: selectedTransaction?.type || 'NONE',
+        selectedTransactionState: selectedTransaction?.state || 'NONE',
+        additionalTransactionId: additionalTransaction?.id || 'NONE',
+        additionalTransactionType: additionalTransaction?.type || 'NONE',
+        captureStatus,
+    };
+
+    return { selectedTransaction, additionalTransaction, selectionLogData };
+};
+
 const updateDecisionSyncService = async (conversionDetails: any): Promise<boolean> => {
     let isConversionPresent = false;
-    let decision = '';
-    let paymentDetails: any = null;
-    let decisionUpdateObject = {
-        id: '',
-        version: 0,
-        state: '',
-    };
-    let latestTransaction: Partial<PaymentTransactionType>;
     if (conversionDetails) {
-        for (let element of conversionDetails) {
-            paymentDetails = null;
-            paymentDetails = await commercetoolsApi.retrievePayment(element.merchantReferenceNumber);
+        for (const element of conversionDetails) {
+            const merchantReferenceNumber = element?.merchantReferenceNumber || '';
+            const requestedDecision = element?.newDecision || '';
+            const decisionSource = element?.source || 'Decision sync';
+            const requestId = element?.requestId || '';
+            const captureRequestId = element?.captureRequestId || '';
+            const captureStatus = element?.captureStatus || '';
+            const settlementSucceeded = element?.settlementSucceeded || false;
+            let paymentDetails = merchantReferenceNumber ? await commercetoolsApi.retrievePayment(merchantReferenceNumber) : null;
+            if (!paymentDetails && merchantReferenceNumber) {
+                paymentDetails = await commercetoolsApi.retrievePaymentByClientReferenceCode(merchantReferenceNumber);
+            }
             if (paymentDetails && paymentDetails?.transactions && paymentDetails.transactions.length) {
-                latestTransaction = paymentDetails.transactions[paymentDetails.transactions.length - 1];
-                if ((Constants.CT_TRANSACTION_TYPE_AUTHORIZATION === latestTransaction.type || Constants.CT_TRANSACTION_TYPE_CHARGE === latestTransaction.type) && Constants.CT_TRANSACTION_STATE_PENDING === latestTransaction.state && latestTransaction?.id) {
-                    isConversionPresent = true;
-                    switch (element.newDecision) {
+                const { selectedTransaction, additionalTransaction, selectionLogData } = selectMatchingSyncTransaction(
+                    paymentDetails.transactions,
+                    requestId,
+                    captureRequestId,
+                    settlementSucceeded,
+                    requestedDecision,
+                    captureStatus,
+                );
+
+                if (selectedTransaction && (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION === selectedTransaction.type || Constants.CT_TRANSACTION_TYPE_CHARGE === selectedTransaction.type) && (Constants.CT_TRANSACTION_STATE_PENDING === selectedTransaction.state || (Constants.CT_TRANSACTION_STATE_INITIAL === selectedTransaction.state && requestedDecision === Constants.HTTP_STATUS_DECISION_ACCEPT)) && selectedTransaction?.id) {
+
+                    // A rejected authorization is still live at the gateway, so mark it Success and void it instead of
+                    // leaving it as Failure. getInteractionId only resolves the authReversalId from a Success/Initial authorization.
+                    const existingCancelAuthorization = paymentDetails.transactions.some((tx: Partial<PaymentTransactionType>) =>
+                        tx.type === Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION && tx.state !== Constants.CT_TRANSACTION_STATE_FAILURE
+                    );
+                    let reverseAuthorizationOnReject = Constants.HTTP_STATUS_DECISION_REJECT === requestedDecision
+                        && Constants.CT_TRANSACTION_TYPE_AUTHORIZATION === selectedTransaction.type
+                        && !!selectedTransaction.amount
+                        && !existingCancelAuthorization;
+                    if (reverseAuthorizationOnReject) {
+                        // A reversal raised from EBC has no commercetools transaction, so the gateway is the only source of truth.
+                        const gatewayReversalState = await awaitGatewayAuthReversalState(paymentDetails);
+                        if ('ABSENT' !== gatewayReversalState) {
+                            reverseAuthorizationOnReject = false;
+                            paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_WARN, 'PaymentId : ' + paymentDetails.id, `${decisionSource} skipping authorization reversal for transactionId=${selectedTransaction.id} because gateway reversal state is ${gatewayReversalState}.`);
+                        }
+                    }
+
+                    let decision = '';
+                    switch (requestedDecision) {
                         case Constants.HTTP_STATUS_DECISION_ACCEPT:
                             decision = Constants.CT_TRANSACTION_STATE_SUCCESS;
                             break;
                         case Constants.HTTP_STATUS_DECISION_REJECT:
-                            decision = Constants.CT_TRANSACTION_STATE_FAILURE;
+
+                            decision = reverseAuthorizationOnReject ? Constants.CT_TRANSACTION_STATE_SUCCESS : Constants.CT_TRANSACTION_STATE_FAILURE;
+
+                            break;
+                        default:
+                            paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_WARN, '', `${decisionSource} webhook ignored for merchantReferenceNumber=${merchantReferenceNumber} because decision=${requestedDecision} is not supported.`);
+                            continue;
                     }
-                    decisionUpdateObject.id = paymentDetails.id;
-                    decisionUpdateObject.version = paymentDetails.version;
-                    decisionUpdateObject.state = decision;
-                    await commercetoolsApi.updateDecisionSync(decisionUpdateObject, latestTransaction.id);
+                    const transactionInteractionId = requestId && requestId !== selectedTransaction.interactionId ? requestId : '';
+                    const decisionUpdateObject = {
+                        id: paymentDetails.id,
+                        version: paymentDetails.version,
+                        state: decision,
+                        interactionId: transactionInteractionId,
+                    };
+                    const updateResponse: any = await commercetoolsApi.updateDecisionSync(decisionUpdateObject, selectedTransaction.id);
+                    if (updateResponse) {
+                        isConversionPresent = true;
+                        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, 'PaymentId : ' + paymentDetails.id, `${decisionSource} successfully updated transactionId=${selectedTransaction.id} to state=${decision}.`);
+                        if (reverseAuthorizationOnReject) {
+                            // The API extension picks up this Initial CancelAuthorization and calls the gateway reversal.
+                            const authReversalObject = paymentUtils.createTransactionObject(updateResponse.version, selectedTransaction.amount as AmountPlannedType, Constants.CT_TRANSACTION_TYPE_CANCEL_AUTHORIZATION, Constants.CT_TRANSACTION_STATE_INITIAL, undefined, undefined);
+                            const authReversalResponse = await commercetoolsApi.addTransaction(authReversalObject, paymentDetails.id);
+                            paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_INFO, 'PaymentId : ' + paymentDetails.id, `${decisionSource} added CancelAuthorization transaction for rejected authorizationId=${selectedTransaction.id}. Added=${!!authReversalResponse}.`);
+                        }
+                        if (additionalTransaction && additionalTransaction.id) {
+                            const chargeDecision = requestedDecision === Constants.HTTP_STATUS_DECISION_ACCEPT ? Constants.CT_TRANSACTION_STATE_SUCCESS : Constants.CT_TRANSACTION_STATE_FAILURE;
+                            const chargeUpdateObject = {
+                                id: paymentDetails.id,
+                                version: updateResponse.version,
+                                state: chargeDecision,
+                                interactionId: captureRequestId || '',
+                            };
+                            await commercetoolsApi.updateDecisionSync(chargeUpdateObject, additionalTransaction.id);
+                        }
+                    } else {
+                        paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_WARN, 'PaymentId : ' + paymentDetails.id, `${decisionSource} webhook did not update transactionId=${selectedTransaction.id}.`);
+                    }
+                } else {
+                    paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_WARN, 'PaymentId : ' + paymentDetails.id, `${decisionSource} webhook could not find suitable pending transaction. Details: ${JSON.stringify(selectionLogData)}`);
                 }
+            } else {
+                paymentUtils.logData(__filename, FunctionConstant.FUNC_UPDATE_DECISION_SYNC, Constants.LOG_WARN, '', `${decisionSource} webhook did not find a payment for merchantReferenceNumber=${merchantReferenceNumber}, requestId=${requestId}.`);
             }
         }
     }
     return isConversionPresent;
 };
+
 
 /**
 * Processes sync update capture amount based on the provided transaction details.
@@ -555,7 +760,6 @@ const checkAuthReversalTriggered = async (updatePaymentObj: Payment, cartObj: Ca
         },
     };
     for (let i = 0; i < Constants.PAYMENT_GATEWAY_TRANSACTION_SUMMARIES_MAX_RETRY; i++) {
-        //Retries to get the response, if there is no proper response received
         transactionDetail = await getTransactionSummaries(updatePaymentObj, i + 1);
         if (transactionDetail) {
             transactionSummaries = transactionDetail.summaries;
@@ -704,6 +908,8 @@ export default {
     retrieveSyncResponse,
     runSyncAddTransaction,
     isAuthReversalTriggered,
+    getGatewayAuthReversalState,
+    awaitGatewayAuthReversalState,
     retrieveSyncAmountDetails,
     runSyncUpdateCaptureAmount,
     updateDecisionSyncService,
@@ -713,7 +919,9 @@ export default {
     getTransactionSummaries,
     checkAuthReversalTriggered,
     getMissingPaymentDetails,
-    syncPaymentDetails
+    syncPaymentDetails,
+    selectMatchingSyncTransaction
 }
+
 
 

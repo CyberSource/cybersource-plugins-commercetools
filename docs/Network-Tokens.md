@@ -1,96 +1,43 @@
-# Network Tokens
+# Network token refresh
 
-Network token is a security technique that involves replacing sensitive information such as customer's actual PAN with a non-sensitive place holder token.
+Network token refresh keeps a customer's saved cards up to date. When a card's network token changes in Visa Acceptance Solutions (for example, the card is reissued with a new expiry date, or closed), the extension updates or removes the matching saved card in Commercetools.
 
-Before a MID can be enabled for Network Tokens, it has to be provisioned with a Token Requestor ID (TRID) for each card scheme. A TRID is a unique identifier that links a MID to a record at the card scheme and is used to identify which entity is using a Network Token.
+If network tokenisation is enabled for your merchant account, you can call this endpoint ({baseUrl}/refreshSavedTokens) to update the card so customers can always see their latest card details. You can control this functionality using an environment variable, for example ENABLE_NETWORK_TOKEN_REFRESH; when the variable is set to true, call the endpoint to update the card details, and when it is false, skip the endpoint call.
 
-Cybersource-Commercetools Extension only supports the event `tms.networktoken.updated` from Webhooks currently
+### Step 1: Refresh saved cards when the checkout page loads
 
-# Creation of a Webhook Subscription:
+When a logged-in customer opens the checkout page, call the refresh endpoint before showing their saved cards.
 
-Webhook subscription can be created by running the following npm script command to the root directory of extension
+```text
+POST {baseUrl}/refreshSavedTokens
+Content-Type: application/json
+Authorization: Bearer <header value>
 
-     npm run create-subscription  
-    
-Following env variables are mandatory for creation of subscription
+{
+  "customerId": "<Commercetools customer ID>"
+}
+```
 
- - PAYMENT_GATEWAY_NETWORK_TOKEN_MULTI_MID
- - PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL
+- `{baseUrl}` is the URL where the extension is hosted.
+- `<header value>` is the value returned by `GET {baseUrl}/generateHeader`, the same header used for `{baseUrl}/captureContext`.
+- Skip this call for guest customers, because they have no saved cards.
+- Call it once per checkout session to avoid repeated calls on page reloads.
 
-    PAYMENT_GATEWAY_NETWORK_TOKEN_MULTI_MID - (csv of merchant ids if webhooks subscription needs to be created in multiple mids). For default mid to be considered, populate this variable with default Mid
+Example response:
 
-Once the subscription is created successfully, the merchant id, webhook id, key id, key and key expiration details will be stored in a Custom Object created in Commercetools.
+```json
+{
+  "success": true,
+  "processedCount": 3,
+  "removedCount": 1,
+  "updatedCount": 0,
+  "errorMessage": "",
+  "successMessage": "Network token refresh completed. Processed 3 tokens, removed 1 invalid tokens, 2 tokens remain valid."
+}
+```
 
-> **_NOTE:_** The command `npm run create-subscription` also can be used, if already a subscription exists for the product id, but the data is not found updated in Commercetools or the base url of Webhook is found different from the one available in PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL. In this case, the command will delete the existing subscription and create new.
+If `customerId` is missing, the endpoint returns HTTP `400` with an `errorMessage`.
 
- > If same card is used by different customers in Commercetools, the extension will support network tokens only for one customer, which is present in the incoming notification. The card info will remain same for all other customers.
-# Subscription Details in Commercetools:
+### Step 2: Show the customer's saved cards
 
-Once the subscription is created, the details will be stored in Commercetools custom object which has key and container name of `webHookSubscription` and `ctWebHookSubscription` respectively. Each array in the array of objects represents the webhook details of the particular merchant id. Below given details can be retrieved from the Custom Object.
-1. MerchantId
-2. Key
-3. KeyId
-4. KeyExpiration
-5. SubscriptionId
-
-When an update notification is received at the webhook endpoint, the stored subscription details are used to validate the notification details.
-
-Eg: Custom Object in Commercetools for storing Webhook information
-
-    {
-            "id": "203c47be-7151-**************",
-            "version": 1,
-            "versionModifiedAt": "2024-02-20T14****************",
-            "createdAt": "2024-02-20T14***********",
-            "lastModifiedAt": "2024-02-20T14**********",
-            "lastModifiedBy": {
-                "clientId": "IAnbNpgsQD**************",
-                "isPlatformClient": false
-            },
-            "createdBy": {
-                "clientId": "IAnbNpgsQ************",
-                "isPlatformClient": false
-            },
-            "container": "ctWebHookSubscription",
-            "key": "webHookSubscription",
-            "value": [
-                {
-                    "merchantId": "xxxxx",
-                    "key": "wdXJppHGu**************************",
-                    "keyId": "11d1bc95****************",
-                    "keyExpiration": "2027-02-********",
-                    "subscriptionId": "11d1bca6*********************"
-                },
-                {
-                    "merchantId": "xxxxx",
-                    "key": "B1J8NwMUyEPcFo83I**********************",
-                    "keyId": "11d1bc95-d14*********************",
-                    "keyExpiration": "2027-02************",
-                    "subscriptionId": "11d1bca6-133f********************"
-                }
-            ]
-        }
-
-# Receiving Webhook Notifications
-
-Following are the endpoints related to Webhook in Extension. ${baseUrl} is the endpoint in which the extension is hosted.
-
-
- Endpoint Type                       | Endpoint                                                                                 | Http Method                                                                                                                  |
-| ------------------------------------------ | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Health Check URL                                | ${baseUrl}/netTokenNotification                                                    | GET                                                                          |
-| Webhook URL                                | ${baseUrl}/netTokenNotification                                                    | POST                                                                          |
-
- - Extension will return http status code 200 when the Health check url is invoked
- - Extension will perform the following when a notification is pushed into webhook endpoint
-    - Validate the notification signature  
-    - Retrieve the updated card details from payment gateway using the Instrument id from payload
-    - Update the card details in Commercetools 
-    - Respond with http status code 200 
-    
-> **_NOTE:_** If the extension is failing to authenticate the notification or to update the Card in Commercetools, it will respond with a http status code 400
-
-Based on the response form Cybersource, the following details of a card will be updated
-- Expiry Month
-- Expiry Year
-- Card Suffix
+After the refresh call completes, read the customer's saved cards from the `isv_tokens` custom field on the Commercetools customer. The list now contains the latest card details, and invalid cards have been removed.

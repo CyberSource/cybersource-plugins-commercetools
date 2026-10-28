@@ -41,7 +41,6 @@ let payment = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: '5f39f56e-fb1f-4c29-80af-5168603ab5ce',
       isv_applePayValidationUrl: 'https://apple-pay-gateway-cert.apple.com/paymentservices/startSession',
       isv_acceptHeader: '*/*',
       isv_applePayDisplayName: 'Sunrise',
@@ -93,7 +92,6 @@ const guestPayment = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: '5f39f56e-fb1f-4c29-80af-5168603ab5ce',
       isv_applePayValidationUrl: 'https://apple-pay-gateway-cert.apple.com/paymentservices/startSession',
       isv_acceptHeader: '*/*',
       isv_applePayDisplayName: 'Sunrise',
@@ -371,7 +369,6 @@ let payments = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: '5f39f56e-fb1f-4c29-80af-5168603ab5ce',
       isv_applePayValidationUrl: 'https://apple-pay-gateway-cert.apple.com/paymentservices/startSession',
       isv_acceptHeader: '*/*',
       isv_applePayDisplayName: 'Sunrise',

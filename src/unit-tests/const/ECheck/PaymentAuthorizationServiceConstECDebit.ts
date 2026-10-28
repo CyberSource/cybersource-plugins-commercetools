@@ -37,7 +37,6 @@ let payment = {
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "054a9aa8-58dc-49a1-8b93-d8325719cb3d",
           "isv_merchantId": "",
           "isv_accountNumber": eCheck.accountNumber,
           "isv_shippingMethod": "SINGLE",
@@ -108,7 +107,6 @@ let paymentGuest = {
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "054a9aa8-58dc-49a1-8b93-d8325719cb3d",
           "isv_merchantId": "",
           "isv_accountNumber": eCheck.accountNumber,
           "isv_shippingMethod": "SINGLE",

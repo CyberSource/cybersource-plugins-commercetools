@@ -79,12 +79,6 @@ test.serial('Valid Update service response with invalid httpCode', async (t) => 
   t.is(result, false);
 })
 
-test.serial('Validate Rate Limiter Input', async (t) => {
-  const result = paymentValidator.isValidRateLimiterInput();
-  t.is(typeof result, 'boolean');
-})
-
-
 test.serial('Test Is Valid Transaction with Valid Input', async (t) => {
   const result = paymentValidator.isValidTransaction(PaymentServiceConst.getRefundResponseUpdatePaymentObj as any, PaymentServiceConst.getRefundResponseUpdateTransactions);
   t.is(result, true);

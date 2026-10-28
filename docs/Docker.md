@@ -1,7 +1,7 @@
 # Docker
 Docker is an open platform for developing, shipping and running applications. It enables you to separate your applications from your infrastructure so you can deliver software quickly.
 
-By using Docker, image of Cybersource-Commercetools Extension can be created and run in various platforms wherever Docker is supported.
+By using Docker, image of Visa Acceptance Solutions-Commercetools Extension can be created and run in various platforms wherever Docker is supported.
 
 Before using it, make sure to install Docker Desktop in the respective system.
 

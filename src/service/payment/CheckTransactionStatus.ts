@@ -7,8 +7,6 @@ import prepareFields from '../../requestBuilder/PrepareFields';
 import { ResponseType } from '../../types/Types';
 import paymentUtils from '../../utils/PaymentUtils';
 
-
-
 const getTransactionStatusResponse = async (paymentObj: Payment, requestId: string): Promise<any> => {
   let transactionStatusResponse: any;
   if (requestId) {
@@ -20,10 +18,9 @@ const getTransactionStatusResponse = async (paymentObj: Payment, requestId: stri
     const requestObj: CreatePaymentRequest = {
       clientReferenceInformation: clientReferenceInformation,
       paymentInformation: paymentInformation,
-      processingInformation: processingInformation
+      processingInformation: processingInformation,
     };
-    if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG))
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_STATUS, Constants.LOG_DEBUG, 'RequestId : ' + requestId, 'Check Status Request = ' + JSON.stringify(requestObj));
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_TRANSACTION_STATUS, Constants.LOG_DEBUG, 'RequestId : ' + requestId, 'Check Status Request = ' + JSON.stringify(requestObj));
     const paymentApiInstance = configObject && new restApi.PaymentsApi(await configObject, apiClient);
     const startTime = new Date().getTime();
     return await new Promise<Partial<ResponseType>>(function (resolve, reject) {
@@ -36,7 +33,7 @@ const getTransactionStatusResponse = async (paymentObj: Payment, requestId: stri
             resolve(transactionStatusResponse);
           } else if (JSON.parse(response?.text).paymentInformation?.eWallet?.accountId) {
             transactionStatusResponse = JSON.parse(response?.text);
-            resolve(transactionStatusResponse)
+            resolve(transactionStatusResponse);
           } else {
             reject(transactionStatusResponse);
           }

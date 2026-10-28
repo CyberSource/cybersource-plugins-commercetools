@@ -35,7 +35,6 @@ const payment = {
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "2b06fc7d-f575-4438-b543-b47f5a47b992",
           "isv_merchantId": "chtest",
           "isv_token": "6487362459229686102",
           "isv_saleEnabled": false,

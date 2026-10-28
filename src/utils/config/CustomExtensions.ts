@@ -51,6 +51,7 @@ const syncExtensions = async (extension: any) => {
       }
       if (process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE && url) {
         const headerValue = authenticationHelper.encryption(process.env.PAYMENT_GATEWAY_EXTENSION_HEADER_VALUE);
+        //   extension.destination.url = String(process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL || '').replace(/\/+$/, '') + url;
         extension.destination.url = process.env.PAYMENT_GATEWAY_EXTENSION_DESTINATION_URL + url;
         extension.destination.authentication.headerValue = 'Bearer' + ' ' + headerValue;
         const scriptResponse = await commercetoolsApi.addExtensions(extension);

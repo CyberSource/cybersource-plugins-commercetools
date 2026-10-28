@@ -6,36 +6,58 @@ export abstract class Constants {
   static readonly PAYMENT_GATEWAY_FAILURE_REASON_CODE = '481';
 
   //Payments data
-  static readonly PAYMENT_GATEWAY_TEST_ENVIRONMENT = 'apitest.cybersource.com';
-  static readonly PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT = 'api.cybersource.com';
+  static readonly PAYMENT_GATEWAY_TEST_ENVIRONMENT = 'apitest.visaacceptance.com';
+
+  static readonly PAYMENT_GATEWAY_PRODUCTION_ENVIRONMENT = 'api.visaacceptance.com';
   static readonly PAYMENT_GATEWAY_PUBLIC_KEY_VERIFICATION = '/flex/v2/public-keys/';
   static readonly TEST_ENVIRONMENT = 'TEST';
   static readonly LIVE_ENVIRONMENT = 'PRODUCTION';
   static readonly PAYMENT_GATEWAY_APPLE_PAY_DESCRIPTOR = 'RklEPUVNVi5QQVlNRU5ULkFQSQ==';
   static readonly PAYMENT_GATEWAY_APPLE_PAY_INITIATIVE = 'web';
   static readonly PAYMENT_GATEWAY_APPLE_PAY_PAYMENT_SOLUTION = '001';
-  static readonly PAYMENT_GATEWAY_AUTHENTICATION_TYPE = 'http_signature';
+  static readonly PAYMENT_GATEWAY_AUTHENTICATION_TYPE = 'jwt';
+
+  static readonly PAYMENT_GATEWAY_JWT_KEY_TYPE = 'SHARED_SECRET';
+
   static readonly PAYMENT_GATEWAY_CLICK_TO_PAY_PAYMENT_SOLUTION = 'visaCheckout';
   static readonly PAYMENT_GATEWAY_CLICK_TO_PAY_UC_PAYMENT_SOLUTION = '027';
   static readonly PAYMENT_GATEWAY_CLIENT_REFERENCE_CODE = 'clientReferenceInformation.code:';
   static readonly PAYMENT_GATEWAY_CONSUMER_AUTHENTICATION = 'CONSUMER_AUTHENTICATION';
   static readonly PAYMENT_GATEWAY_DECISION_SKIP = 'DECISION_SKIP';
   static readonly PAYMENT_GATEWAY_E_CHECK_PAYMENT_TYPE = 'CHECK';
+  static readonly PAYMENT_GATEWAY_E_CHECK_UC_PAYMENT_TYPE = 'CHECK';
   static readonly PAYMENT_GATEWAY_ENCRYPTION_TYPE = 'RsaOaep';
   static readonly PAYMENT_GATEWAY_GOOGLE_PAY_PAYMENT_SOLUTION = '012';
-  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'NTKW5X4G';
+  static readonly PAYMENT_GATEWAY_PARTNER_SOLUTION_ID = 'oo6h28vu';
   static readonly PAYMENT_GATEWAY_PAYER_AUTH_CHALLENGE_CODE = '04';
-  static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES = 'customer,paymentInstrument,instrumentIdentifier';
-  static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS = 'paymentInstrument,instrumentIdentifier';
+
+  static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES: string[] = ['customer', 'paymentInstrument', 'instrumentIdentifier'];
+  static readonly PAYMENT_GATEWAY_TOKEN_ACTION_TYPES_CUSTOMER_EXISTS: string[] = ['paymentInstrument', 'instrumentIdentifier'];
+
   static readonly PAYMENT_GATEWAY_TOKEN_CREATE = 'TOKEN_CREATE';
   static readonly PAYMENT_GATEWAY_ACS_WINDOW_SIZE = '01';
   static readonly PAYMENT_GATEWAY_WEBHOOK_PORT = '443';
   static readonly PAYMENT_GATEWAY_VALIDATE_CONSUMER_AUTHENTICATION = 'VALIDATE_CONSUMER_AUTHENTICATION';
   static readonly PAYMENT_GATEWAY_WEBHOOK_ENDPOINT = '/netTokenNotification';
+  static readonly PAYMENT_GATEWAY_FRAUD_WEBHOOK_ENDPOINT = '/fraudNotification';
   static readonly PAYMENT_GATEWAY_PRODUCT_ID = 'ctNetworkTokenSubscription';
   static readonly PAYMENT_GATEWAY_NETWORK_TOKEN_EVENT_TYPE = 'tms.networktoken.updated';
+  static readonly PAYMENT_GATEWAY_FRAUD_PRODUCT_ID = 'decisionManager';
+  static readonly PAYMENT_GATEWAY_FRAUD_MANAGEMENT_ESSENTIALS_PRODUCT_ID = 'fraudManagementEssentials';
+  static readonly PAYMENT_GATEWAY_FRAUD_DM_EVENT_TYPE = 'risk.profile.decision.reject';
+  static readonly PAYMENT_GATEWAY_FRAUD_REVIEW_EVENT_TYPES = ['risk.casemanagement.decision.accept', 'risk.casemanagement.decision.reject'];
+
+  static readonly API_STATUS_SETTLE_INITIATED = 'SETTLE_INITIATED';
+  static readonly API_STATUS_FAILED = 'FAILED';
+  static readonly API_STATUS_CANCELLED = 'CANCELLED';
+
+  static readonly FRAUD_REVIEW_ACCEPT_EVENT = 'risk.casemanagement.decision.accept';
+  static readonly FRAUD_REVIEW_REJECT_EVENT = 'risk.casemanagement.decision.reject';
+  static readonly FRAUD_DM_REJECT_EVENT = 'risk.profile.decision.reject';
+  static readonly UC_ORDER_TRANSACTION_RESULT_EVENT = 'uc.orders.transactionresults';
+  static readonly PAYMENT_GATEWAY_UNIFIED_CHECKOUT_PRODUCT_ID = 'unifiedCheckout';
   static readonly PAYMENT_GATEWAY_APPLICATION_NAME = 'Commercetools(REST)';
-  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '25.3.1';
+  static readonly PAYMENT_GATEWAY_APPLICATION_VERSION = '3.0.0';
   static readonly PAYMENT_GATEWAY_AP_SESSIONS = 'AP_SESSIONS';
   static readonly PAYMENT_GATEWAY_AP_STATUS = 'AP_STATUS';
   static readonly PAYMENT_GATEWAY_AP_ORDER = 'AP_ORDER';
@@ -91,6 +113,7 @@ export abstract class Constants {
   static readonly REGEX_DOT = '.';
   static readonly REGEX_HYPHEN = '-';
   static readonly REGEX_UNDERSCORE = '_';
+  static readonly REGEX_TWO_LETTER_LOCALE = /^[a-zA-Z]{2}$/;
   static readonly STRING_FULL_COLON = ':';
   static readonly STRING_HYPHEN = ' - ';
   static readonly STATIC_FILE_REGEX = /\.(css|js|png|jpg|jpeg|gif|ico)$/;
@@ -110,6 +133,16 @@ export abstract class Constants {
   static readonly STRING_AZURE = 'azure';
   static readonly STRING_FILE_NAME = '_KEY_FILE_NAME';
   static readonly STRING_FILE_URL = '_KEY_FILE_URL'
+  static readonly STRING_KEY_PASS = '_KEY_PASS';
+  static readonly STRING_KEY_ALIAS = '_KEY_ALIAS';
+  static readonly STRING_REQUEST_MLE_PUBLIC_CERT_FILE = '_REQUEST_MLE_PUBLIC_CERT_FILE';
+  static readonly STRING_REQUEST_MLE_PUBLIC_CERT_URL = '_REQUEST_MLE_PUBLIC_CERT_URL';
+  // Environment variable name suffix, not a credential value.
+  static readonly ENV_SUFFIX_REQUEST_MLE_P12_SECRET = '_REQUEST_MLE_P12_PASSWORD'; //checkmarx fix
+  static readonly STRING_RESPONSE_MLE_PRIVATE_KEY_FILE = '_RESPONSE_MLE_PRIVATE_KEY_FILE';
+  static readonly STRING_RESPONSE_MLE_PRIVATE_KEY_URL = '_RESPONSE_MLE_PRIVATE_KEY_URL';
+  static readonly STRING_RESPONSE_MLE_PRIVATE_KEY_PASSWORD = '_RESPONSE_MLE_PRIVATE_KEY_PASSWORD';
+  static readonly STRING_RESPONSE_MLE_KID = '_RESPONSE_MLE_KID';
   static readonly ACTIVE_CART_STATE = 'cartState="Active"';
   static readonly ANONYMOUS_ID = 'anonymousId';
   static readonly AUTHENTICATION_SCHEME = 'Basic';
@@ -139,10 +172,15 @@ export abstract class Constants {
   static readonly STRING_SYNC_ECHECK_CREDIT_NAME = 'ics_ecp_credit';
   static readonly STRING_SYNC_ECHECK_DEBIT_NAME = 'ics_ecp_debit';
   static readonly STRING_SYNC_QUERY = 'submitTimeUtc:[NOW/DAY-1DAY TO NOW/HOUR+1HOUR}';
+  static readonly STRING_AUTH_REVERSAL_LOOKUP_QUERY = 'submitTimeUtc:[NOW/DAY-30DAY TO NOW/HOUR+1HOUR}';
   static readonly STRING_SYNC_REFUND_NAME = 'ics_credit';
   static readonly STRING_SYNC_SORT = 'submitTimeUtc:desc';
   static readonly STRING_TRANSACTIONS = 'transactions';
   static readonly STRING_TRUE = 'true';
+  static readonly CACHE_CERTIFICATE_FROM_P12_FILE = 'certificateFromP12File';
+  static readonly CACHE_CERTIFICATE_LAST_MODIFIED_TIMESTAMP = 'certificateLastModifideTimeStamp';
+  static readonly CACHE_PEM_CERTIFICATE_FROM_FILE = 'certificateFromPemFile';
+  static readonly CACHE_PEM_CERTIFICATE_LAST_MODIFIED_TIMESTAMP = 'certificatePemLastModifideTimeStamp';
   static readonly STRING_DEFAULT = 'default';
   static readonly CART_ID = 'cartId';
   static readonly PAYMENT_ID = 'paymentId';
@@ -155,8 +193,6 @@ export abstract class Constants {
   static readonly NETWORK_TOKEN_EVENT = 'tms.networktoken.updated';
   static readonly ADDITIONAL_CUSTOM_TYPE_FILE_PATH = 'src/resources/isv_additonal_custom_type.json';
   static readonly CERTIFICATE_PATH = '../certificates';
-  static readonly CACHE_CERTIFICATE_FROM_P12_FILE = 'certificateFromP12File';
-  static readonly CACHE_CERTIFICATE_LAST_MODIFIED_TIMESTAMP = 'certificateLastModifideTimeStamp';
   static readonly STRING_TEST = 'test';
   static readonly STRING_GOOGLE_PAY = 'googlePay';
   static readonly STRING_VISA = 'visa';
@@ -176,7 +212,9 @@ export abstract class Constants {
   static readonly VALIDATION = 'validation';
   static readonly STRING_FULL = 'FULL';
   static readonly UNIFIED_CHECKOUT_CAPTURE_CONTEXT_CLIENT_VERSION = '0.19';
+  static readonly UNIFIED_CHECKOUT_SESSION_CLIENT_VERSION = '1.0';
   static readonly FLEX_MICROFORM_CLIENT_VERSION = 'v2';
+  static readonly UC_SESSION_ENDPOINT = '/uc/v1/sessions';
 
   //CT transaction type
   static readonly CT_TRANSACTION_TYPE_AUTHORIZATION = 'Authorization';
@@ -192,6 +230,9 @@ export abstract class Constants {
 
   //CT custom fields
   static readonly ADD_INTERFACE_INTERACTION = 'addInterfaceInteraction';
+  static readonly ISV_TOKEN_ACTION = 'isv_tokenAction';
+  static readonly ISV_TOKEN_ACTION_DELETE = 'delete';
+  static readonly ISV_TOKEN_ACTION_UPDATE = 'update';
   static readonly ADD_TRANSACTION = 'addTransaction';
   static readonly ADD_FIELD_DEFINITION = 'addFieldDefinition'
   static readonly CHANGE_TRANSACTION_STATE = 'changeTransactionState';
@@ -199,13 +240,15 @@ export abstract class Constants {
   static readonly INVALID_INPUT = 'InvalidInput';
   static readonly ISV_ADDRESS_ID = 'isv_addressId';
   static readonly ISV_TRANSACTION_DATA = 'isv_transaction_data';
-  static readonly ISV_TOKEN_ACTION = 'isv_tokenAction';
-  static readonly ISV_TOKEN_ACTION_DELETE = 'delete';
-  static readonly ISV_TOKEN_ACTION_UPDATE = 'update';
   static readonly ISV_CARD_NEW_EXPIRY_MONTH = 'isv_cardNewExpiryMonth';
   static readonly ISV_CARD_NEW_EXPIRY_YEAR = 'isv_cardNewExpiryYear';
   static readonly ISV_FAILED_TOKENS = 'isv_failedTokens';
+  static readonly ISV_METADATA = 'isv_metadata';
   static readonly ISV_TOKEN = 'isv_token';
+  static readonly ISV_UC_ALLOWED_PAYMENT_TYPES = 'isv_ucAllowedPaymentTypes';
+  static readonly ISV_UC_BILLING_TYPE = 'isv_ucBillingType';
+  static readonly ISV_UC_TARGET_ORIGINS = 'isv_ucTargetOrigins';
+  static readonly ISV_UC_SHOW_ACCEPTED_NETWORK_ICONS = 'isv_ucShowAcceptedNetworkIcons';
   static readonly ISV_PAYMENTS_CUSTOMER_TOKENS = 'isv_payments_customer_tokens';
   static readonly ISV_TOKENS = 'isv_tokens';
   static readonly SET_CUSTOM_FIELD = 'setCustomField';
@@ -214,17 +257,23 @@ export abstract class Constants {
   static readonly TYPE_ID_TYPE = 'type';
   static readonly UC_ADDRESS = 'UCAddress';
   static readonly ISV_CUSTOMER_ID = 'isv_customerId';
+  static readonly ISV_ENABLED_MOTO = 'isv_enabledMoto';
 
   //  API Endpoints
   static readonly PAYMENT_CREATE_DESTINATION_URL = '/api/extension/payment/create';
   static readonly PAYMENT_UPDATE_DESTINATION_URL = '/api/extension/payment/update';
   static readonly CUSTOMER_UPDATE_DESTINATION_URL = '/api/extension/customer/update';
-  static readonly EXTENSION_SERVICE_END_POINTS = ['/capture', '/refund', '/authReversal', '/orders', '/orderData', '/paymentData', '/paymentDetails', '/decisionSync', '/sync', '/configureExtension', '/generateHeader', '/testConnection', '/favicon.ico'];
+  static readonly CAPTURE_CONTEXT_DESTINATION_URL = '/captureContext';
+  static readonly CHECKOUT_SESSION_DESTINATION_URL = '/checkoutSession';
+  static readonly REFRESH_SAVED_TOKENS_DESTINATION_URL = '/refreshSavedTokens';
+  static readonly EXTENSION_SERVICE_END_POINTS = ['/capture', '/refund', '/refreshStatus', '/authReversal', '/orders', '/orderData', '/paymentData', '/paymentDetails', '/decisionSync', '/sync', '/configureExtension', '/generateHeader', '/testConnection', '/favicon.ico'];
   static readonly PAYER_AUTH_RETURN_URL = '/payerAuthReturnUrl';
-  static readonly WHITE_LIST_ENDPOINTS = ['/api/extension/payment/create', '/api/extension/payment/update',
-    '/api/extension/customer/update', '/netTokenNotification', '/captureContext', '/orders', '/orderData',
-    '/capture', '/refund', '/authReversal', '/paymentDetails', '/paymentData', '/payerAuthReturnUrl',
+
+  static readonly WHITE_LIST_ENDPOINTS = ['/api/extension/payment/create',
+    '/api/extension/payment/update', '/api/extension/customer/update', '/netTokenNotification', '/fraudNotification', '/captureContext', '/checkoutSession', '/refreshSavedTokens', '/orders', '/orderData',
+    '/capture', '/refund', '/refreshStatus', '/authReversal', '/paymentDetails', '/paymentData', '/payerAuthReturnUrl',
     '/sync', '/decisionSync', '/configureExtension', '/generateHeader', '/favicon.ico', '/testConnection', '/payPalReturnUrl', '/payPalCancelUrl'];
+
 
   //HTMLContent
   static readonly HTML_PREFIX =
@@ -233,15 +282,18 @@ export abstract class Constants {
 
   //Function Arrays
   static readonly UPDATE_AMOUNT_RESPONSE_FUNCTIONS = ['FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetAuthReversalResponse'];
-  static readonly GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS = ['FuncGetTransactionData', 'FuncGetFlexKeys', 'FuncGetPayerAuthSetupData', 'FuncGetAuthReversalResponse', 'FuncGetAuthorizationResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse'];
-  static readonly GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS = ['FuncGetTransactionSearchResponse', 'FuncGetConversionDetails', 'FuncGetPublicKeys', 'FuncGetTransientTokenDataResponse', 'FuncWebhookSubscriptionResponse', 'FuncGetKeyGenerationResponse', 'FuncGetCreateWebhookSubscriptionResponse', 'FuncDeleteWebhookSubscriptionResponse', 'FuncGetTransactionData'];
+
+  static readonly GET_CONFIG_BY_PAYMENT_OBJECT_FUNCTIONS = ['FuncGetTransactionData', 'FuncGetAuthReversalResponse', 'FuncGetAuthorizationResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse'];
+  static readonly GET_CONFIG_BY_MID_CREDENTIALS_FUNCTIONS = ['FuncGetTransactionSearchResponse', 'FuncGetConversionDetails', 'FuncGetTransientTokenDataResponse', 'FuncWebhookSubscriptionResponse', 'FuncGetKeyGenerationResponse', 'FuncGetCreateWebhookSubscriptionResponse', 'FuncDeleteWebhookSubscriptionResponse', 'FuncGetTransactionData'];
+
   static readonly GET_PROCESSING_INFORMATION_FUNCTIONS = ['FuncGetAuthorizationResponse', 'FuncGetAddTokenResponse', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse', 'FuncGetCaptureResponse', 'FuncGetRefundData', 'FuncGetAuthReversalResponse'];
   static readonly MAP_PAYMENT_INFORMATION_FUNCTIONS = ['FuncGetAuthorizationResponse', 'FuncGetRefundData', 'FuncGetSessionResponse', 'FuncGetTransactionStatus', 'FuncCreateOrderResponse', 'FuncGetCaptureResponse', 'FuncGetAuthReversalResponse'];
-  static readonly MLE_UNSUPPORTED_FUNCTIONS = ['FuncGenerateCaptureContext', 'FuncGetTransientTokenDataResponse'];
+  static readonly MLE_UNSUPPORTED_FUNCTIONS = ['FuncGenerateCaptureContext', 'FuncCreateCheckoutSession', 'FuncGetTransientTokenDataResponse'];
 
   //default cards
   static readonly UC_ALLOWED_CARD_NETWORKS = ['VISA'];
   static readonly FLEX_MICROFORM_ALLOWED_CARDS = ['VISA'];
+  static readonly REFRESH_STATUS_TRANSACTION_SCAN_MAX = 100;
 
   //Datatypes
   static readonly STR_ARRAY = 'array';
@@ -254,6 +306,15 @@ export abstract class Constants {
 
   //Limits
   static readonly PAYMENT_GATEWAY_TRANSACTION_SUMMARIES_MAX_RETRY = 3;
+  static readonly PAYMENT_GATEWAY_AUTH_REVERSAL_LOOKUP_MAX_RETRY = 3;
+  static readonly PAYMENT_GATEWAY_AUTH_REVERSAL_LOOKUP_DELAY = 2000;
   static readonly MAX_REQUESTS = 10;
   static readonly RATE_LIMIT_TIME_WINDOW = 60000; //1 minute in ms
+
+  //Locale and Country Validation Messages
+  static readonly LOCALE_EMPTY_ERROR = 'LOCALE IS EMPTY';
+  static readonly COUNTRY_REQUIRED_FOR_PAYMENT_WARNING = 'Country is required for payment.';
+  static readonly COUNTRY_REQUIRED_FOR_LOCALE_FORMATTING_WARNING = 'Country is required for locale formatting.';
+  static readonly SAVED_CARD_NO_PAYMENT_INSTRUMENT_WARNING = 'isSavedCard=true but no paymentInstrumentId was provided in the frontend payload';
+
 }

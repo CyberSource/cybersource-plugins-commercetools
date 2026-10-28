@@ -35,7 +35,6 @@ const payment ={
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "84bc3678-851f-474f-8866-10a11af041a7",
           "isv_merchantId": "chtest",
           "isv_token": clickToPay.isv_token,
           "isv_saleEnabled": false,
@@ -101,7 +100,6 @@ const payments = {
   custom: {
     type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
     fields: {
-      isv_deviceFingerprintId: '8a22fb00-dc63-496b-b0de-9f1d1fd36a50',
       isv_cardExpiryYear: '25  ',
       isv_token: clickToPay.isv_token,
       isv_customerIpAddress: '106.202.150.94',
@@ -787,7 +785,6 @@ const multipleShippingPayment = {
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "e2013320-c36a-4b17-98fb-cad6b61d96ec",
           "isv_merchantId": "chtest",
           "isv_token": "2756441060512475901",
           "isv_saleEnabled": false,

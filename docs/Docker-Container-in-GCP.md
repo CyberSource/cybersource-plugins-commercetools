@@ -1,6 +1,6 @@
 # Deploying Extension as a Docker Image on Google Cloud Platform
 
-Google Cloud Run is a fully managed serverless platform that enables developers to run containerized applications without managing infrastructure. Using Cloud Run, the Cybersource-Commercetools Extension can be deployed easily with automatic scaling. For this deployment, the docker image of the extension needs to be built and pushed to Google Artifact Registry.
+Google Cloud Run is a fully managed serverless platform that enables developers to run containerized applications without managing infrastructure. Using Cloud Run, the Visa Acceptance Solutions-Commercetools Extension can be deployed easily with automatic scaling. For this deployment, the docker image of the extension needs to be built and pushed to Google Artifact Registry.
 
 ## Pre-Requisites
 
@@ -47,6 +47,7 @@ gcloud services enable artifactregistry.googleapis.com
 
    ```bash
    gcloud auth configure-docker
+   ```
 
 ### Step 2. Build the docker image using the following command
 
@@ -59,7 +60,7 @@ Leave the docker desktop as open/connected and navigate to the root directory of
 - Create an Artifact Registry repository:
 
    ```bash
-   gcloud artifacts repositories create <REPOSITORY_NAME> --repository-format=docker --location=<REGION> --description="Cybersource Commercetools Extension Repository"
+   gcloud artifacts repositories create <REPOSITORY_NAME> --repository-format=docker --location=<REGION> --description="Visa Acceptance Solutions Commercetools Extension Repository"
    ```
 
 - Configure Docker authentication for Artifact Registry:
@@ -91,7 +92,6 @@ To create it, navigate to **Cloud Run** → **Create Service**
 - Click **Create Service**(Deploy Container)
 
 - Configure the service:
-
    - **Service name**: `<your-app-name>` (e.g., ctextension)
 
    - **Region**: Select your preferred region
@@ -107,15 +107,12 @@ To create it, navigate to **Cloud Run** → **Create Service**
 Container configuration defines how your application runs, including the image source, resource allocation, and environment variables.
 
 - Configure the container:
-
    - **Container image URL**: Enter your image URL from Artifact Registry
-
      -  `<REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY_NAME>/<imageName>`
 
    - **Container port**: 8080
 
 - Click **Container, Connections, Security** to expand advanced settings:
-
    - **Memory**: 512 MiB
 
    - **CPU**: 1
@@ -128,12 +125,11 @@ Container configuration defines how your application runs, including the image s
 
 ### Step 6: Environment Variables Configuration
 
-Environment variables are used to configure your application with the necessary Commercetools and Cybersource credentials.
+Environment variables are used to configure your application with the necessary Commercetools and Visa Acceptance Solutions credentials.
 
 - Click **Variables & Secrets** tab
 
 - Click **Add Variable** for each environment variable:
-
    - Add all required environment variables (CT_PROJECT_KEY, CT_CLIENT_ID, etc.)
    - Set `CONFIG_PORT` to `8080`
 

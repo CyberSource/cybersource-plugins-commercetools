@@ -27,20 +27,24 @@ const getAuthReversalResponse = async (payment: Payment, cart: Cart, authReversa
     if (authReversalId && payment) {
       const apiClient = new restApi.ApiClient();
       const configObject = await prepareFields.getConfigObject(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, null, payment, null);
-      let clientReferenceInformation = prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, payment.id);
+      const clientRefCode = payment?.custom?.fields?.isv_clientReferenceCode || payment.id;
+      let clientReferenceInformation = prepareFields.getClientReferenceInformation(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, clientRefCode);
       let processingInformation = prepareFields.getProcessingInformation(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, payment, '', '', null, null) as PtsV2PaymentsReversalsPost201Response;
-      let orderInformation = prepareFields.getOrderInformation(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, payment, payment.transactions[0] as Partial<PaymentTransactionType>, cart, null, null, '', '') as Ptsv2paymentsidreversalsOrderInformation;
+      const reversalTransaction = (payment.transactions?.[0] || { amount: payment.amountPlanned }) as Partial<PaymentTransactionType>;
+      let orderInformation = prepareFields.getOrderInformation(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, payment, reversalTransaction, cart, null, null, '', '') as Ptsv2paymentsidreversalsOrderInformation;
       const requestObj: AuthReversalRequest = {
         clientReferenceInformation: clientReferenceInformation,
         processingInformation: processingInformation,
         orderInformation: orderInformation
       }
-      if (Constants.PAYPAL === payment.paymentMethodInfo.method) {
+      if (
+        Constants.PAYPAL === payment.paymentMethodInfo.method ||
+        Constants.ECHECK === payment?.paymentMethodInfo?.method
+      ) {
         requestObj.paymentInformation = prepareFields.getPaymentInformation(FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, payment, null, null);
       }
-      if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
-        paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + payment.id, 'Authorization Reversal Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
-      }
+
+      paymentUtils.logData(__filename, FunctionConstant.FUNC_GET_AUTH_REVERSAL_RESPONSE, Constants.LOG_DEBUG, 'PaymentId : ' + payment.id, 'Authorization Reversal Request = ' + paymentUtils.maskData(JSON.stringify(requestObj)));
       const reversalApiInstance = configObject && new restApi.ReversalApi(configObject, apiClient);
       const startTime = new Date().getTime();
       return await new Promise<PtsV2PaymentsReversalsPost201Response>((resolve, reject) => {

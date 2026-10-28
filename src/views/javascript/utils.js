@@ -118,7 +118,6 @@ export function validateAmountValue(amount) {
 export const validateWhiteListEndPoints = (url) => {
   const whiteListEndpoints = [
     '/api/extension/payment/create',
-    '/api/extension/payment/update',
     '/api/extension/customer/update',
     '/netTokenNotification',
     '/captureContext',

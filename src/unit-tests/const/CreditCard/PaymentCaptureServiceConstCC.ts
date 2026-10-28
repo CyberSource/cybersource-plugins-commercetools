@@ -36,7 +36,6 @@ const payment = {
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "a1cc1516-02f1-4757-bed2-9cbb96e00b0f",
           "isv_token": "eyJraWQiOiIwOGVPREtiRHg3M3ZabkZpQ3ZTZk96WG1jSDVITmJwNCIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJGbGV4LzA3IiwiZXhwIjoxNzQxNzgzMzAxLCJ0eXBlIjoibWYtMi4xLjAiLCJpYXQiOjE3NDE3ODI0MDEsImp0aSI6IjFFMVlZNVZONzlBSExOWlU3NTlVOTNMRjlBU0dTS0ZITTVZVVAxNElGU05TQTVTT1ExUFQ2N0QxODEwNTdCMzEiLCJjb250ZW50Ijp7InBheW1lbnRJbmZvcm1hdGlvbiI6eyJjYXJkIjp7ImV4cGlyYXRpb25ZZWFyIjp7InZhbHVlIjoiMjAyOSJ9LCJudW1iZXIiOnsiZGV0ZWN0ZWRDYXJkVHlwZXMiOlsiMDAxIl0sIm1hc2tlZFZhbHVlIjoiWFhYWFhYWFhYWFhYMTExMSIsImJpbiI6IjQxMTExMSJ9LCJzZWN1cml0eUNvZGUiOnt9LCJleHBpcmF0aW9uTW9udGgiOnsidmFsdWUiOiIwMSJ9fX19fQ.okEtmQPQ-WcKSoAzAKgTop9opY1ykgx8fvOdfrzCZ_1fNThsufjcqrGOFMpt2e2dW-q6z-sBKgiaJK0-D1gdUKdlJ1SccZVn7pykjlrih_UsDaQQvPB9e67oqV44XwWfRWfrFZSlQJtPhPcQVCM13JkAfgKnY4HR4x3vCuZ4JuSd_0lI27oRaeiPu1ONCsM2twi2QODmO8lfzHiEzI4mGqwA_QX1pqhntrXNvH-vCEM6i3EZkrc2plNnQvmLGgecKP9-cIC5y_3b1m0i_3N1S-vuMAues8rsVnJwAik8BXHQt9vmQShIv-Ccy5uQEMKSwnSoYnF6XR2ARFor7ARoSQ",
           "isv_saleEnabled": false,
           "isv_shippingMethod": "SINGLE",

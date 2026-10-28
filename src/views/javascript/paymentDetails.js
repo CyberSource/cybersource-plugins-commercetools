@@ -1,6 +1,118 @@
 import { amountConversion, roundOff, getPaymentId, formatCurrency, createTableRow, createAndSetAttributes, validatePaymentId, sanitizeResponseData, getApiPath, validateAmountValue } from './utils.js';
 
-if (window.location.pathname.includes('paymentDetails')) {
+
+function resolveBackOfficePaymentMethodDisplay(payments) {
+  const method = String(payments?.paymentMethodInfo?.method || '').trim();
+  const name = String(payments?.paymentMethodInfo?.name?.en || '').trim();
+  const customFields = payments?.custom?.fields || {};
+
+  const cardType = String(customFields?.isv_cardType || '').trim().toUpperCase();
+  const status = String(customFields?.isv_authorizationStatus || '').trim().toUpperCase();
+
+  const methodCode = [method, name, cardType].join('|').toUpperCase();
+
+  if (methodCode.includes('MLTBT') || methodCode.includes('MULTIBANCO')) {
+    return { method: 'multibanco', name: 'MultiBanco' };
+  }
+
+  if (methodCode.includes('IDLPP') || methodCode.includes('IDEAL')) {
+    return { method: 'ideal', name: 'Ideal' };
+  }
+
+  if (status === 'SETTLE_INITIATED') {
+    return { method: 'tinkPayByBank', name: 'Tink' };
+  }
+
+  return {
+    method: method || '',
+    name: name || '',
+  };
+}
+
+function getOrderManagementPermissions(paymentMethod, cybersourceStatus, transactionType, refundExists, summary, authorizedAmount, captureAmount) {
+  const normalizedMethod = String(paymentMethod || '').trim().toLowerCase();
+  const normalizedStatus = String(cybersourceStatus || '').trim().toUpperCase();
+  const normalizedTransactionType = String(transactionType || '').trim();
+
+  const isApmRefreshMethod = ['ideal', 'multibanco', 'tink'].some((method) => normalizedMethod.includes(method));
+  const refreshAllowedStatuses = ['PENDING', 'SETTLE_INITIATED', 'FAILED', 'DECLINED'];
+  const allowRefreshStatus =
+    isApmRefreshMethod &&
+    refreshAllowedStatuses.includes(normalizedStatus) &&
+    !summary.authReversalPresent &&
+    !refundExists &&
+    normalizedTransactionType !== 'CancelAuthorization';
+
+  const blockOmActionsUntilRefresh = allowRefreshStatus;
+
+  const allowCaptureForm =
+    summary.authPresent &&
+    !summary.authReversalPresent &&
+    (!summary.refundPresent || (summary.refundPresent && authorizedAmount)) &&
+    ((summary.capturePresent && authorizedAmount) || (!summary.capturePresent && authorizedAmount));
+
+  const allowReversal = summary.authPresent && !summary.capturePresent && !summary.authReversalPresent && !summary.refundPresent;
+
+  const allowRefundForm =
+    (summary.capturePresent && !summary.authReversalPresent && summary.refundPresent && captureAmount) ||
+    (!summary.refundPresent && summary.capturePresent);
+
+  return {
+    allowCaptureForm: !blockOmActionsUntilRefresh && allowCaptureForm,
+    allowReversal: !blockOmActionsUntilRefresh && allowReversal,
+    allowRefundForm: !blockOmActionsUntilRefresh && allowRefundForm,
+    allowRefreshStatus,
+  };
+}
+
+export function filterTransactionsForDisplay(transactions, logger = console.debug) {
+  if (!Array.isArray(transactions) || !transactions.length) {
+    return [];
+  }
+
+  const normalizedTransactions = transactions.filter((transaction) => transaction && typeof transaction === 'object');
+
+  return normalizedTransactions.filter((transaction) => {
+    const transactionType = String(transaction?.type || transaction?.transactionType || '').trim();
+    const transactionState = String(transaction?.state || transaction?.status || '').trim();
+    const interactionId = String(transaction?.interactionId || '').trim();
+
+    const isAuthorization = transactionType === 'Authorization';
+    if (!isAuthorization) {
+      return true;
+    }
+
+    if (!interactionId || !transactionState) {
+      return true;
+    }
+
+    const hasMatchingSuccessfulCharge = normalizedTransactions.some((otherTransaction) => {
+      const otherType = String(otherTransaction?.type || otherTransaction?.transactionType || '').trim();
+      const otherInteractionId = String(otherTransaction?.interactionId || '').trim();
+      const otherState = String(otherTransaction?.state || otherTransaction?.status || '').trim();
+
+      return (
+        otherType === 'Charge' &&
+        !!otherInteractionId &&
+        otherInteractionId === interactionId &&
+        otherState === 'Success'
+      );
+    });
+
+    if (hasMatchingSuccessfulCharge) {
+      logger(
+        '[paymentDetails] Hiding Authorization row from display because a successful Charge row shares interactionId=' +
+          interactionId
+      );
+      return false;
+    }
+
+    return true;
+  });
+}
+
+
+if (typeof window !== 'undefined' && window.location.pathname.includes('paymentDetails')) {
   document.addEventListener('DOMContentLoaded', async function () {
     let authPresent = false;
     let capturePresent = false;
@@ -44,23 +156,37 @@ if (window.location.pathname.includes('paymentDetails')) {
       const paymentDetailsTableBody = document.getElementById('paymentDetailsTable').getElementsByTagName('tbody')[0];
 
       if (payments?.paymentMethodInfo && paymentDetailsTableBody) {
+        
+        const mappedDisplay = resolveBackOfficePaymentMethodDisplay(payments);
+        
         createTableRow(paymentDetailsTableBody, [
-          payments.paymentMethodInfo?.name.en || '',
-          payments.paymentMethodInfo?.method || '',
+          
+          mappedDisplay.name,
+          mappedDisplay.method,
+          
           payments.paymentMethodInfo?.paymentInterface || '',
           `${payments?.amountPlanned?.currencyCode} ${amountConversion(payments.amountPlanned.centAmount, fractionDigits)}`,
         ]);
       }
 
+      const transactions = Array.isArray(payments?.transactions) ? payments.transactions : [];
+      const displayTransactions = filterTransactionsForDisplay(transactions);
+
       const paymentTransactionBody = document.getElementById('paymentTransactions').getElementsByTagName('tbody')[0];
-      if (payments?.transactions && 0 < payments?.transactions.length && paymentTransactionBody) {
-        payments.transactions.forEach((transaction) => {
-          createTableRow(paymentTransactionBody, [transaction.type || '', transaction.state || '', `${transaction.amount.currencyCode} ` + `${amountConversion(transaction.amount.centAmount, fractionDigits)}` || '', transaction.interactionId || 0, transaction.id || '']);
+      if (displayTransactions.length && paymentTransactionBody) {
+        displayTransactions.forEach((transaction) => {
+          const amountCurrency = transaction?.amount?.currencyCode || '';
+          const amountCent = transaction?.amount?.centAmount;
+          const amountDisplay =
+            typeof amountCent === 'number'
+              ? `${amountCurrency} ${amountConversion(amountCent, fractionDigits)}`
+              : '';
+
+          createTableRow(paymentTransactionBody, [transaction?.type || '', transaction?.state || '', amountDisplay, transaction?.interactionId || 0, transaction?.id || '']);
         });
       }
 
-      const transactions = payments.transactions;
-      transactions.forEach((element) => {
+      displayTransactions.forEach((element) => {
         if ('Authorization' === element.type && 'Success' === element.state) {
           authPresent = true;
         }
@@ -83,13 +209,34 @@ if (window.location.pathname.includes('paymentDetails')) {
        const authorizedAmount = authorizedAmountValue > 0 ? String(authorizedAmountValue) : '';
 
       const captureAmount = validateAmountValue(paymentsData?.captureAmount);
+      
+      const omMappedDisplay = resolveBackOfficePaymentMethodDisplay(payments);
+      const summary = {
+        authPresent,
+        capturePresent,
+        authReversalPresent,
+        refundPresent,
+      };
+      const latestTransactionType = Array.isArray(transactions) && transactions.length
+        ? String(transactions[transactions.length - 1]?.type || '')
+        : '';
+      const permissions = getOrderManagementPermissions(
+        omMappedDisplay.method || payments?.paymentMethodInfo?.method,
+        payments?.custom?.fields?.isv_authorizationStatus,
+        latestTransactionType,
+        refundPresent,
+        summary,
+        authorizedAmount,
+        captureAmount,
+      );
+      
 
-      if (authPresent && !authReversalPresent && (!refundPresent || (refundPresent && authorizedAmount)) && ((capturePresent && authorizedAmount) || (!capturePresent && authorizedAmount))) {
+      if (permissions.allowCaptureForm) {
         const captureMsgDiv = document.createElement('div');
         captureMsgDiv.classList.add('div-padding');
-        /* START GENAI */
+         
         captureMsgDiv.textContent = 'Capture is available. Enter the amount to capture:';
-        /* END GENAI */
+         
         const partialCaptureForm = document.createElement('form');
         partialCaptureForm.action = getApiPath('capture');
         partialCaptureForm.classList.add('div-padding');
@@ -98,7 +245,7 @@ if (window.location.pathname.includes('paymentDetails')) {
         buttonsDiv.appendChild(captureMsgDiv);
         buttonsDiv.appendChild(partialCaptureForm);
       }
-      if (authPresent && !capturePresent && !authReversalPresent && !refundPresent) {
+      if (permissions.allowReversal) {
         const authButton = document.createElement('a');
         authButton.classList.add('button');
         authButton.id = 'auth';
@@ -108,12 +255,12 @@ if (window.location.pathname.includes('paymentDetails')) {
 
         buttonsDiv.appendChild(authButton);
       }
-      if ((capturePresent && !authReversalPresent && refundPresent && captureAmount) || (!refundPresent && capturePresent)) {
+      if (permissions.allowRefundForm) {
         const refundMsgDiv = document.createElement('div');
         refundMsgDiv.classList.add('div-padding');
-        /* START GENAI */
+         
         refundMsgDiv.textContent = 'Refund is available. Enter the amount to refund:';
-        /* END GENAI */
+         
 
         const refundForm = document.createElement('form');
         refundForm.action = getApiPath('refund');
@@ -123,6 +270,17 @@ if (window.location.pathname.includes('paymentDetails')) {
         buttonsDiv.appendChild(refundMsgDiv);
         buttonsDiv.appendChild(refundForm);
       }
+      
+      if (permissions.allowRefreshStatus) {
+        const refreshButton = document.createElement('a');
+        refreshButton.classList.add('button');
+        refreshButton.id = 'refreshStatus';
+        refreshButton.href = getApiPath(`refreshStatus?id=${encodeURIComponent(id)}`);
+        refreshButton.role = 'button';
+        refreshButton.textContent = 'Refresh Status';
+        buttonsDiv.appendChild(refreshButton);
+      }
+      
       const captureMsg = document.createElement('div');
       captureMsg.id = 'captureMsg';
       captureMsg.textContent = paymentsData?.captureErrorMessage || '';
@@ -142,6 +300,9 @@ if (window.location.pathname.includes('paymentDetails')) {
       let captureAmountValue = document.getElementById('captureAmount');
       let refundAmount = document.getElementById('refundAmount');
       let auth = document.getElementById('auth');
+      
+      let refreshStatus = document.getElementById('refreshStatus');
+      
       if (captureAmountValue) {
         captureAmountValue.addEventListener('input', function () {
           validateAmountWithRegex('captureAmount', 'captureButton', 'captureMsg');
@@ -165,6 +326,11 @@ if (window.location.pathname.includes('paymentDetails')) {
       if (auth) {
         auth.addEventListener('click', showLoadingDiv);
       }
+      
+      if (refreshStatus) {
+        refreshStatus.addEventListener('click', showLoadingDiv);
+      }
+      
     }
   });
 }
@@ -288,29 +454,37 @@ function createRow(label, value) {
  * @param {string} orderNo - The order number.
  * @returns {string} The HTML string representing the custom fields table.
  */
+
+
 function createCustomFieldsTable(payments, orderNo) {
   if (payments?.custom?.fields) {
     const fields = payments.custom.fields;
     let tableHTML = "<table class='paymentTableBelow'>";
     if (fields.isv_token) {
-      tableHTML += createRow('Token', fields.isv_token).outerHTML;
-      if (fields.isv_tokenVerificationContext) {
-        tableHTML += createRow('Token Verification Context', fields.isv_tokenVerificationContext).outerHTML;
-      }
-    } else if ('eCheck' === payments.paymentMethodInfo.method) {
-      if (fields.isv_accountNumber) {
+    tableHTML += createRow('Token', fields.isv_token).outerHTML;
+}
+
+if (payments.paymentMethodInfo.method === 'eCheck') {
+    if (fields.isv_accountNumber) {
         tableHTML += createRow('Account Number', fields.isv_accountNumber).outerHTML;
-      }
-      if (fields.isv_routingNumber) {
+    }
+
+    if (fields.isv_routingNumber) {
         tableHTML += createRow('Routing Number', fields.isv_routingNumber).outerHTML;
-      }
-      if (fields.isv_accountType) {
-        const accountType = fields.isv_accountType === 'C' ? 'Checking' : fields.isv_accountType === 'S' ? 'Savings' : fields.isv_accountType === 'X' ? 'Corporate Checking' : '';
-        tableHTML += createRow('Account Type', accountType).outerHTML;
-      }
-    } else if (fields.isv_transientToken) {
-      tableHTML += createRow('Transient Token', fields.isv_transientToken).outerHTML;
-    } else {
+    }
+
+    if (fields.isv_accountType) {
+        tableHTML += createRow('Account Type', fields.isv_accountType).outerHTML;
+    }
+}
+
+if (fields.isv_transientToken) {
+    tableHTML += createRow(
+        'Transient Token',
+        fields.isv_transientToken
+    ).outerHTML;
+}
+    else {
       if (fields.isv_tokenAlias) {
         tableHTML += createRow('Token Alias', fields.isv_tokenAlias).outerHTML;
       }
@@ -339,6 +513,26 @@ function createCustomFieldsTable(payments, orderNo) {
     if (fields?.isv_responseCode) {
       tableHTML += createRow('Response Code', fields.isv_responseCode).outerHTML;
     }
+    
+    if (fields?.isv_approvalCode) {
+      const approvalCodeRow = createRow('Approval Code', fields.isv_approvalCode);
+      if (approvalCodeRow) {
+        tableHTML += approvalCodeRow.outerHTML;
+      }
+    }
+    if (fields?.isv_clientReferenceCode) {
+      const clientRefCodeRow = createRow('Client Reference Code', fields.isv_clientReferenceCode);
+      if (clientRefCodeRow) {
+        tableHTML += clientRefCodeRow.outerHTML;
+      }
+    }
+    if (fields?.isv_processorTransactionId) {
+      const processorTxIdRow = createRow('Processor Transaction ID', fields.isv_processorTransactionId);
+      if (processorTxIdRow) {
+        tableHTML += processorTxIdRow.outerHTML;
+      }
+    }
+    
     if (orderNo) {
       tableHTML += createRow('Reconciliation Id', orderNo).outerHTML;
     }
@@ -352,6 +546,8 @@ function createCustomFieldsTable(payments, orderNo) {
     return tableHTML;
   }
 }
+
+
 
 /**
  * Renders custom payment fields in the specified HTML element.

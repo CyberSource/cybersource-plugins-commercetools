@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { Constants } from '../../../../constants/paymentConstants'
 import paymentCustomJson from '../../../../resources/isv_payment_data_type.json';
-import paymentUpdateJson from '../../../../resources/payment_update_extension.json';
 import commercetoolsApi from '../../../../utils/api/CommercetoolsApi';
 import unit from '../../../JSON/unit.json';
 import CommercetoolsApiConst from '../../../const/CommercetoolsApiConst';
@@ -616,22 +615,6 @@ test.serial('add custom types with empty object', async (t) => {
   }
 });
 
-test.serial('add extensions', async (t) => {
-  try {
-    let result = await commercetoolsApi.addExtensions(paymentUpdateJson as any);
-    if (result) {
-      if (201 !== parseInt(result.statusCode)) {
-        t.is(result.statusCode, 201);
-      } else {
-        t.not(result.statusCode, 201);
-      }
-    } else {
-      t.pass();
-    }
-  } catch (error) {
-    t.pass();
-  }
-});
 
 test.serial('add extensions with empty object', async (t) => {
   try {

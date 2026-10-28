@@ -24,9 +24,7 @@ const getCreateOrderResponse = async (payment: Payment, requestId: string, accou
       processingInformation: processingInformation,
       orderInformation: orderInformation
     };
-    if (paymentUtils.toBoolean(process.env.PAYMENT_GATEWAY_ENABLE_DEBUG)) {
-      paymentUtils.logData(__filename, FunctionConstant.FUNC_CREATE_ORDER_RESPONSE, Constants.LOG_DEBUG, 'RequestId : ' + requestId, 'Create Order Request = ' + JSON.stringify(requestObj));
-    }
+    paymentUtils.logData(__filename, FunctionConstant.FUNC_CREATE_ORDER_RESPONSE, Constants.LOG_DEBUG, 'RequestId : ' + requestId, 'Create Order Request = ' + JSON.stringify(requestObj));
     const paymentApiInstance = configObject && new restApi.PaymentsApi(await configObject, apiClient);
     const startTime = new Date().getTime();
     return await new Promise<Partial<ResponseType>>(function (resolve, reject) {

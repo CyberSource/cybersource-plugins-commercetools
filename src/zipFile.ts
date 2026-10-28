@@ -1,7 +1,6 @@
 import DirArchiver from 'dir-archiver';
 
 import { FunctionConstant } from './constants/functionConstant';
-import { Constants } from './constants/paymentConstants';
 import { errorHandler, SystemError } from './utils/ErrorHandler';
 
 /**
@@ -12,7 +11,7 @@ const setupZipFile = async (): Promise<boolean> => {
   let isZipCompleted = false;
   try {
     const excludes = ['.slsignore', '.serverless'];
-    const archive = new DirArchiver('', 'ctExtension.zip', Constants.STRING_FALSE, excludes);
+    const archive = new DirArchiver('', 'ctExtension.zip', false, excludes);
     archive.createZip();
     isZipCompleted = true;
   } catch (error) {

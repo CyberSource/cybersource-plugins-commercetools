@@ -26,7 +26,7 @@ test.serial('Map payment information for credit card authorization', async (t) =
 
     if (Object.keys(result).length) {
       t.is(result.customer.id, PaymentAuthorizationServiceConstCC.cardTokens.customerTokenId);
-      t.is(result.card.typeSelectionIndicator, 1);
+      t.false(Object.prototype.hasOwnProperty.call(result.card, 'typeSelectionIndicator'));
     } else {
       t.fail(`Unexpected error: information for credit card authorization' ${result}`);
     }
@@ -86,7 +86,7 @@ test.serial('Map payment information for add token', async (t) => {
 
     if (Object.keys(result).length) {
       t.is(result.customer.id, PaymentAuthorizationServiceConstCC.cardTokens.customerTokenId);
-      t.is(result.card.typeSelectionIndicator, 1);
+      t.false(Object.prototype.hasOwnProperty.call(result.card, 'typeSelectionIndicator'));
     } else {
       t.fail(`Unexpected error: information for add token' ${result}`);
     }
@@ -119,19 +119,22 @@ test.serial('Map payment information for payer auth set up', async (t) => {
 
 test.serial('Map payment information for credit card authorization with saved card', async (t) => {
   try {
+     
     const result = paymentInformationInstance.mapPaymentInformation(
       FunctionConstant.FUNC_GET_AUTHORIZATION_RESPONSE,
       PaymentAuthorizationServiceConstCC.payments as any,
       PaymentAuthorizationServiceConstCC.cardTokens,
-      PaymentAuthorizationServiceConstCC.cardTokens.customerTokenId,
+      null,
     );
 
     if (Object.keys(result).length) {
-      t.is(result.customer.id, PaymentAuthorizationServiceConstCC.cardTokens.customerTokenId);
+      t.falsy(result.customer);
       t.is(result.paymentInstrument.id, PaymentAuthorizationServiceConstCC.cardTokens.paymentInstrumentId);
+      t.is(result.instrumentIdentifier.id, PaymentAuthorizationServiceConstCC.cardTokens.instrumentIdentifier);
     } else {
       t.fail(`Unexpected error: information for credit card authorization with saved card' ${result}`);
     }
+     
   } catch (error) {
     t.fail(`Caught an error during execution: ${error instanceof Error ? error.message : String(error)}`);
   }

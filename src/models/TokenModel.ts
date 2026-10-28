@@ -30,7 +30,6 @@ export class Token {
      * @param {any} address - The address associated with the token.
      */
     constructor(customFields: Partial<CustomerCustomType>, customerTokenId: string | undefined, paymentToken: string | undefined, instrumentIdentifier: string | undefined, addressId: string | undefined, address: any) {
-        paymentValidator.setObjectValue(this, 'alias', customFields, 'isv_tokenAlias', Constants.STR_STRING, false);
         paymentValidator.setObjectValue(this, 'value', customerTokenId, '', Constants.STR_STRING, false);
         paymentValidator.setObjectValue(this, 'paymentToken', paymentToken, '', Constants.STR_STRING, false);
         paymentValidator.setObjectValue(this, 'instrumentIdentifier', instrumentIdentifier, '', Constants.STR_STRING, false);

@@ -1,5 +1,6 @@
 # Deploying Docker Containers on AWS Elastic Container Service(ECS)
-The Docker Compose CLI enables developers to use native Docker commands to run applications in Amazon Elastic Container Service (ECS) when building cloud-native applications. Using docker compose, the Cybersource-Commercetools Extension can be deployed into the AWS easily. For this, docker image of the extension has to be built and same needs to be pushed into the AWS Elastic Container Registry.
+
+The Docker Compose CLI enables developers to use native Docker commands to run applications in Amazon Elastic Container Service (ECS) when building cloud-native applications. Using docker compose, the Visa Acceptance Solutions-Commercetools Extension can be deployed into the AWS easily. For this, docker image of the extension has to be built and same needs to be pushed into the AWS Elastic Container Registry.
 
 ## Pre-Requisites
 
@@ -11,11 +12,11 @@ To deploy Docker containers on ECS, you must meet the following requirements:
 
 3. Download and install the latest version of AWS CLI
 
-4. AWS Security Credentials 
+4. AWS Security Credentials
 
 ## Creation of AWS Security Credentials
- 
-  To generate AWS Security Credentials, Refer [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials)
+
+To generate AWS Security Credentials, Refer [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials)
 
 ## Run an application on ECS
 
@@ -25,9 +26,7 @@ If you are using IAM user, ensure that the user has all the required permissions
 ### Configure AWS CLI
  
  To configure AWS CLI, use the following command
-     
     aws configure
-   
   The above command will give you options like:
 
     AWS Access Key ID : <Access Key Id>
@@ -35,12 +34,12 @@ If you are using IAM user, ensure that the user has all the required permissions
     Default region name : <region>
     Default output format : text
 
-  For `Access Key Id` and `Secret Key`, use value returned by [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials), for `region`, use aws region which is convenient.
+For `Access Key Id` and `Secret Key`, use value returned by [AWS-Security-Credentials](AWS-Serverless-Deployment.md#aws-security-credentials), for `region`, use aws region which is convenient.
 
 ### Create AWS Context
 
 Run the below command to create an Amazon ECS Docker context 
-   
+
       docker context create ecs <contextName>
 
 where `contextName` is the name of your context
@@ -54,9 +53,11 @@ Follow the below steps to deploy docker image into AWS ECR by using AWS CLI
    **_NOTE:_** Make sure to use same region for following steps
 
   ### Step 1: Build a Docker image
+
    To build a Docker image, Refer [Building-the Docker-image](Docker.md#building-the-docker-image)
-  
+
   ### Step 2: Authenticate the Docker CLI to your default registry
+
    By doing Authentication, the docker command can push and pull images with Amazon ECR. The AWS CLI provides a get-login-password command to simplify the authentication process. To authenticate the Docker CLI to default registry, use the following command:
 
      aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
@@ -64,9 +65,9 @@ Follow the below steps to deploy docker image into AWS ECR by using AWS CLI
    **_NOTE:_** Make sure Docker is running before executing the above command
 
  ### Step 3: Create a Repository
-  
+
   To create a Repository in AWS ECR, use the following command:
-    
+
      aws ecr create-repository --repository-name <repositoryName> --region <region>
 
    where `repositoryName` is the name of your choice and it should start with a letter and can only contain lowercase letters, numbers, hyphens, underscores and forward slashes. Use of double hyphen, underscore or forward slash isn't supported.
@@ -76,9 +77,9 @@ Follow the below steps to deploy docker image into AWS ECR by using AWS CLI
   To push the image into ECR, first tag the image to push into your repository by using the following command:
 
     docker tag <imageName>:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/<repositoryName>
-    
+
  Once the image is tagged, push the image using the following command:
-  
+
     docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/<repositoryName>
 
 ### Step 5: Creation of Task Definitions
@@ -103,7 +104,7 @@ Services are higher-level abstractions that manage the desired state of your tas
 
 To Create it, navigate to your cluster and click on `Create`
 
-Under `Deployment configuration`, for `Family`, choose your task definition. For `Revision`, choose the latest revision  and enter `Service name`.
+Under `Deployment configuration`, for `Family`, choose your task definition. For `Revision`, choose the latest revision and enter `Service name`.
 
 Under `Networking`, choose your VPC and add subnets. For `Security group`, use existing security groups or create a new one.
 
@@ -131,9 +132,7 @@ Otherwise, use LoadBalancer DNS name followed by port number.
 
     Example: <DNSname>:<port number>/xxx  
 
-
 DNS name will available in AWS console under respective LoadBalancer details in LoadBalancer service and it will be in the following format
-    
      <LoadBalancerName>-<Some-randomly-generated-Id>.elb.<region>.amazonaws.com
 
 ## Loggers in AWS Cloudwatch
@@ -143,6 +142,7 @@ You can see all your logs in AWS Cloudwatch, for that you need to perform below 
 - Before you could create the image of the extension, the `logData` function in PaymentUtils.ts file and the `logError` function in ErrorHandler.ts should be updated with console.log statements, which will log the extension logs properly
 
 ## Troubleshoot
+
  - When using `docker compose up` command, if you get the following error `pulling from host <accountId>.dkr.ecr.<region>.amazonaws.com failed with status code [manifests latest]: 403 Forbidden`, it means that authentication is expired. Refer [Authenticate-to-default-registry](#step-2-authenticate-the-docker-cli-to-your-default-registry) to authenticate again.
 
  - It's better to use `PowerShell` if any of the above commands are not working or not retrieving the data in cmd terminal.

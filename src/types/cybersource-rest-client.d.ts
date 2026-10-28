@@ -2,6 +2,9 @@
 declare module "cybersource-rest-client" {
   export interface MerchantConfig {
     authenticationType: string;
+
+    jwtKeyType?: string;
+
     runEnvironment: string;
 
     merchantID: string;
@@ -19,6 +22,13 @@ declare module "cybersource-rest-client" {
       logFileMaxSize?: string;
     };
     useMLEGlobally?: boolean;
+    enableRequestMLEForOptionalApisGlobally?: boolean;
+    mleForRequestPublicCertPath?: string;
+    requestMleKeyAlias?: string;
+    mapToControlMLEonAPI?: Record<string, string | boolean>;
+    enableResponseMleGlobally?: boolean;
+    responseMlePrivateKeyFilePath?: string;
+    responseMlePrivateKeyFilePassword?: string;
   }
 
   export class ApiClient {
@@ -495,10 +505,10 @@ declare module "cybersource-rest-client" {
     targetOrigins?: Array<string>;
     allowedCardNetworks?: Array<string>;
     clientVersion?: string;
-    transientTokenResponseOptions?:transientTokenResponseOptions;
+    transientTokenResponseOptions?: transientTokenResponseOptions;
   }
 
-   export interface transientTokenResponseOptions{
+  export interface transientTokenResponseOptions {
     // include card prefix 
     includeCardPrefix?: boolean;
   }
@@ -15007,7 +15017,7 @@ declare module "cybersource-rest-client" {
     captureMandate?: Upv1capturecontextsCaptureMandate;
     orderInformation?: Upv1capturecontextsOrderInformation;
     checkoutApiInitialization?: Upv1capturecontextsCheckoutApiInitialization;
-    transientTokenResponseOptions?:transientTokenResponseOptions;
+    transientTokenResponseOptions?: transientTokenResponseOptions;
   }
   export interface Upv1capturecontextsCheckoutApiInitialization {
     profileId?: string;
@@ -15226,6 +15236,11 @@ declare module "cybersource-rest-client" {
      * Show the list of accepted payment icons in the payment button
      */
     showAcceptedNetworkIcons?: boolean;
+    /**
+     *  * Show the "Save my information for future purchases" checkbox in UC.
+     */
+    requestSaveCredentials?: boolean;
+
   }
   export class UserManagementApi {
     config: MerchantConfig;
@@ -15362,6 +15377,16 @@ declare module "cybersource-rest-client" {
       callback?: any,
     ): PtsV2PaymentsVoidsPost201Response;
   }
+
+
+  export class UnifiedCheckoutV1CaptureContextApi {
+    constructor(configObject?: MerchantConfig, apiClient?: ApiClient);
+    generateUnifiedCheckoutV1CaptureContext(
+      requestObj: Record<string, any>,
+      callback: (error: any, data: any, response: any) => void,
+    ): void;
+  }
+
 }
 
 

@@ -34,7 +34,6 @@ const payment = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: '8a031d45-3893-4ba3-9b8f-7f406c3e085f',
       isv_accountNumber: eCheck.accountNumber,
       isv_acceptHeader: '*/*',
       isv_accountType: 'C',
@@ -98,7 +97,6 @@ const paymentObject = {
       id: '87b9d9db-74a3-45d7-8e60-dde669866808',
     },
     fields: {
-      isv_deviceFingerprintId: '8a031d45-3893-4ba3-9b8f-7f406c3e085f',
       isv_accountNumber: eCheck.accountNumber,
       isv_acceptHeader: '*/*',
       isv_accountType: 'C',

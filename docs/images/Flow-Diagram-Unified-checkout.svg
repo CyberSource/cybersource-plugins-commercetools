@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050" role="img" aria-labelledby="title description">
+  <title id="title">Unified Checkout payment flow</title>
+  <desc id="description">Sequence diagram showing the shopper, frontend, Commercetools, extension, and Visa Acceptance Solutions during synchronous payment processing and asynchronous webhook enrichment.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#333" />
+    </marker>
+    <style>
+      .lane { fill: #fff2cc; stroke: #d6b656; stroke-width: 1; }
+      .lane-label { fill: #222; font: 600 14px Arial, sans-serif; text-anchor: middle; }
+      .lifeline { fill: #d9d9d9; stroke: #777; stroke-width: 1; }
+      .message { stroke: #333; stroke-width: 1.5; marker-end: url(#arrow); }
+      .message-label { fill: #222; font: 12px Arial, sans-serif; text-anchor: middle; }
+      .section { fill: #fff2cc; stroke: #d6b656; stroke-width: 1; }
+      .section-label { fill: #222; font: 600 13px Arial, sans-serif; text-anchor: middle; }
+      .divider { stroke: #d6b656; stroke-width: 1; }
+      .background { fill: #fff; }
+    </style>
+  </defs>
+
+  <rect class="background" x="0" y="0" width="1200" height="1050" />
+
+  <!-- Participants -->
+  <rect class="lane" x="45" y="28" width="150" height="38" />
+  <text class="lane-label" x="120" y="52">Shopper</text>
+  <rect class="lane" x="270" y="28" width="150" height="38" />
+  <text class="lane-label" x="345" y="52">Frontend</text>
+  <rect class="lane" x="495" y="28" width="150" height="38" />
+  <text class="lane-label" x="570" y="52">Commercetools</text>
+  <rect class="lane" x="720" y="28" width="150" height="38" />
+  <text class="lane-label" x="795" y="52">Extension</text>
+  <rect class="lane" x="945" y="28" width="190" height="38" />
+  <text class="lane-label" x="1040" y="52">Visa Acceptance Solutions</text>
+
+  <rect class="lifeline" x="113" y="66" width="14" height="952" />
+  <rect class="lifeline" x="338" y="66" width="14" height="952" />
+  <rect class="lifeline" x="563" y="66" width="14" height="952" />
+  <rect class="lifeline" x="788" y="66" width="14" height="952" />
+  <rect class="lifeline" x="1033" y="66" width="14" height="952" />
+
+  <!-- Synchronous flow -->
+  <text class="message-label" x="600" y="92">Synchronous payment processing</text>
+
+  <line class="message" x1="120" y1="120" x2="345" y2="120" />
+  <text class="message-label" x="232" y="113">Enter billing / shipping addresses</text>
+
+  <line class="message" x1="345" y1="155" x2="570" y2="155" />
+  <text class="message-label" x="457" y="148">Update cart</text>
+
+  <line class="message" x1="570" y1="190" x2="345" y2="190" />
+  <text class="message-label" x="457" y="183">Updated cart resource</text>
+
+  <line class="message" x1="345" y1="225" x2="795" y2="225" />
+  <text class="message-label" x="570" y="218">Request capture context<br />{baseUrl}/captureContext</text>
+
+  <line class="message" x1="795" y1="260" x2="1040" y2="260" />
+  <text class="message-label" x="917" y="253">Generate capture context</text>
+
+  <line class="message" x1="1040" y1="300" x2="795" y2="300" />
+  <text class="message-label" x="917" y="293">captureContextData (JWT), client library<br />and integrity hash</text>
+
+  <line class="message" x1="795" y1="345" x2="345" y2="345" />
+  <text class="message-label" x="570" y="338">Capture context response</text>
+
+  <line class="message" x1="345" y1="390" x2="120" y2="390" />
+  <text class="message-label" x="232" y="383">Display Unified Checkout widget<br />(autoProcessing: false)</text>
+
+  <line class="message" x1="120" y1="450" x2="1040" y2="450" />
+  <text class="message-label" x="580" y="443">Enter payment details / select saved payment method and submit</text>
+
+  <text class="message-label" x="1080" y="485" text-anchor="start">Tokenize payment and<br />&#160;return completion token</text>
+
+  <line class="message" x1="1040" y1="535" x2="345" y2="535" />
+  <text class="message-label" x="692" y="528">Completion token (JWT),<br />token information, payment result</text>
+
+  <text class="message-label" x="232" y="575">Decode completion JWT<br />and check SCA requirement</text>
+
+  <line class="message" x1="345" y1="620" x2="570" y2="620" />
+  <text class="message-label" x="457" y="613">Create payment</text>
+
+  <line class="message" x1="570" y1="660" x2="795" y2="660" />
+  <text class="message-label" x="682" y="653">API extension callback</text>
+
+  <line class="message" x1="795" y1="700" x2="570" y2="700" />
+  <text class="message-label" x="682" y="693">Updated resource with transaction details</text>
+
+  <line class="message" x1="570" y1="740" x2="345" y2="740" />
+  <text class="message-label" x="457" y="733">Created payment resource</text>
+
+  <line class="message" x1="345" y1="780" x2="570" y2="780" />
+  <text class="message-label" x="457" y="773">Add payment to cart</text>
+
+  <line class="message" x1="570" y1="820" x2="345" y2="820" />
+  <text class="message-label" x="457" y="813">Updated cart resource</text>
+
+  <line class="message" x1="345" y1="860" x2="120" y2="860" />
+  <text class="message-label" x="232" y="853">Display order confirmation</text>
+
+  <!-- Asynchronous flow -->
+  <line class="divider" x1="25" y1="900" x2="1175" y2="900" />
+  <rect class="section" x="455" y="886" width="290" height="28" />
+  <text class="section-label" x="600" y="905">Asynchronous (webhook enrichment)</text>
+
+  <line class="message" x1="1040" y1="940" x2="795" y2="940" />
+  <text class="message-label" x="917" y="933">Webhook: transaction results</text>
+
+  <line class="message" x1="795" y1="975" x2="1040" y2="975" />
+  <text class="message-label" x="917" y="968">TMS lookup if details are incomplete:<br />instrument identifier, payment instrument, transaction details</text>
+
+  <line class="message" x1="1040" y1="1010" x2="795" y2="1010" />
+  <text class="message-label" x="917" y="1003">Card details and token information</text>
+
+</svg>

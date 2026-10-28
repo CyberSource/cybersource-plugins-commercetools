@@ -1,6 +1,5 @@
 import { Cart, Payment, Transaction } from "@commercetools/platform-sdk";
 import { PtsV2PaymentsCapturesPost201Response, PtsV2PaymentsReversalsPost201Response } from "cybersource-rest-client";
-
 import { Constants } from "../../constants/paymentConstants";
 import paymentAuthorizationReversal from "../../service/payment/PaymentAuthorizationReversal";
 import paymentRefund from "../../service/payment/PaymentRefundService";
@@ -8,7 +7,6 @@ import { ActionResponseType, ActionType, PaymentTransactionType } from "../../ty
 import paymentActions from "../PaymentActions";
 import paymentUtils from "../PaymentUtils";
 import paymentValidator from "../PaymentValidator";
-
 import paymentHelper from "./PaymentHelper";
 
 /**
@@ -26,7 +24,7 @@ const getOMServiceResponse = (paymentResponse: PtsV2PaymentsCapturesPost201Respo
     let setCustomType: Partial<ActionType> | null = null;
     let response = paymentUtils.getEmptyResponse();
     if (paymentResponse && transactionDetail) {
-        if (Constants.API_STATUS_PENDING === paymentResponse.status || Constants.API_STATUS_REVERSED === paymentResponse.status || Constants.API_STATUS_REFUNDED === paymentResponse.status || Constants.API_STATUS_SETTLED === paymentResponse.status || Constants.API_STATUS_AUTH_REVERSED === paymentResponse.status) {
+        if (Constants.API_STATUS_PENDING === paymentResponse.status || Constants.API_STATUS_REVERSED === paymentResponse.status || Constants.API_STATUS_REFUNDED === paymentResponse.status || Constants.API_STATUS_SETTLED === paymentResponse.status || Constants.API_STATUS_AUTH_REVERSED === paymentResponse.status || Constants.API_STATUS_COMPLETED === paymentResponse.status) {
             setCustomField = paymentUtils.changeState(transactionDetail, Constants.CT_TRANSACTION_STATE_SUCCESS);
             if (captureId && 0 <= pendingAmount) {
                 setCustomType = paymentHelper.setTransactionCustomType(captureId, pendingAmount);
@@ -60,9 +58,9 @@ const getCapturedAmount = (refundPaymentObj: Payment): number => {
             if (Constants.CT_TRANSACTION_TYPE_CHARGE === transaction.type) {
                 return true;
             }
-            /* START GENAI */
+
             return false;
-            /* END GENAI */
+
         });
         if (0 <= indexValue) {
             for (let transaction of refundTransaction) {
@@ -96,9 +94,9 @@ const getAuthorizedAmount = (capturePaymentObj: Payment): number => {
             if (Constants.CT_TRANSACTION_TYPE_AUTHORIZATION === transaction.type) {
                 return true;
             }
-            /* START GENAI */
+
             return false;
-            /* END GENAI */
+
         });
         if (0 <= indexValue) {
             const authorizedAmount = Number(captureTransaction[indexValue]?.amount?.centAmount);

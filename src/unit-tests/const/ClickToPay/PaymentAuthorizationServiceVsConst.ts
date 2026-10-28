@@ -42,7 +42,6 @@ const payment = {
       "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
     },
     "fields": {
-      "isv_deviceFingerprintId": "9140e812-1788-4ea9-a7e7-d59523ada055",
       "isv_merchantId": "chtest",
       "isv_token": clickToPay.isv_token,
       "isv_saleEnabled": false,
@@ -98,7 +97,6 @@ const guestPayment = {
           "id": "28bba466-fc03-4801-a823-6c7e6e3586b0"
       },
       "fields": {
-          "isv_deviceFingerprintId": "2b06fc7d-f575-4438-b543-b47f5a47b992",
           "isv_merchantId": "chtest",
           "isv_token": clickToPay.isv_token,
           "isv_saleEnabled": false,
@@ -150,7 +148,6 @@ const payments = {
   custom: {
     type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
     fields: {
-      isv_deviceFingerprintId: 'ac692e81-8ed7-4f85-b4c2-931057fb9b24',
       isv_token: '195403577059284',
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '171.76.13.221',
@@ -731,7 +728,6 @@ const ucPayment = {
     },
     fields: {
       isv_transientToken: clickToPay.isv_transientToken,
-      isv_deviceFingerprintId: 'a82beccd-0fc0-48f8-a84e-0151709df8c8',
       isv_saleEnabled: false,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '192.140.152.21',
@@ -795,7 +791,6 @@ const clickToPayPayment = {
   custom: {
     type: { typeId: 'type', id: '28701886-4e26-4cab-924e-9b0da3829f88' },
     fields: {
-      isv_deviceFingerprintId: '1ccd2043-4c08-4419-a629-bc32dc5f91eb',
       isv_token: clickToPay.isv_token,
       isv_acceptHeader: '*/*',
       isv_customerIpAddress: '171.76.13.221',

@@ -1,6 +1,6 @@
 # Deploying Extension as a Docker Image on Azure Container Instance(ACI)
 
-The Docker Azure Integration enables developers to use native Docker commands to run applications in Azure Container Instances (ACI) when building cloud-native applications. Using docker compose, the Cybersource-Commercetools Extension can be deployed into the Azure Container Instance easily. For this, the docker image of the extension has to built and the same has to be pushed into the Azure Container registry.
+The Docker Azure Integration enables developers to use native Docker commands to run applications in Azure Container Instances (ACI) when building cloud-native applications. Using docker compose, the Visa Acceptance Solutions-Commercetools Extension can be deployed into the Azure Container Instance easily. For this, the docker image of the extension has to built and the same has to be pushed into the Azure Container registry.
 
 ## Pre-Requisites
 
@@ -23,14 +23,13 @@ Leave the docker desktop as open/connected and navigate to the root directory of
 Run the following commands in your command prompt
 
 -  To login into your azure account, enter below command     
-        
         az login
 
 This will redirect you to Azure portal in web. Login to your active azure account with your credentials
 
 - In order to create a container registry, first you need to create a resource group. Use the following command to create a resource group.
 
-    	az group create --name <name of resource group> --location <any valid location>
+        az group create --name <name of resource group> --location <any valid location>
 
 e.g: az group create --name myResourceGroup --location eastus
 

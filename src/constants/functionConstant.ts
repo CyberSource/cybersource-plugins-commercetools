@@ -2,6 +2,7 @@ export abstract class FunctionConstant {
   //service functions
   static readonly FUNC_GET_ADD_TOKEN_RESPONSE = 'FuncGetAddTokenResponse';
   static readonly FUNC_GENERATE_CAPTURE_CONTEXT = 'FuncGenerateCaptureContext';
+  static readonly FUNC_CREATE_CHECKOUT_SESSION = 'FuncCreateCheckoutSession';
   static readonly FUNC_GET_TRANSACTION_SEARCH_RESPONSE = 'FuncGetTransactionSearchResponse';
   static readonly FUNC_GET_CREATE_WEBHOOK_SUBSCRIPTION_RESPONSE = 'FuncGetCreateWebhookSubscriptionResponse';
   static readonly FUNC_GET_CONVERSION_DETAILS = 'FuncGetConversionDetails';
@@ -13,6 +14,7 @@ export abstract class FunctionConstant {
   static readonly FUNC_GET_TRANSACTION_DATA = 'FuncGetTransactionData';
   static readonly FUNC_GET_TRANSIENT_TOKEN_DATA_RESPONSE = 'FuncGetTransientTokenDataResponse';
   static readonly FUNC_GET_WEBHOOK_SUBSCRIPTION_RESPONSE = 'FuncWebhookSubscriptionResponse';
+  static readonly FUNC_GET_SUBSCRIBED_PRODUCTS = 'FuncGetSubscribedProducts';
   static readonly FUNC_GET_KEY_GENERATION_RESPONSE = 'FuncGetKeyGenerationResponse';
   static readonly FUNC_GET_PAYER_AUTH_SETUP_DATA = 'FuncGetPayerAuthSetupData';
   static readonly FUNC_GET_AUTH_REVERSAL_RESPONSE = 'FuncGetAuthReversalResponse';
@@ -111,14 +113,12 @@ export abstract class FunctionConstant {
   static readonly FUNC_HANDLE_WEBHOOK_SUBSCRIPTION = 'FuncHandleWebhookSubscription';
   static readonly FUNC_CARD_DETAILS_ACTION = 'FuncCardDetailsAction';
   static readonly FUNC_HANDLE_ORDER_MANAGEMENT_AUTH_REVERSAL = 'FuncHandleOrderManagementAuthReverse';
-  static readonly FUNC_HANDLE_AUTHORIZATION = 'FunchandleAuthorization';
   static readonly FUNC_HANDLE_PAYER_AUTH_REVERSAL = 'FuncHandlePayerAuthReversal';
   static readonly FUNC_HANDLE_ORDER_MANAGEMENT_FOR_CHARGE = 'FuncHandleOrderManagementForCharge';
   static readonly FUNC_HANDLE_NETWORK_TOKEN = 'FuncHandleNetWorkToken';
   static readonly FUNC_GET_MID_CREDENTIALS = 'FuncGetMidCredentials';
   static readonly FUNC_GET_PAYMENT_RESPONSE = 'FuncGetPaymentResponse';
   static readonly FUNC_PROCESS_INVALID_CARD_RESPONSE = 'FuncProcessInvalidCardResponse';
-  static readonly FUNC_HANDLE_PAYMENT_AUTH = 'FuncHandlePaymentAuth';
   static readonly FUNC_TEST_API_CONNECTION = 'FuncTestApiConnection';
   static readonly FUNC_HANDLE_TEST_CONNECTION = 'FuncHandleTestConnection';
   static readonly FUNC_GET_MISSING_PAYMENT_DETAILS = 'FuncGetMissingPaymentDetails';
@@ -148,17 +148,20 @@ export abstract class FunctionConstant {
   static readonly FUNC_SET_OBJECT_VALUE = 'FuncSetObjectValue';
   static readonly FUNC_ADD_CUSTOM_TYPE = 'FuncAddCustomType';
   static readonly FUNC_SET_CERTIFICATE_CACHE = 'FuncSetCertificateCache';
+  static readonly FUNC_SET_PEM_CERTIFICATE_CACHE = 'FuncSetPemCertificateCache';
   static readonly FUNC_SET_MLE_CACHE = 'FuncSetMLECache';
   static readonly FUNC_SANITIZE_AND_VALIDATE_URL = 'FuncSanitizeAndValidateUrl';
   static readonly FUNC_INITIALIZE_COMMERCETOOLS_CLIENT = 'FuncInitializeCommercetoolsClient';
   static readonly FUNC_HANDLE_POST_AUTHORIZATION = 'FuncHandlePostAuthorization';
+  static readonly FUNC_GET_ORDER_MANAGEMENT_PERMISSIONS = 'FuncGetOrderManagementPermissions';
 
   //Controller Functions
   static readonly FUNC_PAYMENT_CREATE_API = 'FuncPaymentCreateApi';
-  static readonly FUNC_PAYMENT_UPDATE_API = 'FuncPaymentUpdateApi';
   static readonly FUNC_CUSTOMER_UPDATE_API = 'FuncCustomerUpdateApi';
   static readonly FUNC_PAYMENT_DETAILS_API = 'FuncPaymentDetailsApi';
   static readonly FUNC_CAPTURE_CONTEXT_API = 'FuncCaptureContextApi';
+  static readonly FUNC_CHECKOUT_SESSION_API = 'FuncCheckoutSessionApi';
+  static readonly FUNC_HANDLE_CHECKOUT_SESSION = 'FuncHandleCheckoutSession';
   static readonly FUNC_NOTIFICATION_API = 'FuncNotificationApi';
   static readonly FUNC_AUTHENTICATION = 'FuncAuthentication';
   static readonly FUNC_REQUEST_HANDLER = 'FuncRequestHandler';
@@ -174,4 +177,8 @@ export abstract class FunctionConstant {
   static readonly FUNC_CREATE_WEBHOOK_SUBSCRIPTION = 'FuncCreateWebhookSubscription';
   static readonly FUNC_ORDER_MANAGEMENT_API = 'FuncOrderManagementApi';
   static readonly FUNC_CREATE_ORDER = 'FunCreateOrderResponse';
+
+  static readonly FUNC_REFRESH_SAVED_TOKENS_API = 'FuncRefreshSavedTokensApi';
+  static readonly FUNC_HANDLE_REFRESH_SAVED_TOKENS = 'FuncHandleRefreshSavedTokens';
+
 }

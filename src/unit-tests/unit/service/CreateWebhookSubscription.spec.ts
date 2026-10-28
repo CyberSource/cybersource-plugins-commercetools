@@ -18,7 +18,7 @@ test.serial('Test create webhook subscription response', async (t) => {
     }
 
     let midCredentials = multiMid.getMidCredentials(mid);
-    let response = await createWebhookSubscription.getCreateWebhookSubscriptionResponse(midCredentials);
+    let response = await createWebhookSubscription.getCreateDecisionManagerWebhookSubscriptionResponse(midCredentials);
     if (Constants.HTTP_SUCCESS_STATUS_CODE === response.httpCode) {
       t.is(response.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
     } else {
@@ -36,7 +36,7 @@ test.serial('Test create webhook subscription response', async (t) => {
 
 test.serial('Test create webhook subscription response with invalid mid credentials', async (t) => {
   try {
-    let response = await createWebhookSubscription.getCreateWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.invalidMidCredentials as any);
+    let response = await createWebhookSubscription.getCreateDecisionManagerWebhookSubscriptionResponse(DeleteWebhookSubscriptionConst.invalidMidCredentials as any);
     if (Constants.HTTP_SUCCESS_STATUS_CODE !== response.httpCode) {
       t.not(response.httpCode, Constants.HTTP_SUCCESS_STATUS_CODE);
     } else {

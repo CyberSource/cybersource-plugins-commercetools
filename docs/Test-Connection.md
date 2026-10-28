@@ -2,7 +2,7 @@
 
 ## Overview
 
-Test Connection uses the [Cybersource Transaction Search API](https://developer.cybersource.com/docs/cybs/en-us/txn-search/developer/all/rest/txn-search/txn-search-intro.html) to send request and verify configuration.
+Test Connection uses the [Visa Acceptance Solutions Transaction Search API](https://developer.cybersource.com/docs/cybs/en-us/txn-search/developer/all/rest/txn-search/txn-search-intro.html) to send request and verify configuration.
 
 This process ensures that:
 

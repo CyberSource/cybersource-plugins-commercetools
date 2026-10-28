@@ -1,11 +1,11 @@
-/* START GENAI */
+ 
  const configObject = {
-  authenticationType: 'http_signature',
+  authenticationType: 'jwt',
   runEnvironment: process.env.PAYMENT_GATEWAY_TEST_ENVIRONMENT || 'apitest.cybersource.com',
   merchantID: process.env.PAYMENT_GATEWAY_MERCHANT_ID || '',
   merchantKeyId: process.env.PAYMENT_GATEWAY_MERCHANT_KEY_ID || '',
   merchantsecretKey: process.env.PAYMENT_GATEWAY_MERCHANT_SECRET_KEY || '',
-/* END GENAI */
+ 
   logConfiguration: {
     enableLog: false,
   },
