@@ -7,7 +7,7 @@ import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
 import { AuthenticationError, errorHandler } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
-import isvApi from '../../utils/api/isvApi';
+import isvApi from '../../utils/api/IsvApi';
 import fraudProductResolver from './FraudProductResolver';
 
 const buildWebhookRequest = (organizationId: string, name: string, description: string, products: Array<{ productId: string; eventTypes: string[] }>, webhookPath: string, securityType: string, extraFields: Record<string, unknown> = {}) => ({

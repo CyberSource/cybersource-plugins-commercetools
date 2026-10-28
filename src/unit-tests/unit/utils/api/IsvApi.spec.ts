@@ -3,7 +3,7 @@ import restApi from 'cybersource-rest-client';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import cybersourceApi from '../../../../utils/api/isvApi';
+import cybersourceApi from '../../../../utils/api/IsvApi';
 import CybersourceApiConst from '../../../const/CybersourceApiConst';
 
 test.serial('Test get subscription details api function', async (t) => {
