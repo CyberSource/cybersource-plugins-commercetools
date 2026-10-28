@@ -7,7 +7,7 @@ import prepareFields from '../../requestBuilder/PrepareFields';
 import { MidCredentialsType } from '../../types/Types';
 import { AuthenticationError, errorHandler } from '../../utils/ErrorHandler';
 import paymentUtils from '../../utils/PaymentUtils';
-import isvApi from '../../utils/api/isvApi';
+import isvApi from '../../utils/api/IsvApi';
 
 /**
  * Deletes a webhook subscription.

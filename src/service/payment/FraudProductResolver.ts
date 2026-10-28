@@ -1,7 +1,7 @@
 import { FunctionConstant } from '../../constants/functionConstant';
 import { Constants } from '../../constants/paymentConstants';
 import paymentUtils from '../../utils/PaymentUtils';
-import isvApi from '../../utils/api/isvApi';
+import isvApi from '../../utils/api/IsvApi';
 
 /**
  * Product IDs that CyberSource may use for fraud/decision-manager entitlement; varies by MID.

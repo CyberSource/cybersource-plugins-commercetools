@@ -12,7 +12,7 @@ import { KeyResponse, MidCredentialsType, NotificationBodyType, WebhookVerificat
 import { AuthenticationError, errorHandler } from '../ErrorHandler';
 import paymentUtils from "../PaymentUtils";
 import commercetoolsApi from '../api/CommercetoolsApi';
-import isvApi from '../api/isvApi';
+import isvApi from '../api/IsvApi';
 import authenticationHelper from './AuthenticationHelper';
 
 /**
